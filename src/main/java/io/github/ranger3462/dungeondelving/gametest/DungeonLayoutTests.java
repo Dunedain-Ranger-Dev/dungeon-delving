@@ -95,7 +95,7 @@ public class DungeonLayoutTests {
                 Map.of(Cell.ORIGIN, new Room(Cell.ORIGIN, RoomKind.START, Rotation.CLOCKWISE_90, Mirror.LEFT_RIGHT),
                         east, new Room(east, RoomKind.COMMON, Rotation.CLOCKWISE_180, Mirror.FRONT_BACK)),
                 Set.of(Connection.between(Cell.ORIGIN, east)));
-        DungeonPieces pieces = DungeonPieces.load(level.getServer().getResourceManager());
+        DungeonPieces pieces = DungeonPieces.load(level.getServer());
         BlockPos center = helper.absolutePos(BlockPos.ZERO).above(120);
         DungeonBuilder.plan(layout, pieces, center, RandomSource.create(1)).forEach(placement -> DungeonBuilder.place(level, placement));
 

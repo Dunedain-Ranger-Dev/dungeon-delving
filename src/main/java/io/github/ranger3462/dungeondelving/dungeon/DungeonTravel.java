@@ -31,7 +31,7 @@ public final class DungeonTravel {
         BlockPos center = DungeonDimension.regionCenter(region);
 
         DungeonLayout layout = DungeonLayoutGenerator.generate(dungeon.getRandom(), roomCount);
-        DungeonPieces pieces = DungeonPieces.load(player.server.getResourceManager());
+        DungeonPieces pieces = DungeonPieces.load(player.server);
         List<Placement> placements = DungeonBuilder.plan(layout, pieces, center, dungeon.getRandom());
         DungeonBuilder.place(dungeon, placements.getFirst());
         DungeonBuildQueue.add(region, placements.subList(1, placements.size()));

@@ -1,5 +1,8 @@
 package io.github.ranger3462.dungeondelving.command;
 
+import static io.github.ranger3462.dungeondelving.command.Feedback.fail;
+import static io.github.ranger3462.dungeondelving.command.Feedback.tell;
+
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -11,11 +14,9 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonTravel;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
-import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -79,25 +80,5 @@ public final class DevCommands {
                 + regions.freeRegions().size() + " free " + regions.freeRegions() + ", "
                 + regions.releasedRegions().size() + " waiting to be wiped " + regions.releasedRegions() + ")");
         return 1;
-    }
-
-    /**
-     * Messages the player running the command directly. Minecraft hides normal command feedback when a command runs
-     * inside a function or command block, so dev functions would otherwise give no response.
-     */
-    private static void tell(CommandSourceStack source, String message) {
-        send(source, Component.literal(message).withStyle(ChatFormatting.GOLD));
-    }
-
-    private static void fail(CommandSourceStack source, String message) {
-        send(source, Component.literal(message).withStyle(ChatFormatting.RED));
-    }
-
-    private static void send(CommandSourceStack source, Component message) {
-        if (source.getEntity() instanceof ServerPlayer player) {
-            player.sendSystemMessage(message);
-        } else {
-            source.sendSystemMessage(message);
-        }
     }
 }
