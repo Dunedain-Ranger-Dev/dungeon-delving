@@ -15,7 +15,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 /**
  * A simple box of blocks that can be saved in the vanilla structure (.nbt) format, the same format a structure block
- * produces. Every position starts as air, so placing the piece clears whatever was there.
+ * produces. Every position starts as air, so placing the piece clears whatever was there, unless it is marked as
+ * untouched with {@link #untouched}, which leaves the world as it was (like structure void).
  */
 public class PieceBuilder {
     private final int sizeX;
@@ -48,6 +49,18 @@ public class PieceBuilder {
         return this;
     }
 
+    /** Marks the inclusive box between the two corners as untouched: placing the piece leaves those blocks alone. */
+    public PieceBuilder untouched(int x1, int y1, int z1, int x2, int y2, int z2) {
+        for (int x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
+            for (int y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
+                for (int z = Math.min(z1, z2); z <= Math.max(z1, z2); z++) {
+                    blocks[index(x, y, z)] = null;
+                }
+            }
+        }
+        return this;
+    }
+
     /** Fills the inclusive box between the two corners. */
     public PieceBuilder fill(int x1, int y1, int z1, int x2, int y2, int z2, Block block) {
         for (int x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
@@ -67,6 +80,9 @@ public class PieceBuilder {
             for (int z = 0; z < sizeZ; z++) {
                 for (int x = 0; x < sizeX; x++) {
                     BlockState state = blocks[index(x, y, z)];
+                    if (state == null) {
+                        continue; // Untouched positions are simply left out of the structure.
+                    }
                     int stateId = palette.computeIfAbsent(state, s -> palette.size());
                     CompoundTag entry = new CompoundTag();
                     entry.put("pos", intList(x, y, z));

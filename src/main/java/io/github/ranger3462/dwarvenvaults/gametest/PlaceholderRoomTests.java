@@ -52,27 +52,25 @@ public class PlaceholderRoomTests {
     public static void tunnel(GameTestHelper helper) {
         Piece piece = Piece.of(helper);
         piece.checkSize(TUNNEL_WIDTH, TUNNEL_HEIGHT, TUNNEL_LENGTH);
-        for (int z : new int[] { 0, TUNNEL_LENGTH - 1 }) {
-            for (int x = TUNNEL_DOOR_START; x < TUNNEL_DOOR_START + DOOR_WIDTH; x++) {
-                piece.checkSolid(x, 0, z, "tunnel floor under doorway");
-                for (int y = DOOR_BOTTOM_Y; y < DOOR_BOTTOM_Y + DOOR_HEIGHT; y++) {
-                    piece.checkAir(x, y, z, "tunnel end must be open where it meets a doorway");
+        int lastZ = TUNNEL_LENGTH - 1;
+        // A doorway wall at each end: solid except for the doorway opening.
+        for (int z : new int[] { 0, lastZ }) {
+            for (int x = 0; x < WALL_LENGTH; x++) {
+                for (int y = 0; y < WALL_HEIGHT; y++) {
+                    if (inDoorSpan(x) && inDoorHeight(y)) {
+                        piece.checkAir(x, y, z, "doorway must be open");
+                    } else {
+                        piece.checkSolid(x, y, z, "doorway wall must be solid outside the " + DOOR_WIDTH + "x" + DOOR_HEIGHT + " opening");
+                    }
                 }
             }
         }
-        helper.succeed();
-    }
-
-    @GameTest(template = "vault/wall_door_placeholder")
-    public static void doorwayWall(GameTestHelper helper) {
-        Piece piece = Piece.of(helper);
-        piece.checkSize(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS);
-        for (int x = 0; x < WALL_LENGTH; x++) {
-            for (int y = 0; y < WALL_HEIGHT; y++) {
-                if (inWallDoorSpan(x) && inDoorHeight(y)) {
-                    piece.checkAir(x, y, 0, "doorway must be open");
-                } else {
-                    piece.checkSolid(x, y, 0, "doorway wall must be solid outside the " + DOOR_WIDTH + "x" + DOOR_HEIGHT + " opening");
+        // The corridor between them: walkable all the way through the doorway span.
+        for (int z = 1; z < lastZ; z++) {
+            for (int x = DOOR_START; x < DOOR_START + DOOR_WIDTH; x++) {
+                piece.checkSolid(x, 0, z, "corridor must have a floor");
+                for (int y = DOOR_BOTTOM_Y; y < DOOR_BOTTOM_Y + DOOR_HEIGHT; y++) {
+                    piece.checkAir(x, y, z, "corridor must be open in line with the doorways");
                 }
             }
         }
@@ -91,19 +89,24 @@ public class PlaceholderRoomTests {
         helper.succeed();
     }
 
-    /** Checks a room's size, that it has a floor and ceiling, and that the outer ring is left empty for walls. */
+    /** Checks a room's size, that it has a full floor and ceiling, and that each doorway's spot on its edge is clear. */
     private static void checkRoom(GameTestHelper helper) {
         Piece piece = Piece.of(helper);
         piece.checkSize(ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE);
+        int max = ROOM_SIZE - 1;
         for (int x = 0; x < ROOM_SIZE; x++) {
             for (int z = 0; z < ROOM_SIZE; z++) {
                 piece.checkSolid(x, 0, z, "room must have a full floor");
                 piece.checkSolid(x, ROOM_HEIGHT - 1, z, "room must have a full ceiling");
-                if (inRoomWallRing(x, z)) {
-                    for (int y = 1; y < ROOM_HEIGHT - 1; y++) {
-                        piece.checkAir(x, y, z, "outer ring must stay empty for walls");
-                    }
-                }
+            }
+        }
+        // Any face can get a doorway, so the doorway spot on every edge must stay clear.
+        for (int i = DOOR_START; i < DOOR_START + DOOR_WIDTH; i++) {
+            for (int y = DOOR_BOTTOM_Y; y < DOOR_BOTTOM_Y + DOOR_HEIGHT; y++) {
+                piece.checkAir(0, y, i, "west doorway spot must be clear");
+                piece.checkAir(max, y, i, "east doorway spot must be clear");
+                piece.checkAir(i, y, 0, "north doorway spot must be clear");
+                piece.checkAir(i, y, max, "south doorway spot must be clear");
             }
         }
         helper.succeed();

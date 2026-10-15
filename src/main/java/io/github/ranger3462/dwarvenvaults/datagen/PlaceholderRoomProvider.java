@@ -24,8 +24,8 @@ import net.minecraft.world.level.block.Blocks;
  * Generates simple test pieces that follow {@link io.github.ranger3462.dwarvenvaults.vault.RoomSpec}, so vault
  * generation can be built and tested before hand-built rooms exist.
  * <p>
- * Each kind of piece has its own material so alignment is easy to check in-game: rooms are light gray, tunnels and
- * doorway walls are cyan, and caps are red. Gold blocks stand in for markers.
+ * Each kind of piece has its own material so alignment is easy to check in-game: rooms are light gray, tunnels
+ * (including their doorway walls) are cyan, and caps are red. Gold blocks stand in for markers.
  * <p>
  * Output goes to {@code data/dwarvenvaults/structure/vault/}. Every file name ends in {@code _placeholder} so these can
  * be filtered out once real rooms take over.
@@ -58,7 +58,6 @@ public class PlaceholderRoomProvider implements DataProvider {
         pieces.put("common_walls_placeholder", wallsRoom());
         pieces.put("objective_placeholder", objectiveRoom());
         pieces.put("tunnel_placeholder", tunnel());
-        pieces.put("wall_door_placeholder", doorwayWall());
         pieces.put("wall_cap_placeholder", capWall());
         return pieces;
     }
@@ -169,36 +168,38 @@ public class PlaceholderRoomProvider implements DataProvider {
         return room;
     }
 
-    // --- Walls and tunnels ---
+    // --- Caps and tunnels ---
 
-    /** A room face with no exit. Runs along x, 1 deep along z. */
+    /** A wall covering one room face from the outside, with no exit. Runs along x, 1 deep along z. */
     private static PieceBuilder capWall() {
         PieceBuilder wall = new PieceBuilder(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS);
         wall.fill(0, 0, 0, WALL_LENGTH - 1, WALL_HEIGHT - 1, WALL_THICKNESS - 1, CAP);
         return wall;
     }
 
-    /** A room face with a doorway that a tunnel attaches to. Runs along x, 1 deep along z. */
-    private static PieceBuilder doorwayWall() {
-        PieceBuilder wall = new PieceBuilder(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS);
-        wall.fill(0, 0, 0, WALL_LENGTH - 1, WALL_HEIGHT - 1, WALL_THICKNESS - 1, TUNNEL);
-        wall.fill(WALL_DOOR_START, DOOR_BOTTOM_Y, 0, WALL_DOOR_START + DOOR_WIDTH - 1, DOOR_BOTTOM_Y + DOOR_HEIGHT - 1,
-                WALL_THICKNESS - 1, Blocks.AIR);
-        return wall;
-    }
-
+    /**
+     * A doorway wall at each end with a corridor between them, running along z. Only the walls and corridor are
+     * placed; the rest of the piece's box is left untouched.
+     */
     private static PieceBuilder tunnel() {
-        // Runs along z. Both ends are open; the doorway walls they connect to frame the opening.
         PieceBuilder tunnel = new PieceBuilder(TUNNEL_WIDTH, TUNNEL_HEIGHT, TUNNEL_LENGTH);
-        int maxX = TUNNEL_WIDTH - 1;
-        int maxY = TUNNEL_HEIGHT - 1;
-        int maxZ = TUNNEL_LENGTH - 1;
-        tunnel.fill(0, 0, 0, maxX, 0, maxZ, TUNNEL);
-        tunnel.fill(0, maxY, 0, maxX, maxY, maxZ, TUNNEL);
-        tunnel.fill(0, 1, 0, 0, maxY - 1, maxZ, TUNNEL);
-        tunnel.fill(maxX, 1, 0, maxX, maxY - 1, maxZ, TUNNEL);
-        for (int z = 4; z < TUNNEL_LENGTH; z += 6) {
-            tunnel.set(TUNNEL_WIDTH / 2, maxY, z, LIGHT);
+        int lastZ = TUNNEL_LENGTH - 1;
+        tunnel.untouched(0, 0, 0, TUNNEL_WIDTH - 1, TUNNEL_HEIGHT - 1, lastZ);
+
+        int doorEnd = DOOR_START + DOOR_WIDTH - 1;
+        int doorTop = DOOR_BOTTOM_Y + DOOR_HEIGHT - 1;
+        for (int z : new int[] { 0, lastZ }) {
+            tunnel.fill(0, 0, z, WALL_LENGTH - 1, WALL_HEIGHT - 1, z, TUNNEL);
+            tunnel.fill(DOOR_START, DOOR_BOTTOM_Y, z, doorEnd, doorTop, z, Blocks.AIR);
+        }
+
+        int x1 = CORRIDOR_START;
+        int x2 = CORRIDOR_START + CORRIDOR_WIDTH - 1;
+        int top = CORRIDOR_HEIGHT - 1;
+        tunnel.fill(x1, 0, 1, x2, top, lastZ - 1, TUNNEL);
+        tunnel.fill(x1 + 1, 1, 1, x2 - 1, top - 1, lastZ - 1, Blocks.AIR);
+        for (int z = 4; z < lastZ; z += 6) {
+            tunnel.set(TUNNEL_WIDTH / 2, top, z, LIGHT);
         }
         return tunnel;
     }
