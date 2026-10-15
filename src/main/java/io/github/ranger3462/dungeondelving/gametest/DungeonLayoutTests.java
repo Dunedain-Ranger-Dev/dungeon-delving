@@ -2,6 +2,8 @@ package io.github.ranger3462.dungeondelving.gametest;
 
 import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.*;
 
+import java.util.ArrayDeque;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,6 +17,7 @@ import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.RoomKind
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -137,11 +140,11 @@ public class DungeonLayoutTests {
     }
 
     /**
-     * Builds a two-room dungeon with its bedrock shell and checks there is bedrock under, over and around the whole
-     * thing, and none inside the rooms or tunnel.
+     * Builds two rooms joined east-west with their bedrock skin and checks there is bedrock directly behind every
+     * outer surface, while the space beside the tunnel corridor and the insides of rooms and tunnels stay open.
      */
     @GameTest(template = ANY_TEMPLATE)
-    public static void shellEnclosesDungeon(GameTestHelper helper) {
+    public static void bedrockSkinSealsDungeon(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Cell east = new Cell(1, 0);
         DungeonLayout layout = new DungeonLayout(
@@ -155,27 +158,84 @@ public class DungeonLayoutTests {
 
         BlockPos a = DungeonBuilder.roomMin(center, Cell.ORIGIN);
         BlockPos b = DungeonBuilder.roomMin(center, east);
-        BlockPos shellMin = a.offset(-2, -1, -2);
-        BlockPos shellMax = b.offset(ROOM_SIZE + 1, ROOM_HEIGHT, ROOM_SIZE + 1);
+        int mid = ROOM_SIZE / 2;
+        int y = 5;
+        int corridorX = a.getX() + ROOM_SIZE + TUNNEL_LENGTH / 2;
         try {
-            for (int x = shellMin.getX(); x <= shellMax.getX(); x++) {
-                for (int z = shellMin.getZ(); z <= shellMax.getZ(); z++) {
-                    bedrock(helper, new BlockPos(x, shellMin.getY(), z), "shell floor");
-                    bedrock(helper, new BlockPos(x, shellMax.getY(), z), "shell ceiling");
-                }
-            }
-            for (int y = shellMin.getY(); y <= shellMax.getY(); y++) {
-                bedrock(helper, new BlockPos(shellMin.getX(), y, a.getZ() + ROOM_SIZE / 2), "west shell wall");
-                bedrock(helper, new BlockPos(shellMax.getX(), y, a.getZ() + ROOM_SIZE / 2), "east shell wall");
-                bedrock(helper, new BlockPos(a.getX() + ROOM_SIZE / 2, y, shellMin.getZ()), "north shell wall");
-                bedrock(helper, new BlockPos(b.getX() + ROOM_SIZE / 2, y, shellMax.getZ()), "south shell wall");
-            }
-            helper.assertFalse(level.getBlockState(a.offset(ROOM_SIZE / 2, 0, ROOM_SIZE / 2)).is(Blocks.BEDROCK), "room floors should stay breakable");
-            helper.assertTrue(level.getBlockState(a.offset(ROOM_SIZE / 2, 4, ROOM_SIZE / 2)).isAir(), "rooms should stay open inside");
-            helper.assertTrue(level.getBlockState(new BlockPos(a.getX() + ROOM_SIZE + TUNNEL_LENGTH / 2, a.getY() + DOOR_BOTTOM_Y, a.getZ() + DOOR_START + 2)).isAir(),
+            // Rooms: under the floor and over the ceiling, reaching one block past the edges to seal corners.
+            bedrock(helper, a.offset(mid, -1, mid), "under the room floor");
+            bedrock(helper, a.offset(-1, -1, -1), "under the corner between two caps");
+            bedrock(helper, a.offset(mid, ROOM_HEIGHT, mid), "over the room ceiling");
+            // Caps: directly behind each one.
+            bedrock(helper, a.offset(mid, y, -2), "behind the start room's north cap");
+            bedrock(helper, a.offset(-2, y, mid), "behind the start room's west cap");
+            bedrock(helper, b.offset(ROOM_SIZE + 1, y, mid), "behind the east room's east cap");
+            // Tunnel: around the corridor and behind the end walls.
+            bedrock(helper, new BlockPos(corridorX, a.getY() + y, a.getZ() + CORRIDOR_START - 1), "beside the corridor");
+            bedrock(helper, new BlockPos(corridorX, a.getY() + y, a.getZ() + CORRIDOR_START + CORRIDOR_WIDTH), "beside the corridor");
+            bedrock(helper, new BlockPos(corridorX, a.getY() - 1, a.getZ() + mid), "under the corridor");
+            bedrock(helper, new BlockPos(corridorX, a.getY() + CORRIDOR_HEIGHT, a.getZ() + mid), "over the corridor");
+            bedrock(helper, a.offset(ROOM_SIZE + 1, y, 3), "behind the tunnel's end wall");
+            bedrock(helper, b.offset(-2, y, ROOM_SIZE - 3), "behind the tunnel's other end wall");
+
+            // A tight skin, not a solid block: the space beside the corridor and inside pieces stays open.
+            helper.assertTrue(level.getBlockState(new BlockPos(corridorX, a.getY() + y, a.getZ() + 3)).isAir(), "the space beside the corridor should stay empty");
+            helper.assertFalse(level.getBlockState(a.offset(mid, 0, mid)).is(Blocks.BEDROCK), "room floors should stay breakable");
+            helper.assertTrue(level.getBlockState(a.offset(mid, 4, mid)).isAir(), "rooms should stay open inside");
+            helper.assertTrue(level.getBlockState(new BlockPos(corridorX, a.getY() + DOOR_BOTTOM_Y, a.getZ() + DOOR_START + 2)).isAir(),
                     "the tunnel should stay open inside");
         } finally {
-            clear(level, shellMin, shellMax);
+            clear(level, a.offset(-2, -1, -2), b.offset(ROOM_SIZE + 1, ROOM_HEIGHT, ROOM_SIZE + 1));
+        }
+        helper.succeed();
+    }
+
+    /**
+     * Treats every block that isn't bedrock as breakable and floods outward from inside the start room. With an
+     * L-shaped layout (tunnels in both directions, caps and tunnels meeting at corners), the flood must never escape.
+     */
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 200)
+    public static void bedrockSkinIsAirtight(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        Cell east = new Cell(1, 0);
+        Cell south = new Cell(0, 1);
+        DungeonLayout layout = new DungeonLayout(
+                Map.of(Cell.ORIGIN, new Room(Cell.ORIGIN, RoomKind.START, Rotation.NONE, Mirror.NONE),
+                        east, new Room(east, RoomKind.COMMON, Rotation.CLOCKWISE_90, Mirror.NONE),
+                        south, new Room(south, RoomKind.OBJECTIVE, Rotation.NONE, Mirror.LEFT_RIGHT)),
+                Set.of(Connection.between(Cell.ORIGIN, east), Connection.between(Cell.ORIGIN, south)));
+        DungeonPieces pieces = DungeonPieces.load(level.getServer());
+        BlockPos center = helper.absolutePos(BlockPos.ZERO).above(120);
+        DungeonBuilder.plan(layout, pieces, center, RandomSource.create(1)).forEach(placement -> DungeonBuilder.place(level, placement));
+        DungeonBuilder.shell(layout, center).forEach(box -> DungeonBuilder.fillShell(level, box));
+
+        BlockPos a = DungeonBuilder.roomMin(center, Cell.ORIGIN);
+        BlockPos far = DungeonBuilder.roomMin(center, new Cell(1, 1)).offset(ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE);
+        BlockPos min = a.offset(-4, -3, -4);
+        BlockPos max = far.offset(4, 3, 4);
+        try {
+            Set<BlockPos> seen = new HashSet<>();
+            ArrayDeque<BlockPos> queue = new ArrayDeque<>();
+            BlockPos start = a.offset(ROOM_SIZE / 2, 4, ROOM_SIZE / 2);
+            seen.add(start);
+            queue.add(start);
+            while (!queue.isEmpty()) {
+                BlockPos pos = queue.poll();
+                if (pos.getX() <= min.getX() || pos.getY() <= min.getY() || pos.getZ() <= min.getZ()
+                        || pos.getX() >= max.getX() || pos.getY() >= max.getY() || pos.getZ() >= max.getZ()) {
+                    helper.fail("The bedrock skin leaks: reached " + pos.toShortString() + " from inside the start room");
+                }
+                for (Direction direction : Direction.values()) {
+                    BlockPos next = pos.relative(direction);
+                    if (!seen.contains(next) && !level.getBlockState(next).is(Blocks.BEDROCK)) {
+                        seen.add(next);
+                        queue.add(next);
+                    }
+                }
+            }
+            helper.assertTrue(seen.size() > ROOM_SIZE * ROOM_SIZE, "the flood should have filled the dungeon's inside");
+        } finally {
+            clear(level, min, max);
         }
         helper.succeed();
     }

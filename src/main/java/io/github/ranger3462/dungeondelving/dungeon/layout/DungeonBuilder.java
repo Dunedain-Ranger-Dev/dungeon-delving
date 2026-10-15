@@ -1,8 +1,12 @@
 package io.github.ranger3462.dungeondelving.dungeon.layout;
 
+import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.CORRIDOR_HEIGHT;
+import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.CORRIDOR_START;
+import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.CORRIDOR_WIDTH;
 import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.GRID_PITCH;
 import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.ROOM_HEIGHT;
 import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.ROOM_SIZE;
+import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.TUNNEL_LENGTH;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -29,7 +33,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 
 /**
  * Turns a {@link DungeonLayout} into concrete piece placements in the world: a room per cell, a tunnel per
- * connection, a cap on every room face with no tunnel, and a bedrock shell around it all. The start room sits
+ * connection, a cap on every room face with no tunnel, and a bedrock skin behind every outer surface. The start room sits
  * centered on {@code center}.
  */
 public final class DungeonBuilder {
@@ -94,53 +98,68 @@ public final class DungeonBuilder {
         return placements;
     }
 
-    /** Bedrock shell sections are filled at most this many blocks along x and z at a time, to spread the work out. */
-    private static final int SHELL_SECTION = 32;
-
     /**
-     * The bedrock shell around a layout: a floor under the whole dungeon, a ceiling over it, and walls around its
-     * outer edge, just outside the caps. Pieces stay breakable, but a hole never leads into the void. Returned as
-     * small boxes so they can be filled a few per tick.
+     * The bedrock skin around a layout: one layer directly behind every outer surface (under room floors, over room
+     * ceilings, behind caps, around tunnel corridors, and behind tunnel end walls). Each layer reaches one block past
+     * its edges, so the open corners between walls are sealed too. Pieces stay breakable, but breaking through one
+     * always leads to bedrock, never into the void. Returned as small boxes so they can be filled a few per tick.
      */
     public static List<BoundingBox> shell(DungeonLayout layout, BlockPos center) {
-        int minX = Integer.MAX_VALUE;
-        int minZ = Integer.MAX_VALUE;
-        int maxX = Integer.MIN_VALUE;
-        int maxZ = Integer.MIN_VALUE;
-        for (Cell cell : layout.rooms().keySet()) {
-            BlockPos min = roomMin(center, cell);
-            minX = Math.min(minX, min.getX());
-            minZ = Math.min(minZ, min.getZ());
-            maxX = Math.max(maxX, min.getX() + ROOM_SIZE - 1);
-            maxZ = Math.max(maxZ, min.getZ() + ROOM_SIZE - 1);
-        }
-        // Caps sit one block outside the rooms; the shell goes one block beyond that.
-        minX -= 2;
-        minZ -= 2;
-        maxX += 2;
-        maxZ += 2;
-        int bottom = center.getY() - 1;
-        int top = center.getY() + ROOM_HEIGHT;
-
         List<BoundingBox> boxes = new ArrayList<>();
-        for (int y : new int[] { bottom, top }) {
-            for (int x = minX; x <= maxX; x += SHELL_SECTION) {
-                for (int z = minZ; z <= maxZ; z += SHELL_SECTION) {
-                    boxes.add(new BoundingBox(x, y, z, Math.min(x + SHELL_SECTION - 1, maxX), y, Math.min(z + SHELL_SECTION - 1, maxZ)));
+        int below = -1;
+        int above = ROOM_HEIGHT;
+        int edge = ROOM_SIZE; // One block past a room's far side.
+
+        for (Room room : layout.rooms().values()) {
+            BlockPos min = roomMin(center, room.cell());
+            boxes.add(box(min, -1, below, -1, edge, below, edge));
+            boxes.add(box(min, -1, above, -1, edge, above, edge));
+            for (Direction direction : new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST }) {
+                if (layout.connected(room.cell(), direction)) {
+                    continue;
                 }
+                // Directly behind the cap, which sits one block outside the room.
+                boxes.add(switch (direction) {
+                    case NORTH -> box(min, -1, below, -2, edge, above, -2);
+                    case SOUTH -> box(min, -1, below, edge + 1, edge, above, edge + 1);
+                    case WEST -> box(min, -2, below, -1, -2, above, edge);
+                    default -> box(min, edge + 1, below, -1, edge + 1, above, edge);
+                });
             }
         }
-        for (int x = minX; x <= maxX; x += SHELL_SECTION) {
-            int x2 = Math.min(x + SHELL_SECTION - 1, maxX);
-            boxes.add(new BoundingBox(x, bottom, minZ, x2, top, minZ));
-            boxes.add(new BoundingBox(x, bottom, maxZ, x2, top, maxZ));
-        }
-        for (int z = minZ; z <= maxZ; z += SHELL_SECTION) {
-            int z2 = Math.min(z + SHELL_SECTION - 1, maxZ);
-            boxes.add(new BoundingBox(minX, bottom, z, minX, top, z2));
-            boxes.add(new BoundingBox(maxX, bottom, z, maxX, top, z2));
+
+        for (Connection connection : layout.connections()) {
+            BlockPos fromMin = roomMin(center, connection.from());
+            // Work in the tunnel's own frame (corridor along z), then turn it to match the tunnel's direction.
+            BlockPos tunnelMin = connection.alongX() ? fromMin.offset(ROOM_SIZE, 0, 0) : fromMin.offset(0, 0, ROOM_SIZE);
+            boolean turn = connection.alongX();
+            int x1 = CORRIDOR_START - 1;
+            int x2 = CORRIDOR_START + CORRIDOR_WIDTH;
+            int z1 = 1;
+            int z2 = TUNNEL_LENGTH - 2;
+            int top = CORRIDOR_HEIGHT;
+            // Around the corridor: under, over, and both sides.
+            boxes.add(tunnelBox(tunnelMin, turn, x1, below, z1, x2, below, z2));
+            boxes.add(tunnelBox(tunnelMin, turn, x1, top, z1, x2, top, z2));
+            boxes.add(tunnelBox(tunnelMin, turn, x1, below, z1, x1, top, z2));
+            boxes.add(tunnelBox(tunnelMin, turn, x2, below, z1, x2, top, z2));
+            // Behind each end wall, wherever the corridor isn't: beside it, and above it.
+            for (int z : new int[] { z1, z2 }) {
+                boxes.add(tunnelBox(tunnelMin, turn, -1, below, z, x1, above, z));
+                boxes.add(tunnelBox(tunnelMin, turn, x2, below, z, edge, above, z));
+                boxes.add(tunnelBox(tunnelMin, turn, x1, top, z, x2, above, z));
+            }
         }
         return boxes;
+    }
+
+    private static BoundingBox box(BlockPos origin, int x1, int y1, int z1, int x2, int y2, int z2) {
+        return BoundingBox.fromCorners(origin.offset(x1, y1, z1), origin.offset(x2, y2, z2));
+    }
+
+    /** A box given in a tunnel's own frame (x across, z along the corridor), placed in the world. */
+    private static BoundingBox tunnelBox(BlockPos tunnelMin, boolean turn, int x1, int y1, int z1, int x2, int y2, int z2) {
+        return turn ? box(tunnelMin, z1, y1, x1, z2, y2, x2) : box(tunnelMin, x1, y1, z1, x2, y2, z2);
     }
 
     /** Fills one shell section with bedrock. */
