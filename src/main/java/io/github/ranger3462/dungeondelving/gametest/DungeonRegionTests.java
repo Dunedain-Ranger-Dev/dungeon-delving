@@ -76,7 +76,7 @@ public class DungeonRegionTests {
         regions.startRun(run(player, regions.allocate()));
         regions.release(regions.allocate());
 
-        DungeonRegions loaded = DungeonRegions.load(regions.save(new CompoundTag()));
+        DungeonRegions loaded = DungeonRegions.load(regions.save(new CompoundTag(), helper.getLevel().registryAccess()), helper.getLevel().registryAccess());
         helper.assertTrue(loaded.regionsCreated() == 2, "region count should be saved");
         helper.assertTrue(loaded.run(player).map(DungeonRun::region).orElse(-1) == 0, "active runs should be saved");
         helper.assertTrue(loaded.releasedRegions().contains(1), "released regions should be saved");

@@ -13,5 +13,8 @@
   "block.dungeondelving.objective_marker": "Objective Marker",
   "dungeondelving.configuration.lootMarkerChance": "Loot marker chest chance",
   "dungeondelving.configuration.resourceMarkerChance": "Resource marker ore chance",
-  "dungeondelving.configuration.maxMobsPerMarker": "Max mobs per mob marker"
+  "dungeondelving.configuration.maxMobsPerMarker": "Max mobs per mob marker",
+  "item.dungeondelving.dungeon_bag": "Dungeon Bag",
+  "item.dungeondelving.dungeon_bag.tooltip": "Holds what you find in this dungeon. Right-click to look inside.",
+  "container.dungeondelving.dungeon_bag": "Dungeon Bag (%s/%s slots)"
 }

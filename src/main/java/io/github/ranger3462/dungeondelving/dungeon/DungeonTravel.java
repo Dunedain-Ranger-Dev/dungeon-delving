@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import io.github.ranger3462.dungeondelving.Config;
+import io.github.ranger3462.dungeondelving.dungeon.bag.DungeonBag;
+import io.github.ranger3462.dungeondelving.dungeon.bag.DungeonBagItem;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuildQueue;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder.Placement;
@@ -16,6 +18,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 
 /**
@@ -52,17 +55,25 @@ public final class DungeonTravel {
         DungeonRun run = new DungeonRun(player.getUUID(), region, player.level().dimension(), player.getX(), player.getY(),
                 player.getZ(), player.getYRot(), player.getXRot());
         regions.startRun(run);
+        regions.startBag(player.getUUID(), new DungeonBag(DungeonBag.slotsForLevel(player.getData(ModRegistries.BAG_LEVEL))));
         player.teleportTo(dungeon, center.getX() + 0.5, center.getY() + 1, center.getZ() + ARRIVAL_OFFSET + 0.5, 180.0f, 0.0f);
+        giveBagItem(player);
         return new Entry(run, layout);
     }
 
-    /** Ends the player's run successfully: they keep their dungeon loot and go back to where they entered from. */
+    /**
+     * Ends the player's run successfully: they go back to where they entered from, their bag is emptied into their
+     * inventory (anything that doesn't fit drops at their feet), and their dungeon loot becomes ordinary items.
+     */
     public static Optional<DungeonRun> exit(ServerPlayer player) {
+        Optional<DungeonBag> bag = DungeonRegions.get().takeBag(player.getUUID());
         Optional<DungeonRun> ended = end(player);
         ended.ifPresent(run -> {
-            DungeonLoot.claim(player);
             returnPlayer(player, run);
-            player.sendSystemMessage(Component.literal("You made it out with your loot.").withStyle(ChatFormatting.GREEN));
+            int stacks = bag.map(b -> emptyIntoInventory(player, b)).orElse(0);
+            DungeonLoot.claim(player);
+            player.sendSystemMessage(Component.literal(stacks == 0 ? "You made it out, though your bag was empty."
+                    : "You made it out with " + stacks + " stack" + (stacks == 1 ? "" : "s") + " of loot.").withStyle(ChatFormatting.GREEN));
         });
         return ended;
     }
@@ -72,9 +83,10 @@ public final class DungeonTravel {
      * damaged, and they're sent back to where they entered from.
      */
     public static Optional<DungeonRun> fail(ServerPlayer player, String reason) {
+        int bagged = DungeonRegions.get().takeBag(player.getUUID()).map(bag -> bag.takeAll().size()).orElse(0);
         Optional<DungeonRun> ended = end(player);
         ended.ifPresent(run -> {
-            int lost = DungeonLoot.applyFailurePenalty(player, Config.FAILURE_GEAR_DAMAGE.get());
+            int lost = bagged + DungeonLoot.applyFailurePenalty(player, Config.FAILURE_GEAR_DAMAGE.get());
             returnPlayer(player, run);
             player.sendSystemMessage(Component.literal(reason + " " + penaltyText(lost)).withStyle(ChatFormatting.RED));
         });
@@ -88,8 +100,10 @@ public final class DungeonTravel {
         return Config.FAILURE_GEAR_DAMAGE.get() > 0 ? loot + ", and your gear was damaged." : loot + ".";
     }
 
-    /** Ends the player's run, stopping any building still queued for its region. */
+    /** Ends the player's run, stopping any building still queued for its region and taking back the bag item. */
     public static Optional<DungeonRun> end(ServerPlayer player) {
+        DungeonBagItem.removeAll(player.getInventory());
+        DungeonBagItem.removeAll(player.getEnderChestInventory());
         Optional<DungeonRun> ended = DungeonRegions.get().endRun(player.getUUID());
         ended.ifPresent(run -> {
             if (DungeonRegions.get().runs().stream().noneMatch(other -> other.region() == run.region())) {
@@ -97,6 +111,26 @@ public final class DungeonTravel {
             }
         });
         return ended;
+    }
+
+    /** Moves everything from a bag into the player's inventory, dropping what doesn't fit. Returns the stack count. */
+    public static int emptyIntoInventory(ServerPlayer player, DungeonBag bag) {
+        int stacks = 0;
+        for (ItemStack stack : bag.takeAll()) {
+            stacks++;
+            if (!player.getInventory().add(stack) && !stack.isEmpty()) {
+                player.drop(stack, false);
+            }
+        }
+        player.inventoryMenu.broadcastChanges();
+        return stacks;
+    }
+
+    private static void giveBagItem(ServerPlayer player) {
+        ItemStack bag = new ItemStack(ModRegistries.DUNGEON_BAG.get());
+        if (!player.getInventory().add(bag)) {
+            player.drop(bag, false); // Inventory full: drop it where the player can pick it back up.
+        }
     }
 
     private static void returnPlayer(ServerPlayer player, DungeonRun run) {

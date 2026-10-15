@@ -1,11 +1,13 @@
 package io.github.ranger3462.dungeondelving.registry;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.block.DungeonExitBlock;
 import io.github.ranger3462.dungeondelving.block.DungeonGateBlock;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
+import io.github.ranger3462.dungeondelving.dungeon.bag.DungeonBagItem;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
@@ -14,11 +16,13 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -32,6 +36,7 @@ public final class ModRegistries {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(DungeonDelving.MODID);
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(DungeonDelving.MODID);
     public static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, DungeonDelving.MODID);
+    public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES, DungeonDelving.MODID);
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DungeonDelving.MODID);
     public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> LOOT_MODIFIERS =
             DeferredRegister.create(NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, DungeonDelving.MODID);
@@ -52,6 +57,14 @@ public final class ModRegistries {
     public static final DeferredBlock<Block> MOB_MARKER = marker("mob_marker", MapColor.STONE);
     public static final DeferredBlock<Block> RESOURCE_MARKER = marker("resource_marker", MapColor.RAW_IRON);
     public static final DeferredBlock<Block> OBJECTIVE_MARKER = marker("objective_marker", MapColor.METAL);
+
+    /** Given on entering a dungeon; right-click to see what you've found. */
+    public static final DeferredItem<DungeonBagItem> DUNGEON_BAG = ITEMS.registerItem("dungeon_bag", DungeonBagItem::new,
+            new Item.Properties().stacksTo(1));
+
+    /** How many times a player has upgraded their dungeon bag (DD-44). Kept for life, including through death. */
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<Integer>> BAG_LEVEL = ATTACHMENTS.register("bag_level",
+            () -> AttachmentType.builder(() -> 0).serialize(Codec.INT).copyOnDeath().build());
 
     /** Marks an item as found in the current dungeon run. Removed when the player exits; such items are lost on death. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> DUNGEON_LOOT = COMPONENTS.registerComponentType("dungeon_loot",
@@ -89,6 +102,7 @@ public final class ModRegistries {
         ITEMS.register(modEventBus);
         COMPONENTS.register(modEventBus);
         TABS.register(modEventBus);
+        ATTACHMENTS.register(modEventBus);
         LOOT_MODIFIERS.register(modEventBus);
         modEventBus.addListener(ModRegistries::addToCreativeTabs);
     }

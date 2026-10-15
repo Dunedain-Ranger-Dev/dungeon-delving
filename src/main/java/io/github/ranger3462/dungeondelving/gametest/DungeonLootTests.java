@@ -89,7 +89,7 @@ public class DungeonLootTests {
 
         DungeonRegions regions = new DungeonRegions();
         regions.holdInventory(before.getUUID(), before.getInventory().save(new ListTag()));
-        DungeonRegions loaded = DungeonRegions.load(regions.save(new CompoundTag()));
+        DungeonRegions loaded = DungeonRegions.load(regions.save(new CompoundTag(), helper.getLevel().registryAccess()), helper.getLevel().registryAccess());
 
         ServerPlayer after = player(helper);
         loaded.takeHeldInventory(before.getUUID()).ifPresent(held -> after.getInventory().load(held));
