@@ -1,4 +1,4 @@
-package io.github.ranger3462.dwarvenvaults.vault;
+package io.github.ranger3462.dungeondelving.vault;
 
 /**
  * The fixed dimensions every vault piece must follow, so any room fits any grid slot and doorways always line up.

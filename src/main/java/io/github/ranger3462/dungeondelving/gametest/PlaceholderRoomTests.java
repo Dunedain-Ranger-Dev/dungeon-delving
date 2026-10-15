@@ -1,8 +1,8 @@
-package io.github.ranger3462.dwarvenvaults.gametest;
+package io.github.ranger3462.dungeondelving.gametest;
 
-import static io.github.ranger3462.dwarvenvaults.vault.RoomSpec.*;
+import static io.github.ranger3462.dungeondelving.vault.RoomSpec.*;
 
-import io.github.ranger3462.dwarvenvaults.DwarvenVaults;
+import io.github.ranger3462.dungeondelving.DungeonDelving;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -11,10 +11,10 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 /**
- * Places each placeholder piece in a real world and checks it against {@link io.github.ranger3462.dwarvenvaults.vault.RoomSpec}.
+ * Places each placeholder piece in a real world and checks it against {@link io.github.ranger3462.dungeondelving.vault.RoomSpec}.
  * Run with {@code ./gradlew runGameTestServer}, or in-game with {@code /test runall}.
  */
-@GameTestHolder(DwarvenVaults.MODID)
+@GameTestHolder(DungeonDelving.MODID)
 @PrefixGameTestTemplate(false)
 public class PlaceholderRoomTests {
 

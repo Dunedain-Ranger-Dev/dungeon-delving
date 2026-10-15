@@ -1,4 +1,4 @@
-package io.github.ranger3462.dwarvenvaults;
+package io.github.ranger3462.dungeondelving;
 
 import org.slf4j.Logger;
 
@@ -11,21 +11,21 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 
 // The value here should match the modId entry in META-INF/neoforge.mods.toml
-@Mod(DwarvenVaults.MODID)
-public class DwarvenVaults {
-    public static final String MODID = "dwarvenvaults";
+@Mod(DungeonDelving.MODID)
+public class DungeonDelving {
+    public static final String MODID = "dungeondelving";
     public static final Logger LOGGER = LogUtils.getLogger();
 
     // The first code that runs when the mod loads. NeoForge passes in the mod event bus and container.
-    public DwarvenVaults(IEventBus modEventBus, ModContainer modContainer) {
+    public DungeonDelving(IEventBus modEventBus, ModContainer modContainer) {
         modEventBus.addListener(this::commonSetup);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        LOGGER.info("Dwarven Vaults loaded");
+        LOGGER.info("Dungeon Delving loaded");
     }
 
-    /** Builds a resource location in this mod's namespace, e.g. {@code dwarvenvaults:vault/start}. */
+    /** Builds a resource location in this mod's namespace, e.g. {@code dungeondelving:vault/start}. */
     public static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }

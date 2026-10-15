@@ -1,6 +1,6 @@
 # License
 
-Dwarven Vaults uses two licenses: one for code, one for assets.
+Dungeon Delving uses two licenses: one for code, one for assets.
 
 ## Code: LGPL-3.0
 
@@ -36,5 +36,5 @@ LGPL-3.0-only.
 
 By submitting assets (art, models, sounds, or structure files), you grant
 Ranger3462 a perpetual, irrevocable, worldwide, royalty-free license to use,
-modify, and distribute them as part of Dwarven Vaults and its official
+modify, and distribute them as part of Dungeon Delving and its official
 releases, under the terms above. You keep the copyright to your own work.

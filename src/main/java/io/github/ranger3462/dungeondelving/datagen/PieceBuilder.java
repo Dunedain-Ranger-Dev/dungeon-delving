@@ -1,4 +1,4 @@
-package io.github.ranger3462.dwarvenvaults.datagen;
+package io.github.ranger3462.dungeondelving.datagen;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -1,5 +1,5 @@
-# dwarven-vaults
-Minecraft Modpack emulating Vault Hunters, with a bigger emphasis on magic and less on tech.
+# Dungeon Delving
+A Minecraft mod (NeoForge 1.21.1) for repeatable, procedurally generated dungeon runs: dive in, survive, and bring the loot home to grow stronger. Built as the core of a magic-focused modpack.
 
 ## License
 

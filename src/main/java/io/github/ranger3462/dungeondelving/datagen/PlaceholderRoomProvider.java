@@ -1,6 +1,6 @@
-package io.github.ranger3462.dwarvenvaults.datagen;
+package io.github.ranger3462.dungeondelving.datagen;
 
-import static io.github.ranger3462.dwarvenvaults.vault.RoomSpec.*;
+import static io.github.ranger3462.dungeondelving.vault.RoomSpec.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 import com.google.common.hash.Hashing;
 
-import io.github.ranger3462.dwarvenvaults.DwarvenVaults;
+import io.github.ranger3462.dungeondelving.DungeonDelving;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -21,13 +21,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
 /**
- * Generates simple test pieces that follow {@link io.github.ranger3462.dwarvenvaults.vault.RoomSpec}, so vault
+ * Generates simple test pieces that follow {@link io.github.ranger3462.dungeondelving.vault.RoomSpec}, so vault
  * generation can be built and tested before hand-built rooms exist.
  * <p>
  * Each kind of piece has its own material so alignment is easy to check in-game: rooms are light gray, tunnels
  * (including their doorway walls) are cyan, and caps are red. Gold blocks stand in for markers.
  * <p>
- * Output goes to {@code data/dwarvenvaults/structure/vault/}. Every file name ends in {@code _placeholder} so these can
+ * Output goes to {@code data/dungeondelving/structure/vault/}. Every file name ends in {@code _placeholder} so these can
  * be filtered out once real rooms take over.
  */
 public class PlaceholderRoomProvider implements DataProvider {
@@ -65,7 +65,7 @@ public class PlaceholderRoomProvider implements DataProvider {
     @Override
     public CompletableFuture<?> run(CachedOutput output) {
         return CompletableFuture.allOf(pieces().entrySet().stream().map(entry -> CompletableFuture.runAsync(() -> {
-            Path path = structures.file(DwarvenVaults.id(FOLDER + "/" + entry.getKey()), "nbt");
+            Path path = structures.file(DungeonDelving.id(FOLDER + "/" + entry.getKey()), "nbt");
             try {
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 NbtIo.writeCompressed(entry.getValue().toNbt(), bytes);
@@ -81,7 +81,7 @@ public class PlaceholderRoomProvider implements DataProvider {
 
     @Override
     public String getName() {
-        return "Dwarven Vaults placeholder rooms";
+        return "Dungeon Delving placeholder rooms";
     }
 
     // --- Rooms ---
