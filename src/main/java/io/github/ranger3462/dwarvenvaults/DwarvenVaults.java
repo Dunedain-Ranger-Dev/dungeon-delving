@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -22,5 +23,10 @@ public class DwarvenVaults {
 
     private void commonSetup(FMLCommonSetupEvent event) {
         LOGGER.info("Dwarven Vaults loaded");
+    }
+
+    /** Builds a resource location in this mod's namespace, e.g. {@code dwarvenvaults:vault/start}. */
+    public static ResourceLocation id(String path) {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 }
