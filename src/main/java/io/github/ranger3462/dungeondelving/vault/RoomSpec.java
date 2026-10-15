@@ -30,6 +30,9 @@ public final class RoomSpec {
     public static final int TUNNEL_HEIGHT = WALL_HEIGHT;
     public static final int TUNNEL_LENGTH = WALL_THICKNESS + CORRIDOR_LENGTH + WALL_THICKNESS;
 
+    /** Distance between neighboring rooms' corners on the vault grid: one room plus one tunnel piece. */
+    public static final int GRID_PITCH = ROOM_SIZE + TUNNEL_LENGTH;
+
     // Doorways: 5 wide, 6 tall, sitting on top of the floor.
     public static final int DOOR_WIDTH = 5;
     public static final int DOOR_HEIGHT = 6;

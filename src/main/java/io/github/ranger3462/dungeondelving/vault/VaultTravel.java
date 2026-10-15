@@ -1,46 +1,55 @@
 package io.github.ranger3462.dungeondelving.vault;
 
+import java.util.List;
 import java.util.Optional;
 
-import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.vault.layout.VaultBuildQueue;
+import io.github.ranger3462.dungeondelving.vault.layout.VaultBuilder;
+import io.github.ranger3462.dungeondelving.vault.layout.VaultBuilder.Placement;
+import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout;
+import io.github.ranger3462.dungeondelving.vault.layout.VaultLayoutGenerator;
+import io.github.ranger3462.dungeondelving.vault.layout.VaultPieces;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
-import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 /** Moves players into and out of vault runs. */
 public final class VaultTravel {
-    /** Placed at the center of every new region until the grid generator (DD-13) builds full vaults. */
-    public static final ResourceLocation START_ROOM = DungeonDelving.id("vault/start_placeholder");
-
     private VaultTravel() {}
 
-    /** Starts a run in a fresh region and sends the player into its start room. */
-    public static VaultRun enter(ServerPlayer player) {
+    /** The result of entering a vault: the run, and the layout being built for it. */
+    public record Entry(VaultRun run, VaultLayout layout) {}
+
+    /**
+     * Starts a run in a fresh region: generates a layout, places the start room right away, queues the rest to be
+     * built over the next few ticks, and sends the player into the start room.
+     */
+    public static Entry enter(ServerPlayer player, int roomCount) {
         ServerLevel vault = vaultLevel(player);
         VaultRegions regions = VaultRegions.get();
         int region = regions.allocate();
-
         BlockPos center = VaultDimension.regionCenter(region);
-        BlockPos roomCorner = center.offset(-RoomSpec.ROOM_SIZE / 2, 0, -RoomSpec.ROOM_SIZE / 2);
-        StructureTemplate room = vault.getStructureManager().get(START_ROOM)
-                .orElseThrow(() -> new IllegalStateException("Missing structure " + START_ROOM));
-        room.placeInWorld(vault, roomCorner, roomCorner, new StructurePlaceSettings(), vault.getRandom(), Block.UPDATE_CLIENTS);
+
+        VaultLayout layout = VaultLayoutGenerator.generate(vault.getRandom(), roomCount);
+        VaultPieces pieces = VaultPieces.load(player.server.getResourceManager());
+        List<Placement> placements = VaultBuilder.plan(layout, pieces, center, vault.getRandom());
+        VaultBuilder.place(vault, placements.getFirst());
+        VaultBuildQueue.add(region, placements.subList(1, placements.size()));
 
         VaultRun run = new VaultRun(player.getUUID(), region, player.level().dimension(), player.getX(), player.getY(),
                 player.getZ(), player.getYRot(), player.getXRot());
         regions.startRun(run);
         player.teleportTo(vault, center.getX() + 0.5, center.getY() + 1, center.getZ() + 0.5, player.getYRot(), player.getXRot());
-        return run;
+        return new Entry(run, layout);
     }
 
     /** Ends the player's run and sends them back to where they entered from. */
     public static Optional<VaultRun> leave(ServerPlayer player) {
         Optional<VaultRun> ended = VaultRegions.get().endRun(player.getUUID());
         ended.ifPresent(run -> {
+            if (VaultRegions.get().runs().stream().noneMatch(other -> other.region() == run.region())) {
+                VaultBuildQueue.cancel(run.region());
+            }
             ServerLevel target = player.server.getLevel(run.returnLevel());
             if (target == null) {
                 target = player.server.overworld();

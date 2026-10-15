@@ -1,6 +1,7 @@
 package io.github.ranger3462.dungeondelving.command;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
@@ -9,6 +10,7 @@ import io.github.ranger3462.dungeondelving.vault.VaultDimension;
 import io.github.ranger3462.dungeondelving.vault.VaultRegions;
 import io.github.ranger3462.dungeondelving.vault.VaultRun;
 import io.github.ranger3462.dungeondelving.vault.VaultTravel;
+import io.github.ranger3462.dungeondelving.vault.layout.VaultLayoutGenerator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -21,7 +23,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
  * Operator-only commands for testing vaults before the real entry and exit (DD-15) exist:
- * {@code /dungeondelving vault enter|leave|regions}.
+ * {@code /dungeondelving vault enter [rooms]|leave|regions}.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class DevCommands {
@@ -36,20 +38,25 @@ public final class DevCommands {
         dispatcher.register(Commands.literal(DungeonDelving.MODID)
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("vault")
-                        .then(Commands.literal("enter").executes(DevCommands::enter))
+                        .then(Commands.literal("enter")
+                                .executes(context -> enter(context, VaultLayoutGenerator.DEFAULT_ROOMS))
+                                .then(Commands.argument("rooms", IntegerArgumentType.integer(1, VaultLayoutGenerator.maxRooms()))
+                                        .executes(context -> enter(context, IntegerArgumentType.getInteger(context, "rooms")))))
                         .then(Commands.literal("leave").executes(DevCommands::leave))
                         .then(Commands.literal("regions").executes(DevCommands::regions))));
     }
 
-    private static int enter(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+    private static int enter(CommandContext<CommandSourceStack> context, int rooms) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         if (VaultRegions.get().run(player.getUUID()).isPresent()) {
             fail(context.getSource(), "You are already in a vault. Leave it first.");
             return 0;
         }
-        VaultRun run = VaultTravel.enter(player);
+        VaultTravel.Entry entry = VaultTravel.enter(player, rooms);
+        VaultRun run = entry.run();
         BlockPos center = VaultDimension.regionCenter(run.region());
-        tell(context.getSource(), "Entered vault region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ() + ")");
+        tell(context.getSource(), "Entered vault region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ()
+                + "): " + entry.layout().rooms().size() + " rooms, " + entry.layout().connections().size() + " tunnels");
         return 1;
     }
 

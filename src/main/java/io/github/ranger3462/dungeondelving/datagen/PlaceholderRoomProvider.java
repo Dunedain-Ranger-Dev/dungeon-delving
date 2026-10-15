@@ -58,7 +58,7 @@ public class PlaceholderRoomProvider implements DataProvider {
         pieces.put("common_walls_placeholder", wallsRoom());
         pieces.put("objective_placeholder", objectiveRoom());
         pieces.put("tunnel_placeholder", tunnel());
-        pieces.put("wall_cap_placeholder", capWall());
+        pieces.put("cap_placeholder", capWall());
         return pieces;
     }
 

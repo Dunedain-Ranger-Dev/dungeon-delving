@@ -77,7 +77,7 @@ public class PlaceholderRoomTests {
         helper.succeed();
     }
 
-    @GameTest(template = "vault/wall_cap_placeholder")
+    @GameTest(template = "vault/cap_placeholder")
     public static void capWall(GameTestHelper helper) {
         Piece piece = Piece.of(helper);
         piece.checkSize(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS);

@@ -25,7 +25,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public class VaultRegionTests {
     // These tests don't use the placed structure; the cap is just the smallest available piece.
-    private static final String ANY_TEMPLATE = "vault/wall_cap_placeholder";
+    private static final String ANY_TEMPLATE = "vault/cap_placeholder";
 
     /**
      * The game test server only creates the overworld, so this checks the vault's dimension type loaded from data
