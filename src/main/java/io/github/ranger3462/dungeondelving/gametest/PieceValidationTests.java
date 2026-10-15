@@ -64,6 +64,7 @@ public class PieceValidationTests {
             }
         }
         helper.assertTrue(failures.isEmpty(), "Pieces that don't meet the spec: " + String.join("; ", failures));
+        helper.assertTrue(pieces.skipped().isEmpty(), "Pieces skipped for the wrong size: " + pieces.skipped());
         helper.assertTrue(pieces.all().size() >= Kind.values().length, "every kind of piece should exist");
         helper.succeed();
     }

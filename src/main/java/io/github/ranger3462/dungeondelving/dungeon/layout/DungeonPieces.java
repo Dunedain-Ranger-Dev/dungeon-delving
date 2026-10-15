@@ -26,7 +26,8 @@ import net.minecraft.util.RandomSource;
  * Pieces come from {@code data/dungeondelving/structure/dungeon/} in the mod and data packs, plus any exported into
  * the current world with {@code /dungeondelving room export}. Placeholder pieces (names ending in
  * {@code _placeholder}) are only used for a kind that has no real pieces yet, so hand-built rooms take over as soon
- * as they are added.
+ * as they are added. Pieces whose size doesn't match the current spec (for example, built before a spec change) are
+ * skipped with a warning.
  */
 public final class DungeonPieces {
     public enum Kind {
@@ -72,10 +73,12 @@ public final class DungeonPieces {
     private static final String PLACEHOLDER_SUFFIX = "_placeholder";
 
     private final Map<ResourceLocation, Kind> all;
+    private final Map<ResourceLocation, String> skipped;
     private final Map<Kind, List<ResourceLocation>> pools;
 
-    private DungeonPieces(Map<ResourceLocation, Kind> all, Map<Kind, List<ResourceLocation>> pools) {
+    private DungeonPieces(Map<ResourceLocation, Kind> all, Map<ResourceLocation, String> skipped, Map<Kind, List<ResourceLocation>> pools) {
         this.all = all;
+        this.skipped = skipped;
         this.pools = pools;
     }
 
@@ -101,7 +104,18 @@ public final class DungeonPieces {
             real.put(kind, new ArrayList<>());
             placeholders.put(kind, new ArrayList<>());
         }
-        all.forEach((template, kind) -> (template.getPath().endsWith(PLACEHOLDER_SUFFIX) ? placeholders : real).get(kind).add(template));
+        Map<ResourceLocation, String> skipped = new TreeMap<>();
+        all.forEach((template, kind) -> {
+            Optional<Vec3i> size = server.getStructureManager().get(template).map(t -> t.getSize());
+            if (size.isEmpty() || !size.get().equals(kind.size())) {
+                String reason = size.map(s -> "is " + sizeText(s) + " but " + kind + " pieces must be " + sizeText(kind.size()))
+                        .orElse("couldn't be loaded");
+                skipped.put(template, reason);
+                DungeonDelving.LOGGER.warn("Skipping dungeon piece {}: it {}", template, reason);
+                return;
+            }
+            (template.getPath().endsWith(PLACEHOLDER_SUFFIX) ? placeholders : real).get(kind).add(template);
+        });
 
         Map<Kind, List<ResourceLocation>> pools = new EnumMap<>(Kind.class);
         for (Kind kind : Kind.values()) {
@@ -111,7 +125,11 @@ public final class DungeonPieces {
             }
             pools.put(kind, List.copyOf(chosen));
         }
-        return new DungeonPieces(all, pools);
+        return new DungeonPieces(all, skipped, pools);
+    }
+
+    private static String sizeText(Vec3i size) {
+        return size.getX() + "x" + size.getY() + "x" + size.getZ();
     }
 
     /** The folder {@code /dungeondelving room export} saves pieces to in the current world. */
@@ -136,9 +154,14 @@ public final class DungeonPieces {
         }
     }
 
-    /** Every piece found, placeholders included, with its kind. */
+    /** Every piece found, placeholders and skipped pieces included, with its kind. */
     public Map<ResourceLocation, Kind> all() {
         return all;
+    }
+
+    /** Pieces left out of generation because they don't match the spec size, with the reason. */
+    public Map<ResourceLocation, String> skipped() {
+        return skipped;
     }
 
     /** The pieces generation picks from for a kind: real pieces if there are any, otherwise placeholders. */

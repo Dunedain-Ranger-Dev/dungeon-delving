@@ -136,6 +136,54 @@ public class DungeonLayoutTests {
         helper.succeed();
     }
 
+    /**
+     * Builds a two-room dungeon with its bedrock shell and checks there is bedrock under, over and around the whole
+     * thing, and none inside the rooms or tunnel.
+     */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void shellEnclosesDungeon(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        Cell east = new Cell(1, 0);
+        DungeonLayout layout = new DungeonLayout(
+                Map.of(Cell.ORIGIN, new Room(Cell.ORIGIN, RoomKind.START, Rotation.NONE, Mirror.NONE),
+                        east, new Room(east, RoomKind.COMMON, Rotation.NONE, Mirror.NONE)),
+                Set.of(Connection.between(Cell.ORIGIN, east)));
+        DungeonPieces pieces = DungeonPieces.load(level.getServer());
+        BlockPos center = helper.absolutePos(BlockPos.ZERO).above(120);
+        DungeonBuilder.plan(layout, pieces, center, RandomSource.create(1)).forEach(placement -> DungeonBuilder.place(level, placement));
+        DungeonBuilder.shell(layout, center).forEach(box -> DungeonBuilder.fillShell(level, box));
+
+        BlockPos a = DungeonBuilder.roomMin(center, Cell.ORIGIN);
+        BlockPos b = DungeonBuilder.roomMin(center, east);
+        BlockPos shellMin = a.offset(-2, -1, -2);
+        BlockPos shellMax = b.offset(ROOM_SIZE + 1, ROOM_HEIGHT, ROOM_SIZE + 1);
+        try {
+            for (int x = shellMin.getX(); x <= shellMax.getX(); x++) {
+                for (int z = shellMin.getZ(); z <= shellMax.getZ(); z++) {
+                    bedrock(helper, new BlockPos(x, shellMin.getY(), z), "shell floor");
+                    bedrock(helper, new BlockPos(x, shellMax.getY(), z), "shell ceiling");
+                }
+            }
+            for (int y = shellMin.getY(); y <= shellMax.getY(); y++) {
+                bedrock(helper, new BlockPos(shellMin.getX(), y, a.getZ() + ROOM_SIZE / 2), "west shell wall");
+                bedrock(helper, new BlockPos(shellMax.getX(), y, a.getZ() + ROOM_SIZE / 2), "east shell wall");
+                bedrock(helper, new BlockPos(a.getX() + ROOM_SIZE / 2, y, shellMin.getZ()), "north shell wall");
+                bedrock(helper, new BlockPos(b.getX() + ROOM_SIZE / 2, y, shellMax.getZ()), "south shell wall");
+            }
+            helper.assertFalse(level.getBlockState(a.offset(ROOM_SIZE / 2, 0, ROOM_SIZE / 2)).is(Blocks.BEDROCK), "room floors should stay breakable");
+            helper.assertTrue(level.getBlockState(a.offset(ROOM_SIZE / 2, 4, ROOM_SIZE / 2)).isAir(), "rooms should stay open inside");
+            helper.assertTrue(level.getBlockState(new BlockPos(a.getX() + ROOM_SIZE + TUNNEL_LENGTH / 2, a.getY() + DOOR_BOTTOM_Y, a.getZ() + DOOR_START + 2)).isAir(),
+                    "the tunnel should stay open inside");
+        } finally {
+            clear(level, shellMin, shellMax);
+        }
+        helper.succeed();
+    }
+
+    private static void bedrock(GameTestHelper helper, BlockPos pos, String what) {
+        helper.assertTrue(helper.getLevel().getBlockState(pos).is(Blocks.BEDROCK), what + " should be bedrock at " + pos.toShortString());
+    }
+
     private static void solid(GameTestHelper helper, BlockPos pos, String what) {
         helper.assertFalse(helper.getLevel().getBlockState(pos).isAir(), what + " should be solid at " + pos.toShortString());
     }

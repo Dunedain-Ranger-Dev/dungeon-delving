@@ -33,7 +33,7 @@ public final class DungeonTravel {
 
     /**
      * Starts a run in a fresh region: generates a layout, places the start room and its exit right away, queues the
-     * rest to be built over the next few ticks, and sends the player into the start room.
+     * rest and the bedrock shell to be built over the next few ticks, and sends the player into the start room.
      */
     public static Entry enter(ServerPlayer player, int roomCount) {
         ServerLevel dungeon = dungeonLevel(player);
@@ -47,6 +47,7 @@ public final class DungeonTravel {
         DungeonBuilder.place(dungeon, placements.getFirst());
         dungeon.setBlock(center.above(), ModRegistries.DUNGEON_EXIT.get().defaultBlockState(), Block.UPDATE_ALL);
         DungeonBuildQueue.add(region, placements.subList(1, placements.size()));
+        DungeonBuildQueue.addShell(region, DungeonBuilder.shell(layout, center));
 
         DungeonRun run = new DungeonRun(player.getUUID(), region, player.level().dimension(), player.getX(), player.getY(),
                 player.getZ(), player.getYRot(), player.getXRot());

@@ -1,6 +1,7 @@
 package io.github.ranger3462.dungeondelving.dungeon.layout;
 
 import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.GRID_PITCH;
+import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.ROOM_HEIGHT;
 import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.ROOM_SIZE;
 
 import java.util.ArrayList;
@@ -18,15 +19,18 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 /**
  * Turns a {@link DungeonLayout} into concrete piece placements in the world: a room per cell, a tunnel per
- * connection, and a cap on every room face with no tunnel. The start room sits centered on {@code center}.
+ * connection, a cap on every room face with no tunnel, and a bedrock shell around it all. The start room sits
+ * centered on {@code center}.
  */
 public final class DungeonBuilder {
     private DungeonBuilder() {}
@@ -88,6 +92,63 @@ public final class DungeonBuilder {
             }
         }
         return placements;
+    }
+
+    /** Bedrock shell sections are filled at most this many blocks along x and z at a time, to spread the work out. */
+    private static final int SHELL_SECTION = 32;
+
+    /**
+     * The bedrock shell around a layout: a floor under the whole dungeon, a ceiling over it, and walls around its
+     * outer edge, just outside the caps. Pieces stay breakable, but a hole never leads into the void. Returned as
+     * small boxes so they can be filled a few per tick.
+     */
+    public static List<BoundingBox> shell(DungeonLayout layout, BlockPos center) {
+        int minX = Integer.MAX_VALUE;
+        int minZ = Integer.MAX_VALUE;
+        int maxX = Integer.MIN_VALUE;
+        int maxZ = Integer.MIN_VALUE;
+        for (Cell cell : layout.rooms().keySet()) {
+            BlockPos min = roomMin(center, cell);
+            minX = Math.min(minX, min.getX());
+            minZ = Math.min(minZ, min.getZ());
+            maxX = Math.max(maxX, min.getX() + ROOM_SIZE - 1);
+            maxZ = Math.max(maxZ, min.getZ() + ROOM_SIZE - 1);
+        }
+        // Caps sit one block outside the rooms; the shell goes one block beyond that.
+        minX -= 2;
+        minZ -= 2;
+        maxX += 2;
+        maxZ += 2;
+        int bottom = center.getY() - 1;
+        int top = center.getY() + ROOM_HEIGHT;
+
+        List<BoundingBox> boxes = new ArrayList<>();
+        for (int y : new int[] { bottom, top }) {
+            for (int x = minX; x <= maxX; x += SHELL_SECTION) {
+                for (int z = minZ; z <= maxZ; z += SHELL_SECTION) {
+                    boxes.add(new BoundingBox(x, y, z, Math.min(x + SHELL_SECTION - 1, maxX), y, Math.min(z + SHELL_SECTION - 1, maxZ)));
+                }
+            }
+        }
+        for (int x = minX; x <= maxX; x += SHELL_SECTION) {
+            int x2 = Math.min(x + SHELL_SECTION - 1, maxX);
+            boxes.add(new BoundingBox(x, bottom, minZ, x2, top, minZ));
+            boxes.add(new BoundingBox(x, bottom, maxZ, x2, top, maxZ));
+        }
+        for (int z = minZ; z <= maxZ; z += SHELL_SECTION) {
+            int z2 = Math.min(z + SHELL_SECTION - 1, maxZ);
+            boxes.add(new BoundingBox(minX, bottom, z, minX, top, z2));
+            boxes.add(new BoundingBox(maxX, bottom, z, maxX, top, z2));
+        }
+        return boxes;
+    }
+
+    /** Fills one shell section with bedrock. */
+    public static void fillShell(ServerLevel level, BoundingBox box) {
+        BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
+        for (BlockPos pos : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
+            level.setBlock(pos, bedrock, Block.UPDATE_CLIENTS);
+        }
     }
 
     /** Places one piece so that, after turning, it exactly fills the space starting at {@code targetMin}. */
