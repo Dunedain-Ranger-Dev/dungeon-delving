@@ -14,5 +14,4 @@ place template dwarvenvaults:vault/wall_cap_placeholder 0 -60 -1
 place template dwarvenvaults:vault/wall_cap_placeholder -1 -60 0 clockwise_90
 place template dwarvenvaults:vault/wall_cap_placeholder 33 -60 0 clockwise_90
 
-tp @p 16 -40 -12
 tellraw @a {"text":"Test vault built.","color":"green"}
