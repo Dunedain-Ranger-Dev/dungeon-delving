@@ -20,7 +20,7 @@ The following are **not** covered by the LGPL and may not be copied,
 modified, or reused outside this project without written permission:
 
 - Textures, models, sounds, and other media under `src/main/resources/assets/`
-- Structure files (`.nbt`), including vault rooms, tunnels, and door plugs
+- Structure files (`.nbt`), including dungeon rooms, tunnels, and caps
 - Logos, banners, and other artwork
 
 **Exception:** you may redistribute the official, unmodified mod jar

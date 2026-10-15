@@ -1,6 +1,6 @@
 package io.github.ranger3462.dungeondelving.gametest;
 
-import static io.github.ranger3462.dungeondelving.vault.RoomSpec.*;
+import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.*;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import net.minecraft.core.BlockPos;
@@ -11,44 +11,44 @@ import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 /**
- * Places each placeholder piece in a real world and checks it against {@link io.github.ranger3462.dungeondelving.vault.RoomSpec}.
+ * Places each placeholder piece in a real world and checks it against {@link io.github.ranger3462.dungeondelving.dungeon.RoomSpec}.
  * Run with {@code ./gradlew runGameTestServer}, or in-game with {@code /test runall}.
  */
 @GameTestHolder(DungeonDelving.MODID)
 @PrefixGameTestTemplate(false)
 public class PlaceholderRoomTests {
 
-    @GameTest(template = "vault/start_placeholder")
+    @GameTest(template = "dungeon/start_placeholder")
     public static void startRoom(GameTestHelper helper) {
         checkRoom(helper);
     }
 
-    @GameTest(template = "vault/common_pillars_placeholder")
+    @GameTest(template = "dungeon/common_pillars_placeholder")
     public static void pillarsRoom(GameTestHelper helper) {
         checkRoom(helper);
     }
 
-    @GameTest(template = "vault/common_steps_placeholder")
+    @GameTest(template = "dungeon/common_steps_placeholder")
     public static void stepsRoom(GameTestHelper helper) {
         checkRoom(helper);
     }
 
-    @GameTest(template = "vault/common_cover_placeholder")
+    @GameTest(template = "dungeon/common_cover_placeholder")
     public static void coverRoom(GameTestHelper helper) {
         checkRoom(helper);
     }
 
-    @GameTest(template = "vault/common_walls_placeholder")
+    @GameTest(template = "dungeon/common_walls_placeholder")
     public static void wallsRoom(GameTestHelper helper) {
         checkRoom(helper);
     }
 
-    @GameTest(template = "vault/objective_placeholder")
+    @GameTest(template = "dungeon/objective_placeholder")
     public static void objectiveRoom(GameTestHelper helper) {
         checkRoom(helper);
     }
 
-    @GameTest(template = "vault/tunnel_placeholder")
+    @GameTest(template = "dungeon/tunnel_placeholder")
     public static void tunnel(GameTestHelper helper) {
         Piece piece = Piece.of(helper);
         piece.checkSize(TUNNEL_WIDTH, TUNNEL_HEIGHT, TUNNEL_LENGTH);
@@ -77,7 +77,7 @@ public class PlaceholderRoomTests {
         helper.succeed();
     }
 
-    @GameTest(template = "vault/cap_placeholder")
+    @GameTest(template = "dungeon/cap_placeholder")
     public static void capWall(GameTestHelper helper) {
         Piece piece = Piece.of(helper);
         piece.checkSize(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS);

@@ -1,17 +1,17 @@
-package io.github.ranger3462.dungeondelving.vault.layout;
+package io.github.ranger3462.dungeondelving.dungeon.layout;
 
-import static io.github.ranger3462.dungeondelving.vault.RoomSpec.GRID_PITCH;
-import static io.github.ranger3462.dungeondelving.vault.RoomSpec.ROOM_SIZE;
+import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.GRID_PITCH;
+import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.ROOM_SIZE;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout.Cell;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout.Connection;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout.Room;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultPieces.Kind;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Cell;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Connection;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Room;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces.Kind;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -25,11 +25,11 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 
 /**
- * Turns a {@link VaultLayout} into concrete piece placements in the world: a room per cell, a tunnel per
+ * Turns a {@link DungeonLayout} into concrete piece placements in the world: a room per cell, a tunnel per
  * connection, and a cap on every room face with no tunnel. The start room sits centered on {@code center}.
  */
-public final class VaultBuilder {
-    private VaultBuilder() {}
+public final class DungeonBuilder {
+    private DungeonBuilder() {}
 
     /** One structure to place, positioned by the minimum corner of the space it should occupy once turned. */
     public record Placement(ResourceLocation template, BlockPos targetMin, Rotation rotation, Mirror mirror) {}
@@ -40,7 +40,7 @@ public final class VaultBuilder {
     }
 
     /** Every placement for a layout, start room first, then the other rooms nearest-first, then tunnels and caps. */
-    public static List<Placement> plan(VaultLayout layout, VaultPieces pieces, BlockPos center, RandomSource random) {
+    public static List<Placement> plan(DungeonLayout layout, DungeonPieces pieces, BlockPos center, RandomSource random) {
         List<Placement> placements = new ArrayList<>();
         Map<Cell, Integer> distances = layout.distancesFromStart();
         List<Room> rooms = layout.rooms().values().stream()
@@ -93,7 +93,7 @@ public final class VaultBuilder {
     /** Places one piece so that, after turning, it exactly fills the space starting at {@code targetMin}. */
     public static void place(ServerLevel level, Placement placement) {
         StructureTemplate template = level.getStructureManager().get(placement.template())
-                .orElseThrow(() -> new IllegalStateException("Missing vault piece " + placement.template()));
+                .orElseThrow(() -> new IllegalStateException("Missing dungeon piece " + placement.template()));
         StructurePlaceSettings settings = new StructurePlaceSettings().setRotation(placement.rotation()).setMirror(placement.mirror());
         BoundingBox box = template.getBoundingBox(settings, BlockPos.ZERO);
         BlockPos pos = placement.targetMin().offset(-box.minX(), -box.minY(), -box.minZ());

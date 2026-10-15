@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.UUID;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
-import io.github.ranger3462.dungeondelving.vault.VaultDimension;
-import io.github.ranger3462.dungeondelving.vault.VaultRegions;
-import io.github.ranger3462.dungeondelving.vault.VaultRun;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.nbt.CompoundTag;
@@ -20,30 +20,30 @@ import net.minecraft.world.level.dimension.DimensionType;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
-/** Checks the vault dimension type loads and that regions are handed out, released and reused correctly. */
+/** Checks the dungeon dimension type loads and that regions are handed out, released and reused correctly. */
 @GameTestHolder(DungeonDelving.MODID)
 @PrefixGameTestTemplate(false)
-public class VaultRegionTests {
+public class DungeonRegionTests {
     // These tests don't use the placed structure; the cap is just the smallest available piece.
-    private static final String ANY_TEMPLATE = "vault/cap_placeholder";
+    private static final String ANY_TEMPLATE = "dungeon/cap_placeholder";
 
     /**
-     * The game test server only creates the overworld, so this checks the vault's dimension type loaded from data
-     * with the right settings. The dimension itself is checked in-game with dev/enter_vault.
+     * The game test server only creates the overworld, so this checks the dungeon's dimension type loaded from data
+     * with the right settings. The dimension itself is checked in-game with dev/enter_dungeon.
      */
     @GameTest(template = ANY_TEMPLATE)
-    public static void vaultDimensionTypeLoads(GameTestHelper helper) {
+    public static void dungeonDimensionTypeLoads(GameTestHelper helper) {
         var types = helper.getLevel().registryAccess().registryOrThrow(Registries.DIMENSION_TYPE);
-        DimensionType vault = types.get(VaultDimension.VAULT.location());
-        helper.assertTrue(vault != null, "vault dimension type should be loaded from data");
-        helper.assertFalse(vault.hasSkyLight(), "vault should have no skylight");
-        helper.assertFalse(vault.bedWorks(), "beds should not work in vaults");
+        DimensionType dungeon = types.get(DungeonDimension.DUNGEON.location());
+        helper.assertTrue(dungeon != null, "dungeon dimension type should be loaded from data");
+        helper.assertFalse(dungeon.hasSkyLight(), "dungeon should have no skylight");
+        helper.assertFalse(dungeon.bedWorks(), "beds should not work in dungeons");
         helper.succeed();
     }
 
     @GameTest(template = ANY_TEMPLATE)
     public static void regionsAreReusedOnlyAfterWipe(GameTestHelper helper) {
-        VaultRegions regions = new VaultRegions();
+        DungeonRegions regions = new DungeonRegions();
         UUID alice = UUID.randomUUID();
         UUID bob = UUID.randomUUID();
 
@@ -58,8 +58,8 @@ public class VaultRegionTests {
         helper.assertTrue(regions.allocate() == 2, "a region that hasn't been wiped must not be reused");
 
         Path folder = tempDimensionFolder();
-        Path firstFile = touch(folder.resolve("region").resolve("r." + VaultDimension.firstRegionFileX(first) + ".0.mca"));
-        Path secondFile = touch(folder.resolve("region").resolve("r." + VaultDimension.firstRegionFileX(second) + ".0.mca"));
+        Path firstFile = touch(folder.resolve("region").resolve("r." + DungeonDimension.firstRegionFileX(first) + ".0.mca"));
+        Path secondFile = touch(folder.resolve("region").resolve("r." + DungeonDimension.firstRegionFileX(second) + ".0.mca"));
         List<Integer> wiped = wipe(regions, folder);
 
         helper.assertTrue(wiped.equals(List.of(first)), "only the released region should be wiped");
@@ -71,25 +71,25 @@ public class VaultRegionTests {
 
     @GameTest(template = ANY_TEMPLATE)
     public static void regionsSurviveSaveAndLoad(GameTestHelper helper) {
-        VaultRegions regions = new VaultRegions();
+        DungeonRegions regions = new DungeonRegions();
         UUID player = UUID.randomUUID();
         regions.startRun(run(player, regions.allocate()));
         regions.release(regions.allocate());
 
-        VaultRegions loaded = VaultRegions.load(regions.save(new CompoundTag()));
+        DungeonRegions loaded = DungeonRegions.load(regions.save(new CompoundTag()));
         helper.assertTrue(loaded.regionsCreated() == 2, "region count should be saved");
-        helper.assertTrue(loaded.run(player).map(VaultRun::region).orElse(-1) == 0, "active runs should be saved");
+        helper.assertTrue(loaded.run(player).map(DungeonRun::region).orElse(-1) == 0, "active runs should be saved");
         helper.assertTrue(loaded.releasedRegions().contains(1), "released regions should be saved");
         helper.succeed();
     }
 
-    private static VaultRun run(UUID player, int region) {
-        return new VaultRun(player, region, Level.OVERWORLD, 0, 64, 0, 0, 0);
+    private static DungeonRun run(UUID player, int region) {
+        return new DungeonRun(player, region, Level.OVERWORLD, 0, 64, 0, 0, 0);
     }
 
     private static Path tempDimensionFolder() {
         try {
-            return Files.createTempDirectory("dungeondelving-vault-test");
+            return Files.createTempDirectory("dungeondelving-dungeon-test");
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -104,7 +104,7 @@ public class VaultRegionTests {
         }
     }
 
-    private static List<Integer> wipe(VaultRegions regions, Path folder) {
+    private static List<Integer> wipe(DungeonRegions regions, Path folder) {
         try {
             return regions.wipeReleased(folder);
         } catch (IOException e) {

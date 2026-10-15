@@ -1,5 +1,5 @@
 {
-  "type": "dungeondelving:vault",
+  "type": "dungeondelving:dungeon",
   "generator": {
     "type": "minecraft:flat",
     "settings": {

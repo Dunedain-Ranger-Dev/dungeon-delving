@@ -1,6 +1,6 @@
 package io.github.ranger3462.dungeondelving.datagen;
 
-import static io.github.ranger3462.dungeondelving.vault.RoomSpec.*;
+import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,17 +21,17 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
 /**
- * Generates simple test pieces that follow {@link io.github.ranger3462.dungeondelving.vault.RoomSpec}, so vault
+ * Generates simple test pieces that follow {@link io.github.ranger3462.dungeondelving.dungeon.RoomSpec}, so dungeon
  * generation can be built and tested before hand-built rooms exist.
  * <p>
  * Each kind of piece has its own material so alignment is easy to check in-game: rooms are light gray, tunnels
  * (including their doorway walls) are cyan, and caps are red. Gold blocks stand in for markers.
  * <p>
- * Output goes to {@code data/dungeondelving/structure/vault/}. Every file name ends in {@code _placeholder} so these can
+ * Output goes to {@code data/dungeondelving/structure/dungeon/}. Every file name ends in {@code _placeholder} so these can
  * be filtered out once real rooms take over.
  */
 public class PlaceholderRoomProvider implements DataProvider {
-    public static final String FOLDER = "vault";
+    public static final String FOLDER = "dungeon";
 
     private static final Block ROOM = Blocks.LIGHT_GRAY_CONCRETE;
     private static final Block TUNNEL = Blocks.CYAN_CONCRETE;

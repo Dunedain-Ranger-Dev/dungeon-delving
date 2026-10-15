@@ -25,7 +25,7 @@ public class DungeonDelving {
         LOGGER.info("Dungeon Delving loaded");
     }
 
-    /** Builds a resource location in this mod's namespace, e.g. {@code dungeondelving:vault/start}. */
+    /** Builds a resource location in this mod's namespace, e.g. {@code dungeondelving:dungeon/start}. */
     public static ResourceLocation id(String path) {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }

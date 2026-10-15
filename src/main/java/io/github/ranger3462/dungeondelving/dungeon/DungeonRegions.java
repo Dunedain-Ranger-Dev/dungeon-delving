@@ -1,4 +1,4 @@
-package io.github.ranger3462.dungeondelving.vault;
+package io.github.ranger3462.dungeondelving.dungeon;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,26 +29,26 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
 /**
- * Hands out vault regions to runs and tracks which are in use.
+ * Hands out dungeon regions to runs and tracks which are in use.
  * <p>
  * A region released by a finished run is not reused right away, because it still holds that run's blocks. On the
- * next server start, before the vault dimension loads, its region files are deleted and it becomes free again.
+ * next server start, before the dungeon dimension loads, its region files are deleted and it becomes free again.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
-public class VaultRegions {
+public class DungeonRegions {
     private static final String[] STORAGE_FOLDERS = { "region", "entities", "poi" };
-    private static VaultRegions current;
+    private static DungeonRegions current;
 
     private int nextRegion;
     private final TreeSet<Integer> free = new TreeSet<>();
     private final TreeSet<Integer> released = new TreeSet<>();
-    private final Map<UUID, VaultRun> runs = new HashMap<>();
+    private final Map<UUID, DungeonRun> runs = new HashMap<>();
     private Path file;
 
     /** The region tracker for the running server. */
-    public static VaultRegions get() {
+    public static DungeonRegions get() {
         if (current == null) {
-            throw new IllegalStateException("Vault regions are only available while a server is running");
+            throw new IllegalStateException("Dungeon regions are only available while a server is running");
         }
         return current;
     }
@@ -86,22 +86,22 @@ public class VaultRegions {
 
     // --- Runs ---
 
-    public Optional<VaultRun> run(UUID player) {
+    public Optional<DungeonRun> run(UUID player) {
         return Optional.ofNullable(runs.get(player));
     }
 
-    public Collection<VaultRun> runs() {
+    public Collection<DungeonRun> runs() {
         return Collections.unmodifiableCollection(runs.values());
     }
 
-    public void startRun(VaultRun run) {
+    public void startRun(DungeonRun run) {
         runs.put(run.player(), run);
         save();
     }
 
     /** Ends a player's run and releases its region if no one else is using it. */
-    public Optional<VaultRun> endRun(UUID player) {
-        VaultRun run = runs.remove(player);
+    public Optional<DungeonRun> endRun(UUID player) {
+        DungeonRun run = runs.remove(player);
         if (run != null) {
             release(run.region());
             save();
@@ -115,9 +115,9 @@ public class VaultRegions {
     public List<Integer> wipeReleased(Path dimensionFolder) throws IOException {
         List<Integer> wiped = new ArrayList<>(released);
         for (int region : wiped) {
-            int firstX = VaultDimension.firstRegionFileX(region);
-            for (int dx = 0; dx < VaultDimension.regionFilesPerSide(); dx++) {
-                for (int z = 0; z < VaultDimension.regionFilesPerSide(); z++) {
+            int firstX = DungeonDimension.firstRegionFileX(region);
+            for (int dx = 0; dx < DungeonDimension.regionFilesPerSide(); dx++) {
+                for (int z = 0; z < DungeonDimension.regionFilesPerSide(); z++) {
                     String name = "r." + (firstX + dx) + "." + z + ".mca";
                     for (String folder : STORAGE_FOLDERS) {
                         Files.deleteIfExists(dimensionFolder.resolve(folder).resolve(name));
@@ -143,8 +143,8 @@ public class VaultRegions {
         return tag;
     }
 
-    public static VaultRegions load(CompoundTag tag) {
-        VaultRegions regions = new VaultRegions();
+    public static DungeonRegions load(CompoundTag tag) {
+        DungeonRegions regions = new DungeonRegions();
         regions.nextRegion = tag.getInt("next_region");
         for (int region : tag.getIntArray("free")) {
             regions.free.add(region);
@@ -153,7 +153,7 @@ public class VaultRegions {
             regions.released.add(region);
         }
         for (Tag runTag : tag.getList("runs", Tag.TAG_COMPOUND)) {
-            VaultRun run = VaultRun.load((CompoundTag) runTag);
+            DungeonRun run = DungeonRun.load((CompoundTag) runTag);
             regions.runs.put(run.player(), run);
         }
         return regions;
@@ -167,7 +167,7 @@ public class VaultRegions {
             Files.createDirectories(file.getParent());
             NbtIo.writeCompressed(save(new CompoundTag()), file);
         } catch (IOException e) {
-            DungeonDelving.LOGGER.error("Failed to save vault regions to {}", file, e);
+            DungeonDelving.LOGGER.error("Failed to save dungeon regions to {}", file, e);
         }
     }
 
@@ -177,26 +177,26 @@ public class VaultRegions {
     public static void onServerAboutToStart(ServerAboutToStartEvent event) {
         MinecraftServer server = event.getServer();
         Path worldRoot = server.getWorldPath(LevelResource.ROOT);
-        Path file = worldRoot.resolve(DungeonDelving.MODID).resolve("vault_regions.dat");
+        Path file = worldRoot.resolve(DungeonDelving.MODID).resolve("dungeon_regions.dat");
 
-        VaultRegions regions = new VaultRegions();
+        DungeonRegions regions = new DungeonRegions();
         if (Files.exists(file)) {
             try {
                 regions = load(NbtIo.readCompressed(file, NbtAccounter.unlimitedHeap()));
             } catch (IOException e) {
-                DungeonDelving.LOGGER.error("Failed to read vault regions from {}, starting fresh", file, e);
+                DungeonDelving.LOGGER.error("Failed to read dungeon regions from {}, starting fresh", file, e);
             }
         }
         regions.file = file;
 
-        // The vault dimension has not loaded yet, so its region files are safe to delete.
+        // The dungeon dimension has not loaded yet, so its region files are safe to delete.
         try {
-            List<Integer> wiped = regions.wipeReleased(DimensionType.getStorageFolder(VaultDimension.VAULT, worldRoot));
+            List<Integer> wiped = regions.wipeReleased(DimensionType.getStorageFolder(DungeonDimension.DUNGEON, worldRoot));
             if (!wiped.isEmpty()) {
-                DungeonDelving.LOGGER.info("Wiped finished vault regions {}", wiped);
+                DungeonDelving.LOGGER.info("Wiped finished dungeon regions {}", wiped);
             }
         } catch (IOException e) {
-            DungeonDelving.LOGGER.error("Failed to wipe finished vault regions", e);
+            DungeonDelving.LOGGER.error("Failed to wipe finished dungeon regions", e);
         }
         current = regions;
     }

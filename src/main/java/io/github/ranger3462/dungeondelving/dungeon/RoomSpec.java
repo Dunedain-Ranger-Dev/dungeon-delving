@@ -1,7 +1,7 @@
-package io.github.ranger3462.dungeondelving.vault;
+package io.github.ranger3462.dungeondelving.dungeon;
 
 /**
- * The fixed dimensions every vault piece must follow, so any room fits any grid slot and doorways always line up.
+ * The fixed dimensions every dungeon piece must follow, so any room fits any grid slot and doorways always line up.
  * <p>
  * Coordinates are local to a piece, counted from 0. Rooms and tunnels share a floor at y=0, and every doorway
  * opening starts at y=1, directly on top of that floor.
@@ -30,7 +30,7 @@ public final class RoomSpec {
     public static final int TUNNEL_HEIGHT = WALL_HEIGHT;
     public static final int TUNNEL_LENGTH = WALL_THICKNESS + CORRIDOR_LENGTH + WALL_THICKNESS;
 
-    /** Distance between neighboring rooms' corners on the vault grid: one room plus one tunnel piece. */
+    /** Distance between neighboring rooms' corners on the dungeon grid: one room plus one tunnel piece. */
     public static final int GRID_PITCH = ROOM_SIZE + TUNNEL_LENGTH;
 
     // Doorways: 5 wide, 6 tall, sitting on top of the floor.

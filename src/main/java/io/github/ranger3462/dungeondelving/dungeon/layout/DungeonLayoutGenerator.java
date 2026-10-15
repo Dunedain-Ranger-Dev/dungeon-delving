@@ -1,4 +1,4 @@
-package io.github.ranger3462.dungeondelving.vault.layout;
+package io.github.ranger3462.dungeondelving.dungeon.layout;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,37 +8,37 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout.Cell;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout.Connection;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout.Room;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout.RoomKind;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Cell;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Connection;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Room;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.RoomKind;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 
 /**
- * Grows a vault layout outward from the start room. Each new room is attached to an existing one by a tunnel, so
+ * Grows a dungeon layout outward from the start room. Each new room is attached to an existing one by a tunnel, so
  * the rooms always form a connected tree; a few extra tunnels between neighboring rooms then add loops. The room
  * farthest from the start becomes the objective room.
  */
-public final class VaultLayoutGenerator {
+public final class DungeonLayoutGenerator {
     public static final int DEFAULT_ROOMS = 15;
-    /** How far from the start a room may be, in cells. Keeps a whole vault inside one 1024-block region. */
+    /** How far from the start a room may be, in cells. Keeps a whole dungeon inside one 1024-block region. */
     public static final int MAX_RADIUS = 6;
     /** Chance that two neighboring rooms not yet joined get an extra tunnel, creating a loop. */
     public static final float LOOP_CHANCE = 0.15f;
 
     private static final Direction[] DIRECTIONS = { Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST };
 
-    private VaultLayoutGenerator() {}
+    private DungeonLayoutGenerator() {}
 
     public static int maxRooms() {
         int side = MAX_RADIUS * 2 + 1;
         return side * side;
     }
 
-    public static VaultLayout generate(RandomSource random, int roomCount) {
+    public static DungeonLayout generate(RandomSource random, int roomCount) {
         int target = Math.max(1, Math.min(roomCount, maxRooms()));
         List<Cell> cells = new ArrayList<>();
         Set<Connection> connections = new HashSet<>();
@@ -57,7 +57,7 @@ public final class VaultLayoutGenerator {
             connections.add(Connection.between(from, next));
         }
 
-        // Extra tunnels between neighbors that aren't joined yet, so the vault isn't a pure dead-end tree.
+        // Extra tunnels between neighbors that aren't joined yet, so the dungeon isn't a pure dead-end tree.
         for (Cell cell : cells) {
             for (Direction direction : new Direction[] { Direction.EAST, Direction.SOUTH }) {
                 Cell neighbor = cell.neighbor(direction);
@@ -74,7 +74,7 @@ public final class VaultLayoutGenerator {
         rooms.put(Cell.ORIGIN, new Room(Cell.ORIGIN, RoomKind.START, randomRotation(random), randomMirror(random)));
 
         if (cells.size() > 1) {
-            VaultLayout plan = new VaultLayout(rooms, connections);
+            DungeonLayout plan = new DungeonLayout(rooms, connections);
             Cell farthest = plan.distancesFromStart().entrySet().stream()
                     .max(Map.Entry.<Cell, Integer>comparingByValue().thenComparing(e -> e.getKey(), cellOrder()))
                     .orElseThrow()
@@ -82,7 +82,7 @@ public final class VaultLayoutGenerator {
             Room old = rooms.get(farthest);
             rooms.put(farthest, new Room(farthest, RoomKind.OBJECTIVE, old.rotation(), old.mirror()));
         }
-        return new VaultLayout(rooms, connections);
+        return new DungeonLayout(rooms, connections);
     }
 
     private static boolean inBounds(Cell cell) {

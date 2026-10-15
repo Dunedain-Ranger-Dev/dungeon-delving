@@ -1,4 +1,4 @@
-package io.github.ranger3462.dungeondelving.vault;
+package io.github.ranger3462.dungeondelving.dungeon;
 
 import java.util.UUID;
 
@@ -9,9 +9,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 /**
- * A player's active vault run: which region it is in, and where to send the player back to when they leave.
+ * A player's active dungeon run: which region it is in, and where to send the player back to when they leave.
  */
-public record VaultRun(UUID player, int region, ResourceKey<Level> returnLevel, double returnX, double returnY, double returnZ,
+public record DungeonRun(UUID player, int region, ResourceKey<Level> returnLevel, double returnX, double returnY, double returnZ,
         float returnYRot, float returnXRot) {
 
     public CompoundTag save() {
@@ -27,8 +27,8 @@ public record VaultRun(UUID player, int region, ResourceKey<Level> returnLevel, 
         return tag;
     }
 
-    public static VaultRun load(CompoundTag tag) {
-        return new VaultRun(
+    public static DungeonRun load(CompoundTag tag) {
+        return new DungeonRun(
                 tag.getUUID("player"),
                 tag.getInt("region"),
                 ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(tag.getString("return_level"))),

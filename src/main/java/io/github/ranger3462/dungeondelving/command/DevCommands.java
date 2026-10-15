@@ -6,11 +6,11 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
-import io.github.ranger3462.dungeondelving.vault.VaultDimension;
-import io.github.ranger3462.dungeondelving.vault.VaultRegions;
-import io.github.ranger3462.dungeondelving.vault.VaultRun;
-import io.github.ranger3462.dungeondelving.vault.VaultTravel;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayoutGenerator;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonTravel;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -22,8 +22,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
- * Operator-only commands for testing vaults before the real entry and exit (DD-15) exist:
- * {@code /dungeondelving vault enter [rooms]|leave|regions}.
+ * Operator-only commands for testing dungeons before the real entry and exit (DD-15) exist:
+ * {@code /dungeondelving dungeon enter [rooms]|leave|regions}.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class DevCommands {
@@ -37,10 +37,10 @@ public final class DevCommands {
     private static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal(DungeonDelving.MODID)
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                .then(Commands.literal("vault")
+                .then(Commands.literal("dungeon")
                         .then(Commands.literal("enter")
-                                .executes(context -> enter(context, VaultLayoutGenerator.DEFAULT_ROOMS))
-                                .then(Commands.argument("rooms", IntegerArgumentType.integer(1, VaultLayoutGenerator.maxRooms()))
+                                .executes(context -> enter(context, DungeonLayoutGenerator.DEFAULT_ROOMS))
+                                .then(Commands.argument("rooms", IntegerArgumentType.integer(1, DungeonLayoutGenerator.maxRooms()))
                                         .executes(context -> enter(context, IntegerArgumentType.getInteger(context, "rooms")))))
                         .then(Commands.literal("leave").executes(DevCommands::leave))
                         .then(Commands.literal("regions").executes(DevCommands::regions))));
@@ -48,33 +48,33 @@ public final class DevCommands {
 
     private static int enter(CommandContext<CommandSourceStack> context, int rooms) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
-        if (VaultRegions.get().run(player.getUUID()).isPresent()) {
-            fail(context.getSource(), "You are already in a vault. Leave it first.");
+        if (DungeonRegions.get().run(player.getUUID()).isPresent()) {
+            fail(context.getSource(), "You are already in a dungeon. Leave it first.");
             return 0;
         }
-        VaultTravel.Entry entry = VaultTravel.enter(player, rooms);
-        VaultRun run = entry.run();
-        BlockPos center = VaultDimension.regionCenter(run.region());
-        tell(context.getSource(), "Entered vault region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ()
+        DungeonTravel.Entry entry = DungeonTravel.enter(player, rooms);
+        DungeonRun run = entry.run();
+        BlockPos center = DungeonDimension.regionCenter(run.region());
+        tell(context.getSource(), "Entered dungeon region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ()
                 + "): " + entry.layout().rooms().size() + " rooms, " + entry.layout().connections().size() + " tunnels");
         return 1;
     }
 
     private static int leave(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
-        return VaultTravel.leave(player).map(run -> {
-            tell(context.getSource(), "Left vault region " + run.region() + ". It will be wiped the next time the world loads.");
+        return DungeonTravel.leave(player).map(run -> {
+            tell(context.getSource(), "Left dungeon region " + run.region() + ". It will be wiped the next time the world loads.");
             return 1;
         }).orElseGet(() -> {
-            fail(context.getSource(), "You are not in a vault.");
+            fail(context.getSource(), "You are not in a dungeon.");
             return 0;
         });
     }
 
     private static int regions(CommandContext<CommandSourceStack> context) {
-        VaultRegions regions = VaultRegions.get();
+        DungeonRegions regions = DungeonRegions.get();
         // "total" counts every region ever made; wiped regions become free and get reused rather than removed.
-        tell(context.getSource(), "Vault regions: " + regions.regionsCreated() + " total ("
+        tell(context.getSource(), "Dungeon regions: " + regions.regionsCreated() + " total ("
                 + regions.runs().size() + " in use, "
                 + regions.freeRegions().size() + " free " + regions.freeRegions() + ", "
                 + regions.releasedRegions().size() + " waiting to be wiped " + regions.releasedRegions() + ")");

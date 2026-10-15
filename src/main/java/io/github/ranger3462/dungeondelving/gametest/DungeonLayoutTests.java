@@ -1,19 +1,19 @@
 package io.github.ranger3462.dungeondelving.gametest;
 
-import static io.github.ranger3462.dungeondelving.vault.RoomSpec.*;
+import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.*;
 
 import java.util.Map;
 import java.util.Set;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultBuilder;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout.Cell;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout.Connection;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout.Room;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayout.RoomKind;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultLayoutGenerator;
-import io.github.ranger3462.dungeondelving.vault.layout.VaultPieces;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Cell;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Connection;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Room;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.RoomKind;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -29,15 +29,15 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 /** Checks generated layouts are sound, and that placed pieces line up in the world. */
 @GameTestHolder(DungeonDelving.MODID)
 @PrefixGameTestTemplate(false)
-public class VaultLayoutTests {
+public class DungeonLayoutTests {
     // These tests don't use the placed structure; the cap is just the smallest available piece.
-    private static final String ANY_TEMPLATE = "vault/cap_placeholder";
+    private static final String ANY_TEMPLATE = "dungeon/cap_placeholder";
 
     @GameTest(template = ANY_TEMPLATE)
     public static void layoutsAreConnectedAndInBounds(GameTestHelper helper) {
         for (long seed = 0; seed < 50; seed++) {
             int count = 1 + (int) (seed % 40);
-            VaultLayout layout = VaultLayoutGenerator.generate(RandomSource.create(seed), count);
+            DungeonLayout layout = DungeonLayoutGenerator.generate(RandomSource.create(seed), count);
             String where = " (seed " + seed + ", " + count + " rooms)";
 
             helper.assertTrue(layout.rooms().size() == count, "layout should have the requested room count" + where);
@@ -45,7 +45,7 @@ public class VaultLayoutTests {
             helper.assertTrue(layout.distancesFromStart().size() == count, "every room should be reachable from the start" + where);
 
             for (Cell cell : layout.rooms().keySet()) {
-                helper.assertTrue(Math.abs(cell.x()) <= VaultLayoutGenerator.MAX_RADIUS && Math.abs(cell.z()) <= VaultLayoutGenerator.MAX_RADIUS,
+                helper.assertTrue(Math.abs(cell.x()) <= DungeonLayoutGenerator.MAX_RADIUS && Math.abs(cell.z()) <= DungeonLayoutGenerator.MAX_RADIUS,
                         "room " + cell + " is outside the region" + where);
             }
             for (Connection connection : layout.connections()) {
@@ -70,16 +70,16 @@ public class VaultLayoutTests {
 
     @GameTest(template = ANY_TEMPLATE)
     public static void sameSeedGivesSameLayout(GameTestHelper helper) {
-        VaultLayout a = VaultLayoutGenerator.generate(RandomSource.create(1234), 20);
-        VaultLayout b = VaultLayoutGenerator.generate(RandomSource.create(1234), 20);
+        DungeonLayout a = DungeonLayoutGenerator.generate(RandomSource.create(1234), 20);
+        DungeonLayout b = DungeonLayoutGenerator.generate(RandomSource.create(1234), 20);
         helper.assertTrue(a.equals(b), "the same seed should produce the same layout");
         helper.succeed();
     }
 
     @GameTest(template = ANY_TEMPLATE)
     public static void roomCountIsCappedToRegion(GameTestHelper helper) {
-        VaultLayout layout = VaultLayoutGenerator.generate(RandomSource.create(7), 10_000);
-        helper.assertTrue(layout.rooms().size() == VaultLayoutGenerator.maxRooms(), "room count should be capped to what fits in a region");
+        DungeonLayout layout = DungeonLayoutGenerator.generate(RandomSource.create(7), 10_000);
+        helper.assertTrue(layout.rooms().size() == DungeonLayoutGenerator.maxRooms(), "room count should be capped to what fits in a region");
         helper.succeed();
     }
 
@@ -91,16 +91,16 @@ public class VaultLayoutTests {
     public static void placedPiecesLineUp(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Cell east = new Cell(1, 0);
-        VaultLayout layout = new VaultLayout(
+        DungeonLayout layout = new DungeonLayout(
                 Map.of(Cell.ORIGIN, new Room(Cell.ORIGIN, RoomKind.START, Rotation.CLOCKWISE_90, Mirror.LEFT_RIGHT),
                         east, new Room(east, RoomKind.COMMON, Rotation.CLOCKWISE_180, Mirror.FRONT_BACK)),
                 Set.of(Connection.between(Cell.ORIGIN, east)));
-        VaultPieces pieces = VaultPieces.load(level.getServer().getResourceManager());
+        DungeonPieces pieces = DungeonPieces.load(level.getServer().getResourceManager());
         BlockPos center = helper.absolutePos(BlockPos.ZERO).above(120);
-        VaultBuilder.plan(layout, pieces, center, RandomSource.create(1)).forEach(placement -> VaultBuilder.place(level, placement));
+        DungeonBuilder.plan(layout, pieces, center, RandomSource.create(1)).forEach(placement -> DungeonBuilder.place(level, placement));
 
-        BlockPos a = VaultBuilder.roomMin(center, Cell.ORIGIN);
-        BlockPos b = VaultBuilder.roomMin(center, east);
+        BlockPos a = DungeonBuilder.roomMin(center, Cell.ORIGIN);
+        BlockPos b = DungeonBuilder.roomMin(center, east);
         int doorMid = DOOR_START + DOOR_WIDTH / 2;
         int doorY = DOOR_BOTTOM_Y + 2;
         int aboveDoor = DOOR_BOTTOM_Y + DOOR_HEIGHT + 2;

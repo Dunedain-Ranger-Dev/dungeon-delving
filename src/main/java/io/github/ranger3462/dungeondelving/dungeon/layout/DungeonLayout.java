@@ -1,4 +1,4 @@
-package io.github.ranger3462.dungeondelving.vault.layout;
+package io.github.ranger3462.dungeondelving.dungeon.layout;
 
 import java.util.ArrayDeque;
 import java.util.Collections;
@@ -12,12 +12,12 @@ import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 
 /**
- * Where a vault's rooms sit on the grid and which neighbors are joined by tunnels. Cell (0, 0) is the start room.
- * This is just the plan; {@link VaultBuilder} turns it into placed pieces.
+ * Where a dungeon's rooms sit on the grid and which neighbors are joined by tunnels. Cell (0, 0) is the start room.
+ * This is just the plan; {@link DungeonBuilder} turns it into placed pieces.
  */
-public record VaultLayout(Map<Cell, Room> rooms, Set<Connection> connections) {
+public record DungeonLayout(Map<Cell, Room> rooms, Set<Connection> connections) {
 
-    public VaultLayout {
+    public DungeonLayout {
         rooms = Collections.unmodifiableMap(rooms);
         connections = Collections.unmodifiableSet(connections);
     }
