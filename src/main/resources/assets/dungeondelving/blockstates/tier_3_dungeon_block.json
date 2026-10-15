@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "dungeondelving:block/tier_3_dungeon_block"
+    }
+  }
+}

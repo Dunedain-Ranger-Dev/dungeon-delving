@@ -24,7 +24,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
  * Operator-only commands for testing dungeons without the gate and exit blocks:
- * {@code /dungeondelving dungeon enter [rooms]|leave|fail|regions}.
+ * {@code /dungeondelving dungeon enter [rooms] [tier]|leave|fail|regions}.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class DevCommands {
@@ -40,24 +40,27 @@ public final class DevCommands {
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("dungeon")
                         .then(Commands.literal("enter")
-                                .executes(context -> enter(context, DungeonLayoutGenerator.DEFAULT_ROOMS))
+                                .executes(context -> enter(context, DungeonLayoutGenerator.DEFAULT_ROOMS, DungeonRun.MIN_TIER))
                                 .then(Commands.argument("rooms", IntegerArgumentType.integer(1, DungeonLayoutGenerator.maxRooms()))
-                                        .executes(context -> enter(context, IntegerArgumentType.getInteger(context, "rooms")))))
+                                        .executes(context -> enter(context, IntegerArgumentType.getInteger(context, "rooms"), DungeonRun.MIN_TIER))
+                                        .then(Commands.argument("tier", IntegerArgumentType.integer(DungeonRun.MIN_TIER, DungeonRun.MAX_TIER))
+                                                .executes(context -> enter(context, IntegerArgumentType.getInteger(context, "rooms"),
+                                                        IntegerArgumentType.getInteger(context, "tier"))))))
                         .then(Commands.literal("leave").executes(DevCommands::leave))
                         .then(Commands.literal("fail").executes(DevCommands::failRun))
                         .then(Commands.literal("regions").executes(DevCommands::regions))));
     }
 
-    private static int enter(CommandContext<CommandSourceStack> context, int rooms) throws CommandSyntaxException {
+    private static int enter(CommandContext<CommandSourceStack> context, int rooms, int tier) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         if (DungeonRegions.get().run(player.getUUID()).isPresent()) {
             fail(context.getSource(), "You are already in a dungeon. Leave it first.");
             return 0;
         }
-        DungeonTravel.Entry entry = DungeonTravel.enter(player, rooms);
+        DungeonTravel.Entry entry = DungeonTravel.enter(player, rooms, tier);
         DungeonRun run = entry.run();
         BlockPos center = DungeonDimension.regionCenter(run.region());
-        tell(context.getSource(), "Entered dungeon region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ()
+        tell(context.getSource(), "Entered tier " + run.tier() + " dungeon region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ()
                 + "): " + entry.layout().rooms().size() + " rooms, " + entry.layout().connections().size() + " tunnels");
         return 1;
     }

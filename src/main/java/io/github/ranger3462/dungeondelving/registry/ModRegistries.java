@@ -85,6 +85,12 @@ public final class ModRegistries {
                 output.accept(MOB_MARKER.get());
                 output.accept(RESOURCE_MARKER.get());
                 output.accept(OBJECTIVE_MARKER.get());
+                for (DungeonOre ore : DungeonOre.values()) {
+                    output.accept(ore.oreItem.get());
+                    output.accept(ore.raw.get());
+                    output.accept(ore.ingot.get());
+                    output.accept(ore.storageBlockItem.get());
+                }
             })
             .build());
 
@@ -98,6 +104,7 @@ public final class ModRegistries {
     }
 
     public static void register(IEventBus modEventBus) {
+        DungeonOre.init(); // Registers the ores' blocks and items before the registers are attached.
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         COMPONENTS.register(modEventBus);

@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "dungeondelving:common_dungeon_ore",
+    "dungeondelving:common_dungeon_block",
+    "dungeondelving:tier_1_dungeon_ore",
+    "dungeondelving:tier_1_dungeon_block"
+  ]
+}

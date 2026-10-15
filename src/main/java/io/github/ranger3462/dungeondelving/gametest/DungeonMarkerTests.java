@@ -10,6 +10,7 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers.Rolls;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder.Placement;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces;
+import io.github.ranger3462.dungeondelving.registry.DungeonOre;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
@@ -34,8 +35,9 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public class DungeonMarkerTests {
     private static final String ANY_TEMPLATE = "dungeon/cap_placeholder";
-    private static final Rolls ALWAYS = new Rolls(1.0, 1.0, 3);
-    private static final Rolls NEVER = new Rolls(0.0, 0.0, 3);
+    // Resource markers here always become a vanilla ore (no tier or common ore chance), to test the vanilla list.
+    private static final Rolls ALWAYS = new Rolls(1, 1.0, 1.0, 0.0, 0.0, 3);
+    private static final Rolls NEVER = new Rolls(1, 0.0, 0.0, 0.0, 0.0, 3);
 
     @GameTest(template = ANY_TEMPLATE)
     public static void markersBecomeContent(GameTestHelper helper) {
@@ -63,6 +65,25 @@ public class DungeonMarkerTests {
             helper.assertTrue(mobs.stream().allMatch(mob -> mob.getType().is(DungeonMarkers.DUNGEON_MOBS)), "mobs should come from the dungeon mob list");
             helper.assertTrue(mobs.stream().allMatch(mob -> mob instanceof Mob m && m.isPersistenceRequired()), "dungeon mobs shouldn't despawn");
             helper.assertTrue(level.getBlockState(pos).isAir(), "the mob marker itself should be removed");
+        } finally {
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void resourceMarkersRollDungeonOres(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos pos = helper.absolutePos(BlockPos.ZERO).above(120);
+        RandomSource random = RandomSource.create(9);
+        try {
+            for (int tier = 1; tier <= 4; tier++) {
+                resolve(level, pos, ModRegistries.RESOURCE_MARKER.get(), random, new Rolls(tier, 0, 1.0, 1.0, 0.0, 1));
+                Block expected = DungeonOre.forTier(tier).orElseThrow().ore.get();
+                helper.assertTrue(level.getBlockState(pos).is(expected), "a tier " + tier + " dungeon should roll its own tier ore");
+            }
+            resolve(level, pos, ModRegistries.RESOURCE_MARKER.get(), random, new Rolls(3, 0, 1.0, 0.0, 1.0, 1));
+            helper.assertTrue(level.getBlockState(pos).is(DungeonOre.COMMON.ore.get()), "the common ore can roll in any dungeon");
         } finally {
             level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         }

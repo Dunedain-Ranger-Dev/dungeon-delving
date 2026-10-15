@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "dungeondelving:block/common_dungeon_ore"
+    }
+  }
+}

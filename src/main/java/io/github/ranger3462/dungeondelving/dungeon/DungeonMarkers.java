@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import io.github.ranger3462.dungeondelving.Config;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.registry.DungeonOre;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -33,7 +34,8 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * <ul>
  * <li>Loot marker: a chest with {@code dungeondelving:chests/dungeon_room} loot, or nothing.</li>
  * <li>Mob marker: one or more mobs from the {@code dungeondelving:dungeon_mobs} entity tag.</li>
- * <li>Resource marker: an ore from the {@code dungeondelving:dungeon_resources} block tag, or nothing.</li>
+ * <li>Resource marker: the dungeon's tier ore, the common dungeon ore, a vanilla ore from the
+ * {@code dungeondelving:dungeon_resources} block tag, or nothing.</li>
  * <li>Objective marker: a reward chest with {@code dungeondelving:chests/dungeon_objective} loot.</li>
  * </ul>
  * Chances and mob counts come from the config.
@@ -44,10 +46,11 @@ public final class DungeonMarkers {
     public static final TagKey<EntityType<?>> DUNGEON_MOBS = TagKey.create(Registries.ENTITY_TYPE, DungeonDelving.id("dungeon_mobs"));
     public static final TagKey<Block> DUNGEON_RESOURCES = TagKey.create(Registries.BLOCK, DungeonDelving.id("dungeon_resources"));
 
-    /** Chances and limits used when rolling markers. */
-    public record Rolls(double lootChance, double resourceChance, int maxMobs) {
-        public static Rolls fromConfig() {
-            return new Rolls(Config.LOOT_MARKER_CHANCE.get(), Config.RESOURCE_MARKER_CHANCE.get(), Config.MAX_MOBS_PER_MARKER.get());
+    /** The dungeon's tier, and the chances and limits used when rolling its markers. */
+    public record Rolls(int tier, double lootChance, double resourceChance, double tierOreChance, double commonOreChance, int maxMobs) {
+        public static Rolls fromConfig(int tier) {
+            return new Rolls(tier, Config.LOOT_MARKER_CHANCE.get(), Config.RESOURCE_MARKER_CHANCE.get(), Config.TIER_ORE_CHANCE.get(),
+                    Config.COMMON_ORE_CHANCE.get(), Config.MAX_MOBS_PER_MARKER.get());
         }
     }
 
@@ -77,13 +80,24 @@ public final class DungeonMarkers {
             placeChest(level, pos, OBJECTIVE_LOOT, random);
         } else if (marker == ModRegistries.RESOURCE_MARKER.get()) {
             if (random.nextDouble() < rolls.resourceChance()) {
-                pickFromTag(level.registryAccess().registryOrThrow(Registries.BLOCK).getTag(DUNGEON_RESOURCES), random)
-                        .ifPresent(ore -> level.setBlock(pos, ore.value().defaultBlockState(), Block.UPDATE_CLIENTS));
+                pickOre(level, random, rolls).ifPresent(ore -> level.setBlock(pos, ore.defaultBlockState(), Block.UPDATE_CLIENTS));
             }
         } else if (marker == ModRegistries.MOB_MARKER.get()) {
             return spawnMobs(level, pos, random, rolls.maxMobs());
         }
         return List.of();
+    }
+
+    /** The dungeon's tier ore, the common dungeon ore, or a vanilla ore, by the configured chances. */
+    private static Optional<Block> pickOre(ServerLevel level, RandomSource random, Rolls rolls) {
+        double roll = random.nextDouble();
+        if (roll < rolls.tierOreChance()) {
+            return DungeonOre.forTier(rolls.tier()).map(ore -> ore.ore.get());
+        }
+        if (roll < rolls.tierOreChance() + rolls.commonOreChance()) {
+            return Optional.of(DungeonOre.COMMON.ore.get());
+        }
+        return pickFromTag(level.registryAccess().registryOrThrow(Registries.BLOCK).getTag(DUNGEON_RESOURCES), random).map(Holder::value);
     }
 
     private static void placeChest(ServerLevel level, BlockPos pos, ResourceKey<LootTable> table, RandomSource random) {

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "dungeondelving:tier_4_dungeon_ingot"
+    }
+  },
+  "result": {
+    "id": "dungeondelving:tier_4_dungeon_block",
+    "count": 1
+  }
+}

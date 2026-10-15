@@ -84,7 +84,7 @@ public class DungeonRegionTests {
     }
 
     private static DungeonRun run(UUID player, int region) {
-        return new DungeonRun(player, region, Level.OVERWORLD, 0, 64, 0, 0, 0);
+        return new DungeonRun(player, region, DungeonRun.MIN_TIER, Level.OVERWORLD, 0, 64, 0, 0, 0);
     }
 
     private static Path tempDimensionFolder() {

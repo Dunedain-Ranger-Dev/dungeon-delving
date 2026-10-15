@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder.Placement;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -31,8 +32,8 @@ public final class DungeonBuildQueue {
 
     private DungeonBuildQueue() {}
 
-    public static void add(int region, List<Placement> placements) {
-        placements.forEach(placement -> TASKS.add(new Task(region, level -> DungeonBuilder.place(level, placement), placement.template().toString())));
+    public static void add(int region, List<Placement> placements, DungeonMarkers.Rolls rolls) {
+        placements.forEach(placement -> TASKS.add(new Task(region, level -> DungeonBuilder.place(level, placement, rolls), placement.template().toString())));
     }
 
     public static void addShell(int region, List<BoundingBox> sections) {

@@ -175,12 +175,21 @@ public final class DungeonBuilder {
      * Places one piece so that, after turning, it exactly fills the space starting at {@code targetMin}, then turns
      * its marker blocks into chests, mobs and ores.
      */
+    public static void place(ServerLevel level, Placement placement, DungeonMarkers.Rolls rolls) {
+        place(level, placement, rolls, true);
+    }
+
+    /** Places a piece as part of a tier 1 dungeon. */
     public static void place(ServerLevel level, Placement placement) {
-        place(level, placement, true);
+        place(level, placement, DungeonMarkers.Rolls.fromConfig(1));
     }
 
     /** Places one piece, optionally leaving its marker blocks as they are (useful for checking a piece's shape). */
     public static void place(ServerLevel level, Placement placement, boolean resolveMarkers) {
+        place(level, placement, DungeonMarkers.Rolls.fromConfig(1), resolveMarkers);
+    }
+
+    private static void place(ServerLevel level, Placement placement, DungeonMarkers.Rolls rolls, boolean resolveMarkers) {
         StructureTemplate template = level.getStructureManager().get(placement.template())
                 .orElseThrow(() -> new IllegalStateException("Missing dungeon piece " + placement.template()));
         StructurePlaceSettings settings = new StructurePlaceSettings().setRotation(placement.rotation()).setMirror(placement.mirror());
@@ -188,7 +197,7 @@ public final class DungeonBuilder {
         BlockPos pos = placement.targetMin().offset(-box.minX(), -box.minY(), -box.minZ());
         template.placeInWorld(level, pos, pos, settings, level.getRandom(), Block.UPDATE_CLIENTS);
         if (resolveMarkers) {
-            DungeonMarkers.resolve(level, template, pos, settings, level.getRandom(), DungeonMarkers.Rolls.fromConfig());
+            DungeonMarkers.resolve(level, template, pos, settings, level.getRandom(), rolls);
         }
     }
 }

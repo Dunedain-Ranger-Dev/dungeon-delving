@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "dungeondelving:block/tier_3_dungeon_ore"
+  }
+}

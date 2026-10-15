@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "ingredient": {
+    "item": "dungeondelving:raw_tier_3_dungeon_ore"
+  },
+  "result": {
+    "id": "dungeondelving:tier_3_dungeon_ingot"
+  },
+  "experience": 1.3,
+  "cookingtime": 200
+}

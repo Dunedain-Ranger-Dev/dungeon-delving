@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "dungeondelving:common_dungeon_ingot",
+    "dungeondelving:tier_1_dungeon_ingot",
+    "dungeondelving:tier_2_dungeon_ingot",
+    "dungeondelving:tier_3_dungeon_ingot",
+    "dungeondelving:tier_4_dungeon_ingot"
+  ]
+}

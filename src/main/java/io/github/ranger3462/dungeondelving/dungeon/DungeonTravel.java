@@ -38,7 +38,8 @@ public final class DungeonTravel {
      * Starts a run in a fresh region: generates a layout, places the start room and its exit right away, queues the
      * rest and the bedrock shell to be built over the next few ticks, and sends the player into the start room.
      */
-    public static Entry enter(ServerPlayer player, int roomCount) {
+    public static Entry enter(ServerPlayer player, int roomCount, int tier) {
+        tier = DungeonRun.clampTier(tier);
         ServerLevel dungeon = dungeonLevel(player);
         DungeonRegions regions = DungeonRegions.get();
         int region = regions.allocate();
@@ -47,12 +48,13 @@ public final class DungeonTravel {
         DungeonLayout layout = DungeonLayoutGenerator.generate(dungeon.getRandom(), roomCount);
         DungeonPieces pieces = DungeonPieces.load(player.server);
         List<Placement> placements = DungeonBuilder.plan(layout, pieces, center, dungeon.getRandom());
-        DungeonBuilder.place(dungeon, placements.getFirst());
+        DungeonMarkers.Rolls rolls = DungeonMarkers.Rolls.fromConfig(tier);
+        DungeonBuilder.place(dungeon, placements.getFirst(), rolls);
         dungeon.setBlock(center.above(), ModRegistries.DUNGEON_EXIT.get().defaultBlockState(), Block.UPDATE_ALL);
-        DungeonBuildQueue.add(region, placements.subList(1, placements.size()));
+        DungeonBuildQueue.add(region, placements.subList(1, placements.size()), rolls);
         DungeonBuildQueue.addShell(region, DungeonBuilder.shell(layout, center));
 
-        DungeonRun run = new DungeonRun(player.getUUID(), region, player.level().dimension(), player.getX(), player.getY(),
+        DungeonRun run = new DungeonRun(player.getUUID(), region, tier, player.level().dimension(), player.getX(), player.getY(),
                 player.getZ(), player.getYRot(), player.getXRot());
         regions.startRun(run);
         regions.startBag(player.getUUID(), new DungeonBag(DungeonBag.slotsForLevel(player.getData(ModRegistries.BAG_LEVEL))));

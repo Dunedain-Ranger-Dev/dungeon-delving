@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonTravel;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
 import net.minecraft.ChatFormatting;
@@ -39,7 +40,8 @@ public class DungeonGateBlock extends Block {
             serverPlayer.sendSystemMessage(Component.literal("You're already in a dungeon.").withStyle(ChatFormatting.RED));
             return InteractionResult.CONSUME;
         }
-        DungeonTravel.Entry entry = DungeonTravel.enter(serverPlayer, DungeonLayoutGenerator.DEFAULT_ROOMS);
+        // Choosing a higher tier comes with DD-32; the gate always opens tier 1 for now.
+        DungeonTravel.Entry entry = DungeonTravel.enter(serverPlayer, DungeonLayoutGenerator.DEFAULT_ROOMS, DungeonRun.MIN_TIER);
         serverPlayer.sendSystemMessage(Component.literal("You enter a dungeon of " + entry.layout().rooms().size()
                 + " rooms. Find the loot and leave through the exit to keep it.").withStyle(ChatFormatting.GOLD));
         return InteractionResult.CONSUME;

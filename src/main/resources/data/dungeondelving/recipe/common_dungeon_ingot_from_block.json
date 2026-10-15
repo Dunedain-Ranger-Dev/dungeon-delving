@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "dungeondelving:common_dungeon_block"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:common_dungeon_ingot",
+    "count": 9
+  }
+}
