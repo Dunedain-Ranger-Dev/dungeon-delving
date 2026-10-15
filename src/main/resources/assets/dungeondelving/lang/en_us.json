@@ -1,2 +1,10 @@
 {
+  "block.dungeondelving.dungeon_gate": "Dungeon Gate",
+  "block.dungeondelving.dungeon_exit": "Dungeon Exit",
+  "tooltip.dungeondelving.dungeon_loot": "Dungeon loot: leave through the exit to keep it",
+
+  "dungeondelving.configuration.title": "Dungeon Delving",
+  "dungeondelving.configuration.exportCopyFolder": "Export copy folder",
+  "dungeondelving.configuration.runTimeLimitSeconds": "Run time limit (seconds, 0 = off)",
+  "dungeondelving.configuration.failureGearDamage": "Gear damage on a failed run"
 }

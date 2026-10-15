@@ -27,6 +27,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 
 /**
  * Hands out dungeon regions to runs and tracks which are in use.
@@ -43,6 +44,10 @@ public class DungeonRegions {
     private final TreeSet<Integer> free = new TreeSet<>();
     private final TreeSet<Integer> released = new TreeSet<>();
     private final Map<UUID, DungeonRun> runs = new HashMap<>();
+    /** Ticks each active run has been going while its player was in the dungeon. */
+    private final Map<UUID, Integer> elapsed = new HashMap<>();
+    /** Inventories kept from players who died in a dungeon, given back when they respawn. */
+    private final Map<UUID, ListTag> heldInventories = new HashMap<>();
     private Path file;
 
     /** The region tracker for the running server. */
@@ -99,8 +104,32 @@ public class DungeonRegions {
         save();
     }
 
+    public int elapsedTicks(UUID player) {
+        return elapsed.getOrDefault(player, 0);
+    }
+
+    /** Adds a tick to the player's run time. Not saved immediately; see {@link #saveNow()}. */
+    public int tick(UUID player) {
+        return elapsed.merge(player, 1, Integer::sum);
+    }
+
+    public void holdInventory(UUID player, ListTag inventory) {
+        heldInventories.put(player, inventory);
+        save();
+    }
+
+    /** Takes back an inventory held since the player died in a dungeon, if there is one. */
+    public Optional<ListTag> takeHeldInventory(UUID player) {
+        ListTag inventory = heldInventories.remove(player);
+        if (inventory != null) {
+            save();
+        }
+        return Optional.ofNullable(inventory);
+    }
+
     /** Ends a player's run and releases its region if no one else is using it. */
     public Optional<DungeonRun> endRun(UUID player) {
+        elapsed.remove(player);
         DungeonRun run = runs.remove(player);
         if (run != null) {
             release(run.region());
@@ -138,8 +167,20 @@ public class DungeonRegions {
         tag.put("free", new IntArrayTag(new ArrayList<>(free)));
         tag.put("released", new IntArrayTag(new ArrayList<>(released)));
         ListTag runList = new ListTag();
-        runs.values().forEach(run -> runList.add(run.save()));
+        runs.values().forEach(run -> {
+            CompoundTag runTag = run.save();
+            runTag.putInt("elapsed_ticks", elapsedTicks(run.player()));
+            runList.add(runTag);
+        });
         tag.put("runs", runList);
+        ListTag heldList = new ListTag();
+        heldInventories.forEach((player, inventory) -> {
+            CompoundTag held = new CompoundTag();
+            held.putUUID("player", player);
+            held.put("inventory", inventory);
+            heldList.add(held);
+        });
+        tag.put("held_inventories", heldList);
         return tag;
     }
 
@@ -155,8 +196,18 @@ public class DungeonRegions {
         for (Tag runTag : tag.getList("runs", Tag.TAG_COMPOUND)) {
             DungeonRun run = DungeonRun.load((CompoundTag) runTag);
             regions.runs.put(run.player(), run);
+            regions.elapsed.put(run.player(), ((CompoundTag) runTag).getInt("elapsed_ticks"));
+        }
+        for (Tag heldTag : tag.getList("held_inventories", Tag.TAG_COMPOUND)) {
+            CompoundTag held = (CompoundTag) heldTag;
+            regions.heldInventories.put(held.getUUID("player"), held.getList("inventory", Tag.TAG_COMPOUND));
         }
         return regions;
+    }
+
+    /** Writes the current state to disk, including run times, which aren't saved on every tick. */
+    public void saveNow() {
+        save();
     }
 
     private void save() {
@@ -199,6 +250,13 @@ public class DungeonRegions {
             DungeonDelving.LOGGER.error("Failed to wipe finished dungeon regions", e);
         }
         current = regions;
+    }
+
+    @SubscribeEvent
+    public static void onServerStopping(ServerStoppingEvent event) {
+        if (current != null) {
+            current.save();
+        }
     }
 
     @SubscribeEvent

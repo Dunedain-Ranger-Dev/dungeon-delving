@@ -23,8 +23,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
- * Operator-only commands for testing dungeons before the real entry and exit (DD-15) exist:
- * {@code /dungeondelving dungeon enter [rooms]|leave|regions}.
+ * Operator-only commands for testing dungeons without the gate and exit blocks:
+ * {@code /dungeondelving dungeon enter [rooms]|leave|fail|regions}.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class DevCommands {
@@ -44,6 +44,7 @@ public final class DevCommands {
                                 .then(Commands.argument("rooms", IntegerArgumentType.integer(1, DungeonLayoutGenerator.maxRooms()))
                                         .executes(context -> enter(context, IntegerArgumentType.getInteger(context, "rooms")))))
                         .then(Commands.literal("leave").executes(DevCommands::leave))
+                        .then(Commands.literal("fail").executes(DevCommands::failRun))
                         .then(Commands.literal("regions").executes(DevCommands::regions))));
     }
 
@@ -61,12 +62,22 @@ public final class DevCommands {
         return 1;
     }
 
+    /** Same as using the exit block: ends the run and keeps the loot. */
     private static int leave(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
-        return DungeonTravel.leave(player).map(run -> {
+        return DungeonTravel.exit(player).map(run -> {
             tell(context.getSource(), "Left dungeon region " + run.region() + ". It will be wiped the next time the world loads.");
             return 1;
         }).orElseGet(() -> {
+            fail(context.getSource(), "You are not in a dungeon.");
+            return 0;
+        });
+    }
+
+    /** Fails the run the same way running out of time does, for testing without waiting. */
+    private static int failRun(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        return DungeonTravel.fail(player, "Run failed (dev command).").map(run -> 1).orElseGet(() -> {
             fail(context.getSource(), "You are not in a dungeon.");
             return 0;
         });

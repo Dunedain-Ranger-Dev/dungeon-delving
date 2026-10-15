@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "dungeondelving:block/dungeon_exit" }
+  }
+}
