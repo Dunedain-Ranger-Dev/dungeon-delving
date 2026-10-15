@@ -63,45 +63,50 @@ public class PlaceholderRoomTests {
         helper.succeed();
     }
 
-    @GameTest(template = "vault/plug_placeholder")
-    public static void doorPlug(GameTestHelper helper) {
+    @GameTest(template = "vault/wall_door_placeholder")
+    public static void doorwayWall(GameTestHelper helper) {
         Piece piece = Piece.of(helper);
-        piece.checkSize(DOOR_WIDTH, DOOR_HEIGHT, PLUG_DEPTH);
-        for (int x = 0; x < DOOR_WIDTH; x++) {
-            for (int y = 0; y < DOOR_HEIGHT; y++) {
-                piece.checkSolid(x, y, 0, "door plug must fully fill the doorway");
-            }
-        }
-        helper.succeed();
-    }
-
-    /** Checks a room's size and that all four doorways are open, framed by wall, and sitting on the floor. */
-    private static void checkRoom(GameTestHelper helper) {
-        Piece piece = Piece.of(helper);
-        piece.checkSize(ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE);
-        int max = ROOM_SIZE - 1;
-        // Each face as (fixed x or z, whether the face runs along z).
-        checkDoorway(piece, 0, true);
-        checkDoorway(piece, max, true);
-        checkDoorway(piece, 0, false);
-        checkDoorway(piece, max, false);
-        helper.succeed();
-    }
-
-    private static void checkDoorway(Piece piece, int face, boolean alongZ) {
-        for (int i = 0; i < ROOM_SIZE; i++) {
-            for (int y = 0; y < ROOM_HEIGHT; y++) {
-                int x = alongZ ? face : i;
-                int z = alongZ ? i : face;
-                if (inRoomDoorSpan(i) && inDoorHeight(y)) {
-                    piece.checkAir(x, y, z, "doorway must be open");
-                } else if (inRoomDoorSpan(i) && (y == 0 || y == DOOR_BOTTOM_Y + DOOR_HEIGHT)) {
-                    piece.checkSolid(x, y, z, "doorway must have floor below and wall above");
-                } else if (inDoorHeight(y) && (i == ROOM_DOOR_START - 1 || i == ROOM_DOOR_START + DOOR_WIDTH)) {
-                    piece.checkSolid(x, y, z, "doorway must be exactly " + DOOR_WIDTH + " wide");
+        piece.checkSize(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS);
+        for (int x = 0; x < WALL_LENGTH; x++) {
+            for (int y = 0; y < WALL_HEIGHT; y++) {
+                if (inWallDoorSpan(x) && inDoorHeight(y)) {
+                    piece.checkAir(x, y, 0, "doorway must be open");
+                } else {
+                    piece.checkSolid(x, y, 0, "doorway wall must be solid outside the " + DOOR_WIDTH + "x" + DOOR_HEIGHT + " opening");
                 }
             }
         }
+        helper.succeed();
+    }
+
+    @GameTest(template = "vault/wall_cap_placeholder")
+    public static void capWall(GameTestHelper helper) {
+        Piece piece = Piece.of(helper);
+        piece.checkSize(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS);
+        for (int x = 0; x < WALL_LENGTH; x++) {
+            for (int y = 0; y < WALL_HEIGHT; y++) {
+                piece.checkSolid(x, y, 0, "cap wall must be fully solid");
+            }
+        }
+        helper.succeed();
+    }
+
+    /** Checks a room's size, that it has a floor and ceiling, and that the outer ring is left empty for walls. */
+    private static void checkRoom(GameTestHelper helper) {
+        Piece piece = Piece.of(helper);
+        piece.checkSize(ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE);
+        for (int x = 0; x < ROOM_SIZE; x++) {
+            for (int z = 0; z < ROOM_SIZE; z++) {
+                piece.checkSolid(x, 0, z, "room must have a full floor");
+                piece.checkSolid(x, ROOM_HEIGHT - 1, z, "room must have a full ceiling");
+                if (inRoomWallRing(x, z)) {
+                    for (int y = 1; y < ROOM_HEIGHT - 1; y++) {
+                        piece.checkAir(x, y, z, "outer ring must stay empty for walls");
+                    }
+                }
+            }
+        }
+        helper.succeed();
     }
 
     /** A placed piece, addressed in the piece's own local coordinates. */
