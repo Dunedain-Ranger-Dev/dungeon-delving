@@ -87,12 +87,12 @@ public class PieceValidationTests {
             clear(level, corner, corner.offset(ROOM_SIZE - 1, ROOM_HEIGHT - 1, ROOM_SIZE - 1));
         }
         try {
-            // A cap with a gap where the doorway would be.
+            // A cap with a gap in it.
             DungeonBuilder.place(level, new Placement(DungeonPieces.id("cap_placeholder"), corner, Rotation.NONE, Mirror.NONE), false);
-            level.setBlock(corner.offset(doorMid, DOOR_BOTTOM_Y, 0), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            level.setBlock(corner.offset(CAP_WIDTH / 2, CAP_HEIGHT / 2, 0), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             helper.assertTrue(PieceValidator.validate(Kind.CAP, level, corner).size() == 1, "a cap gap should be reported");
         } finally {
-            clear(level, corner, corner.offset(WALL_LENGTH - 1, WALL_HEIGHT - 1, 0));
+            clear(level, corner, corner.offset(CAP_WIDTH - 1, CAP_HEIGHT - 1, CAP_DEPTH - 1));
         }
         helper.succeed();
     }

@@ -1,12 +1,6 @@
 package io.github.ranger3462.dungeondelving.dungeon.layout;
 
-import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.CORRIDOR_HEIGHT;
-import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.CORRIDOR_START;
-import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.CORRIDOR_WIDTH;
-import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.GRID_PITCH;
-import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.ROOM_HEIGHT;
-import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.ROOM_SIZE;
-import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.TUNNEL_LENGTH;
+import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.*;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -34,7 +28,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 
 /**
  * Turns a {@link DungeonLayout} into concrete piece placements in the world: a room per cell, a tunnel per
- * connection, a cap on every room face with no tunnel, and a bedrock skin behind every outer surface. The start room sits
+ * connection, a cap plugging every doorway with no tunnel, and a bedrock skin behind every outer surface. The start room sits
  * centered on {@code center}.
  */
 public final class DungeonBuilder {
@@ -72,26 +66,28 @@ public final class DungeonBuilder {
                         .thenComparing(Connection::alongX))
                 .toList()) {
             BlockPos fromMin = roomMin(center, connection.from());
-            // Tunnel pieces run along z; turn them a quarter for east-west tunnels.
+            // Tunnel pieces run along z; turn them a quarter for east-west tunnels. Either way the corridor starts
+            // just outside the room and is centered on its doorway.
             if (connection.alongX()) {
-                placements.add(new Placement(pieces.pick(Kind.TUNNEL, random), fromMin.offset(ROOM_SIZE, 0, 0), Rotation.CLOCKWISE_90, Mirror.NONE));
+                placements.add(new Placement(pieces.pick(Kind.TUNNEL, random), fromMin.offset(ROOM_SIZE, 0, TUNNEL_START), Rotation.CLOCKWISE_90, Mirror.NONE));
             } else {
-                placements.add(new Placement(pieces.pick(Kind.TUNNEL, random), fromMin.offset(0, 0, ROOM_SIZE), Rotation.NONE, Mirror.NONE));
+                placements.add(new Placement(pieces.pick(Kind.TUNNEL, random), fromMin.offset(TUNNEL_START, 0, ROOM_SIZE), Rotation.NONE, Mirror.NONE));
             }
         }
 
+        int max = ROOM_SIZE - 1;
         for (Room room : rooms) {
             BlockPos min = roomMin(center, room.cell());
             for (Direction direction : new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST }) {
                 if (layout.connected(room.cell(), direction)) {
                     continue;
                 }
-                // Caps run along x; turn them a quarter for west and east faces.
+                // Caps plug the doorway hole in the room's wall. They run along x; turn them a quarter for west and east.
                 Placement cap = switch (direction) {
-                    case NORTH -> new Placement(pieces.pick(Kind.CAP, random), min.offset(0, 0, -1), Rotation.NONE, Mirror.NONE);
-                    case SOUTH -> new Placement(pieces.pick(Kind.CAP, random), min.offset(0, 0, ROOM_SIZE), Rotation.NONE, Mirror.NONE);
-                    case WEST -> new Placement(pieces.pick(Kind.CAP, random), min.offset(-1, 0, 0), Rotation.CLOCKWISE_90, Mirror.NONE);
-                    default -> new Placement(pieces.pick(Kind.CAP, random), min.offset(ROOM_SIZE, 0, 0), Rotation.CLOCKWISE_90, Mirror.NONE);
+                    case NORTH -> new Placement(pieces.pick(Kind.CAP, random), min.offset(DOOR_START, DOOR_BOTTOM_Y, 0), Rotation.NONE, Mirror.NONE);
+                    case SOUTH -> new Placement(pieces.pick(Kind.CAP, random), min.offset(DOOR_START, DOOR_BOTTOM_Y, max), Rotation.NONE, Mirror.NONE);
+                    case WEST -> new Placement(pieces.pick(Kind.CAP, random), min.offset(0, DOOR_BOTTOM_Y, DOOR_START), Rotation.CLOCKWISE_90, Mirror.NONE);
+                    default -> new Placement(pieces.pick(Kind.CAP, random), min.offset(max, DOOR_BOTTOM_Y, DOOR_START), Rotation.CLOCKWISE_90, Mirror.NONE);
                 };
                 placements.add(cap);
             }
@@ -100,9 +96,9 @@ public final class DungeonBuilder {
     }
 
     /**
-     * The bedrock skin around a layout: one layer directly behind every outer surface (under room floors, over room
-     * ceilings, behind caps, around tunnel corridors, and behind tunnel end walls). Each layer reaches one block past
-     * its edges, so the open corners between walls are sealed too. Pieces stay breakable, but breaking through one
+     * The bedrock skin around a layout: one layer directly behind every outer surface: under room floors, over room
+     * ceilings, outside room walls (leaving a gap where a tunnel attaches), and around tunnel corridors. Each layer
+     * reaches one block past its edges, so corners are sealed too. Pieces stay breakable, but breaking through one
      * always leads to bedrock, never into the void. Returned as small boxes so they can be filled a few per tick.
      */
     public static List<BoundingBox> shell(DungeonLayout layout, BlockPos center) {
@@ -110,52 +106,52 @@ public final class DungeonBuilder {
         int below = -1;
         int above = ROOM_HEIGHT;
         int edge = ROOM_SIZE; // One block past a room's far side.
+        int tunnelEnd = TUNNEL_START + TUNNEL_WIDTH - 1;
+        int tunnelTop = TUNNEL_HEIGHT - 1;
 
         for (Room room : layout.rooms().values()) {
             BlockPos min = roomMin(center, room.cell());
             boxes.add(box(min, -1, below, -1, edge, below, edge));
             boxes.add(box(min, -1, above, -1, edge, above, edge));
             for (Direction direction : new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST }) {
-                if (layout.connected(room.cell(), direction)) {
+                // Just outside the wall, in the room's own frame: "across" runs along the wall, "out" is the fixed plane.
+                int out = direction == Direction.NORTH || direction == Direction.WEST ? -1 : edge;
+                boolean alongX = direction == Direction.NORTH || direction == Direction.SOUTH;
+                if (!layout.connected(room.cell(), direction)) {
+                    boxes.add(sideBox(min, alongX, out, -1, below, edge, above));
                     continue;
                 }
-                // Directly behind the cap, which sits one block outside the room.
-                boxes.add(switch (direction) {
-                    case NORTH -> box(min, -1, below, -2, edge, above, -2);
-                    case SOUTH -> box(min, -1, below, edge + 1, edge, above, edge + 1);
-                    case WEST -> box(min, -2, below, -1, -2, above, edge);
-                    default -> box(min, edge + 1, below, -1, edge + 1, above, edge);
-                });
+                // Leave the tunnel's cross-section open; seal everything around it.
+                boxes.add(sideBox(min, alongX, out, -1, below, TUNNEL_START - 1, above));
+                boxes.add(sideBox(min, alongX, out, tunnelEnd + 1, below, edge, above));
+                boxes.add(sideBox(min, alongX, out, TUNNEL_START, tunnelTop + 1, tunnelEnd, above));
+                boxes.add(sideBox(min, alongX, out, TUNNEL_START, below, tunnelEnd, below));
             }
         }
 
         for (Connection connection : layout.connections()) {
             BlockPos fromMin = roomMin(center, connection.from());
             // Work in the tunnel's own frame (corridor along z), then turn it to match the tunnel's direction.
-            BlockPos tunnelMin = connection.alongX() ? fromMin.offset(ROOM_SIZE, 0, 0) : fromMin.offset(0, 0, ROOM_SIZE);
             boolean turn = connection.alongX();
-            int x1 = CORRIDOR_START - 1;
-            int x2 = CORRIDOR_START + CORRIDOR_WIDTH;
-            int z1 = 1;
-            int z2 = TUNNEL_LENGTH - 2;
-            int top = CORRIDOR_HEIGHT;
-            // Around the corridor: under, over, and both sides.
-            boxes.add(tunnelBox(tunnelMin, turn, x1, below, z1, x2, below, z2));
-            boxes.add(tunnelBox(tunnelMin, turn, x1, top, z1, x2, top, z2));
-            boxes.add(tunnelBox(tunnelMin, turn, x1, below, z1, x1, top, z2));
-            boxes.add(tunnelBox(tunnelMin, turn, x2, below, z1, x2, top, z2));
-            // Behind each end wall, wherever the corridor isn't: beside it, and above it.
-            for (int z : new int[] { z1, z2 }) {
-                boxes.add(tunnelBox(tunnelMin, turn, -1, below, z, x1, above, z));
-                boxes.add(tunnelBox(tunnelMin, turn, x2, below, z, edge, above, z));
-                boxes.add(tunnelBox(tunnelMin, turn, x1, top, z, x2, above, z));
-            }
+            BlockPos tunnelMin = turn ? fromMin.offset(ROOM_SIZE, 0, TUNNEL_START) : fromMin.offset(TUNNEL_START, 0, ROOM_SIZE);
+            int x1 = -1;
+            int x2 = TUNNEL_WIDTH;
+            int lastZ = TUNNEL_LENGTH - 1;
+            boxes.add(tunnelBox(tunnelMin, turn, x1, below, 0, x2, below, lastZ));
+            boxes.add(tunnelBox(tunnelMin, turn, x1, TUNNEL_HEIGHT, 0, x2, TUNNEL_HEIGHT, lastZ));
+            boxes.add(tunnelBox(tunnelMin, turn, x1, below, 0, x1, TUNNEL_HEIGHT, lastZ));
+            boxes.add(tunnelBox(tunnelMin, turn, x2, below, 0, x2, TUNNEL_HEIGHT, lastZ));
         }
         return boxes;
     }
 
     private static BoundingBox box(BlockPos origin, int x1, int y1, int z1, int x2, int y2, int z2) {
         return BoundingBox.fromCorners(origin.offset(x1, y1, z1), origin.offset(x2, y2, z2));
+    }
+
+    /** A box in the plane just outside one room wall, from {@code a1} to {@code a2} along the wall. */
+    private static BoundingBox sideBox(BlockPos roomMin, boolean alongX, int out, int a1, int y1, int a2, int y2) {
+        return alongX ? box(roomMin, a1, y1, out, a2, y2, out) : box(roomMin, out, y1, a1, out, y2, a2);
     }
 
     /** A box given in a tunnel's own frame (x across, z along the corridor), placed in the world. */

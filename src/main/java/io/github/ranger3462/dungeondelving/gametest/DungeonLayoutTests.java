@@ -115,26 +115,27 @@ public class DungeonLayoutTests {
                 solid(helper, room.offset(ROOM_SIZE - 1, ROOM_HEIGHT - 1, 0), "room ceiling corner");
             }
 
-            // The tunnel's two doorway walls sit against each room's facing side.
-            for (int wallX : new int[] { a.getX() + ROOM_SIZE, b.getX() - 1 }) {
+            // Where the tunnel attaches, each room's doorway is open, framed by its own wall.
+            for (int wallX : new int[] { a.getX() + ROOM_SIZE - 1, b.getX() }) {
                 air(helper, new BlockPos(wallX, a.getY() + doorY, a.getZ() + doorMid), "doorway opening");
-                solid(helper, new BlockPos(wallX, a.getY() + doorY, a.getZ() + DOOR_START - 1), "wall beside the doorway");
-                solid(helper, new BlockPos(wallX, a.getY() + aboveDoor, a.getZ() + doorMid), "wall above the doorway");
-                solid(helper, new BlockPos(wallX, a.getY(), a.getZ() + doorMid), "doorway threshold");
+                solid(helper, new BlockPos(wallX, a.getY() + doorY, a.getZ() + DOOR_START - 1), "room wall beside the doorway");
+                solid(helper, new BlockPos(wallX, a.getY() + aboveDoor, a.getZ() + doorMid), "room wall above the doorway");
             }
             BlockPos corridor = new BlockPos(a.getX() + ROOM_SIZE + TUNNEL_LENGTH / 2, a.getY(), a.getZ() + doorMid);
             solid(helper, corridor, "corridor floor");
             air(helper, corridor.above(DOOR_BOTTOM_Y), "corridor walkway");
+            solid(helper, new BlockPos(corridor.getX(), a.getY() + doorY, a.getZ() + TUNNEL_START), "corridor wall");
 
-            // Every face without a tunnel is capped, including across the doorway spot.
-            solid(helper, a.offset(doorMid, doorY, -1), "start room north cap");
-            solid(helper, a.offset(doorMid, doorY, ROOM_SIZE), "start room south cap");
-            solid(helper, a.offset(-1, doorY, doorMid), "start room west cap");
-            solid(helper, b.offset(doorMid, doorY, -1), "east room north cap");
-            solid(helper, b.offset(doorMid, doorY, ROOM_SIZE), "east room south cap");
-            solid(helper, b.offset(ROOM_SIZE, doorY, doorMid), "east room east cap");
+            // Every doorway without a tunnel is plugged by a cap.
+            int max = ROOM_SIZE - 1;
+            solid(helper, a.offset(doorMid, doorY, 0), "start room north cap");
+            solid(helper, a.offset(doorMid, doorY, max), "start room south cap");
+            solid(helper, a.offset(0, doorY, doorMid), "start room west cap");
+            solid(helper, b.offset(doorMid, doorY, 0), "east room north cap");
+            solid(helper, b.offset(doorMid, doorY, max), "east room south cap");
+            solid(helper, b.offset(max, doorY, doorMid), "east room east cap");
         } finally {
-            clear(level, a.offset(-1, 0, -1), b.offset(ROOM_SIZE, ROOM_HEIGHT - 1, ROOM_SIZE));
+            clear(level, a, b.offset(ROOM_SIZE - 1, ROOM_HEIGHT - 1, ROOM_SIZE - 1));
         }
         helper.succeed();
     }
@@ -162,21 +163,22 @@ public class DungeonLayoutTests {
         int y = 5;
         int corridorX = a.getX() + ROOM_SIZE + TUNNEL_LENGTH / 2;
         try {
-            // Rooms: under the floor and over the ceiling, reaching one block past the edges to seal corners.
+            // Rooms: under the floor, over the ceiling, and just outside each wall, reaching a block past the edges.
             bedrock(helper, a.offset(mid, -1, mid), "under the room floor");
-            bedrock(helper, a.offset(-1, -1, -1), "under the corner between two caps");
+            bedrock(helper, a.offset(-1, -1, -1), "under the corner between two walls");
             bedrock(helper, a.offset(mid, ROOM_HEIGHT, mid), "over the room ceiling");
-            // Caps: directly behind each one.
-            bedrock(helper, a.offset(mid, y, -2), "behind the start room's north cap");
-            bedrock(helper, a.offset(-2, y, mid), "behind the start room's west cap");
-            bedrock(helper, b.offset(ROOM_SIZE + 1, y, mid), "behind the east room's east cap");
-            // Tunnel: around the corridor and behind the end walls.
-            bedrock(helper, new BlockPos(corridorX, a.getY() + y, a.getZ() + CORRIDOR_START - 1), "beside the corridor");
-            bedrock(helper, new BlockPos(corridorX, a.getY() + y, a.getZ() + CORRIDOR_START + CORRIDOR_WIDTH), "beside the corridor");
+            bedrock(helper, a.offset(mid, y, -1), "outside the start room's north wall");
+            bedrock(helper, a.offset(-1, y, mid), "outside the start room's west wall");
+            bedrock(helper, b.offset(ROOM_SIZE, y, mid), "outside the east room's east wall");
+            // Where the tunnel attaches, the wall's skin leaves the corridor open but seals around it.
+            bedrock(helper, a.offset(ROOM_SIZE, y, 3), "outside the start room's east wall, beside the tunnel");
+            bedrock(helper, a.offset(ROOM_SIZE, TUNNEL_HEIGHT + 1, mid), "outside the start room's east wall, above the tunnel");
+            bedrock(helper, b.offset(-1, y, ROOM_SIZE - 3), "outside the east room's west wall, beside the tunnel");
+            // Tunnel: under, over and both sides of the corridor.
+            bedrock(helper, new BlockPos(corridorX, a.getY() + y, a.getZ() + TUNNEL_START - 1), "beside the corridor");
+            bedrock(helper, new BlockPos(corridorX, a.getY() + y, a.getZ() + TUNNEL_START + TUNNEL_WIDTH), "beside the corridor");
             bedrock(helper, new BlockPos(corridorX, a.getY() - 1, a.getZ() + mid), "under the corridor");
-            bedrock(helper, new BlockPos(corridorX, a.getY() + CORRIDOR_HEIGHT, a.getZ() + mid), "over the corridor");
-            bedrock(helper, a.offset(ROOM_SIZE + 1, y, 3), "behind the tunnel's end wall");
-            bedrock(helper, b.offset(-2, y, ROOM_SIZE - 3), "behind the tunnel's other end wall");
+            bedrock(helper, new BlockPos(corridorX, a.getY() + TUNNEL_HEIGHT, a.getZ() + mid), "over the corridor");
 
             // A tight skin, not a solid block: the space beside the corridor and inside pieces stays open.
             helper.assertTrue(level.getBlockState(new BlockPos(corridorX, a.getY() + y, a.getZ() + 3)).isAir(), "the space beside the corridor should stay empty");

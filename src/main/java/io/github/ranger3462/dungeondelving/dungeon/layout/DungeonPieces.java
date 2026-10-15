@@ -48,7 +48,7 @@ public final class DungeonPieces {
             return switch (this) {
                 case START, COMMON, OBJECTIVE -> new Vec3i(ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE);
                 case TUNNEL -> new Vec3i(TUNNEL_WIDTH, TUNNEL_HEIGHT, TUNNEL_LENGTH);
-                case CAP -> new Vec3i(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS);
+                case CAP -> new Vec3i(CAP_WIDTH, CAP_HEIGHT, CAP_DEPTH);
             };
         }
 

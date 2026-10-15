@@ -25,8 +25,8 @@ import net.minecraft.world.level.block.Blocks;
  * Generates simple test pieces that follow {@link io.github.ranger3462.dungeondelving.dungeon.RoomSpec}, so dungeon
  * generation can be built and tested before hand-built rooms exist.
  * <p>
- * Each kind of piece has its own material so alignment is easy to check in-game: rooms are light gray, tunnels
- * (including their doorway walls) are cyan, and caps are red. Rooms include marker blocks so generated dungeons have
+ * Each kind of piece has its own material so alignment is easy to check in-game: rooms (walls included) are light
+ * gray, tunnels are cyan, and caps are red. Rooms include marker blocks so generated dungeons have
  * chests, mobs, ores and an objective.
  * <p>
  * Output goes to {@code data/dungeondelving/structure/dungeon/}. Every file name ends in {@code _placeholder} so these can
@@ -176,52 +176,49 @@ public class PlaceholderRoomProvider implements DataProvider {
         return room;
     }
 
-    /** An open room: floor, ceiling and ceiling lights, with no walls. The walls come from separate wall pieces. */
+    /** A room with walls, floor, ceiling, ceiling lights, and a doorway hole in the middle of every side. */
     private static PieceBuilder roomShell() {
         int top = ROOM_HEIGHT - 1;
         PieceBuilder room = new PieceBuilder(ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE);
         room.fill(0, 0, 0, MAX, 0, MAX, ROOM);
         room.fill(0, top, 0, MAX, top, MAX, ROOM);
+        room.fill(0, 1, 0, MAX, top - 1, 0, ROOM);
+        room.fill(0, 1, MAX, MAX, top - 1, MAX, ROOM);
+        room.fill(0, 1, 0, 0, top - 1, MAX, ROOM);
+        room.fill(MAX, 1, 0, MAX, top - 1, MAX, ROOM);
         for (int x = 6; x < MAX; x += 5) {
             for (int z = 6; z < MAX; z += 5) {
                 room.set(x, top, z, LIGHT);
             }
         }
+        int doorEnd = DOOR_START + DOOR_WIDTH - 1;
+        int doorTop = DOOR_BOTTOM_Y + DOOR_HEIGHT - 1;
+        room.fill(DOOR_START, DOOR_BOTTOM_Y, 0, doorEnd, doorTop, 0, Blocks.AIR);
+        room.fill(DOOR_START, DOOR_BOTTOM_Y, MAX, doorEnd, doorTop, MAX, Blocks.AIR);
+        room.fill(0, DOOR_BOTTOM_Y, DOOR_START, 0, doorTop, doorEnd, Blocks.AIR);
+        room.fill(MAX, DOOR_BOTTOM_Y, DOOR_START, MAX, doorTop, doorEnd, Blocks.AIR);
         return room;
     }
 
     // --- Caps and tunnels ---
 
-    /** A wall covering one room face from the outside, with no exit. Runs along x, 1 deep along z. */
+    /** A plug that exactly fills one doorway. 5 wide (along x), 6 tall, 1 deep. */
     private static PieceBuilder capWall() {
-        PieceBuilder wall = new PieceBuilder(WALL_LENGTH, WALL_HEIGHT, WALL_THICKNESS);
-        wall.fill(0, 0, 0, WALL_LENGTH - 1, WALL_HEIGHT - 1, WALL_THICKNESS - 1, CAP);
-        return wall;
+        PieceBuilder cap = new PieceBuilder(CAP_WIDTH, CAP_HEIGHT, CAP_DEPTH);
+        cap.fill(0, 0, 0, CAP_WIDTH - 1, CAP_HEIGHT - 1, CAP_DEPTH - 1, CAP);
+        return cap;
     }
 
-    /**
-     * A doorway wall at each end with a corridor between them, running along z. Only the walls and corridor are
-     * placed; the rest of the piece's box is left untouched.
-     */
+    /** A corridor running along z between two rooms' doorways. Both ends are open; the room walls frame them. */
     private static PieceBuilder tunnel() {
         PieceBuilder tunnel = new PieceBuilder(TUNNEL_WIDTH, TUNNEL_HEIGHT, TUNNEL_LENGTH);
-        int lastZ = TUNNEL_LENGTH - 1;
-        tunnel.untouched(0, 0, 0, TUNNEL_WIDTH - 1, TUNNEL_HEIGHT - 1, lastZ);
-
-        int doorEnd = DOOR_START + DOOR_WIDTH - 1;
-        int doorTop = DOOR_BOTTOM_Y + DOOR_HEIGHT - 1;
-        for (int z : new int[] { 0, lastZ }) {
-            tunnel.fill(0, 0, z, WALL_LENGTH - 1, WALL_HEIGHT - 1, z, TUNNEL);
-            tunnel.fill(DOOR_START, DOOR_BOTTOM_Y, z, doorEnd, doorTop, z, Blocks.AIR);
-        }
-
-        int x1 = CORRIDOR_START;
-        int x2 = CORRIDOR_START + CORRIDOR_WIDTH - 1;
-        int top = CORRIDOR_HEIGHT - 1;
-        tunnel.fill(x1, 0, 1, x2, top, lastZ - 1, TUNNEL);
-        tunnel.fill(x1 + 1, 1, 1, x2 - 1, top - 1, lastZ - 1, Blocks.AIR);
-        for (int z = 4; z < lastZ; z += 6) {
-            tunnel.set(TUNNEL_WIDTH / 2, top, z, LIGHT);
+        int maxX = TUNNEL_WIDTH - 1;
+        int maxY = TUNNEL_HEIGHT - 1;
+        int maxZ = TUNNEL_LENGTH - 1;
+        tunnel.fill(0, 0, 0, maxX, maxY, maxZ, TUNNEL);
+        tunnel.fill(1, 1, 0, maxX - 1, maxY - 1, maxZ, Blocks.AIR);
+        for (int z = 4; z < TUNNEL_LENGTH; z += 6) {
+            tunnel.set(TUNNEL_WIDTH / 2, maxY, z, LIGHT);
         }
         return tunnel;
     }

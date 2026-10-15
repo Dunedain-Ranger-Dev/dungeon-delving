@@ -13,9 +13,9 @@ import net.minecraft.world.level.BlockGetter;
  * Checks a built piece against {@link io.github.ranger3462.dungeondelving.dungeon.RoomSpec}: the parts that make
  * pieces fit together, not how they look. Used by {@code /dungeondelving room check} and by the game tests.
  * <ul>
- * <li>Rooms: a full floor and ceiling, and every side's doorway spot clear.</li>
- * <li>Tunnels: a doorway open at both ends, with a floor and a clear path between them.</li>
- * <li>Caps: the doorway area fully blocked.</li>
+ * <li>Rooms: a full floor and ceiling, an open doorway in the middle of every side, and wall framing each doorway.</li>
+ * <li>Tunnels: a floor and a clear path the full length, in line with the doorways.</li>
+ * <li>Caps: completely solid, so they fill a doorway.</li>
  * </ul>
  */
 public final class PieceValidator {
@@ -50,41 +50,48 @@ public final class PieceValidator {
                 check.solid(x, ROOM_HEIGHT - 1, z, "Ceiling has a hole");
             }
         }
+        checkDoorway(check, "North", (i, y) -> new int[] { i, y, 0 });
+        checkDoorway(check, "South", (i, y) -> new int[] { i, y, max });
+        checkDoorway(check, "West", (i, y) -> new int[] { 0, y, i });
+        checkDoorway(check, "East", (i, y) -> new int[] { max, y, i });
+    }
+
+    /** A doorway hole must be open, with wall on both sides and above, so caps and tunnels fit it exactly. */
+    private static void checkDoorway(Checker check, String side, SidePos at) {
+        int top = DOOR_BOTTOM_Y + DOOR_HEIGHT;
         for (int i = DOOR_START; i < DOOR_START + DOOR_WIDTH; i++) {
-            for (int y = DOOR_BOTTOM_Y; y < DOOR_BOTTOM_Y + DOOR_HEIGHT; y++) {
-                check.air(i, y, 0, "North doorway spot is blocked");
-                check.air(i, y, max, "South doorway spot is blocked");
-                check.air(0, y, i, "West doorway spot is blocked");
-                check.air(max, y, i, "East doorway spot is blocked");
+            for (int y = DOOR_BOTTOM_Y; y < top; y++) {
+                check.air(at.get(i, y), side + " doorway is blocked");
             }
+            check.solid(at.get(i, top), side + " doorway needs wall above it");
+        }
+        for (int y = DOOR_BOTTOM_Y; y < top; y++) {
+            check.solid(at.get(DOOR_START - 1, y), side + " doorway needs wall beside it");
+            check.solid(at.get(DOOR_START + DOOR_WIDTH, y), side + " doorway needs wall beside it");
         }
     }
 
     private static void checkTunnel(Checker check) {
-        int lastZ = TUNNEL_LENGTH - 1;
-        for (int x = DOOR_START; x < DOOR_START + DOOR_WIDTH; x++) {
-            for (int z = 0; z <= lastZ; z++) {
-                check.solid(x, 0, z, "Tunnel floor has a hole");
+        for (int z = 0; z < TUNNEL_LENGTH; z++) {
+            for (int x = TUNNEL_DOOR_START; x < TUNNEL_DOOR_START + DOOR_WIDTH; x++) {
+                check.solid(new int[] { x, 0, z }, "Tunnel floor has a hole");
                 for (int y = DOOR_BOTTOM_Y; y < DOOR_BOTTOM_Y + DOOR_HEIGHT; y++) {
-                    String where = z == 0 || z == lastZ ? "Tunnel doorway is blocked" : "Tunnel path is blocked";
-                    check.air(x, y, z, where);
+                    check.air(new int[] { x, y, z }, "Tunnel path is blocked");
                 }
             }
-        }
-        // The end walls must close off everything around the doorway, or players could walk out of the tunnel.
-        for (int z : new int[] { 0, lastZ }) {
-            check.solid(DOOR_START - 1, DOOR_BOTTOM_Y, z, "Tunnel end wall is open beside the doorway");
-            check.solid(DOOR_START + DOOR_WIDTH, DOOR_BOTTOM_Y, z, "Tunnel end wall is open beside the doorway");
-            check.solid(DOOR_START + DOOR_WIDTH / 2, DOOR_BOTTOM_Y + DOOR_HEIGHT, z, "Tunnel end wall is open above the doorway");
         }
     }
 
     private static void checkCap(Checker check) {
-        for (int x = DOOR_START; x < DOOR_START + DOOR_WIDTH; x++) {
-            for (int y = DOOR_BOTTOM_Y; y < DOOR_BOTTOM_Y + DOOR_HEIGHT; y++) {
-                check.solid(x, y, 0, "Cap leaves the doorway open");
+        for (int x = 0; x < CAP_WIDTH; x++) {
+            for (int y = 0; y < CAP_HEIGHT; y++) {
+                check.solid(new int[] { x, y, 0 }, "Cap has a gap");
             }
         }
+    }
+
+    private interface SidePos {
+        int[] get(int along, int y);
     }
 
     private static final class Checker {
@@ -98,14 +105,18 @@ public final class PieceValidator {
         }
 
         void solid(int x, int y, int z, String message) {
-            if (level.getBlockState(corner.offset(x, y, z)).isAir()) {
-                problems.add(new Problem(new BlockPos(x, y, z), message));
+            solid(new int[] { x, y, z }, message);
+        }
+
+        void solid(int[] p, String message) {
+            if (level.getBlockState(corner.offset(p[0], p[1], p[2])).isAir()) {
+                problems.add(new Problem(new BlockPos(p[0], p[1], p[2]), message));
             }
         }
 
-        void air(int x, int y, int z, String message) {
-            if (!level.getBlockState(corner.offset(x, y, z)).isAir()) {
-                problems.add(new Problem(new BlockPos(x, y, z), message));
+        void air(int[] p, String message) {
+            if (!level.getBlockState(corner.offset(p[0], p[1], p[2])).isAir()) {
+                problems.add(new Problem(new BlockPos(p[0], p[1], p[2]), message));
             }
         }
     }
