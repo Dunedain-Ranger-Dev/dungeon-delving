@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.hash.Hashing;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -25,7 +26,8 @@ import net.minecraft.world.level.block.Blocks;
  * generation can be built and tested before hand-built rooms exist.
  * <p>
  * Each kind of piece has its own material so alignment is easy to check in-game: rooms are light gray, tunnels
- * (including their doorway walls) are cyan, and caps are red. Gold blocks stand in for markers.
+ * (including their doorway walls) are cyan, and caps are red. Rooms include marker blocks so generated dungeons have
+ * chests, mobs, ores and an objective.
  * <p>
  * Output goes to {@code data/dungeondelving/structure/dungeon/}. Every file name ends in {@code _placeholder} so these can
  * be filtered out once real rooms take over.
@@ -36,7 +38,21 @@ public class PlaceholderRoomProvider implements DataProvider {
     private static final Block ROOM = Blocks.LIGHT_GRAY_CONCRETE;
     private static final Block TUNNEL = Blocks.CYAN_CONCRETE;
     private static final Block CAP = Blocks.RED_CONCRETE;
-    private static final Block MARKER = Blocks.GOLD_BLOCK;
+    private static Block loot() {
+        return ModRegistries.LOOT_MARKER.get();
+    }
+
+    private static Block mob() {
+        return ModRegistries.MOB_MARKER.get();
+    }
+
+    private static Block resource() {
+        return ModRegistries.RESOURCE_MARKER.get();
+    }
+
+    private static Block objective() {
+        return ModRegistries.OBJECTIVE_MARKER.get();
+    }
     private static final Block LIGHT = Blocks.GLOWSTONE;
 
     private static final int MID = ROOM_SIZE / 2;
@@ -87,10 +103,8 @@ public class PlaceholderRoomProvider implements DataProvider {
     // --- Rooms ---
 
     private static PieceBuilder startRoom() {
-        PieceBuilder room = roomShell();
-        // Gold pad marks where players arrive.
-        room.fill(MID - 2, 0, MID - 2, MID + 2, 0, MID + 2, MARKER);
-        return room;
+        // Kept empty: the exit block goes in the center and players arrive just south of it.
+        return roomShell();
     }
 
     private static PieceBuilder pillarsRoom() {
@@ -100,9 +114,12 @@ public class PlaceholderRoomProvider implements DataProvider {
                 room.fill(px - 1, 1, pz - 1, px + 1, ROOM_HEIGHT - 2, pz + 1, ROOM);
             }
         }
-        room.set(3, 1, 3, MARKER);
-        room.set(MAX - 3, 1, MAX - 3, MARKER);
-        room.set(MID, 1, MID, MARKER);
+        room.set(3, 1, 3, loot());
+        room.set(MAX - 3, 1, MAX - 3, loot());
+        room.set(MID, 1, MID, mob());
+        // Ore veins showing on the faces of two pillars.
+        room.set(8, 3, 7, resource());
+        room.set(24, 3, 25, resource());
         return room;
     }
 
@@ -112,7 +129,9 @@ public class PlaceholderRoomProvider implements DataProvider {
         room.fill(MID - 7, 1, MID - 7, MID + 7, 1, MID + 7, ROOM);
         room.fill(MID - 5, 2, MID - 5, MID + 5, 2, MID + 5, ROOM);
         room.fill(MID - 3, 3, MID - 3, MID + 3, 3, MID + 3, ROOM);
-        room.set(MID, 4, MID, MARKER);
+        room.set(MID, 4, MID, loot());
+        room.set(4, 1, 4, mob());
+        room.set(MAX - 4, 1, MAX - 4, mob());
         return room;
     }
 
@@ -123,9 +142,10 @@ public class PlaceholderRoomProvider implements DataProvider {
         for (int[] c : cover) {
             room.fill(c[0], 1, c[1], c[0] + 2, 2, c[1], ROOM);
         }
-        room.set(4, 1, 28, MARKER);
-        room.set(28, 1, 4, MARKER);
-        room.set(MID, 1, MID, MARKER);
+        room.set(4, 1, 28, loot());
+        room.set(28, 1, 4, loot());
+        room.set(MID, 1, MID, mob());
+        room.set(6, 2, 5, resource());
         return room;
     }
 
@@ -139,8 +159,8 @@ public class PlaceholderRoomProvider implements DataProvider {
             room.fill(c, 1, 21, c, 3, 29, ROOM);
             room.fill(3, 1, c, 11, 3, c, ROOM);
             room.fill(21, 1, c, 29, 3, c, ROOM);
-            room.set(lo + 1, 1, lo + 1, MARKER);
-            room.set(hi - 1, 1, lo + 1, MARKER);
+            room.set(lo + 1, 1, lo + 1, loot());
+            room.set(hi - 1, 1, lo + 1, mob());
         }
         return room;
     }
@@ -150,7 +170,9 @@ public class PlaceholderRoomProvider implements DataProvider {
         // A raised altar with the objective marker on top.
         room.fill(MID - 3, 1, MID - 3, MID + 3, 1, MID + 3, ROOM);
         room.fill(MID - 1, 2, MID - 1, MID + 1, 2, MID + 1, ROOM);
-        room.set(MID, 3, MID, MARKER);
+        room.set(MID, 3, MID, objective());
+        room.set(MID - 6, 1, MID, mob());
+        room.set(MID + 6, 1, MID, mob());
         return room;
     }
 

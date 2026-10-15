@@ -2,9 +2,16 @@
   "block.dungeondelving.dungeon_gate": "Dungeon Gate",
   "block.dungeondelving.dungeon_exit": "Dungeon Exit",
   "tooltip.dungeondelving.dungeon_loot": "Dungeon loot: leave through the exit to keep it",
-
   "dungeondelving.configuration.title": "Dungeon Delving",
   "dungeondelving.configuration.exportCopyFolder": "Export copy folder",
   "dungeondelving.configuration.runTimeLimitSeconds": "Run time limit (seconds, 0 = off)",
-  "dungeondelving.configuration.failureGearDamage": "Gear damage on a failed run"
+  "dungeondelving.configuration.failureGearDamage": "Gear damage on a failed run",
+  "itemGroup.dungeondelving": "Dungeon Delving",
+  "block.dungeondelving.loot_marker": "Loot Marker",
+  "block.dungeondelving.mob_marker": "Mob Marker",
+  "block.dungeondelving.resource_marker": "Resource Marker",
+  "block.dungeondelving.objective_marker": "Objective Marker",
+  "dungeondelving.configuration.lootMarkerChance": "Loot marker chest chance",
+  "dungeondelving.configuration.resourceMarkerChance": "Resource marker ore chance",
+  "dungeondelving.configuration.maxMobsPerMarker": "Max mobs per mob marker"
 }

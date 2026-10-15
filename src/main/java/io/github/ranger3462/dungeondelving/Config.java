@@ -22,6 +22,18 @@ public final class Config {
                     "fraction of its max durability. Never fully breaks an item. 0 turns gear damage off.")
             .defineInRange("failureGearDamage", 0.25, 0.0, 1.0);
 
+    public static final ModConfigSpec.DoubleValue LOOT_MARKER_CHANCE = BUILDER
+            .comment("Chance that each loot marker in a dungeon becomes a chest. Otherwise it's left empty.")
+            .defineInRange("lootMarkerChance", 0.6, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue RESOURCE_MARKER_CHANCE = BUILDER
+            .comment("Chance that each resource marker becomes an ore from the dungeondelving:dungeon_resources block tag.")
+            .defineInRange("resourceMarkerChance", 0.5, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue MAX_MOBS_PER_MARKER = BUILDER
+            .comment("Each mob marker spawns between 1 and this many mobs from the dungeondelving:dungeon_mobs entity tag.")
+            .defineInRange("maxMobsPerMarker", 3, 1, 16);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private Config() {}

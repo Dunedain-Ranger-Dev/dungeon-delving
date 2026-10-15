@@ -52,7 +52,7 @@ public class PieceValidationTests {
                 failures.add(id.getPath() + " is " + sizeText(size) + " but a " + kind + " piece must be " + sizeText(kind.size()));
                 continue;
             }
-            DungeonBuilder.place(level, new Placement(id, corner, Rotation.NONE, Mirror.NONE));
+            DungeonBuilder.place(level, new Placement(id, corner, Rotation.NONE, Mirror.NONE), false);
             try {
                 List<Problem> problems = PieceValidator.validate(kind, level, corner);
                 if (!problems.isEmpty()) {
@@ -76,7 +76,7 @@ public class PieceValidationTests {
         int doorMid = DOOR_START + DOOR_WIDTH / 2;
         try {
             // A room with a block in its north doorway spot and a hole in its floor.
-            DungeonBuilder.place(level, new Placement(DungeonPieces.id("start_placeholder"), corner, Rotation.NONE, Mirror.NONE));
+            DungeonBuilder.place(level, new Placement(DungeonPieces.id("start_placeholder"), corner, Rotation.NONE, Mirror.NONE), false);
             level.setBlock(corner.offset(doorMid, DOOR_BOTTOM_Y, 0), Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
             level.setBlock(corner.offset(5, 0, 5), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             List<Problem> problems = PieceValidator.validate(Kind.START, level, corner);
@@ -88,7 +88,7 @@ public class PieceValidationTests {
         }
         try {
             // A cap with a gap where the doorway would be.
-            DungeonBuilder.place(level, new Placement(DungeonPieces.id("cap_placeholder"), corner, Rotation.NONE, Mirror.NONE));
+            DungeonBuilder.place(level, new Placement(DungeonPieces.id("cap_placeholder"), corner, Rotation.NONE, Mirror.NONE), false);
             level.setBlock(corner.offset(doorMid, DOOR_BOTTOM_Y, 0), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             helper.assertTrue(PieceValidator.validate(Kind.CAP, level, corner).size() == 1, "a cap gap should be reported");
         } finally {

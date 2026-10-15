@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Cell;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Connection;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Room;
@@ -170,13 +171,24 @@ public final class DungeonBuilder {
         }
     }
 
-    /** Places one piece so that, after turning, it exactly fills the space starting at {@code targetMin}. */
+    /**
+     * Places one piece so that, after turning, it exactly fills the space starting at {@code targetMin}, then turns
+     * its marker blocks into chests, mobs and ores.
+     */
     public static void place(ServerLevel level, Placement placement) {
+        place(level, placement, true);
+    }
+
+    /** Places one piece, optionally leaving its marker blocks as they are (useful for checking a piece's shape). */
+    public static void place(ServerLevel level, Placement placement, boolean resolveMarkers) {
         StructureTemplate template = level.getStructureManager().get(placement.template())
                 .orElseThrow(() -> new IllegalStateException("Missing dungeon piece " + placement.template()));
         StructurePlaceSettings settings = new StructurePlaceSettings().setRotation(placement.rotation()).setMirror(placement.mirror());
         BoundingBox box = template.getBoundingBox(settings, BlockPos.ZERO);
         BlockPos pos = placement.targetMin().offset(-box.minX(), -box.minY(), -box.minZ());
         template.placeInWorld(level, pos, pos, settings, level.getRandom(), Block.UPDATE_CLIENTS);
+        if (resolveMarkers) {
+            DungeonMarkers.resolve(level, template, pos, settings, level.getRandom(), DungeonMarkers.Rolls.fromConfig());
+        }
     }
 }

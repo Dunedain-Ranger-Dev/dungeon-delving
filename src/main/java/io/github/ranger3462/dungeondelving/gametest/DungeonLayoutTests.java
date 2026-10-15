@@ -100,7 +100,7 @@ public class DungeonLayoutTests {
                 Set.of(Connection.between(Cell.ORIGIN, east)));
         DungeonPieces pieces = DungeonPieces.load(level.getServer());
         BlockPos center = helper.absolutePos(BlockPos.ZERO).above(120);
-        DungeonBuilder.plan(layout, pieces, center, RandomSource.create(1)).forEach(placement -> DungeonBuilder.place(level, placement));
+        DungeonBuilder.plan(layout, pieces, center, RandomSource.create(1)).forEach(placement -> DungeonBuilder.place(level, placement, false));
 
         BlockPos a = DungeonBuilder.roomMin(center, Cell.ORIGIN);
         BlockPos b = DungeonBuilder.roomMin(center, east);
@@ -153,7 +153,7 @@ public class DungeonLayoutTests {
                 Set.of(Connection.between(Cell.ORIGIN, east)));
         DungeonPieces pieces = DungeonPieces.load(level.getServer());
         BlockPos center = helper.absolutePos(BlockPos.ZERO).above(120);
-        DungeonBuilder.plan(layout, pieces, center, RandomSource.create(1)).forEach(placement -> DungeonBuilder.place(level, placement));
+        DungeonBuilder.plan(layout, pieces, center, RandomSource.create(1)).forEach(placement -> DungeonBuilder.place(level, placement, false));
         DungeonBuilder.shell(layout, center).forEach(box -> DungeonBuilder.fillShell(level, box));
 
         BlockPos a = DungeonBuilder.roomMin(center, Cell.ORIGIN);
@@ -206,7 +206,7 @@ public class DungeonLayoutTests {
                 Set.of(Connection.between(Cell.ORIGIN, east), Connection.between(Cell.ORIGIN, south)));
         DungeonPieces pieces = DungeonPieces.load(level.getServer());
         BlockPos center = helper.absolutePos(BlockPos.ZERO).above(120);
-        DungeonBuilder.plan(layout, pieces, center, RandomSource.create(1)).forEach(placement -> DungeonBuilder.place(level, placement));
+        DungeonBuilder.plan(layout, pieces, center, RandomSource.create(1)).forEach(placement -> DungeonBuilder.place(level, placement, false));
         DungeonBuilder.shell(layout, center).forEach(box -> DungeonBuilder.fillShell(level, box));
 
         BlockPos a = DungeonBuilder.roomMin(center, Cell.ORIGIN);

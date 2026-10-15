@@ -7,11 +7,14 @@ import io.github.ranger3462.dungeondelving.block.DungeonExitBlock;
 import io.github.ranger3462.dungeondelving.block.DungeonGateBlock;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -29,6 +32,7 @@ public final class ModRegistries {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(DungeonDelving.MODID);
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(DungeonDelving.MODID);
     public static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, DungeonDelving.MODID);
+    public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DungeonDelving.MODID);
     public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> LOOT_MODIFIERS =
             DeferredRegister.create(NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, DungeonDelving.MODID);
 
@@ -43,6 +47,12 @@ public final class ModRegistries {
                     .sound(SoundType.AMETHYST));
     public static final DeferredItem<BlockItem> DUNGEON_EXIT_ITEM = ITEMS.registerSimpleBlockItem(DUNGEON_EXIT);
 
+    // Markers: placed by builders inside dungeon pieces, and turned into chests, mobs or ores each run.
+    public static final DeferredBlock<Block> LOOT_MARKER = marker("loot_marker", MapColor.WOOD);
+    public static final DeferredBlock<Block> MOB_MARKER = marker("mob_marker", MapColor.STONE);
+    public static final DeferredBlock<Block> RESOURCE_MARKER = marker("resource_marker", MapColor.RAW_IRON);
+    public static final DeferredBlock<Block> OBJECTIVE_MARKER = marker("objective_marker", MapColor.METAL);
+
     /** Marks an item as found in the current dungeon run. Removed when the player exits; such items are lost on death. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> DUNGEON_LOOT = COMPONENTS.registerComponentType("dungeon_loot",
             builder -> builder.persistent(Unit.CODEC).networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
@@ -50,12 +60,35 @@ public final class ModRegistries {
     public static final DeferredHolder<MapCodec<? extends IGlobalLootModifier>, MapCodec<TagDungeonLootModifier>> TAG_DUNGEON_LOOT =
             LOOT_MODIFIERS.register("tag_dungeon_loot", () -> TagDungeonLootModifier.CODEC);
 
+    /** Gate, exit and markers, for players and builders. */
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register("dungeon_delving", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.dungeondelving"))
+            .withTabsBefore(CreativeModeTabs.SPAWN_EGGS)
+            .icon(() -> DUNGEON_GATE_ITEM.get().getDefaultInstance())
+            .displayItems((parameters, output) -> {
+                output.accept(DUNGEON_GATE_ITEM.get());
+                output.accept(DUNGEON_EXIT_ITEM.get());
+                output.accept(LOOT_MARKER.get());
+                output.accept(MOB_MARKER.get());
+                output.accept(RESOURCE_MARKER.get());
+                output.accept(OBJECTIVE_MARKER.get());
+            })
+            .build());
+
     private ModRegistries() {}
+
+    private static DeferredBlock<Block> marker(String name, MapColor color) {
+        DeferredBlock<Block> block = BLOCKS.registerSimpleBlock(name,
+                BlockBehaviour.Properties.of().mapColor(color).strength(0.5f).noLootTable().noOcclusion().sound(SoundType.WOOD));
+        ITEMS.registerSimpleBlockItem(block);
+        return block;
+    }
 
     public static void register(IEventBus modEventBus) {
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         COMPONENTS.register(modEventBus);
+        TABS.register(modEventBus);
         LOOT_MODIFIERS.register(modEventBus);
         modEventBus.addListener(ModRegistries::addToCreativeTabs);
     }
@@ -63,8 +96,6 @@ public final class ModRegistries {
     private static void addToCreativeTabs(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(DUNGEON_GATE_ITEM);
-        } else if (event.getTabKey() == CreativeModeTabs.OP_BLOCKS && event.hasPermissions()) {
-            event.accept(DUNGEON_EXIT_ITEM);
         }
     }
 }
