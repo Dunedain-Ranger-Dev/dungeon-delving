@@ -9,6 +9,7 @@ import io.github.ranger3462.dungeondelving.vault.VaultDimension;
 import io.github.ranger3462.dungeondelving.vault.VaultRegions;
 import io.github.ranger3462.dungeondelving.vault.VaultRun;
 import io.github.ranger3462.dungeondelving.vault.VaultTravel;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
@@ -43,33 +44,50 @@ public final class DevCommands {
     private static int enter(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         if (VaultRegions.get().run(player.getUUID()).isPresent()) {
-            context.getSource().sendFailure(Component.literal("You are already in a vault. Leave it first."));
+            fail(context.getSource(), "You are already in a vault. Leave it first.");
             return 0;
         }
         VaultRun run = VaultTravel.enter(player);
         BlockPos center = VaultDimension.regionCenter(run.region());
-        context.getSource().sendSuccess(() -> Component.literal(
-                "Entered vault region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ() + ")"), true);
+        tell(context.getSource(), "Entered vault region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ() + ")");
         return 1;
     }
 
     private static int leave(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         return VaultTravel.leave(player).map(run -> {
-            context.getSource().sendSuccess(() -> Component.literal(
-                    "Left vault region " + run.region() + ". It will be wiped on the next server start."), true);
+            tell(context.getSource(), "Left vault region " + run.region() + ". It will be wiped the next time the world loads.");
             return 1;
         }).orElseGet(() -> {
-            context.getSource().sendFailure(Component.literal("You are not in a vault."));
+            fail(context.getSource(), "You are not in a vault.");
             return 0;
         });
     }
 
     private static int regions(CommandContext<CommandSourceStack> context) {
         VaultRegions regions = VaultRegions.get();
-        context.getSource().sendSuccess(() -> Component.literal(
-                "Vault regions: " + regions.regionsCreated() + " created, " + regions.runs().size() + " in use, "
-                        + "free " + regions.freeRegions() + ", waiting to be wiped " + regions.releasedRegions()), false);
+        tell(context.getSource(), "Vault regions: " + regions.regionsCreated() + " created, " + regions.runs().size() + " in use, "
+                + "free " + regions.freeRegions() + ", waiting to be wiped " + regions.releasedRegions());
         return 1;
+    }
+
+    /**
+     * Messages the player running the command directly. Minecraft hides normal command feedback when a command runs
+     * inside a function or command block, so dev functions would otherwise give no response.
+     */
+    private static void tell(CommandSourceStack source, String message) {
+        send(source, Component.literal(message).withStyle(ChatFormatting.GOLD));
+    }
+
+    private static void fail(CommandSourceStack source, String message) {
+        send(source, Component.literal(message).withStyle(ChatFormatting.RED));
+    }
+
+    private static void send(CommandSourceStack source, Component message) {
+        if (source.getEntity() instanceof ServerPlayer player) {
+            player.sendSystemMessage(message);
+        } else {
+            source.sendSystemMessage(message);
+        }
     }
 }
