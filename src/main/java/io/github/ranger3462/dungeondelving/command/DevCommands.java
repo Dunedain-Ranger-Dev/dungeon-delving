@@ -66,8 +66,11 @@ public final class DevCommands {
 
     private static int regions(CommandContext<CommandSourceStack> context) {
         VaultRegions regions = VaultRegions.get();
-        tell(context.getSource(), "Vault regions: " + regions.regionsCreated() + " created, " + regions.runs().size() + " in use, "
-                + "free " + regions.freeRegions() + ", waiting to be wiped " + regions.releasedRegions());
+        // "total" counts every region ever made; wiped regions become free and get reused rather than removed.
+        tell(context.getSource(), "Vault regions: " + regions.regionsCreated() + " total ("
+                + regions.runs().size() + " in use, "
+                + regions.freeRegions().size() + " free " + regions.freeRegions() + ", "
+                + regions.releasedRegions().size() + " waiting to be wiped " + regions.releasedRegions() + ")");
         return 1;
     }
 
