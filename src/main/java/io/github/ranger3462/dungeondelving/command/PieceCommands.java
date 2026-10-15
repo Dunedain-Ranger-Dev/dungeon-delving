@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
@@ -17,9 +18,11 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import io.github.ranger3462.dungeondelving.Config;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces.Kind;
+import io.github.ranger3462.dungeondelving.dungeon.layout.PieceTemplates;
 import io.github.ranger3462.dungeondelving.dungeon.layout.PieceValidator;
 import io.github.ranger3462.dungeondelving.dungeon.layout.PieceValidator.Problem;
 import net.minecraft.commands.CommandSourceStack;
@@ -41,6 +44,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 /**
  * Commands for builders to check and save dungeon pieces:
  * <ul>
+ * <li>{@code /dungeondelving room template <kind> <corner>} builds a starting frame to build the piece from.</li>
  * <li>{@code /dungeondelving room check <kind> <corner>} checks the piece built at that minimum corner.</li>
  * <li>{@code /dungeondelving room export <kind> <name> <corner>} checks it, then saves it as
  * {@code <kind>_<name>.nbt} in this world's generated structures, where dungeons in this world pick it up.</li>
@@ -59,10 +63,14 @@ public final class PieceCommands {
     }
 
     private static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        LiteralArgumentBuilder<CommandSourceStack> template = Commands.literal("template");
         LiteralArgumentBuilder<CommandSourceStack> check = Commands.literal("check");
         LiteralArgumentBuilder<CommandSourceStack> export = Commands.literal("export");
         for (Kind kind : Kind.values()) {
             String kindName = kind.name().toLowerCase(Locale.ROOT);
+            template.then(Commands.literal(kindName)
+                    .then(Commands.argument("corner", BlockPosArgument.blockPos())
+                            .executes(context -> template(context, kind))));
             check.then(Commands.literal(kindName)
                     .then(Commands.argument("corner", BlockPosArgument.blockPos())
                             .executes(context -> check(context, kind))));
@@ -73,7 +81,25 @@ public final class PieceCommands {
         }
         dispatcher.register(Commands.literal(DungeonDelving.MODID)
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
-                .then(Commands.literal("room").then(check).then(export)));
+                .then(Commands.literal("room").then(template).then(check).then(export)));
+    }
+
+    private static int template(CommandContext<CommandSourceStack> context, Kind kind) throws CommandSyntaxException {
+        CommandSourceStack source = context.getSource();
+        BlockPos corner = BlockPosArgument.getLoadedBlockPos(context, "corner");
+        String kindName = kind.name().toLowerCase(Locale.ROOT);
+        Vec3i size = kind.size();
+        Optional<BlockPos> inTheWay = PieceTemplates.firstBlockInTheWay(kind, source.getLevel(), corner);
+        if (inTheWay.isPresent()) {
+            fail(source, "The " + sizeText(size) + " space at " + corner.toShortString() + " isn't empty (block at "
+                    + inTheWay.get().toShortString() + "). Templates only go in empty space, so nothing gets overwritten.");
+            return 0;
+        }
+        PieceTemplates.build(kind, source.getLevel(), corner);
+        tell(source, "Placed a " + kindName + " template (" + sizeText(size) + ") at " + corner.toShortString() + ".");
+        detail(source, "Light gray is a starting point to replace. Red wool outside the piece marks doorways that must stay clear.");
+        detail(source, "Check it with: /dungeondelving room check " + kindName + " " + corner.getX() + " " + corner.getY() + " " + corner.getZ());
+        return 1;
     }
 
     private static int check(CommandContext<CommandSourceStack> context, Kind kind) throws CommandSyntaxException {
@@ -110,6 +136,7 @@ public final class PieceCommands {
         tell(source, "Exported " + fileName + ".nbt. Dungeons in this world will now use it.");
         detail(source, "Saved to: " + saved.toAbsolutePath().normalize());
         copyIntoProject(source, saved, fileName);
+        copyToConfiguredFolder(source, saved, fileName);
         return 1;
     }
 
@@ -119,8 +146,7 @@ public final class PieceCommands {
         Vec3i size = kind.size();
         List<Problem> problems = PieceValidator.validate(kind, source.getLevel(), corner);
         if (problems.isEmpty()) {
-            tell(source, "The " + kindName + " piece at " + corner.toShortString() + " (" + size.getX() + "x" + size.getY() + "x" + size.getZ()
-                    + ") meets the spec.");
+            tell(source, "The " + kindName + " piece at " + corner.toShortString() + " (" + sizeText(size) + ") meets the spec.");
             return true;
         }
         fail(source, "The " + kindName + " piece at " + corner.toShortString() + " has " + problems.size() + " problem"
@@ -130,6 +156,27 @@ public final class PieceCommands {
             detail(source, "...and " + (problems.size() - MAX_PROBLEMS_SHOWN) + " more");
         }
         return false;
+    }
+
+    private static String sizeText(Vec3i size) {
+        return size.getX() + "x" + size.getY() + "x" + size.getZ();
+    }
+
+    /** Copies the export to the configured export copy folder, if one is set. */
+    private static void copyToConfiguredFolder(CommandSourceStack source, Path saved, String fileName) {
+        String folder = Config.EXPORT_COPY_FOLDER.get().trim();
+        if (folder.isEmpty()) {
+            return;
+        }
+        Path target = Path.of(folder).resolve(fileName + ".nbt");
+        try {
+            Files.createDirectories(target.getParent());
+            Files.copy(saved, target, StandardCopyOption.REPLACE_EXISTING);
+            detail(source, "Copied to: " + target.toAbsolutePath().normalize());
+        } catch (IOException | RuntimeException e) {
+            DungeonDelving.LOGGER.error("Failed to copy {} to the export copy folder {}", saved, folder, e);
+            fail(source, "Exported, but couldn't copy it to " + folder + ". Check exportCopyFolder in config/dungeondelving-common.toml.");
+        }
     }
 
     /** In a development run from the project, also copies the export into the mod's resources. */

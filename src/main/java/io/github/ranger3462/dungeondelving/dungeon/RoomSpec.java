@@ -11,11 +11,11 @@ package io.github.ranger3462.dungeondelving.dungeon;
  * walls are left open.
  */
 public final class RoomSpec {
-    // Rooms: 33 x 33 footprint, 25 tall, no walls.
+    // Rooms: 33 x 33 footprint, 13 tall (11 blocks of open space), no walls.
     public static final int ROOM_SIZE = 33;
-    public static final int ROOM_HEIGHT = 25;
+    public static final int ROOM_HEIGHT = 13;
 
-    // Walls: cover one room face from the outside. 33 long (along x), 25 tall, 1 deep (along z).
+    // Walls: cover one room face from the outside. 33 long (along x), as tall as a room, 1 deep (along z).
     public static final int WALL_LENGTH = ROOM_SIZE;
     public static final int WALL_HEIGHT = ROOM_HEIGHT;
     public static final int WALL_THICKNESS = 1;

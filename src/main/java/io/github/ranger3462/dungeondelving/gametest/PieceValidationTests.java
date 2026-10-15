@@ -11,6 +11,7 @@ import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder.Placement;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces.Kind;
+import io.github.ranger3462.dungeondelving.dungeon.layout.PieceTemplates;
 import io.github.ranger3462.dungeondelving.dungeon.layout.PieceValidator;
 import io.github.ranger3462.dungeondelving.dungeon.layout.PieceValidator.Problem;
 import net.minecraft.core.BlockPos;
@@ -91,6 +92,27 @@ public class PieceValidationTests {
             helper.assertTrue(PieceValidator.validate(Kind.CAP, level, corner).size() == 1, "a cap gap should be reported");
         } finally {
             clear(level, corner, corner.offset(WALL_LENGTH - 1, WALL_HEIGHT - 1, 0));
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void templatesMeetSpec(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos corner = helper.absolutePos(BlockPos.ZERO).above(120);
+        for (Kind kind : Kind.values()) {
+            Vec3i size = kind.size();
+            try {
+                helper.assertTrue(PieceTemplates.firstBlockInTheWay(kind, level, corner).isEmpty(), "test space should start empty");
+                PieceTemplates.build(kind, level, corner);
+                List<Problem> problems = PieceValidator.validate(kind, level, corner);
+                helper.assertTrue(problems.isEmpty(), "a fresh " + kind + " template should meet the spec, but: "
+                        + (problems.isEmpty() ? "" : problems.getFirst().message()));
+                helper.assertTrue(PieceTemplates.firstBlockInTheWay(kind, level, corner).isPresent(), "a template shouldn't be built over existing blocks");
+            } finally {
+                // Include the one-block ring outside the piece, where the red wool doorway outlines go.
+                clear(level, corner.offset(-1, -1, -1), corner.offset(size));
+            }
         }
         helper.succeed();
     }
