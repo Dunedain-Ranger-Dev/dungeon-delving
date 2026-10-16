@@ -170,6 +170,8 @@ dependencies {
         localRuntime "maven.modrinth:kubejs:THIGFPwf"                // 2101.7.2-build.377
         localRuntime "maven.modrinth:rhino:cQ4POTah"                 // 2101.2.7-build.85
         localRuntime "maven.modrinth:better-advanced-tooltips:uPFbnD32" // 2101.1.0-build.5
+        // JEI, to look up recipes while testing
+        localRuntime "maven.modrinth:jei:ufHUqt9b"                   // 19.51.0.418
     }
 
     // For more info:
@@ -231,7 +233,13 @@ idea {
 // this one) into the dev game folder, so runClient and runServer play with the pack's changes. Game tests and data
 // generation don't run the copy, but they share run/, so files copied by an earlier client run are still there.
 def packDir = file('../dungeon-delving-pack')
+// The pack owns these KubeJS folders: clear them first so scripts removed from the pack don't linger in run/.
+tasks.register('cleanPackScripts', Delete) {
+    onlyIf { packDir.exists() }
+    delete 'run/kubejs/startup_scripts', 'run/kubejs/server_scripts', 'run/kubejs/client_scripts', 'run/kubejs/data'
+}
 tasks.register('syncPack', Copy) {
+    dependsOn 'cleanPackScripts'
     description = "Copies the modpack's kubejs/ and config/ folders into run/."
     onlyIf { packDir.exists() }
     from(packDir) {
