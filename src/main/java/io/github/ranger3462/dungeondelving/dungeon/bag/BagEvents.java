@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonLoot;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.core.BlockPos;
@@ -56,7 +57,7 @@ public final class BagEvents {
     }
 
     public enum PickupResult {
-        /** Not dungeon loot (e.g. the player threw it themselves); picked up normally. */
+        /** Not dungeon loot (e.g. something the player brought and threw); picked up normally. */
         NOT_LOOT,
         /** Some or all of it went into the bag. */
         BAGGED,
@@ -67,7 +68,8 @@ public final class BagEvents {
     /** Moves as much of a dropped item into the bag as fits, leaving the rest on the ground. */
     public static PickupResult pickUpIntoBag(Player player, ItemEntity item, DungeonBag bag) {
         ItemStack stack = item.getItem();
-        if (stack.is(ModRegistries.DUNGEON_BAG.get()) || item.getOwner() == player) {
+        // Items the player threw themselves are theirs, unless they were thrown out of the bag (still marked as loot).
+        if (stack.is(ModRegistries.DUNGEON_BAG.get()) || (item.getOwner() == player && !DungeonLoot.isLoot(stack))) {
             return PickupResult.NOT_LOOT;
         }
         if (item.hasPickUpDelay()) {

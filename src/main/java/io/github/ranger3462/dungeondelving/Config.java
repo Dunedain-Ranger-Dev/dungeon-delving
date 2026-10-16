@@ -27,7 +27,7 @@ public final class Config {
             .defineInRange("lootMarkerChance", 0.6, 0.0, 1.0);
 
     public static final ModConfigSpec.DoubleValue RESOURCE_MARKER_CHANCE = BUILDER
-            .comment("Chance that each resource marker becomes an ore at all. Otherwise it's left empty.")
+            .comment("Chance that each resource marker becomes an ore at all. Otherwise it becomes Hallstone.")
             .defineInRange("resourceMarkerChance", 0.5, 0.0, 1.0);
 
     public static final ModConfigSpec.DoubleValue TIER_ORE_CHANCE = BUILDER
@@ -38,10 +38,6 @@ public final class Config {
             .comment("When a resource marker becomes an ore, the chance it's the common dungeon ore. Whatever's left after the",
                     "tier and common chances is a vanilla ore from the dungeondelving:dungeon_resources block tag.")
             .defineInRange("commonOreChance", 0.45, 0.0, 1.0);
-
-    public static final ModConfigSpec.IntValue MAX_MOBS_PER_MARKER = BUILDER
-            .comment("Each mob marker spawns between 1 and this many mobs from the dungeondelving:dungeon_mobs entity tag.")
-            .defineInRange("maxMobsPerMarker", 3, 1, 16);
 
     public static final ModConfigSpec.BooleanValue BLOCK_NATURAL_SPAWNS = BUILDER
             .comment("Stop mobs spawning naturally in dungeons (including at world generation and as patrols), so every",

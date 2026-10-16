@@ -20,6 +20,8 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.Level;
@@ -40,8 +42,8 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 public class DungeonMarkerTests {
     private static final String ANY_TEMPLATE = "dungeon/cap_placeholder";
     // Resource markers here always become a vanilla ore (no tier or common ore chance), to test the vanilla list.
-    private static final Rolls ALWAYS = new Rolls(1, 1.0, 1.0, 0.0, 0.0, 3);
-    private static final Rolls NEVER = new Rolls(1, 0.0, 0.0, 0.0, 0.0, 3);
+    private static final Rolls ALWAYS = new Rolls(1, 1.0, 1.0, 0.0, 0.0);
+    private static final Rolls NEVER = new Rolls(1, 0.0, 0.0, 0.0, 0.0);
 
     @GameTest(template = ANY_TEMPLATE)
     public static void markersBecomeContent(GameTestHelper helper) {
@@ -60,15 +62,18 @@ public class DungeonMarkerTests {
             resolve(level, pos, ModRegistries.RESOURCE_MARKER.get(), random, ALWAYS);
             helper.assertTrue(level.getBlockState(pos).is(DungeonMarkers.DUNGEON_RESOURCES), "a resource marker should become a dungeon ore");
             resolve(level, pos, ModRegistries.RESOURCE_MARKER.get(), random, NEVER);
-            helper.assertTrue(level.getBlockState(pos).isAir(), "a resource marker that doesn't roll an ore should leave nothing");
+            helper.assertTrue(level.getBlockState(pos).is(ModRegistries.HALLSTONE.get()), "a resource marker that doesn't roll an ore becomes Hallstone");
 
-            level.setBlock(pos, ModRegistries.MOB_MARKER.get().defaultBlockState(), Block.UPDATE_CLIENTS);
-            List<Entity> mobs = DungeonMarkers.resolveAt(level, pos, ModRegistries.MOB_MARKER.get(), random, ALWAYS);
-            mobs.forEach(Entity::discard);
-            helper.assertTrue(mobs.size() >= 1 && mobs.size() <= 3, "a mob marker should spawn 1 to 3 mobs, spawned " + mobs.size());
-            helper.assertTrue(mobs.stream().allMatch(mob -> mob.getType().is(DungeonMarkers.DUNGEON_MOBS)), "mobs should come from the dungeon mob list");
-            helper.assertTrue(mobs.stream().allMatch(mob -> mob instanceof Mob m && m.isPersistenceRequired()), "dungeon mobs shouldn't despawn");
-            helper.assertTrue(level.getBlockState(pos).isAir(), "the mob marker itself should be removed");
+            resolve(level, pos, ModRegistries.MOB_MARKER.get(), random, ALWAYS);
+            helper.assertTrue(level.getBlockState(pos).is(Blocks.SPAWNER), "a mob marker should become a spawner");
+            CompoundTag spawner = level.getBlockEntity(pos).saveWithoutMetadata(level.registryAccess());
+            CompoundTag spawnData = spawner.getCompound("SpawnData");
+            EntityType<?> mob = EntityType.byString(spawnData.getCompound("entity").getString("id")).orElseThrow();
+            helper.assertTrue(mob.is(DungeonMarkers.DUNGEON_MOBS), "the spawner should spawn a mob from the dungeon mob list, not " + mob);
+            // Custom spawn rules replace the mob's own "darkness only" rule. Ours allow any light (0-15), which is the
+            // default range, so it's saved as an empty entry; what matters is that the entry exists.
+            helper.assertTrue(spawnData.contains("custom_spawn_rules"), "dungeon spawners should ignore light level, saved: " + spawnData);
+            helper.assertTrue(level.getEntitiesOfClass(Mob.class, new AABB(pos).inflate(8)).isEmpty(), "mob markers no longer spawn mobs directly");
         } finally {
             level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         }
@@ -82,11 +87,11 @@ public class DungeonMarkerTests {
         RandomSource random = RandomSource.create(9);
         try {
             for (int tier = 1; tier <= 4; tier++) {
-                resolve(level, pos, ModRegistries.RESOURCE_MARKER.get(), random, new Rolls(tier, 0, 1.0, 1.0, 0.0, 1));
+                resolve(level, pos, ModRegistries.RESOURCE_MARKER.get(), random, new Rolls(tier, 0, 1.0, 1.0, 0.0));
                 Block expected = DungeonOre.forTier(tier).orElseThrow().ore.get();
                 helper.assertTrue(level.getBlockState(pos).is(expected), "a tier " + tier + " dungeon should roll its own tier ore");
             }
-            resolve(level, pos, ModRegistries.RESOURCE_MARKER.get(), random, new Rolls(3, 0, 1.0, 0.0, 1.0, 1));
+            resolve(level, pos, ModRegistries.RESOURCE_MARKER.get(), random, new Rolls(3, 0, 1.0, 0.0, 1.0));
             helper.assertTrue(level.getBlockState(pos).is(DungeonOre.COMMON.ore.get()), "the common ore can roll in any dungeon");
         } finally {
             level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);

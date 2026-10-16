@@ -1,6 +1,5 @@
 package io.github.ranger3462.dungeondelving.dungeon;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,19 +11,21 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlaceSettings;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -33,12 +34,13 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * Turns the marker blocks builders place in dungeon pieces into content, freshly rolled every run:
  * <ul>
  * <li>Loot marker: a chest with {@code dungeondelving:chests/dungeon_room} loot, or nothing.</li>
- * <li>Mob marker: one or more mobs from the {@code dungeondelving:dungeon_mobs} entity tag.</li>
+ * <li>Mob marker: a monster spawner for a random mob from the {@code dungeondelving:dungeon_mobs} entity tag. Dungeon
+ * spawners ignore light level, so lit rooms still spawn mobs.</li>
  * <li>Resource marker: the dungeon's tier ore, the common dungeon ore, a vanilla ore from the
- * {@code dungeondelving:dungeon_resources} block tag, or nothing.</li>
+ * {@code dungeondelving:dungeon_resources} block tag, or otherwise Hallstone, so there are never gaps.</li>
  * <li>Objective marker: a reward chest with {@code dungeondelving:chests/dungeon_objective} loot.</li>
  * </ul>
- * Chances and mob counts come from the config.
+ * Chances come from the config.
  */
 public final class DungeonMarkers {
     public static final ResourceKey<LootTable> ROOM_LOOT = lootTable("chests/dungeon_room");
@@ -46,31 +48,29 @@ public final class DungeonMarkers {
     public static final TagKey<EntityType<?>> DUNGEON_MOBS = TagKey.create(Registries.ENTITY_TYPE, DungeonDelving.id("dungeon_mobs"));
     public static final TagKey<Block> DUNGEON_RESOURCES = TagKey.create(Registries.BLOCK, DungeonDelving.id("dungeon_resources"));
 
-    /** The dungeon's tier, and the chances and limits used when rolling its markers. */
-    public record Rolls(int tier, double lootChance, double resourceChance, double tierOreChance, double commonOreChance, int maxMobs) {
+    /** The dungeon's tier, and the chances used when rolling its markers. */
+    public record Rolls(int tier, double lootChance, double resourceChance, double tierOreChance, double commonOreChance) {
         public static Rolls fromConfig(int tier) {
             return new Rolls(tier, Config.LOOT_MARKER_CHANCE.get(), Config.RESOURCE_MARKER_CHANCE.get(), Config.TIER_ORE_CHANCE.get(),
-                    Config.COMMON_ORE_CHANCE.get(), Config.MAX_MOBS_PER_MARKER.get());
+                    Config.COMMON_ORE_CHANCE.get());
         }
     }
 
     private DungeonMarkers() {}
 
     /** Resolves every marker in a piece that was just placed with the given position and settings. */
-    public static List<Entity> resolve(ServerLevel level, StructureTemplate template, BlockPos pos, StructurePlaceSettings settings,
+    public static void resolve(ServerLevel level, StructureTemplate template, BlockPos pos, StructurePlaceSettings settings,
             RandomSource random, Rolls rolls) {
-        List<Entity> spawned = new ArrayList<>();
         for (Block marker : List.of(ModRegistries.LOOT_MARKER.get(), ModRegistries.MOB_MARKER.get(), ModRegistries.RESOURCE_MARKER.get(),
                 ModRegistries.OBJECTIVE_MARKER.get())) {
             for (StructureTemplate.StructureBlockInfo info : template.filterBlocks(pos, settings, marker)) {
-                spawned.addAll(resolveAt(level, info.pos(), marker, random, rolls));
+                resolveAt(level, info.pos(), marker, random, rolls);
             }
         }
-        return spawned;
     }
 
-    /** Resolves one marker block at a position. Returns any mobs it spawned. */
-    public static List<Entity> resolveAt(ServerLevel level, BlockPos pos, Block marker, RandomSource random, Rolls rolls) {
+    /** Resolves one marker block at a position. */
+    public static void resolveAt(ServerLevel level, BlockPos pos, Block marker, RandomSource random, Rolls rolls) {
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         if (marker == ModRegistries.LOOT_MARKER.get()) {
             if (random.nextDouble() < rolls.lootChance()) {
@@ -79,13 +79,11 @@ public final class DungeonMarkers {
         } else if (marker == ModRegistries.OBJECTIVE_MARKER.get()) {
             placeChest(level, pos, OBJECTIVE_LOOT, random);
         } else if (marker == ModRegistries.RESOURCE_MARKER.get()) {
-            if (random.nextDouble() < rolls.resourceChance()) {
-                pickOre(level, random, rolls).ifPresent(ore -> level.setBlock(pos, ore.defaultBlockState(), Block.UPDATE_CLIENTS));
-            }
+            Block block = random.nextDouble() < rolls.resourceChance() ? pickOre(level, random, rolls).orElse(null) : null;
+            level.setBlock(pos, (block != null ? block : ModRegistries.HALLSTONE.get()).defaultBlockState(), Block.UPDATE_CLIENTS);
         } else if (marker == ModRegistries.MOB_MARKER.get()) {
-            return spawnMobs(level, pos, random, rolls.maxMobs());
+            placeSpawner(level, pos, random);
         }
-        return List.of();
     }
 
     /** The dungeon's tier ore, the common dungeon ore, or a vanilla ore, by the configured chances. */
@@ -108,22 +106,50 @@ public final class DungeonMarkers {
         }
     }
 
-    private static List<Entity> spawnMobs(ServerLevel level, BlockPos pos, RandomSource random, int maxMobs) {
+    /**
+     * A monster spawner for a random dungeon mob. Its spawns carry custom light rules (any block or sky light), since
+     * vanilla monsters otherwise only spawn in darkness.
+     */
+    private static void placeSpawner(ServerLevel level, BlockPos pos, RandomSource random) {
         Optional<HolderSet.Named<EntityType<?>>> mobs = level.registryAccess().registryOrThrow(Registries.ENTITY_TYPE).getTag(DUNGEON_MOBS);
-        List<Entity> spawned = new ArrayList<>();
-        int count = 1 + random.nextInt(maxMobs);
-        for (int i = 0; i < count; i++) {
-            pickFromTag(mobs, random).ifPresent(type -> {
-                Entity entity = type.value().spawn(level, pos, MobSpawnType.STRUCTURE);
-                if (entity instanceof Mob mob) {
-                    mob.setPersistenceRequired();
-                }
-                if (entity != null) {
-                    spawned.add(entity);
-                }
-            });
+        Optional<Holder<EntityType<?>>> mob = pickFromTag(mobs, random);
+        if (mob.isEmpty()) {
+            return;
         }
-        return spawned;
+        level.setBlock(pos, Blocks.SPAWNER.defaultBlockState(), Block.UPDATE_ALL);
+        if (level.getBlockEntity(pos) instanceof SpawnerBlockEntity spawner) {
+            spawner.getSpawner().load(level, pos, spawnerTag(mob.get().value()));
+            spawner.setChanged();
+        }
+    }
+
+    /** The spawner settings for a dungeon mob: vanilla timing, with spawning allowed at any light level. */
+    static CompoundTag spawnerTag(EntityType<?> type) {
+        CompoundTag entity = new CompoundTag();
+        entity.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
+        CompoundTag rules = new CompoundTag();
+        rules.put("block_light_limit", lightRange());
+        rules.put("sky_light_limit", lightRange());
+        CompoundTag spawnData = new CompoundTag();
+        spawnData.put("entity", entity);
+        spawnData.put("custom_spawn_rules", rules);
+        CompoundTag potential = new CompoundTag();
+        potential.put("data", spawnData.copy());
+        potential.putInt("weight", 1);
+        ListTag potentials = new ListTag();
+        potentials.add(potential);
+        CompoundTag tag = new CompoundTag();
+        tag.put("SpawnData", spawnData);
+        tag.put("SpawnPotentials", potentials);
+        tag.putShort("Delay", (short) 20);
+        return tag;
+    }
+
+    private static ListTag lightRange() {
+        ListTag range = new ListTag();
+        range.add(IntTag.valueOf(0));
+        range.add(IntTag.valueOf(15));
+        return range;
     }
 
     private static <T> Optional<Holder<T>> pickFromTag(Optional<HolderSet.Named<T>> tag, RandomSource random) {

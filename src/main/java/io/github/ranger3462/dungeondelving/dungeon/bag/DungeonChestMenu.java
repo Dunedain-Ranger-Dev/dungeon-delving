@@ -1,5 +1,7 @@
 package io.github.ranger3462.dungeondelving.dungeon.bag;
 
+import io.github.ranger3462.dungeondelving.dungeon.DungeonLoot;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -14,7 +16,9 @@ import net.minecraft.world.item.ItemStack;
  * player's dungeon bag instead of their inventory, and nothing can be put into the container. If the bag is full,
  * the item simply stays where it is.
  * <p>
- * With {@code readOnly}, nothing in the container can be taken either; used to show the bag itself.
+ * With {@code readOnly}, nothing in the container can be taken either; used to show the bag itself. Items can still be
+ * thrown out of the bag (Q for one, Ctrl+Q for the stack) to make room. They stay marked as dungeon loot, so picking
+ * them back up puts them back in the bag.
  */
 public class DungeonChestMenu extends ChestMenu {
     private final DungeonBag bag;
@@ -54,6 +58,10 @@ public class DungeonChestMenu extends ChestMenu {
             return;
         }
         if (slotId >= 0 && slotId < containerSlots) {
+            if (readOnly && clickType == ClickType.THROW) {
+                throwOut(slots.get(slotId), player, button == 1);
+                return;
+            }
             if (!readOnly && getCarried().isEmpty() && (clickType == ClickType.PICKUP || clickType == ClickType.QUICK_MOVE)) {
                 takeIntoBag(slots.get(slotId));
             }
@@ -77,6 +85,18 @@ public class DungeonChestMenu extends ChestMenu {
         }
         ItemStack left = bag.insert(slot.getItem());
         slot.set(left);
+        slot.setChanged();
+        broadcastChanges();
+    }
+
+    /** Drops one item (or the whole stack) from a bag slot at the player's feet, still marked as dungeon loot. */
+    public void throwOut(Slot slot, Player player, boolean wholeStack) {
+        if (!(player instanceof ServerPlayer) || !slot.hasItem()) {
+            return;
+        }
+        ItemStack thrown = slot.remove(wholeStack ? slot.getItem().getCount() : 1);
+        DungeonLoot.mark(thrown);
+        player.drop(thrown, true);
         slot.setChanged();
         broadcastChanges();
     }

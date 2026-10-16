@@ -1,10 +1,12 @@
 package io.github.ranger3462.dungeondelving.gametest;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonLoot;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonTravel;
 import io.github.ranger3462.dungeondelving.dungeon.bag.BagEvents;
@@ -12,6 +14,7 @@ import io.github.ranger3462.dungeondelving.dungeon.bag.BagEvents.PickupResult;
 import io.github.ranger3462.dungeondelving.dungeon.bag.DungeonBag;
 import io.github.ranger3462.dungeondelving.dungeon.bag.DungeonChestMenu;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
+import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -98,6 +101,30 @@ public class DungeonBagTests {
         DungeonChestMenu view = DungeonChestMenu.viewing(2, player.getInventory(), bag);
         view.clicked(0, 0, ClickType.PICKUP, player);
         helper.assertTrue(view.getCarried().isEmpty() && bag.usedSlots() == 9, "the bag view is read-only");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void itemsCanBeThrownOutOfTheBag(GameTestHelper helper) {
+        ServerPlayer player = player(helper);
+        player.setPos(helper.absolutePos(BlockPos.ZERO).getCenter());
+        DungeonBag bag = new DungeonBag(9);
+        bag.insert(new ItemStack(Items.ROTTEN_FLESH, 5));
+        DungeonChestMenu view = DungeonChestMenu.viewing(3, player.getInventory(), bag);
+
+        view.clicked(0, 0, ClickType.THROW, player);
+        helper.assertTrue(bag.container().countItem(Items.ROTTEN_FLESH) == 4, "Q should throw one item out of the bag");
+        view.clicked(0, 1, ClickType.THROW, player);
+        helper.assertTrue(bag.usedSlots() == 0, "Ctrl+Q should throw the whole stack out of the bag");
+
+        List<ItemEntity> thrown = helper.getLevel().getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(4));
+        helper.assertTrue(thrown.stream().mapToInt(e -> e.getItem().getCount()).sum() == 5, "thrown items should land near the player");
+        ItemEntity flesh = thrown.getFirst();
+        helper.assertTrue(DungeonLoot.isLoot(flesh.getItem()), "items thrown from the bag stay dungeon loot");
+        flesh.setNoPickUpDelay();
+        helper.assertTrue(BagEvents.pickUpIntoBag(player, flesh, bag) == PickupResult.BAGGED,
+                "picking a thrown-out item back up should put it back in the bag, not the inventory");
+        thrown.forEach(ItemEntity::discard);
         helper.succeed();
     }
 
