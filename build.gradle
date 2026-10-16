@@ -229,7 +229,7 @@ idea {
 
 // Copies the modpack's scripts and config overrides from the dungeon-delving-pack repository (checked out next to
 // this one) into the dev game folder, so runClient and runServer play with the pack's changes. Game tests and data
-// generation don't get them, so they test this mod on its own.
+// generation don't run the copy, but they share run/, so files copied by an earlier client run are still there.
 def packDir = file('../dungeon-delving-pack')
 tasks.register('syncPack', Copy) {
     description = "Copies the modpack's kubejs/ and config/ folders into run/."
