@@ -52,12 +52,12 @@ public class DungeonMarkerTests {
         RandomSource random = RandomSource.create(5);
         try {
             resolve(level, pos, ModRegistries.LOOT_MARKER.get(), random, ALWAYS);
-            chestWith(helper, pos, DungeonMarkers.ROOM_LOOT, "a loot marker");
+            chestWith(helper, pos, DungeonMarkers.roomLoot(1), "a loot marker");
             resolve(level, pos, ModRegistries.LOOT_MARKER.get(), random, NEVER);
             helper.assertTrue(level.getBlockState(pos).isAir(), "a loot marker that doesn't roll a chest should leave nothing");
 
             resolve(level, pos, ModRegistries.OBJECTIVE_MARKER.get(), random, NEVER);
-            chestWith(helper, pos, DungeonMarkers.OBJECTIVE_LOOT, "an objective marker");
+            chestWith(helper, pos, DungeonMarkers.objectiveLoot(1), "an objective marker");
 
             resolve(level, pos, ModRegistries.RESOURCE_MARKER.get(), random, ALWAYS);
             helper.assertTrue(level.getBlockState(pos).is(DungeonMarkers.DUNGEON_RESOURCES), "a resource marker should become a dungeon ore");

@@ -2,10 +2,50 @@
   "type": "minecraft:chest",
   "pools": [
     {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeondelving:thraggite_ingot",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 3
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeondelving:barrow_iron_ingot",
+          "weight": 1,
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 3,
+                "max": 6
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "rolls": {
         "type": "minecraft:uniform",
         "min": 3,
-        "max": 5
+        "max": 4
       },
       "entries": [
         {
@@ -33,7 +73,7 @@
               "count": {
                 "type": "minecraft:uniform",
                 "min": 3,
-                "max": 8
+                "max": 7
               }
             }
           ]
@@ -56,14 +96,19 @@
         {
           "type": "minecraft:item",
           "name": "minecraft:diamond",
-          "weight": 4,
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "name": "minecraft:book",
+          "weight": 5,
           "functions": [
             {
-              "function": "minecraft:set_count",
-              "count": {
+              "function": "minecraft:enchant_with_levels",
+              "levels": {
                 "type": "minecraft:uniform",
-                "min": 1,
-                "max": 2
+                "min": 10,
+                "max": 20
               }
             }
           ]
@@ -75,11 +120,16 @@
         },
         {
           "type": "minecraft:item",
-          "name": "minecraft:book",
-          "weight": 3,
+          "name": "minecraft:experience_bottle",
+          "weight": 6,
           "functions": [
             {
-              "function": "minecraft:enchant_randomly"
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 6
+              }
             }
           ]
         }

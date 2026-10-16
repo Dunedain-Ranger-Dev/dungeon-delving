@@ -33,18 +33,16 @@ import net.minecraft.world.level.storage.loot.LootTable;
 /**
  * Turns the marker blocks builders place in dungeon pieces into content, freshly rolled every run:
  * <ul>
- * <li>Loot marker: a chest with {@code dungeondelving:chests/dungeon_room} loot, or nothing.</li>
+ * <li>Loot marker: a chest with the tier's {@code dungeondelving:chests/tier_<n>/room} loot, or nothing.</li>
  * <li>Mob marker: a monster spawner for a random mob from the {@code dungeondelving:dungeon_mobs} entity tag. Dungeon
  * spawners ignore light level, so lit rooms still spawn mobs.</li>
  * <li>Resource marker: the dungeon's tier ore, the common dungeon ore, a vanilla ore from the
  * {@code dungeondelving:dungeon_resources} block tag, or otherwise Hallstone, so there are never gaps.</li>
- * <li>Objective marker: a reward chest with {@code dungeondelving:chests/dungeon_objective} loot.</li>
+ * <li>Objective marker: a reward chest with the tier's {@code dungeondelving:chests/tier_<n>/objective} loot.</li>
  * </ul>
  * Chances come from the config.
  */
 public final class DungeonMarkers {
-    public static final ResourceKey<LootTable> ROOM_LOOT = lootTable("chests/dungeon_room");
-    public static final ResourceKey<LootTable> OBJECTIVE_LOOT = lootTable("chests/dungeon_objective");
     public static final TagKey<EntityType<?>> DUNGEON_MOBS = TagKey.create(Registries.ENTITY_TYPE, DungeonDelving.id("dungeon_mobs"));
     public static final TagKey<Block> DUNGEON_RESOURCES = TagKey.create(Registries.BLOCK, DungeonDelving.id("dungeon_resources"));
 
@@ -57,6 +55,16 @@ public final class DungeonMarkers {
     }
 
     private DungeonMarkers() {}
+
+    /** The loot table for loot-marker chests in a dungeon of this tier (1 to 4). */
+    public static ResourceKey<LootTable> roomLoot(int tier) {
+        return lootTable("chests/tier_" + DungeonRun.clampTier(tier) + "/room");
+    }
+
+    /** The loot table for the objective reward chest in a dungeon of this tier (1 to 4). */
+    public static ResourceKey<LootTable> objectiveLoot(int tier) {
+        return lootTable("chests/tier_" + DungeonRun.clampTier(tier) + "/objective");
+    }
 
     /** Resolves every marker in a piece that was just placed with the given position and settings. */
     public static void resolve(ServerLevel level, StructureTemplate template, BlockPos pos, StructurePlaceSettings settings,
@@ -74,10 +82,10 @@ public final class DungeonMarkers {
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         if (marker == ModRegistries.LOOT_MARKER.get()) {
             if (random.nextDouble() < rolls.lootChance()) {
-                placeChest(level, pos, ROOM_LOOT, random);
+                placeChest(level, pos, roomLoot(rolls.tier()), random);
             }
         } else if (marker == ModRegistries.OBJECTIVE_MARKER.get()) {
-            placeChest(level, pos, OBJECTIVE_LOOT, random);
+            placeChest(level, pos, objectiveLoot(rolls.tier()), random);
         } else if (marker == ModRegistries.RESOURCE_MARKER.get()) {
             Block block = random.nextDouble() < rolls.resourceChance() ? pickOre(level, random, rolls).orElse(null) : null;
             level.setBlock(pos, (block != null ? block : ModRegistries.HALLSTONE.get()).defaultBlockState(), Block.UPDATE_CLIENTS);
