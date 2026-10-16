@@ -15,6 +15,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.neoforged.fml.ModList;
 
 /**
  * Tracks the dungeon ores found during a run. Items in the {@code dungeondelving:lost_on_failure} tag that are generated
@@ -45,27 +46,23 @@ public final class DungeonLoot {
     }
 
     /**
-     * A successful exit: the player keeps everything, and their dungeon loot becomes ordinary items. Returns how many
-     * loot stacks were claimed.
+     * A successful exit: the player keeps everything, and their dungeon loot becomes ordinary items, including loot
+     * stored inside backpacks and other containers they carry. Returns how many loot stacks were claimed.
      */
     public static int claim(ServerPlayer player) {
-        int[] claimed = {0};
-        Consumer<ItemStack> unmark = stack -> {
-            if (stack.remove(ModRegistries.DUNGEON_LOOT.get()) != null) {
-                claimed[0]++;
-            }
-        };
-        forEachStack(player.getInventory(), unmark);
-        forEachStack(player.getEnderChestInventory(), unmark);
-        return claimed[0];
+        return sweepPlayer(player, new LootSweep(stack -> {
+            stack.remove(ModRegistries.DUNGEON_LOOT.get());
+            return stack;
+        }));
     }
 
     /**
-     * A failed run: removes dungeon loot from the player's inventory and ender chest, and damages their gear by the
-     * given fraction of its max durability, without fully breaking anything. Returns how many loot stacks were lost.
+     * A failed run: removes dungeon loot from everything the player carries (inventory, ender chest, Curios slots, and
+     * backpacks or other containers inside those), and damages their gear by the given fraction of its max durability,
+     * without fully breaking anything. Returns how many loot stacks were lost.
      */
     public static int applyFailurePenalty(ServerPlayer player, double gearDamage) {
-        int lost = removeLoot(player.getInventory()) + removeLoot(player.getEnderChestInventory());
+        int lost = sweepPlayer(player, new LootSweep(stack -> ItemStack.EMPTY));
         if (gearDamage > 0) {
             forEachStack(player.getInventory(), stack -> damage(stack, gearDamage));
         }
@@ -73,15 +70,15 @@ public final class DungeonLoot {
         return lost;
     }
 
-    private static int removeLoot(Container container) {
-        int lost = 0;
-        for (int slot = 0; slot < container.getContainerSize(); slot++) {
-            if (isLoot(container.getItem(slot))) {
-                container.setItem(slot, ItemStack.EMPTY);
-                lost++;
-            }
+    /** Runs a sweep over everything the player carries. Returns how many loot stacks it found. */
+    private static int sweepPlayer(ServerPlayer player, LootSweep sweep) {
+        sweep.sweep(player.getInventory());
+        sweep.sweep(player.getEnderChestInventory());
+        if (ModList.get().isLoaded("curios")) {
+            CuriosLoot.sweep(player, sweep);
         }
-        return lost;
+        sweep.overflow().forEach(stack -> player.getInventory().placeItemBackInInventory(stack));
+        return sweep.found();
     }
 
     private static void damage(ItemStack stack, double fraction) {

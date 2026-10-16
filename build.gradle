@@ -39,6 +39,18 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+    // The Curios API, compiled against so dungeon loot in Curios slots can be found.
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Curios"
+                url = "https://maven.theillusivec4.top/"
+            }
+        }
+        filter {
+            includeGroup "top.theillusivec4.curios"
+        }
+    }
     // FTB's and Architectury's Mavens, for FTB Quests and its libraries (they aren't on Modrinth).
     exclusiveContent {
         forRepository {
@@ -167,6 +179,9 @@ dependencies {
 
     // Example project dependency using a sister or child project:
     // implementation project(":myproject")
+
+    // Optional integration: the Curios API at compile time only. CuriosLoot is only used when Curios is installed.
+    compileOnly "top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1:api"
 
     // The pack's mods, loaded in dev runs (client, server, game tests) so features can be tested against them.
     // localRuntime keeps them out of this mod's published dependencies: Dungeon Delving doesn't require any.
