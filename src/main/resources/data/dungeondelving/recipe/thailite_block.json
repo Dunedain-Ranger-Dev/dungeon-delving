@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "dungeondelving:thailite_ingot"
+    }
+  },
+  "result": {
+    "id": "dungeondelving:thailite_block",
+    "count": 1
+  }
+}

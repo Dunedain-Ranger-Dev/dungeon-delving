@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "ingredient": {
+    "item": "dungeondelving:raw_thraggite"
+  },
+  "result": {
+    "id": "dungeondelving:thraggite_ingot"
+  },
+  "experience": 0.9,
+  "cookingtime": 100
+}

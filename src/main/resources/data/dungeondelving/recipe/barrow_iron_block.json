@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "dungeondelving:barrow_iron_ingot"
+    }
+  },
+  "result": {
+    "id": "dungeondelving:barrow_iron_block",
+    "count": 1
+  }
+}

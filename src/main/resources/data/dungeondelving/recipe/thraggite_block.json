@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "dungeondelving:thraggite_ingot"
+    }
+  },
+  "result": {
+    "id": "dungeondelving:thraggite_block",
+    "count": 1
+  }
+}

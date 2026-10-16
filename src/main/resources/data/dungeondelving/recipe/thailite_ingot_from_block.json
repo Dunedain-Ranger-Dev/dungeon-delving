@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "dungeondelving:thailite_block"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:thailite_ingot",
+    "count": 9
+  }
+}

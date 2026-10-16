@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "dungeondelving:emberstone_block"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:emberstone_ingot",
+    "count": 9
+  }
+}

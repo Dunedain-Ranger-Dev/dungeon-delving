@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "dungeondelving:wardsilver_block"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:wardsilver_ingot",
+    "count": 9
+  }
+}

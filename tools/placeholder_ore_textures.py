@@ -12,11 +12,11 @@ ASSETS = Path("src/main/resources/assets/dungeondelving/textures")
 
 # Must match DungeonOre.java.
 ORES = {
-    "common": 0xB8B8B8,
-    "tier_1": 0x4FC75A,
-    "tier_2": 0x4FA8E0,
-    "tier_3": 0xA45BD8,
-    "tier_4": 0xF2B53A,
+    "barrow_iron": 0xB8B8B8,
+    "thraggite": 0x4FC75A,
+    "wardsilver": 0x4FA8E0,
+    "emberstone": 0xA45BD8,
+    "thailite": 0xF2B53A,
 }
 
 
@@ -80,8 +80,8 @@ def ingot(color):
 
 
 for key, color in ORES.items():
-    png(ASSETS / "block" / f"{key}_dungeon_ore.png", ore(color, key))
-    png(ASSETS / "block" / f"{key}_dungeon_block.png", storage_block(color))
-    png(ASSETS / "item" / f"raw_{key}_dungeon_ore.png", raw_chunk(color, key))
-    png(ASSETS / "item" / f"{key}_dungeon_ingot.png", ingot(color))
+    png(ASSETS / "block" / f"{key}_ore.png", ore(color, key))
+    png(ASSETS / "block" / f"{key}_block.png", storage_block(color))
+    png(ASSETS / "item" / f"raw_{key}.png", raw_chunk(color, key))
+    png(ASSETS / "item" / f"{key}_ingot.png", ingot(color))
 print("Wrote placeholder textures for", ", ".join(ORES))

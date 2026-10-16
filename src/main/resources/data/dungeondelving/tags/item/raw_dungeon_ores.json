@@ -1,10 +1,10 @@
 {
   "replace": false,
   "values": [
-    "dungeondelving:raw_common_dungeon_ore",
-    "dungeondelving:raw_tier_1_dungeon_ore",
-    "dungeondelving:raw_tier_2_dungeon_ore",
-    "dungeondelving:raw_tier_3_dungeon_ore",
-    "dungeondelving:raw_tier_4_dungeon_ore"
+    "dungeondelving:raw_barrow_iron",
+    "dungeondelving:raw_thraggite",
+    "dungeondelving:raw_wardsilver",
+    "dungeondelving:raw_emberstone",
+    "dungeondelving:raw_thailite"
   ]
 }
