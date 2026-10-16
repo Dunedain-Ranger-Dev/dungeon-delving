@@ -5,8 +5,10 @@ import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.*;
 import java.util.List;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers.Rolls;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonSpawning;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder.Placement;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces;
@@ -19,6 +21,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
@@ -104,6 +108,25 @@ public class DungeonMarkerTests {
         StructureTemplate pillars = structures.get(DungeonPieces.id("common_pillars_placeholder")).orElseThrow();
         helper.assertTrue(count(pillars, ModRegistries.LOOT_MARKER.get()) > 0 && count(pillars, ModRegistries.RESOURCE_MARKER.get()) > 0,
                 "the pillars room should have loot and resource markers");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void quarryRoomIsFullOfResources(GameTestHelper helper) {
+        StructureTemplate quarry = helper.getLevel().getStructureManager().get(DungeonPieces.id("common_quarry_placeholder")).orElseThrow();
+        int markers = count(quarry, ModRegistries.RESOURCE_MARKER.get());
+        helper.assertTrue(markers >= 100, "the quarry test room should be packed with resource markers, has " + markers);
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void naturalSpawnsAreBlockedInDungeonsOnly(GameTestHelper helper) {
+        helper.assertTrue(DungeonSpawning.blocks(DungeonDimension.DUNGEON, MobSpawnType.NATURAL, true), "natural spawns are blocked in dungeons");
+        helper.assertTrue(DungeonSpawning.blocks(DungeonDimension.DUNGEON, MobSpawnType.CHUNK_GENERATION, true), "world-generation spawns are blocked");
+        helper.assertFalse(DungeonSpawning.blocks(DungeonDimension.DUNGEON, MobSpawnType.STRUCTURE, true), "mob markers still spawn mobs");
+        helper.assertFalse(DungeonSpawning.blocks(DungeonDimension.DUNGEON, MobSpawnType.SPAWNER, true), "spawners still work");
+        helper.assertFalse(DungeonSpawning.blocks(Level.OVERWORLD, MobSpawnType.NATURAL, true), "the overworld is unaffected");
+        helper.assertFalse(DungeonSpawning.blocks(DungeonDimension.DUNGEON, MobSpawnType.NATURAL, false), "the config can turn blocking off");
         helper.succeed();
     }
 

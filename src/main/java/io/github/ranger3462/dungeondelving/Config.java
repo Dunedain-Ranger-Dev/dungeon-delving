@@ -43,6 +43,11 @@ public final class Config {
             .comment("Each mob marker spawns between 1 and this many mobs from the dungeondelving:dungeon_mobs entity tag.")
             .defineInRange("maxMobsPerMarker", 3, 1, 16);
 
+    public static final ModConfigSpec.BooleanValue BLOCK_NATURAL_SPAWNS = BUILDER
+            .comment("Stop mobs spawning naturally in dungeons (including at world generation and as patrols), so every",
+                    "dungeon mob comes from a mob marker or spawner.")
+            .define("blockNaturalSpawns", true);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private Config() {}

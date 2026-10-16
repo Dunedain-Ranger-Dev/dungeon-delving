@@ -72,6 +72,7 @@ public class PlaceholderRoomProvider implements DataProvider {
         pieces.put("common_steps_placeholder", stepsRoom());
         pieces.put("common_cover_placeholder", coverRoom());
         pieces.put("common_walls_placeholder", wallsRoom());
+        pieces.put("common_quarry_placeholder", quarryRoom());
         pieces.put("objective_placeholder", objectiveRoom());
         pieces.put("tunnel_placeholder", tunnel());
         pieces.put("cap_placeholder", capWall());
@@ -165,6 +166,28 @@ public class PlaceholderRoomProvider implements DataProvider {
         return room;
     }
 
+    /**
+     * A test room packed with resource markers: four thick pillars studded with them on every face, so a single room
+     * shows what a dungeon tier's ores look like.
+     */
+    private static PieceBuilder quarryRoom() {
+        PieceBuilder room = roomShell();
+        for (int px : new int[] { 8, 24 }) {
+            for (int pz : new int[] { 8, 24 }) {
+                room.fill(px - 2, 1, pz - 2, px + 2, ROOM_HEIGHT - 2, pz + 2, ROOM);
+                for (int y = 2; y <= 8; y += 2) {
+                    for (int d = -2; d <= 2; d += 2) {
+                        room.set(px + d, y, pz - 2, resource());
+                        room.set(px + d, y, pz + 2, resource());
+                        room.set(px - 2, y, pz + d, resource());
+                        room.set(px + 2, y, pz + d, resource());
+                    }
+                }
+            }
+        }
+        return room;
+    }
+
     private static PieceBuilder objectiveRoom() {
         PieceBuilder room = roomShell();
         // A raised altar with the objective marker on top.
@@ -176,7 +199,10 @@ public class PlaceholderRoomProvider implements DataProvider {
         return room;
     }
 
-    /** A room with walls, floor, ceiling, ceiling lights, and a doorway hole in the middle of every side. */
+    /**
+     * A room with walls, floor, ceiling and a doorway hole in the middle of every side, lit brightly for testing:
+     * glowstone in the ceiling, set into the walls, and in the floor (13 blocks is too tall to light from above alone).
+     */
     private static PieceBuilder roomShell() {
         int top = ROOM_HEIGHT - 1;
         PieceBuilder room = new PieceBuilder(ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE);
@@ -186,9 +212,23 @@ public class PlaceholderRoomProvider implements DataProvider {
         room.fill(0, 1, MAX, MAX, top - 1, MAX, ROOM);
         room.fill(0, 1, 0, 0, top - 1, MAX, ROOM);
         room.fill(MAX, 1, 0, MAX, top - 1, MAX, ROOM);
-        for (int x = 6; x < MAX; x += 5) {
-            for (int z = 6; z < MAX; z += 5) {
+        for (int x = 4; x < MAX; x += 4) {
+            for (int z = 4; z < MAX; z += 4) {
                 room.set(x, top, z, LIGHT);
+            }
+        }
+        for (int x = 4; x < MAX; x += 6) {
+            for (int z = 4; z < MAX; z += 6) {
+                room.set(x, 0, z, LIGHT);
+            }
+        }
+        // Wall lights, kept clear of the doorway frames (blocks 13-19 up to y=7).
+        for (int i : new int[] { 4, 8, 24, 28 }) {
+            for (int y : new int[] { 4, 9 }) {
+                room.set(i, y, 0, LIGHT);
+                room.set(i, y, MAX, LIGHT);
+                room.set(0, y, i, LIGHT);
+                room.set(MAX, y, i, LIGHT);
             }
         }
         int doorEnd = DOOR_START + DOOR_WIDTH - 1;
@@ -217,8 +257,12 @@ public class PlaceholderRoomProvider implements DataProvider {
         int maxZ = TUNNEL_LENGTH - 1;
         tunnel.fill(0, 0, 0, maxX, maxY, maxZ, TUNNEL);
         tunnel.fill(1, 1, 0, maxX - 1, maxY - 1, maxZ, Blocks.AIR);
-        for (int z = 4; z < TUNNEL_LENGTH; z += 6) {
+        for (int z = 2; z < TUNNEL_LENGTH; z += 3) {
             tunnel.set(TUNNEL_WIDTH / 2, maxY, z, LIGHT);
+        }
+        for (int z = 5; z < TUNNEL_LENGTH; z += 6) {
+            tunnel.set(0, 3, z, LIGHT);
+            tunnel.set(maxX, 3, z, LIGHT);
         }
         return tunnel;
     }

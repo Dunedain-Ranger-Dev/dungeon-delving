@@ -36,5 +36,8 @@
   "block.dungeondelving.thailite_ore": "Thailite Ore",
   "block.dungeondelving.thailite_block": "Block of Thailite",
   "item.dungeondelving.raw_thailite": "Raw Thailite",
-  "item.dungeondelving.thailite_ingot": "Thailite Ingot"
+  "item.dungeondelving.thailite_ingot": "Thailite Ingot",
+  "dungeondelving.configuration.blockNaturalSpawns": "Block natural spawns in dungeons",
+  "dungeondelving.configuration.tierOreChance": "Tier ore chance",
+  "dungeondelving.configuration.commonOreChance": "Common ore chance"
 }
