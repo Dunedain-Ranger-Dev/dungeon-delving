@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "#dungeondelving:dungeon_ores",
+    "#dungeondelving:raw_dungeon_ores",
+    "#dungeondelving:dungeon_ingots",
+    "#dungeondelving:dungeon_storage_blocks"
+  ]
+}

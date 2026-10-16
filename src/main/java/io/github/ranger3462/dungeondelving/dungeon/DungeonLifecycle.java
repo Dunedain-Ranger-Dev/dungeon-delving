@@ -5,7 +5,6 @@ import java.util.List;
 
 import io.github.ranger3462.dungeondelving.Config;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
-import io.github.ranger3462.dungeondelving.dungeon.bag.DungeonBagItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.ListTag;
@@ -32,7 +31,7 @@ public final class DungeonLifecycle {
     private DungeonLifecycle() {}
 
     /**
-     * Dying in a dungeon fails the run. The bag and any other dungeon loot are lost and gear is damaged; everything else is held and given
+     * Dying in a dungeon fails the run. Dungeon ores found this run are lost and gear is damaged; everything else is held and given
      * back on respawn, so nothing the player brought is left behind in the dungeon.
      */
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -44,9 +43,7 @@ public final class DungeonLifecycle {
         if (regions.run(player.getUUID()).isEmpty()) {
             return;
         }
-        int lost = regions.takeBag(player.getUUID()).map(bag -> bag.takeAll().size()).orElse(0)
-                + DungeonLoot.applyFailurePenalty(player, Config.FAILURE_GEAR_DAMAGE.get());
-        DungeonBagItem.removeAll(player.getInventory());
+        int lost = DungeonLoot.applyFailurePenalty(player, Config.FAILURE_GEAR_DAMAGE.get());
         ListTag held = player.getInventory().save(new ListTag());
         player.getInventory().clearContent();
         regions.holdInventory(player.getUUID(), held);

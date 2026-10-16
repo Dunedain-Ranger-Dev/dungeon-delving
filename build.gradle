@@ -39,6 +39,29 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+    // FTB's and Architectury's Mavens, for FTB Quests and its libraries (they aren't on Modrinth).
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Architectury"
+                url = "https://maven.architectury.dev"
+            }
+        }
+        filter {
+            includeGroup "dev.architectury"
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "FTB"
+                url = "https://maven.ftb.dev/releases"
+            }
+        }
+        filter {
+            includeGroup "dev.ftb.mods"
+        }
+    }
 }
 
 base {
@@ -172,6 +195,14 @@ dependencies {
         localRuntime "maven.modrinth:better-advanced-tooltips:uPFbnD32" // 2101.1.0-build.5
         // JEI, to look up recipes while testing
         localRuntime "maven.modrinth:jei:ufHUqt9b"                   // 19.51.0.418
+        // FTB Quests and its libraries, for the pack's quest book
+        localRuntime "dev.ftb.mods:ftb-quests-neoforge:2101.1.36"
+        localRuntime "dev.ftb.mods:ftb-library-neoforge:2101.1.37"
+        localRuntime "dev.ftb.mods:ftb-teams-neoforge:2101.1.11"
+        localRuntime "dev.architectury:architectury-neoforge:13.0.8"
+        // Sophisticated Backpacks, for storage
+        localRuntime "maven.modrinth:sophisticated-backpacks:QkVLEgt1" // 1.21.1-3.26.12.2208
+        localRuntime "maven.modrinth:sophisticated-core:DAcZAWzl"    // 1.21.1-1.5.13.2404
     }
 
     // For more info:

@@ -3,20 +3,28 @@ package io.github.ranger3462.dungeondelving.dungeon;
 import java.util.List;
 import java.util.function.Consumer;
 
+import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Unit;
 import net.minecraft.world.Container;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 /**
- * Tracks which items were found during a dungeon run. Anything generated in the dungeon dimension (chest loot, mob
- * drops, block drops) is marked as dungeon loot. Leaving through the exit claims it; failing the run takes it away.
+ * Tracks the dungeon ores found during a run. Items in the {@code dungeondelving:lost_on_failure} tag that are generated
+ * in the dungeon dimension (chest loot, mob drops, block drops) are marked as dungeon loot. Leaving through the exit
+ * claims them; failing the run takes them away. Everything else found in a dungeon is the player's to keep.
  */
 public final class DungeonLoot {
+    /** Items that are lost if the run fails: by default, the Dungeon Delving ores and their raw ores, ingots and blocks. */
+    public static final TagKey<Item> LOST_ON_FAILURE = TagKey.create(Registries.ITEM, DungeonDelving.id("lost_on_failure"));
+
     private DungeonLoot() {}
 
     public static boolean isLoot(ItemStack stack) {
@@ -29,17 +37,27 @@ public final class DungeonLoot {
         }
     }
 
-    /** Marks freshly generated items as dungeon loot when they were generated in the dungeon dimension. */
+    /** Marks freshly generated items in the {@link #LOST_ON_FAILURE} tag when they were generated in the dungeon dimension. */
     public static void markIfInDungeon(List<ItemStack> generated, ResourceKey<Level> dimension) {
         if (dimension == DungeonDimension.DUNGEON) {
-            generated.forEach(DungeonLoot::mark);
+            generated.stream().filter(stack -> stack.is(LOST_ON_FAILURE)).forEach(DungeonLoot::mark);
         }
     }
 
-    /** A successful exit: the player keeps everything, and their dungeon loot becomes ordinary items. */
-    public static void claim(ServerPlayer player) {
-        forEachStack(player.getInventory(), stack -> stack.remove(ModRegistries.DUNGEON_LOOT.get()));
-        forEachStack(player.getEnderChestInventory(), stack -> stack.remove(ModRegistries.DUNGEON_LOOT.get()));
+    /**
+     * A successful exit: the player keeps everything, and their dungeon loot becomes ordinary items. Returns how many
+     * loot stacks were claimed.
+     */
+    public static int claim(ServerPlayer player) {
+        int[] claimed = {0};
+        Consumer<ItemStack> unmark = stack -> {
+            if (stack.remove(ModRegistries.DUNGEON_LOOT.get()) != null) {
+                claimed[0]++;
+            }
+        };
+        forEachStack(player.getInventory(), unmark);
+        forEachStack(player.getEnderChestInventory(), unmark);
+        return claimed[0];
     }
 
     /**

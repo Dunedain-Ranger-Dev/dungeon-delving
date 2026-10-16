@@ -14,7 +14,6 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
-import io.github.ranger3462.dungeondelving.dungeon.bag.DungeonBag;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
@@ -50,8 +49,6 @@ public class DungeonRegions {
     private final Map<UUID, Integer> elapsed = new HashMap<>();
     /** Inventories kept from players who died in a dungeon, given back when they respawn. */
     private final Map<UUID, ListTag> heldInventories = new HashMap<>();
-    /** Each active run's loot bag. Changes as players loot, so it's saved with run times rather than on every change. */
-    private final Map<UUID, DungeonBag> bags = new HashMap<>();
     private Path file;
     private HolderLookup.Provider registries;
 
@@ -132,28 +129,9 @@ public class DungeonRegions {
         return Optional.ofNullable(inventory);
     }
 
-    public void startBag(UUID player, DungeonBag bag) {
-        bags.put(player, bag);
-        save();
-    }
-
-    public Optional<DungeonBag> bag(UUID player) {
-        return Optional.ofNullable(bags.get(player));
-    }
-
-    /** Removes and returns a player's bag, e.g. to empty it into their inventory or throw it away. */
-    public Optional<DungeonBag> takeBag(UUID player) {
-        DungeonBag bag = bags.remove(player);
-        if (bag != null) {
-            save();
-        }
-        return Optional.ofNullable(bag);
-    }
-
-    /** Ends a player's run and releases its region if no one else is using it. Any bag left over is discarded. */
+    /** Ends a player's run and releases its region if no one else is using it. */
     public Optional<DungeonRun> endRun(UUID player) {
         elapsed.remove(player);
-        bags.remove(player);
         DungeonRun run = runs.remove(player);
         if (run != null) {
             release(run.region());
@@ -205,13 +183,6 @@ public class DungeonRegions {
             heldList.add(held);
         });
         tag.put("held_inventories", heldList);
-        ListTag bagList = new ListTag();
-        bags.forEach((player, bag) -> {
-            CompoundTag bagTag = bag.save(registries);
-            bagTag.putUUID("player", player);
-            bagList.add(bagTag);
-        });
-        tag.put("bags", bagList);
         return tag;
     }
 
@@ -232,10 +203,6 @@ public class DungeonRegions {
         for (Tag heldTag : tag.getList("held_inventories", Tag.TAG_COMPOUND)) {
             CompoundTag held = (CompoundTag) heldTag;
             regions.heldInventories.put(held.getUUID("player"), held.getList("inventory", Tag.TAG_COMPOUND));
-        }
-        for (Tag bagTag : tag.getList("bags", Tag.TAG_COMPOUND)) {
-            CompoundTag bag = (CompoundTag) bagTag;
-            regions.bags.put(bag.getUUID("player"), DungeonBag.load(bag, registries));
         }
         return regions;
     }

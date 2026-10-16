@@ -9,6 +9,8 @@ import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonLoot;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
+import io.github.ranger3462.dungeondelving.registry.DungeonOre;
+import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -29,13 +31,27 @@ public class DungeonLootTests {
     private static final String ANY_TEMPLATE = "dungeon/cap_placeholder";
 
     @GameTest(template = ANY_TEMPLATE)
-    public static void onlyDungeonLootIsMarked(GameTestHelper helper) {
-        List<ItemStack> overworld = List.of(new ItemStack(Items.DIAMOND), new ItemStack(Items.BONE));
-        List<ItemStack> dungeon = List.of(new ItemStack(Items.DIAMOND), new ItemStack(Items.BONE));
+    public static void onlyDungeonOresFoundInDungeonsAreMarked(GameTestHelper helper) {
+        List<ItemStack> overworld = List.of(new ItemStack(DungeonOre.TIER_2.raw.get()), new ItemStack(Items.BONE));
+        List<ItemStack> dungeon = List.of(new ItemStack(DungeonOre.TIER_2.raw.get()), new ItemStack(DungeonOre.COMMON.oreItem.get()),
+                new ItemStack(Items.DIAMOND), new ItemStack(Items.BONE));
         DungeonLoot.markIfInDungeon(overworld, Level.OVERWORLD);
         DungeonLoot.markIfInDungeon(dungeon, DungeonDimension.DUNGEON);
         helper.assertTrue(overworld.stream().noneMatch(DungeonLoot::isLoot), "items generated outside dungeons shouldn't be marked");
-        helper.assertTrue(dungeon.stream().allMatch(DungeonLoot::isLoot), "items generated in a dungeon should be marked");
+        helper.assertTrue(DungeonLoot.isLoot(dungeon.get(0)) && DungeonLoot.isLoot(dungeon.get(1)), "dungeon ores found in a dungeon should be marked");
+        helper.assertFalse(DungeonLoot.isLoot(dungeon.get(2)) || DungeonLoot.isLoot(dungeon.get(3)), "other dungeon loot should be the player's to keep");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void everyDungeonOreItemIsAtRisk(GameTestHelper helper) {
+        for (DungeonOre ore : DungeonOre.values()) {
+            for (ItemStack stack : List.of(new ItemStack(ore.oreItem.get()), new ItemStack(ore.raw.get()), new ItemStack(ore.ingot.get()),
+                    new ItemStack(ore.storageBlockItem.get()))) {
+                helper.assertTrue(stack.is(DungeonLoot.LOST_ON_FAILURE), stack.getItem() + " should be lost on a failed run");
+            }
+        }
+        helper.assertFalse(new ItemStack(ModRegistries.HALLSTONE_ITEM.get()).is(DungeonLoot.LOST_ON_FAILURE), "Hallstone isn't valuable");
         helper.succeed();
     }
 
@@ -72,8 +88,9 @@ public class DungeonLootTests {
         player.getInventory().setItem(0, loot(new ItemStack(Items.DIAMOND, 5)));
         player.getEnderChestInventory().setItem(0, loot(new ItemStack(Items.EMERALD)));
 
-        DungeonLoot.claim(player);
+        int claimed = DungeonLoot.claim(player);
 
+        helper.assertTrue(claimed == 2, "two loot stacks should be claimed, but " + claimed + " were");
         ItemStack kept = player.getInventory().getItem(0);
         helper.assertTrue(kept.is(Items.DIAMOND) && kept.getCount() == 5, "loot should be kept on exit");
         helper.assertFalse(DungeonLoot.isLoot(kept), "kept loot should become a normal item");
