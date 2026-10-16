@@ -8,6 +8,7 @@ import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces.Kind;
 import io.github.ranger3462.dungeondelving.dungeon.layout.PieceValidator;
 import io.github.ranger3462.dungeondelving.dungeon.layout.PieceValidator.Problem;
+import io.github.ranger3462.dungeondelving.registry.DungeonOre;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -25,6 +26,16 @@ public class PlaceholderRoomTests {
 
     @GameTest(template = "dungeon/start_placeholder")
     public static void startRoom(GameTestHelper helper) {
+        BlockPos corner = BlockPos.containing(helper.getBounds().minX, helper.getBounds().minY, helper.getBounds().minZ);
+        for (DungeonOre ore : DungeonOre.values()) {
+            int count = 0;
+            for (BlockPos pos : BlockPos.betweenClosed(corner, corner.offset(ROOM_SIZE - 1, ROOM_HEIGHT - 1, ROOM_SIZE - 1))) {
+                if (helper.getLevel().getBlockState(pos).is(ore.ore.get())) {
+                    count++;
+                }
+            }
+            helper.assertTrue(count >= 3 * 10, "the start room should have three mounds of " + ore.key + " ore, but has " + count + " blocks");
+        }
         checkRoom(helper);
     }
 

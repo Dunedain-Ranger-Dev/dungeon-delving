@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.hash.Hashing;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.registry.DungeonOre;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
@@ -103,9 +104,34 @@ public class PlaceholderRoomProvider implements DataProvider {
 
     // --- Rooms ---
 
+    /** Ore mounds per dungeon ore in the start room. */
+    static final int START_MOUNDS_PER_ORE = 3;
+
+    /**
+     * The center is kept clear: the exit block goes there and players arrive just south of it. For testing, the corners
+     * hold small mounds of every dungeon ore (real ore blocks, not markers), so they're quick to find.
+     */
     private static PieceBuilder startRoom() {
-        // Kept empty: the exit block goes in the center and players arrive just south of it.
-        return roomShell();
+        PieceBuilder room = roomShell();
+        // Four mound spots in each corner, clear of the doorway lanes.
+        int[] spots = { 3, 7, MAX - 7, MAX - 3 };
+        DungeonOre[] ores = DungeonOre.values();
+        int mound = 0;
+        for (int x : spots) {
+            for (int z : spots) {
+                if (mound < ores.length * START_MOUNDS_PER_ORE) {
+                    oreMound(room, x, z, ores[mound % ores.length].ore.get());
+                }
+                mound++;
+            }
+        }
+        return room;
+    }
+
+    /** A 3×3 mound of ore with one more block on top, centered on (x, z). */
+    private static void oreMound(PieceBuilder room, int x, int z, Block ore) {
+        room.fill(x - 1, 1, z - 1, x + 1, 1, z + 1, ore);
+        room.set(x, 2, z, ore);
     }
 
     private static PieceBuilder pillarsRoom() {
