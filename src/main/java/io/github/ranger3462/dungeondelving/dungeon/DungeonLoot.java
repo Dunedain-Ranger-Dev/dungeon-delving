@@ -26,6 +26,12 @@ public final class DungeonLoot {
     /** Items that are lost if the run fails: by default, the Dungeon Delving ores and their raw ores, ingots and blocks. */
     public static final TagKey<Item> LOST_ON_FAILURE = TagKey.create(Registries.ITEM, DungeonDelving.id("lost_on_failure"));
 
+    /**
+     * Items that only come from dungeons: they're removed from loot generated anywhere else (see
+     * {@link RemoveDungeonOnlyModifier}). Empty in the mod; the pack fills it with, e.g., magic mods' upgrade materials.
+     */
+    public static final TagKey<Item> DUNGEON_ONLY = TagKey.create(Registries.ITEM, DungeonDelving.id("dungeon_only"));
+
     private DungeonLoot() {}
 
     public static boolean isLoot(ItemStack stack) {
@@ -42,6 +48,13 @@ public final class DungeonLoot {
     public static void markIfInDungeon(List<ItemStack> generated, ResourceKey<Level> dimension) {
         if (dimension == DungeonDimension.DUNGEON) {
             generated.stream().filter(stack -> stack.is(LOST_ON_FAILURE)).forEach(DungeonLoot::mark);
+        }
+    }
+
+    /** Removes {@link #DUNGEON_ONLY} items from freshly generated loot, unless it was generated in the dungeon dimension. */
+    public static void removeDungeonOnly(List<ItemStack> generated, ResourceKey<Level> dimension) {
+        if (dimension != DungeonDimension.DUNGEON) {
+            generated.removeIf(stack -> stack.is(DUNGEON_ONLY));
         }
     }
 

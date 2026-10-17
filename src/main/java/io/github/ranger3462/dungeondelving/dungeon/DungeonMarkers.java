@@ -1,5 +1,6 @@
 package io.github.ranger3462.dungeondelving.dungeon;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,8 +37,9 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * <li>Loot marker: a chest with the tier's {@code dungeondelving:chests/tier_<n>/room} loot, or nothing.</li>
  * <li>Mob marker: a monster spawner for a random mob from the {@code dungeondelving:dungeon_mobs} entity tag. Dungeon
  * spawners ignore light level, so lit rooms still spawn mobs.</li>
- * <li>Resource marker: the dungeon's tier ore, the common dungeon ore, a vanilla ore from the
- * {@code dungeondelving:dungeon_resources} block tag, or otherwise Hallstone, so there are never gaps.</li>
+ * <li>Resource marker: the dungeon's tier ore, the common dungeon ore, an ore from the
+ * {@code dungeondelving:dungeon_resources} block tag or the tier's {@code dungeondelving:dungeon_resources/tier_<n>}
+ * tag, or otherwise Hallstone, so there are never gaps.</li>
  * <li>Objective marker: a reward chest with the tier's {@code dungeondelving:chests/tier_<n>/objective} loot.</li>
  * </ul>
  * Chances come from the config.
@@ -103,7 +105,16 @@ public final class DungeonMarkers {
         if (roll < rolls.tierOreChance() + rolls.commonOreChance()) {
             return Optional.of(DungeonOre.COMMON.ore.get());
         }
-        return pickFromTag(level.registryAccess().registryOrThrow(Registries.BLOCK).getTag(DUNGEON_RESOURCES), random).map(Holder::value);
+        var blocks = level.registryAccess().registryOrThrow(Registries.BLOCK);
+        List<Holder<Block>> choices = new ArrayList<>();
+        blocks.getTag(DUNGEON_RESOURCES).ifPresent(tag -> tag.forEach(choices::add));
+        blocks.getTag(tierResources(rolls.tier())).ifPresent(tag -> tag.forEach(choices::add));
+        return choices.isEmpty() ? Optional.empty() : Optional.of(choices.get(random.nextInt(choices.size())).value());
+    }
+
+    /** Extra resource-marker ores for one tier, on top of {@link #DUNGEON_RESOURCES}, e.g. a magic mod's ore from tier 2. */
+    public static TagKey<Block> tierResources(int tier) {
+        return TagKey.create(Registries.BLOCK, DungeonDelving.id("dungeon_resources/tier_" + DungeonRun.clampTier(tier)));
     }
 
     private static void placeChest(ServerLevel level, BlockPos pos, ResourceKey<LootTable> table, RandomSource random) {

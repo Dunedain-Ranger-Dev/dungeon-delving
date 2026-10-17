@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.block.DungeonExitBlock;
 import io.github.ranger3462.dungeondelving.block.DungeonGateBlock;
+import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
@@ -67,6 +68,8 @@ public final class ModRegistries {
 
     public static final DeferredHolder<MapCodec<? extends IGlobalLootModifier>, MapCodec<TagDungeonLootModifier>> TAG_DUNGEON_LOOT =
             LOOT_MODIFIERS.register("tag_dungeon_loot", () -> TagDungeonLootModifier.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IGlobalLootModifier>, MapCodec<RemoveDungeonOnlyModifier>> REMOVE_DUNGEON_ONLY =
+            LOOT_MODIFIERS.register("remove_dungeon_only", () -> RemoveDungeonOnlyModifier.CODEC);
 
     /** Gate, exit and markers, for players and builders. */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register("dungeon_delving", () -> CreativeModeTab.builder()

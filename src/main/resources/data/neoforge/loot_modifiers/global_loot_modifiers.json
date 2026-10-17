@@ -1,6 +1,7 @@
 {
   "replace": false,
   "entries": [
-    "dungeondelving:tag_dungeon_loot"
+    "dungeondelving:tag_dungeon_loot",
+    "dungeondelving:remove_dungeon_only"
   ]
 }

@@ -296,3 +296,4 @@ tasks.register('syncPack', Copy) {
 }
 tasks.named('runClient') { dependsOn 'syncPack' }
 tasks.named('runServer') { dependsOn 'syncPack' }
+tasks.named('runGameTestServer') { dependsOn 'syncPack' }
