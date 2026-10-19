@@ -23,7 +23,6 @@ import net.minecraft.world.level.block.Rotation;
  * farthest from the start becomes the objective room.
  */
 public final class DungeonLayoutGenerator {
-    public static final int DEFAULT_ROOMS = 15;
     /** How far from the start a room may be, in cells. Keeps a whole dungeon inside one 1024-block region. */
     public static final int MAX_RADIUS = 6;
     /** Chance that two neighboring rooms not yet joined get an extra tunnel, creating a loop. */

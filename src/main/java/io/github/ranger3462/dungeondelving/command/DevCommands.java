@@ -12,6 +12,7 @@ import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
+import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonTravel;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
 import net.minecraft.commands.CommandSourceStack;
@@ -24,7 +25,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
  * Operator-only commands for testing dungeons without the gate and exit blocks:
- * {@code /dungeondelving dungeon enter [rooms] [tier]|leave|fail|regions}.
+ * {@code /dungeondelving dungeon enter [rooms] [tier]|enter tier <tier>|leave|fail|regions}. Without a room count, the
+ * count is rolled from the tier's {@code roomCounts} range.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class DevCommands {
@@ -40,7 +42,13 @@ public final class DevCommands {
                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("dungeon")
                         .then(Commands.literal("enter")
-                                .executes(context -> enter(context, DungeonLayoutGenerator.DEFAULT_ROOMS, DungeonRun.MIN_TIER))
+                                .executes(context -> enter(context, rolledRooms(context, DungeonRun.MIN_TIER), DungeonRun.MIN_TIER))
+                                .then(Commands.literal("tier")
+                                        .then(Commands.argument("tier", IntegerArgumentType.integer(DungeonRun.MIN_TIER, DungeonRun.MAX_TIER))
+                                                .executes(context -> {
+                                                    int tier = IntegerArgumentType.getInteger(context, "tier");
+                                                    return enter(context, rolledRooms(context, tier), tier);
+                                                })))
                                 .then(Commands.argument("rooms", IntegerArgumentType.integer(1, DungeonLayoutGenerator.maxRooms()))
                                         .executes(context -> enter(context, IntegerArgumentType.getInteger(context, "rooms"), DungeonRun.MIN_TIER))
                                         .then(Commands.argument("tier", IntegerArgumentType.integer(DungeonRun.MIN_TIER, DungeonRun.MAX_TIER))
@@ -49,6 +57,10 @@ public final class DevCommands {
                         .then(Commands.literal("leave").executes(DevCommands::leave))
                         .then(Commands.literal("fail").executes(DevCommands::failRun))
                         .then(Commands.literal("regions").executes(DevCommands::regions))));
+    }
+
+    private static int rolledRooms(CommandContext<CommandSourceStack> context, int tier) {
+        return RoomCounts.roll(tier, context.getSource().getLevel().getRandom());
     }
 
     private static int enter(CommandContext<CommandSourceStack> context, int rooms, int tier) throws CommandSyntaxException {
