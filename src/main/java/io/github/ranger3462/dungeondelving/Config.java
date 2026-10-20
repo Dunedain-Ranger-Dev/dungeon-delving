@@ -26,9 +26,9 @@ public final class Config {
             .defineInRange("failureGearDamage", 0.25, 0.0, 1.0);
 
     public static final ModConfigSpec.ConfigValue<List<? extends String>> ROOM_COUNTS = BUILDER
-            .comment("How many rooms a dungeon has, for tiers 1, 2, 3 and 4 in order. Each entry is a range like \"3-5\"",
+            .comment("How many rooms a dungeon has, for tiers 1, 2, 3 and 4 in order. Each entry is a range like \"4-6\"",
                     "(rolled fresh every run) or a single number. Every dungeon has at least 2 rooms: the start and the objective.")
-            .defineList("roomCounts", RoomCounts.DEFAULTS, () -> "3-5", value -> value instanceof String text && RoomCounts.parse(text).isPresent());
+            .defineList("roomCounts", RoomCounts.DEFAULTS, () -> "4-6", value -> value instanceof String text && RoomCounts.parse(text).isPresent());
 
     public static final ModConfigSpec.DoubleValue LOOT_MARKER_CHANCE = BUILDER
             .comment("Chance that each loot marker in a dungeon becomes a chest. Otherwise it's left empty.")

@@ -48,8 +48,8 @@ public class RoomCountTests {
             }
             helper.assertTrue(sawMin && sawMax, "tier " + tier + " should roll both ends of " + range);
         }
-        helper.assertTrue(RoomCounts.forTier(RoomCounts.DEFAULTS, 1).equals(new Range(3, 5)), "tier 1 defaults to 3-5 rooms");
-        helper.assertTrue(RoomCounts.forTier(RoomCounts.DEFAULTS, 4).equals(new Range(15, 20)), "tier 4 defaults to 15-20 rooms");
+        helper.assertTrue(RoomCounts.forTier(RoomCounts.DEFAULTS, 1).equals(new Range(4, 6)), "tier 1 defaults to 4-6 rooms");
+        helper.assertTrue(RoomCounts.forTier(RoomCounts.DEFAULTS, 4).equals(new Range(16, 21)), "tier 4 defaults to 16-21 rooms");
         helper.succeed();
     }
 
@@ -57,8 +57,8 @@ public class RoomCountTests {
     public static void missingOrBrokenEntriesFallBackToDefaults(GameTestHelper helper) {
         List<String> partial = List.of("4-4", "nonsense");
         helper.assertTrue(RoomCounts.forTier(partial, 1).equals(new Range(4, 4)), "a configured tier should use its own range");
-        helper.assertTrue(RoomCounts.forTier(partial, 2).equals(new Range(6, 9)), "a broken entry should fall back to the default");
-        helper.assertTrue(RoomCounts.forTier(partial, 3).equals(new Range(10, 14)), "a missing entry should fall back to the default");
+        helper.assertTrue(RoomCounts.forTier(partial, 2).equals(new Range(7, 10)), "a broken entry should fall back to the default");
+        helper.assertTrue(RoomCounts.forTier(partial, 3).equals(new Range(11, 15)), "a missing entry should fall back to the default");
         helper.succeed();
     }
 }
