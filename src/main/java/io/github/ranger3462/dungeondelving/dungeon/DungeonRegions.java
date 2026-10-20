@@ -14,6 +14,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonProgress;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.IntArrayTag;
@@ -49,6 +50,8 @@ public class DungeonRegions {
     private final Map<UUID, Integer> elapsed = new HashMap<>();
     /** Inventories kept from players who died in a dungeon, given back when they respawn. */
     private final Map<UUID, ListTag> heldInventories = new HashMap<>();
+    /** Each active region's progress towards its boss. */
+    private final Map<Integer, DungeonProgress> progress = new HashMap<>();
     private Path file;
     private HolderLookup.Provider registries;
 
@@ -75,6 +78,7 @@ public class DungeonRegions {
         boolean stillUsed = runs.values().stream().anyMatch(run -> run.region() == region);
         if (!stillUsed) {
             released.add(region);
+            progress.remove(region);
             save();
         }
     }
@@ -89,6 +93,22 @@ public class DungeonRegions {
 
     public int regionsCreated() {
         return nextRegion;
+    }
+
+    // --- Progress ---
+
+    public Optional<DungeonProgress> progress(int region) {
+        return Optional.ofNullable(progress.get(region));
+    }
+
+    public void startProgress(int region, DungeonProgress started) {
+        progress.put(region, started);
+        save();
+    }
+
+    /** Saves after a region's progress changes (a key used, a hunt target killed). */
+    public void progressChanged() {
+        save();
     }
 
     // --- Runs ---
@@ -183,6 +203,13 @@ public class DungeonRegions {
             heldList.add(held);
         });
         tag.put("held_inventories", heldList);
+        ListTag progressList = new ListTag();
+        progress.forEach((region, state) -> {
+            CompoundTag stateTag = state.save();
+            stateTag.putInt("region", region);
+            progressList.add(stateTag);
+        });
+        tag.put("progress", progressList);
         return tag;
     }
 
@@ -203,6 +230,10 @@ public class DungeonRegions {
         for (Tag heldTag : tag.getList("held_inventories", Tag.TAG_COMPOUND)) {
             CompoundTag held = (CompoundTag) heldTag;
             regions.heldInventories.put(held.getUUID("player"), held.getList("inventory", Tag.TAG_COMPOUND));
+        }
+        for (Tag stateTag : tag.getList("progress", Tag.TAG_COMPOUND)) {
+            CompoundTag state = (CompoundTag) stateTag;
+            regions.progress.put(state.getInt("region"), DungeonProgress.load(state));
         }
         return regions;
     }

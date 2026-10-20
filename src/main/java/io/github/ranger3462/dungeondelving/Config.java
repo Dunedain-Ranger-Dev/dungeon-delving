@@ -27,7 +27,7 @@ public final class Config {
 
     public static final ModConfigSpec.ConfigValue<List<? extends String>> ROOM_COUNTS = BUILDER
             .comment("How many rooms a dungeon has, for tiers 1, 2, 3 and 4 in order. Each entry is a range like \"4-6\"",
-                    "(rolled fresh every run) or a single number. Every dungeon has at least 2 rooms: the start and the objective.")
+                    "(rolled fresh every run) or a single number. Every dungeon has at least 2 rooms: the start and the boss room.")
             .defineList("roomCounts", RoomCounts.DEFAULTS, () -> "4-6", value -> value instanceof String text && RoomCounts.parse(text).isPresent());
 
     public static final ModConfigSpec.DoubleValue LOOT_MARKER_CHANCE = BUILDER

@@ -5,6 +5,7 @@ import java.util.List;
 
 import io.github.ranger3462.dungeondelving.Config;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.ListTag;
@@ -44,6 +45,7 @@ public final class DungeonLifecycle {
             return;
         }
         int lost = DungeonLoot.applyFailurePenalty(player, Config.FAILURE_GEAR_DAMAGE.get());
+        DungeonKeyItem.removeAll(player); // Before the inventory is held, so keys don't come back on respawn.
         ListTag held = player.getInventory().save(new ListTag());
         player.getInventory().clearContent();
         regions.holdInventory(player.getUUID(), held);

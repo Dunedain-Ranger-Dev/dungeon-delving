@@ -64,8 +64,13 @@ public class PlaceholderRoomTests {
         checkRoom(helper);
     }
 
-    @GameTest(template = "dungeon/objective_placeholder")
-    public static void objectiveRoom(GameTestHelper helper) {
+    @GameTest(template = "dungeon/challenge_hunt_placeholder")
+    public static void huntRoom(GameTestHelper helper) {
+        checkRoom(helper);
+    }
+
+    @GameTest(template = "dungeon/boss_placeholder")
+    public static void bossRoom(GameTestHelper helper) {
         checkRoom(helper);
     }
 

@@ -7,6 +7,7 @@ import java.util.List;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonChallenges;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers.Rolls;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonSpawning;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder;
@@ -103,13 +104,15 @@ public class DungeonMarkerTests {
     public static void placeholderRoomsUseMarkers(GameTestHelper helper) {
         var structures = helper.getLevel().getStructureManager();
         for (String room : List.of("common_pillars_placeholder", "common_steps_placeholder", "common_cover_placeholder",
-                "common_walls_placeholder", "objective_placeholder")) {
+                "common_walls_placeholder", "challenge_hunt_placeholder")) {
             StructureTemplate template = structures.get(DungeonPieces.id(room)).orElseThrow();
             helper.assertTrue(count(template, ModRegistries.MOB_MARKER.get()) > 0, room + " should have mob markers");
             helper.assertTrue(count(template, Blocks.GOLD_BLOCK) == 0, room + " should no longer use gold blocks as stand-ins");
         }
-        StructureTemplate objective = structures.get(DungeonPieces.id("objective_placeholder")).orElseThrow();
-        helper.assertTrue(count(objective, ModRegistries.OBJECTIVE_MARKER.get()) == 1, "the objective room should have one objective marker");
+        StructureTemplate hunt = structures.get(DungeonPieces.id("challenge_hunt_placeholder")).orElseThrow();
+        helper.assertTrue(count(hunt, ModRegistries.HUNT_MARKER.get()) == 3, "the hunt room should have three hunt markers");
+        StructureTemplate boss = structures.get(DungeonPieces.id("boss_placeholder")).orElseThrow();
+        helper.assertTrue(count(boss, ModRegistries.BOSS_MARKER.get()) == 1, "the boss room should have one boss marker");
         StructureTemplate pillars = structures.get(DungeonPieces.id("common_pillars_placeholder")).orElseThrow();
         helper.assertTrue(count(pillars, ModRegistries.LOOT_MARKER.get()) > 0 && count(pillars, ModRegistries.RESOURCE_MARKER.get()) > 0,
                 "the pillars room should have loot and resource markers");
@@ -135,28 +138,27 @@ public class DungeonMarkerTests {
         helper.succeed();
     }
 
-    /** Placing a room for real resolves every marker in it: the objective chest appears and no markers are left. */
+    /** Placing a room for real resolves every marker in it: the hunt targets appear and no markers are left. */
     @GameTest(template = ANY_TEMPLATE)
     public static void placedRoomsResolveTheirMarkers(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos corner = helper.absolutePos(BlockPos.ZERO).above(120);
         BlockPos far = corner.offset(ROOM_SIZE - 1, ROOM_HEIGHT - 1, ROOM_SIZE - 1);
         try {
-            DungeonBuilder.place(level, new Placement(DungeonPieces.id("objective_placeholder"), corner, Rotation.CLOCKWISE_90, Mirror.NONE));
+            DungeonBuilder.place(level, new Placement(DungeonPieces.id("challenge_hunt_placeholder"), corner, Rotation.CLOCKWISE_90, Mirror.NONE));
             int markersLeft = 0;
-            int chests = 0;
             for (BlockPos pos : BlockPos.betweenClosed(corner, far)) {
                 Block block = level.getBlockState(pos).getBlock();
                 if (block == ModRegistries.LOOT_MARKER.get() || block == ModRegistries.MOB_MARKER.get()
-                        || block == ModRegistries.RESOURCE_MARKER.get() || block == ModRegistries.OBJECTIVE_MARKER.get()) {
+                        || block == ModRegistries.RESOURCE_MARKER.get() || block == ModRegistries.OBJECTIVE_MARKER.get()
+                        || block == ModRegistries.HUNT_MARKER.get() || block == ModRegistries.BOSS_MARKER.get()) {
                     markersLeft++;
-                }
-                if (block == Blocks.CHEST) {
-                    chests++;
                 }
             }
             helper.assertTrue(markersLeft == 0, markersLeft + " marker blocks were left in the placed room");
-            helper.assertTrue(chests >= 1, "the objective room should have its reward chest");
+            long hunters = level.getEntitiesOfClass(Mob.class, new AABB(corner.getCenter(), far.getCenter()).inflate(4)).stream()
+                    .filter(mob -> mob.getPersistentData().contains(DungeonChallenges.HUNT_TAG)).count();
+            helper.assertTrue(hunters == 3, "the hunt room should spawn three hunt targets, spawned " + hunters);
         } finally {
             level.getEntitiesOfClass(Mob.class, new AABB(corner.getCenter(), far.getCenter()).inflate(4)).forEach(Entity::discard);
             for (BlockPos pos : BlockPos.betweenClosed(corner, far)) {

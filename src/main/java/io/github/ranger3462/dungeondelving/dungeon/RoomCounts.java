@@ -9,10 +9,10 @@ import net.minecraft.util.RandomSource;
 
 /**
  * How many rooms a dungeon of each tier has: a range per tier from the {@code roomCounts} config, rolled fresh each
- * run. Every dungeon has at least {@link #MIN_ROOMS}: the start room and the objective room.
+ * run. Every dungeon has at least {@link #MIN_ROOMS}: the start room and the boss room.
  */
 public final class RoomCounts {
-    /** The start room plus the objective room. */
+    /** The start room plus the boss room. */
     public static final int MIN_ROOMS = 2;
     /** The default ranges for tiers 1 to 4. */
     public static final List<String> DEFAULTS = List.of("4-6", "7-10", "11-15", "16-21");

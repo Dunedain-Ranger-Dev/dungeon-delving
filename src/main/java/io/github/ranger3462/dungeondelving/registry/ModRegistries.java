@@ -1,20 +1,26 @@
 package io.github.ranger3462.dungeondelving.registry;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.block.BossDoorBlock;
 import io.github.ranger3462.dungeondelving.block.DungeonExitBlock;
 import io.github.ranger3462.dungeondelving.block.DungeonGateBlock;
 import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -58,6 +64,23 @@ public final class ModRegistries {
     public static final DeferredBlock<Block> MOB_MARKER = marker("mob_marker", MapColor.STONE);
     public static final DeferredBlock<Block> RESOURCE_MARKER = marker("resource_marker", MapColor.RAW_IRON);
     public static final DeferredBlock<Block> OBJECTIVE_MARKER = marker("objective_marker", MapColor.METAL);
+    /** Becomes one of a challenge room's hunt targets: tougher mobs; killing them all drops a Dungeon Key. */
+    public static final DeferredBlock<Block> HUNT_MARKER = marker("hunt_marker", MapColor.COLOR_RED);
+    /** Where the boss appears when the boss door opens. One per boss room. */
+    public static final DeferredBlock<Block> BOSS_MARKER = marker("boss_marker", MapColor.COLOR_BLACK);
+
+    /** Seals the boss room's doorways until enough Dungeon Keys are used on it. Placed by the mod; can't be broken. */
+    public static final DeferredBlock<BossDoorBlock> BOSS_DOOR = BLOCKS.registerBlock("boss_door", BossDoorBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).strength(-1.0f, 3600000.0f).noLootTable().lightLevel(state -> 4)
+                    .sound(SoundType.DEEPSLATE_BRICKS));
+
+    /** Dropped by cleared challenge rooms; opens the boss door. Only works in the dungeon it came from. */
+    public static final DeferredItem<DungeonKeyItem> DUNGEON_KEY = ITEMS.registerItem("dungeon_key", DungeonKeyItem::new,
+            new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON));
+
+    /** The dungeon region a Dungeon Key belongs to. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> KEY_REGION = COMPONENTS.registerComponentType("key_region",
+            builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
     /**
      * Marks a dungeon ore item as found in the current dungeon run. Removed when the player exits; such items are lost
@@ -83,6 +106,9 @@ public final class ModRegistries {
                 output.accept(MOB_MARKER.get());
                 output.accept(RESOURCE_MARKER.get());
                 output.accept(OBJECTIVE_MARKER.get());
+                output.accept(HUNT_MARKER.get());
+                output.accept(BOSS_MARKER.get());
+                output.accept(DUNGEON_KEY.get());
                 output.accept(HALLSTONE_ITEM.get());
                 for (DungeonOre ore : DungeonOre.values()) {
                     output.accept(ore.oreItem.get());

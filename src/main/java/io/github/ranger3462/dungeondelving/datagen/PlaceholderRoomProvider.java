@@ -28,7 +28,7 @@ import net.minecraft.world.level.block.Blocks;
  * <p>
  * Each kind of piece has its own material so alignment is easy to check in-game: rooms (walls included) are light
  * gray, tunnels are cyan, and caps are red. Rooms include marker blocks so generated dungeons have
- * chests, mobs, ores and an objective.
+ * chests, mobs, ores, hunt targets and a boss.
  * <p>
  * Output goes to {@code data/dungeondelving/structure/dungeon/}. Every file name ends in {@code _placeholder} so these can
  * be filtered out once real rooms take over.
@@ -51,8 +51,12 @@ public class PlaceholderRoomProvider implements DataProvider {
         return ModRegistries.RESOURCE_MARKER.get();
     }
 
-    private static Block objective() {
-        return ModRegistries.OBJECTIVE_MARKER.get();
+    private static Block hunt() {
+        return ModRegistries.HUNT_MARKER.get();
+    }
+
+    private static Block boss() {
+        return ModRegistries.BOSS_MARKER.get();
     }
     private static final Block LIGHT = Blocks.GLOWSTONE;
 
@@ -74,7 +78,8 @@ public class PlaceholderRoomProvider implements DataProvider {
         pieces.put("common_cover_placeholder", coverRoom());
         pieces.put("common_walls_placeholder", wallsRoom());
         pieces.put("common_quarry_placeholder", quarryRoom());
-        pieces.put("objective_placeholder", objectiveRoom());
+        pieces.put("challenge_hunt_placeholder", huntRoom());
+        pieces.put("boss_placeholder", bossRoom());
         pieces.put("tunnel_placeholder", tunnel());
         pieces.put("cap_placeholder", capWall());
         return pieces;
@@ -214,14 +219,34 @@ public class PlaceholderRoomProvider implements DataProvider {
         return room;
     }
 
-    private static PieceBuilder objectiveRoom() {
+    /**
+     * A hunt challenge room: three hunt targets among the cover, plus two spawners for ordinary mobs. Killing all three
+     * targets drops a Dungeon Key.
+     */
+    private static PieceBuilder huntRoom() {
         PieceBuilder room = roomShell();
-        // A raised altar with the objective marker on top.
+        int[][] cover = { { 6, 6 }, { 24, 6 }, { 6, 24 }, { 24, 24 } };
+        for (int[] c : cover) {
+            room.fill(c[0], 1, c[1], c[0] + 2, 3, c[1] + 2, ROOM);
+        }
+        room.set(9, 1, MID, hunt());
+        room.set(MAX - 9, 1, MID, hunt());
+        room.set(MID, 1, MAX - 9, hunt());
+        room.set(MID, 1, 9, mob());
+        room.set(MID, 1, MID, mob());
+        return room;
+    }
+
+    /** The boss arena: open floor with a raised dais in the middle, where the boss appears once the door opens. */
+    private static PieceBuilder bossRoom() {
+        PieceBuilder room = roomShell();
         room.fill(MID - 3, 1, MID - 3, MID + 3, 1, MID + 3, ROOM);
-        room.fill(MID - 1, 2, MID - 1, MID + 1, 2, MID + 1, ROOM);
-        room.set(MID, 3, MID, objective());
-        room.set(MID - 6, 1, MID, mob());
-        room.set(MID + 6, 1, MID, mob());
+        room.set(MID, 2, MID, boss());
+        for (int px : new int[] { 7, MAX - 7 }) {
+            for (int pz : new int[] { 7, MAX - 7 }) {
+                room.fill(px, 1, pz, px, ROOM_HEIGHT - 2, pz, ROOM);
+            }
+        }
         return room;
     }
 

@@ -22,8 +22,12 @@ public record DungeonLayout(Map<Cell, Room> rooms, Set<Connection> connections) 
         connections = Collections.unmodifiableSet(connections);
     }
 
+    /**
+     * What a room is for: the entry with the exit, an ordinary room, a challenge room that gives a key when cleared,
+     * or the boss room behind the boss door.
+     */
     public enum RoomKind {
-        START, COMMON, OBJECTIVE
+        START, COMMON, CHALLENGE, BOSS
     }
 
     /** A grid position. Neighboring cells are one room plus one tunnel apart in the world. */

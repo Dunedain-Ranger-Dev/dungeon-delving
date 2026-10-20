@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import io.github.ranger3462.dungeondelving.Config;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonChallenges;
 import io.github.ranger3462.dungeondelving.registry.DungeonOre;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.core.BlockPos;
@@ -41,6 +42,8 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * {@code dungeondelving:dungeon_resources} block tag or the tier's {@code dungeondelving:dungeon_resources/tier_<n>}
  * tag, or otherwise Hallstone, so there are never gaps.</li>
  * <li>Objective marker: a reward chest with the tier's {@code dungeondelving:chests/tier_<n>/objective} loot.</li>
+ * <li>Hunt marker: a hunt target for a challenge room (see {@link DungeonChallenges}).</li>
+ * <li>Boss marker: where the boss appears when the boss door opens.</li>
  * </ul>
  * Chances come from the config.
  */
@@ -48,11 +51,22 @@ public final class DungeonMarkers {
     public static final TagKey<EntityType<?>> DUNGEON_MOBS = TagKey.create(Registries.ENTITY_TYPE, DungeonDelving.id("dungeon_mobs"));
     public static final TagKey<Block> DUNGEON_RESOURCES = TagKey.create(Registries.BLOCK, DungeonDelving.id("dungeon_resources"));
 
-    /** The dungeon's tier, and the chances used when rolling its markers. */
-    public record Rolls(int tier, double lootChance, double resourceChance, double tierOreChance, double commonOreChance) {
+    /**
+     * The dungeon's tier and region, and the chances used when rolling its markers. The region is -1 when a piece is
+     * placed outside a run (e.g. in tests), so hunts and the boss aren't tracked.
+     */
+    public record Rolls(int tier, double lootChance, double resourceChance, double tierOreChance, double commonOreChance, int region) {
+        public Rolls(int tier, double lootChance, double resourceChance, double tierOreChance, double commonOreChance) {
+            this(tier, lootChance, resourceChance, tierOreChance, commonOreChance, -1);
+        }
+
         public static Rolls fromConfig(int tier) {
+            return fromConfig(tier, -1);
+        }
+
+        public static Rolls fromConfig(int tier, int region) {
             return new Rolls(tier, Config.LOOT_MARKER_CHANCE.get(), Config.RESOURCE_MARKER_CHANCE.get(), Config.TIER_ORE_CHANCE.get(),
-                    Config.COMMON_ORE_CHANCE.get());
+                    Config.COMMON_ORE_CHANCE.get(), region);
         }
     }
 
@@ -68,19 +82,27 @@ public final class DungeonMarkers {
         return lootTable("chests/tier_" + DungeonRun.clampTier(tier) + "/objective");
     }
 
-    /** Resolves every marker in a piece that was just placed with the given position and settings. */
+    /**
+     * Resolves every marker in a piece that was just placed with the given position and settings. {@code pieceMin}
+     * identifies the room, so hunt targets know which room they belong to.
+     */
     public static void resolve(ServerLevel level, StructureTemplate template, BlockPos pos, StructurePlaceSettings settings,
-            RandomSource random, Rolls rolls) {
+            RandomSource random, Rolls rolls, BlockPos pieceMin) {
         for (Block marker : List.of(ModRegistries.LOOT_MARKER.get(), ModRegistries.MOB_MARKER.get(), ModRegistries.RESOURCE_MARKER.get(),
-                ModRegistries.OBJECTIVE_MARKER.get())) {
+                ModRegistries.OBJECTIVE_MARKER.get(), ModRegistries.HUNT_MARKER.get(), ModRegistries.BOSS_MARKER.get())) {
             for (StructureTemplate.StructureBlockInfo info : template.filterBlocks(pos, settings, marker)) {
-                resolveAt(level, info.pos(), marker, random, rolls);
+                resolveAt(level, info.pos(), marker, random, rolls, pieceMin);
             }
         }
     }
 
-    /** Resolves one marker block at a position. */
+    /** Resolves one marker block at a position, as if it were the only one in its room. */
     public static void resolveAt(ServerLevel level, BlockPos pos, Block marker, RandomSource random, Rolls rolls) {
+        resolveAt(level, pos, marker, random, rolls, pos);
+    }
+
+    /** Resolves one marker block at a position, in the room whose minimum corner is {@code pieceMin}. */
+    public static void resolveAt(ServerLevel level, BlockPos pos, Block marker, RandomSource random, Rolls rolls, BlockPos pieceMin) {
         level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         if (marker == ModRegistries.LOOT_MARKER.get()) {
             if (random.nextDouble() < rolls.lootChance()) {
@@ -93,6 +115,13 @@ public final class DungeonMarkers {
             level.setBlock(pos, (block != null ? block : ModRegistries.HALLSTONE.get()).defaultBlockState(), Block.UPDATE_CLIENTS);
         } else if (marker == ModRegistries.MOB_MARKER.get()) {
             placeSpawner(level, pos, random);
+        } else if (marker == ModRegistries.HUNT_MARKER.get()) {
+            DungeonChallenges.spawnHunter(level, pos, random, rolls.region(), pieceMin.asLong());
+        } else if (marker == ModRegistries.BOSS_MARKER.get() && rolls.region() >= 0) {
+            DungeonRegions.get().progress(rolls.region()).ifPresent(progress -> {
+                progress.setBossSpawn(pos);
+                DungeonRegions.get().progressChanged();
+            });
         }
     }
 

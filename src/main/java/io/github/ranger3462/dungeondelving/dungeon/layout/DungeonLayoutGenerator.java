@@ -20,7 +20,8 @@ import net.minecraft.world.level.block.Rotation;
 /**
  * Grows a dungeon layout outward from the start room. Each new room is attached to an existing one by a tunnel, so
  * the rooms always form a connected tree; a few extra tunnels between neighboring rooms then add loops. The room
- * farthest from the start becomes the objective room.
+ * farthest from the start becomes the boss room, and some of the others become challenge rooms, which give the keys
+ * that open the boss door.
  */
 public final class DungeonLayoutGenerator {
     /** How far from the start a room may be, in cells. Keeps a whole dungeon inside one 1024-block region. */
@@ -38,6 +39,11 @@ public final class DungeonLayoutGenerator {
     }
 
     public static DungeonLayout generate(RandomSource random, int roomCount) {
+        return generate(random, roomCount, 0);
+    }
+
+    /** A layout with up to {@code challengeRooms} challenge rooms (fewer if there aren't enough other rooms). */
+    public static DungeonLayout generate(RandomSource random, int roomCount, int challengeRooms) {
         int target = Math.max(1, Math.min(roomCount, maxRooms()));
         List<Cell> cells = new ArrayList<>();
         Set<Connection> connections = new HashSet<>();
@@ -79,7 +85,15 @@ public final class DungeonLayoutGenerator {
                     .orElseThrow()
                     .getKey();
             Room old = rooms.get(farthest);
-            rooms.put(farthest, new Room(farthest, RoomKind.OBJECTIVE, old.rotation(), old.mirror()));
+            rooms.put(farthest, new Room(farthest, RoomKind.BOSS, old.rotation(), old.mirror()));
+
+            List<Cell> others = new ArrayList<>(rooms.values().stream().filter(room -> room.kind() == RoomKind.COMMON).map(Room::cell)
+                    .sorted(cellOrder()).toList());
+            for (int i = 0; i < challengeRooms && !others.isEmpty(); i++) {
+                Cell cell = others.remove(random.nextInt(others.size()));
+                Room room = rooms.get(cell);
+                rooms.put(cell, new Room(cell, RoomKind.CHALLENGE, room.rotation(), room.mirror()));
+            }
         }
         return new DungeonLayout(rooms, connections);
     }
@@ -88,7 +102,7 @@ public final class DungeonLayoutGenerator {
         return Math.abs(cell.x()) <= MAX_RADIUS && Math.abs(cell.z()) <= MAX_RADIUS;
     }
 
-    /** A fixed tie-breaker, so the same seed always picks the same objective room. */
+    /** A fixed tie-breaker, so the same seed always picks the same boss room. */
     private static Comparator<Cell> cellOrder() {
         return Comparator.comparingInt(Cell::x).thenComparingInt(Cell::z);
     }

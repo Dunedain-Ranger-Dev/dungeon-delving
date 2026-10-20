@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Cell;
@@ -56,7 +57,8 @@ public final class DungeonBuilder {
             Kind kind = switch (room.kind()) {
                 case START -> Kind.START;
                 case COMMON -> Kind.COMMON;
-                case OBJECTIVE -> Kind.OBJECTIVE;
+                case CHALLENGE -> Kind.CHALLENGE;
+                case BOSS -> Kind.BOSS;
             };
             placements.add(new Placement(pieces.pick(kind, random), roomMin(center, room.cell()), room.rotation(), room.mirror()));
         }
@@ -93,6 +95,40 @@ public final class DungeonBuilder {
             }
         }
         return placements;
+    }
+
+    /**
+     * The blocks of the boss door: every doorway of the boss room that a tunnel leads into, filled so the room can't be
+     * entered until the door opens. Empty if the layout has no boss room.
+     */
+    public static List<BlockPos> bossDoor(DungeonLayout layout, BlockPos center) {
+        List<BlockPos> blocks = new ArrayList<>();
+        int max = ROOM_SIZE - 1;
+        layout.rooms().values().stream().filter(room -> room.kind() == DungeonLayout.RoomKind.BOSS).forEach(room -> {
+            BlockPos min = roomMin(center, room.cell());
+            for (Direction direction : new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST }) {
+                if (!layout.connected(room.cell(), direction)) {
+                    continue;
+                }
+                for (int across = DOOR_START; across < DOOR_START + DOOR_WIDTH; across++) {
+                    for (int y = DOOR_BOTTOM_Y; y < DOOR_BOTTOM_Y + DOOR_HEIGHT; y++) {
+                        blocks.add(switch (direction) {
+                            case NORTH -> min.offset(across, y, 0);
+                            case SOUTH -> min.offset(across, y, max);
+                            case WEST -> min.offset(0, y, across);
+                            default -> min.offset(max, y, across);
+                        });
+                    }
+                }
+            }
+        });
+        return blocks;
+    }
+
+    /** The middle of the boss room's floor, where the boss appears if the room has no boss marker. */
+    public static Optional<BlockPos> bossRoomCenter(DungeonLayout layout, BlockPos center) {
+        return layout.rooms().values().stream().filter(room -> room.kind() == DungeonLayout.RoomKind.BOSS).findFirst()
+                .map(room -> roomMin(center, room.cell()).offset(ROOM_SIZE / 2, 1, ROOM_SIZE / 2));
     }
 
     /**
@@ -193,7 +229,7 @@ public final class DungeonBuilder {
         BlockPos pos = placement.targetMin().offset(-box.minX(), -box.minY(), -box.minZ());
         template.placeInWorld(level, pos, pos, settings, level.getRandom(), Block.UPDATE_CLIENTS);
         if (resolveMarkers) {
-            DungeonMarkers.resolve(level, template, pos, settings, level.getRandom(), rolls);
+            DungeonMarkers.resolve(level, template, pos, settings, level.getRandom(), rolls, placement.targetMin());
         }
     }
 }

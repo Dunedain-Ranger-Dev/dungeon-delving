@@ -83,8 +83,8 @@ public final class DungeonLoot {
         return lost;
     }
 
-    /** Runs a sweep over everything the player carries. Returns how many loot stacks it found. */
-    private static int sweepPlayer(ServerPlayer player, LootSweep sweep) {
+    /** Runs a sweep over everything the player carries. Returns how many matching stacks it found. */
+    public static int sweepPlayer(ServerPlayer player, LootSweep sweep) {
         sweep.sweep(player.getInventory());
         sweep.sweep(player.getEnderChestInventory());
         if (ModList.get().isLoaded("curios")) {

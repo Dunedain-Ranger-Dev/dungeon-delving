@@ -2,6 +2,7 @@ package io.github.ranger3462.dungeondelving.dungeon;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import net.minecraft.core.NonNullList;
@@ -25,12 +26,19 @@ public final class LootSweep {
     /** Most extractions to empty one storage slot; large backpack slots hand items out a stack at a time. */
     private static final int MAX_EXTRACTIONS = 1024;
 
+    private final Predicate<ItemStack> match;
     private final UnaryOperator<ItemStack> action;
     private final List<ItemStack> overflow = new ArrayList<>();
     private int found;
 
     /** @param action given each loot stack found, returns its replacement (empty to remove it). */
     public LootSweep(UnaryOperator<ItemStack> action) {
+        this(DungeonLoot::isLoot, action);
+    }
+
+    /** A sweep for any kind of stack, e.g. Dungeon Keys, rather than dungeon loot. */
+    public LootSweep(Predicate<ItemStack> match, UnaryOperator<ItemStack> action) {
+        this.match = match;
         this.action = action;
     }
 
@@ -82,7 +90,7 @@ public final class LootSweep {
      * keep in its place, which may be the same (changed) stack.
      */
     public ItemStack sweep(ItemStack stack, int depth) {
-        if (DungeonLoot.isLoot(stack)) {
+        if (match.test(stack)) {
             found++;
             return action.apply(stack);
         }

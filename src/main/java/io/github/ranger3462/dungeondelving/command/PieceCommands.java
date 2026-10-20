@@ -49,7 +49,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * <li>{@code /dungeondelving room export <kind> <name> <corner>} checks it, then saves it as
  * {@code <kind>_<name>.nbt} in this world's generated structures, where dungeons in this world pick it up.</li>
  * </ul>
- * Kinds are {@code start}, {@code common}, {@code objective}, {@code tunnel} and {@code cap}.
+ * Kinds are {@code start}, {@code common}, {@code challenge}, {@code boss}, {@code tunnel} and {@code cap}.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class PieceCommands {

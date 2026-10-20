@@ -42,8 +42,9 @@ public class DungeonGateBlock extends Block {
         }
         // Choosing a higher tier comes with DD-32; the gate always opens tier 1 for now.
         DungeonTravel.Entry entry = DungeonTravel.enter(serverPlayer, RoomCounts.roll(DungeonRun.MIN_TIER, level.getRandom()), DungeonRun.MIN_TIER);
-        serverPlayer.sendSystemMessage(Component.literal("You enter a dungeon of " + entry.layout().rooms().size()
-                + " rooms. Find the loot and leave through the exit to keep it.").withStyle(ChatFormatting.GOLD));
+        int keys = DungeonRegions.get().progress(entry.run().region()).map(progress -> progress.keysNeeded()).orElse(0);
+        serverPlayer.sendSystemMessage(Component.literal("You enter a dungeon of " + entry.layout().rooms().size() + " rooms. Clear "
+                + keys + " challenge rooms for the keys to the boss door, and leave through the exit to keep your loot.").withStyle(ChatFormatting.GOLD));
         return InteractionResult.CONSUME;
     }
 }

@@ -21,7 +21,7 @@ import net.minecraft.util.RandomSource;
 
 /**
  * The structure files available for each kind of dungeon piece, found by file name prefix: {@code start_},
- * {@code common_}, {@code objective_}, {@code tunnel_} and {@code cap_}.
+ * {@code common_}, {@code challenge_}, {@code boss_}, {@code tunnel_} and {@code cap_}.
  * <p>
  * Pieces come from {@code data/dungeondelving/structure/dungeon/} in the mod and data packs, plus any exported into
  * the current world with {@code /dungeondelving room export}. Placeholder pieces (names ending in
@@ -31,7 +31,7 @@ import net.minecraft.util.RandomSource;
  */
 public final class DungeonPieces {
     public enum Kind {
-        START("start_"), COMMON("common_"), OBJECTIVE("objective_"), TUNNEL("tunnel_"), CAP("cap_");
+        START("start_"), COMMON("common_"), CHALLENGE("challenge_"), BOSS("boss_"), TUNNEL("tunnel_"), CAP("cap_");
 
         private final String prefix;
 
@@ -46,14 +46,14 @@ public final class DungeonPieces {
         /** The exact size a piece of this kind must be, before any turning. */
         public Vec3i size() {
             return switch (this) {
-                case START, COMMON, OBJECTIVE -> new Vec3i(ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE);
+                case START, COMMON, CHALLENGE, BOSS -> new Vec3i(ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE);
                 case TUNNEL -> new Vec3i(TUNNEL_WIDTH, TUNNEL_HEIGHT, TUNNEL_LENGTH);
                 case CAP -> new Vec3i(CAP_WIDTH, CAP_HEIGHT, CAP_DEPTH);
             };
         }
 
         public boolean isRoom() {
-            return this == START || this == COMMON || this == OBJECTIVE;
+            return this == START || this == COMMON || this == CHALLENGE || this == BOSS;
         }
 
         /** The kind a piece belongs to, from its file name. */

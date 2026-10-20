@@ -11,6 +11,9 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder.Placement;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
@@ -34,6 +37,11 @@ public final class DungeonBuildQueue {
 
     public static void add(int region, List<Placement> placements, DungeonMarkers.Rolls rolls) {
         placements.forEach(placement -> TASKS.add(new Task(region, level -> DungeonBuilder.place(level, placement, rolls), placement.template().toString())));
+    }
+
+    /** Sets blocks once the pieces queued before them are placed, e.g. the boss door. */
+    public static void addBlocks(int region, List<BlockPos> positions, BlockState state, String description) {
+        TASKS.add(new Task(region, level -> positions.forEach(pos -> level.setBlock(pos, state, Block.UPDATE_CLIENTS)), description));
     }
 
     public static void addShell(int region, List<BoundingBox> sections) {

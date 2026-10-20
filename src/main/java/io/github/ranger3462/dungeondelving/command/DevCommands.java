@@ -1,5 +1,7 @@
 package io.github.ranger3462.dungeondelving.command;
 
+import java.util.Optional;
+
 import static io.github.ranger3462.dungeondelving.command.Feedback.fail;
 import static io.github.ranger3462.dungeondelving.command.Feedback.tell;
 
@@ -13,19 +15,22 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
 import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonProgress;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonTravel;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
  * Operator-only commands for testing dungeons without the gate and exit blocks:
- * {@code /dungeondelving dungeon enter [rooms] [tier]|enter tier <tier>|leave|fail|regions}. Without a room count, the
+ * {@code /dungeondelving dungeon enter [rooms] [tier]|enter tier <tier>|keys|leave|fail|regions}. Without a room count, the
  * count is rolled from the tier's {@code roomCounts} range.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
@@ -54,6 +59,7 @@ public final class DevCommands {
                                         .then(Commands.argument("tier", IntegerArgumentType.integer(DungeonRun.MIN_TIER, DungeonRun.MAX_TIER))
                                                 .executes(context -> enter(context, IntegerArgumentType.getInteger(context, "rooms"),
                                                         IntegerArgumentType.getInteger(context, "tier"))))))
+                        .then(Commands.literal("keys").executes(DevCommands::keys))
                         .then(Commands.literal("leave").executes(DevCommands::leave))
                         .then(Commands.literal("fail").executes(DevCommands::failRun))
                         .then(Commands.literal("regions").executes(DevCommands::regions))));
@@ -73,7 +79,28 @@ public final class DevCommands {
         DungeonRun run = entry.run();
         BlockPos center = DungeonDimension.regionCenter(run.region());
         tell(context.getSource(), "Entered tier " + run.tier() + " dungeon region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ()
-                + "): " + entry.layout().rooms().size() + " rooms, " + entry.layout().connections().size() + " tunnels");
+                + "): " + entry.layout().rooms().size() + " rooms, " + entry.layout().connections().size() + " tunnels, "
+                + DungeonRegions.get().progress(run.region()).map(DungeonProgress::keysNeeded).orElse(0) + " keys to open the boss door");
+        return 1;
+    }
+
+    /** Gives the player every key their dungeon's boss door still needs, for testing the door and boss. */
+    private static int keys(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        Optional<DungeonRun> run = DungeonRegions.get().run(player.getUUID());
+        Optional<DungeonProgress> progress = run.flatMap(r -> DungeonRegions.get().progress(r.region()));
+        if (progress.isEmpty()) {
+            fail(context.getSource(), "You aren't in a dungeon.");
+            return 0;
+        }
+        int missing = Math.max(0, progress.get().keysNeeded() - progress.get().keysUsed());
+        ItemStack keys = DungeonKeyItem.forRegion(run.get().region());
+        keys.setCount(Math.max(1, missing));
+        if (!player.getInventory().add(keys)) {
+            player.drop(keys, false);
+        }
+        tell(context.getSource(), "Gave " + Math.max(1, missing) + " Dungeon Key(s). The boss door has " + progress.get().keysUsed() + " of "
+                + progress.get().keysNeeded() + ".");
         return 1;
     }
 

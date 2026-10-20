@@ -36,5 +36,20 @@
   "dungeondelving.configuration.blockNaturalSpawns": "Block natural spawns in dungeons",
   "dungeondelving.configuration.tierOreChance": "Tier ore chance",
   "dungeondelving.configuration.commonOreChance": "Common ore chance",
-  "block.dungeondelving.hallstone": "Hallstone"
+  "block.dungeondelving.hallstone": "Hallstone",
+  "block.dungeondelving.hunt_marker": "Hunt Marker",
+  "block.dungeondelving.boss_marker": "Boss Marker",
+  "block.dungeondelving.boss_door": "Boss Door",
+  "item.dungeondelving.dungeon_key": "Dungeon Key",
+  "item.dungeondelving.dungeon_key.tooltip": "Opens the boss door in the dungeon it came from. Lost when the run ends.",
+  "entity.dungeondelving.hunt_target": "Hunted %s",
+  "entity.dungeondelving.barrow_king": "The Barrow King",
+  "message.dungeondelving.hunt_left": "A hunted foe falls. %s left in this room.",
+  "message.dungeondelving.key_dropped": "The last hunted foe falls, and drops a Dungeon Key!",
+  "message.dungeondelving.door_needs": "The boss door needs Dungeon Keys: %s of %s used.",
+  "message.dungeondelving.door_sealed": "This door is sealed.",
+  "message.dungeondelving.key_crumbles": "The key crumbles; it belongs to another dungeon.",
+  "message.dungeondelving.key_used": "A key turns in the boss door: %s of %s.",
+  "message.dungeondelving.door_open": "The boss door grinds open...",
+  "message.dungeondelving.boss_defeated": "%s is defeated!"
 }

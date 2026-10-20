@@ -59,13 +59,13 @@ public class DungeonLayoutTests {
                         "tunnels should only join existing rooms " + connection + where);
             }
 
-            long objectives = layout.rooms().values().stream().filter(room -> room.kind() == RoomKind.OBJECTIVE).count();
-            helper.assertTrue(objectives == (count > 1 ? 1 : 0), "there should be exactly one objective room" + where);
+            long objectives = layout.rooms().values().stream().filter(room -> room.kind() == RoomKind.BOSS).count();
+            helper.assertTrue(objectives == (count > 1 ? 1 : 0), "there should be exactly one boss room" + where);
             if (count > 1) {
                 Map<Cell, Integer> distances = layout.distancesFromStart();
                 int farthest = distances.values().stream().max(Integer::compare).orElseThrow();
-                Cell objective = layout.rooms().values().stream().filter(room -> room.kind() == RoomKind.OBJECTIVE).findFirst().orElseThrow().cell();
-                helper.assertTrue(distances.get(objective) == farthest, "the objective should be the farthest room" + where);
+                Cell objective = layout.rooms().values().stream().filter(room -> room.kind() == RoomKind.BOSS).findFirst().orElseThrow().cell();
+                helper.assertTrue(distances.get(objective) == farthest, "the boss room should be the farthest room" + where);
             }
         }
         helper.succeed();
@@ -204,7 +204,7 @@ public class DungeonLayoutTests {
         DungeonLayout layout = new DungeonLayout(
                 Map.of(Cell.ORIGIN, new Room(Cell.ORIGIN, RoomKind.START, Rotation.NONE, Mirror.NONE),
                         east, new Room(east, RoomKind.COMMON, Rotation.CLOCKWISE_90, Mirror.NONE),
-                        south, new Room(south, RoomKind.OBJECTIVE, Rotation.NONE, Mirror.LEFT_RIGHT)),
+                        south, new Room(south, RoomKind.BOSS, Rotation.NONE, Mirror.LEFT_RIGHT)),
                 Set.of(Connection.between(Cell.ORIGIN, east), Connection.between(Cell.ORIGIN, south)));
         DungeonPieces pieces = DungeonPieces.load(level.getServer());
         BlockPos center = helper.absolutePos(BlockPos.ZERO).above(120);

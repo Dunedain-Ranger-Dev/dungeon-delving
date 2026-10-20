@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import io.github.ranger3462.dungeondelving.Config;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonProgress;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuildQueue;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder.Placement;
@@ -42,13 +44,19 @@ public final class DungeonTravel {
         int region = regions.allocate();
         BlockPos center = DungeonDimension.regionCenter(region);
 
-        DungeonLayout layout = DungeonLayoutGenerator.generate(dungeon.getRandom(), roomCount);
+        DungeonLayout layout = DungeonLayoutGenerator.generate(dungeon.getRandom(), roomCount, DungeonProgress.keysFor(tier));
+        int challengeRooms = (int) layout.rooms().values().stream().filter(room -> room.kind() == DungeonLayout.RoomKind.CHALLENGE).count();
+        List<BlockPos> door = DungeonBuilder.bossDoor(layout, center);
+        regions.startProgress(region, new DungeonProgress(tier, Math.min(DungeonProgress.keysFor(tier), challengeRooms), door,
+                DungeonBuilder.bossRoomCenter(layout, center).orElse(null)));
+
         DungeonPieces pieces = DungeonPieces.load(player.server);
         List<Placement> placements = DungeonBuilder.plan(layout, pieces, center, dungeon.getRandom());
-        DungeonMarkers.Rolls rolls = DungeonMarkers.Rolls.fromConfig(tier);
+        DungeonMarkers.Rolls rolls = DungeonMarkers.Rolls.fromConfig(tier, region);
         DungeonBuilder.place(dungeon, placements.getFirst(), rolls);
         dungeon.setBlock(center.above(), ModRegistries.DUNGEON_EXIT.get().defaultBlockState(), Block.UPDATE_ALL);
         DungeonBuildQueue.add(region, placements.subList(1, placements.size()), rolls);
+        DungeonBuildQueue.addBlocks(region, door, ModRegistries.BOSS_DOOR.get().defaultBlockState(), "boss door");
         DungeonBuildQueue.addShell(region, DungeonBuilder.shell(layout, center));
 
         DungeonRun run = new DungeonRun(player.getUUID(), region, tier, player.level().dimension(), player.getX(), player.getY(),
@@ -96,6 +104,7 @@ public final class DungeonTravel {
 
     /** Ends the player's run, stopping any building still queued for its region. */
     public static Optional<DungeonRun> end(ServerPlayer player) {
+        DungeonKeyItem.removeAll(player);
         Optional<DungeonRun> ended = DungeonRegions.get().endRun(player.getUUID());
         ended.ifPresent(run -> {
             if (DungeonRegions.get().runs().stream().noneMatch(other -> other.region() == run.region())) {
