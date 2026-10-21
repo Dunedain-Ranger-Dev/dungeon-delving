@@ -42,7 +42,8 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * {@code dungeondelving:dungeon_resources} block tag or the tier's {@code dungeondelving:dungeon_resources/tier_<n>}
  * tag, or otherwise Hallstone, so there are never gaps.</li>
  * <li>Objective marker: a reward chest with the tier's {@code dungeondelving:chests/tier_<n>/objective} loot.</li>
- * <li>Hunt marker: a hunt target for a challenge room (see {@link DungeonChallenges}).</li>
+ * <li>Hunt marker: a spawner like a mob marker, and one more hunt target for the room; the room's hunt targets come
+ * out of its spawners at random (see {@link DungeonChallenges}).</li>
  * <li>Boss marker: where the boss appears when the boss door opens.</li>
  * </ul>
  * Chances come from the config.
@@ -118,7 +119,8 @@ public final class DungeonMarkers {
         } else if (marker == ModRegistries.MOB_MARKER.get()) {
             placeSpawner(level, pos, random);
         } else if (marker == ModRegistries.HUNT_MARKER.get()) {
-            DungeonChallenges.spawnHunter(level, pos, random, rolls.region(), pieceMin.asLong());
+            placeSpawner(level, pos, random);
+            DungeonChallenges.addHunter(rolls.region(), DungeonDimension.roomMinAt(pos).asLong());
         } else if (marker == ModRegistries.BOSS_MARKER.get() && rolls.region() >= 0) {
             DungeonRegions.get().progress(rolls.region()).ifPresent(progress -> {
                 progress.setBossSpawn(pos);

@@ -33,6 +33,24 @@ public final class DungeonDimension {
         return regionCorner(region).offset(REGION_SIZE / 2, 0, REGION_SIZE / 2);
     }
 
+    /** The region a position is in. */
+    public static int regionAt(BlockPos pos) {
+        return Math.floorDiv(pos.getX(), REGION_SIZE);
+    }
+
+    /** The center of the dungeon room nearest a position, at floor level. Rooms sit on a grid around the region center. */
+    public static BlockPos roomCenterAt(BlockPos pos) {
+        BlockPos center = regionCenter(regionAt(pos));
+        int cellX = Math.round((pos.getX() - center.getX()) / (float) RoomSpec.GRID_PITCH);
+        int cellZ = Math.round((pos.getZ() - center.getZ()) / (float) RoomSpec.GRID_PITCH);
+        return center.offset(cellX * RoomSpec.GRID_PITCH, 0, cellZ * RoomSpec.GRID_PITCH);
+    }
+
+    /** The minimum corner of the dungeon room nearest a position; identifies the room. */
+    public static BlockPos roomMinAt(BlockPos pos) {
+        return roomCenterAt(pos).offset(-RoomSpec.ROOM_SIZE / 2, 0, -RoomSpec.ROOM_SIZE / 2);
+    }
+
     /** The first region file x coordinate a region covers. */
     public static int firstRegionFileX(int region) {
         return region * REGION_SIZE / REGION_FILE_SIZE;

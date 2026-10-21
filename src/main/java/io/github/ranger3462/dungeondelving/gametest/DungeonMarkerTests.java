@@ -138,7 +138,10 @@ public class DungeonMarkerTests {
         helper.succeed();
     }
 
-    /** Placing a room for real resolves every marker in it: the hunt targets appear and no markers are left. */
+    /**
+     * Placing a room for real resolves every marker in it: no markers are left, every mob and hunt marker becomes a
+     * spawner, and no hunt targets exist yet (they come out of the spawners later).
+     */
     @GameTest(template = ANY_TEMPLATE)
     public static void placedRoomsResolveTheirMarkers(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -156,9 +159,16 @@ public class DungeonMarkerTests {
                 }
             }
             helper.assertTrue(markersLeft == 0, markersLeft + " marker blocks were left in the placed room");
+            int spawners = 0;
+            for (BlockPos pos : BlockPos.betweenClosed(corner, far)) {
+                if (level.getBlockState(pos).is(Blocks.SPAWNER)) {
+                    spawners++;
+                }
+            }
+            helper.assertTrue(spawners == 5, "the hunt room's 2 mob markers and 3 hunt markers should all become spawners, found " + spawners);
             long hunters = level.getEntitiesOfClass(Mob.class, new AABB(corner.getCenter(), far.getCenter()).inflate(4)).stream()
                     .filter(mob -> mob.getPersistentData().contains(DungeonChallenges.HUNT_TAG)).count();
-            helper.assertTrue(hunters == 3, "the hunt room should spawn three hunt targets, spawned " + hunters);
+            helper.assertTrue(hunters == 0, "hunt targets shouldn't be waiting in the room before it spawns anything, found " + hunters);
         } finally {
             level.getEntitiesOfClass(Mob.class, new AABB(corner.getCenter(), far.getCenter()).inflate(4)).forEach(Entity::discard);
             for (BlockPos pos : BlockPos.betweenClosed(corner, far)) {

@@ -23,8 +23,10 @@ public final class DungeonProgress {
     private BlockPos bossSpawn;
     private int keysUsed;
     private boolean bossSpawned;
-    /** Hunt targets still alive, by the room they belong to (the room's minimum corner). */
+    /** Hunt targets still to kill (spawned or not), by the room they belong to (the room's minimum corner). */
     private final Map<Long, Integer> hunters = new HashMap<>();
+    /** Hunt targets that haven't come out of a spawner yet, by room. */
+    private final Map<Long, Integer> unspawned = new HashMap<>();
 
     public DungeonProgress(int tier, int keysNeeded, List<BlockPos> door, BlockPos bossSpawn) {
         this.tier = tier;
@@ -87,9 +89,29 @@ public final class DungeonProgress {
         return true;
     }
 
-    /** Counts a hunt target spawned in a room. */
+    /** Counts a hunt target for a room. It comes out of one of the room's spawners later. */
     public void addHunter(long room) {
         hunters.merge(room, 1, Integer::sum);
+        unspawned.merge(room, 1, Integer::sum);
+    }
+
+    /** Hunt targets in a room that haven't spawned yet. */
+    public int unspawnedHunters(long room) {
+        return unspawned.getOrDefault(room, 0);
+    }
+
+    /** Counts a hunt target coming out of a spawner. Returns false if the room has none left to spawn. */
+    public boolean hunterSpawned(long room) {
+        Integer left = unspawned.get(room);
+        if (left == null || left <= 0) {
+            return false;
+        }
+        if (left == 1) {
+            unspawned.remove(room);
+        } else {
+            unspawned.put(room, left - 1);
+        }
+        return true;
     }
 
     /** Counts a hunt target killed. Returns how many are left in its room, or empty if the room isn't tracked. */
@@ -129,6 +151,14 @@ public final class DungeonProgress {
             hunts.add(hunt);
         });
         tag.put("hunters", hunts);
+        ListTag waiting = new ListTag();
+        unspawned.forEach((room, left) -> {
+            CompoundTag entry = new CompoundTag();
+            entry.putLong("room", room);
+            entry.putInt("left", left);
+            waiting.add(entry);
+        });
+        tag.put("unspawned", waiting);
         return tag;
     }
 
@@ -144,6 +174,10 @@ public final class DungeonProgress {
         for (Tag huntTag : tag.getList("hunters", Tag.TAG_COMPOUND)) {
             CompoundTag hunt = (CompoundTag) huntTag;
             progress.hunters.put(hunt.getLong("room"), hunt.getInt("left"));
+        }
+        for (Tag entryTag : tag.getList("unspawned", Tag.TAG_COMPOUND)) {
+            CompoundTag entry = (CompoundTag) entryTag;
+            progress.unspawned.put(entry.getLong("room"), entry.getInt("left"));
         }
         return progress;
     }

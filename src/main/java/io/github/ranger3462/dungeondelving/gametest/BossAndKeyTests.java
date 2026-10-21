@@ -106,6 +106,19 @@ public class BossAndKeyTests {
     }
 
     @GameTest(template = ANY_TEMPLATE)
+    public static void huntTargetsComeOutOfSpawnersOneAtATime(GameTestHelper helper) {
+        DungeonProgress progress = new DungeonProgress(1, 2, List.of(), BlockPos.ZERO);
+        long room = BlockPos.ZERO.asLong();
+        progress.addHunter(room);
+        progress.addHunter(room);
+        helper.assertTrue(progress.unspawnedHunters(room) == 2 && progress.huntersLeft(room) == 2, "both targets should be waiting to spawn");
+        helper.assertTrue(progress.hunterSpawned(room) && progress.hunterSpawned(room), "both targets should be able to spawn");
+        helper.assertFalse(progress.hunterSpawned(room), "a room shouldn't spawn more targets than it has");
+        helper.assertTrue(progress.huntersLeft(room) == 2, "spawning a target doesn't count as killing it");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
     public static void progressSurvivesSaveAndLoad(GameTestHelper helper) {
         DungeonRegions regions = new DungeonRegions();
         DungeonProgress progress = new DungeonProgress(3, 6, List.of(new BlockPos(1, 2, 3), new BlockPos(4, 5, 6)), new BlockPos(7, 8, 9));

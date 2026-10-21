@@ -2,25 +2,19 @@ package io.github.ranger3462.dungeondelving.dungeon.challenge;
 
 import java.util.Optional;
 
-import io.github.ranger3462.dungeondelving.Config;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
-import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -31,14 +25,16 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 
 /**
  * The path to the boss: hunt targets in challenge rooms, the Dungeon Keys they drop, and the boss door.
  * <ul>
- * <li>Hunt markers become tougher versions of dungeon mobs. They aren't highlighted (a skill may reveal them later).
- * Killing every hunt target in a room drops one Dungeon Key.</li>
+ * <li>Each hunt marker adds a hunt target to its room, and becomes a spawner. The room's spawners then turn some of
+ * the mobs they spawn into hunt targets, at random, until the room has spawned all of them. Hunt targets are tougher
+ * than ordinary mobs and aren't highlighted (a skill may reveal them later). Killing every hunt target in a room drops
+ * one Dungeon Key.</li>
  * <li>The boss door needs {@link DungeonProgress#keysFor tier x 2} keys. Using the last one opens the door and spawns
  * the boss.</li>
  * </ul>
@@ -47,6 +43,8 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 public final class DungeonChallenges {
     /** Saved on hunt targets: which region and room they belong to. */
     public static final String HUNT_TAG = DungeonDelving.MODID + ":hunt";
+    /** Chance each mob a challenge room's spawners spawn is a hunt target, while the room still has some to spawn. */
+    public static final double HUNTER_CHANCE = 0.3;
     /** How much tougher hunt targets are than ordinary mobs. */
     private static final double HUNTER_HEALTH = 2.0;
     private static final double HUNTER_DAMAGE = 2.0;
@@ -55,14 +53,37 @@ public final class DungeonChallenges {
 
     // --- Hunts ---
 
-    /** Spawns a hunt target for a challenge room. Untracked (no key) if the region has no progress, e.g. in tests. */
-    public static Optional<Mob> spawnHunter(ServerLevel level, BlockPos pos, RandomSource random, int region, long room) {
-        Optional<Holder<EntityType<?>>> type = DungeonMarkers.pickMob(level, random, Config.COMMON_MOB_CHANCE.get());
-        if (type.isEmpty() || !(type.get().value().create(level) instanceof Mob mob)) {
-            return Optional.empty();
+    /** Adds a hunt target to a room. Nothing is tracked if the region has no progress, e.g. in tests. */
+    public static void addHunter(int region, long room) {
+        if (region < 0) {
+            return;
         }
-        mob.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, random.nextFloat() * 360.0f, 0.0f);
-        EventHooks.finalizeMobSpawn(mob, level, level.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);
+        DungeonRegions.get().progress(region).ifPresent(progress -> {
+            progress.addHunter(room);
+            DungeonRegions.get().progressChanged();
+        });
+    }
+
+    /** A dungeon spawner spawning a mob: in a room still waiting on hunt targets, it may become one. */
+    @SubscribeEvent
+    public static void onSpawnerSpawn(FinalizeSpawnEvent event) {
+        if (event.getSpawnType() != MobSpawnType.SPAWNER || event.getLevel().getLevel().dimension() != DungeonDimension.DUNGEON) {
+            return;
+        }
+        Mob mob = event.getEntity();
+        BlockPos pos = mob.blockPosition();
+        int region = DungeonDimension.regionAt(pos);
+        long room = DungeonDimension.roomMinAt(pos).asLong();
+        DungeonRegions.get().progress(region).ifPresent(progress -> {
+            if (progress.unspawnedHunters(room) > 0 && mob.getRandom().nextDouble() < HUNTER_CHANCE && progress.hunterSpawned(room)) {
+                makeHunter(mob, region, room);
+                DungeonRegions.get().progressChanged();
+            }
+        });
+    }
+
+    /** Turns a mob into a hunt target for a room: tougher, persistent, and counted towards the room's key. */
+    public static void makeHunter(Mob mob, int region, long room) {
         AttributeInstance health = mob.getAttribute(Attributes.MAX_HEALTH);
         if (health != null) {
             health.setBaseValue(health.getBaseValue() * HUNTER_HEALTH);
@@ -79,12 +100,6 @@ public final class DungeonChallenges {
         hunt.putInt("region", region);
         hunt.putLong("room", room);
         mob.getPersistentData().put(HUNT_TAG, hunt);
-        level.addFreshEntity(mob);
-        DungeonRegions.get().progress(region).ifPresent(progress -> {
-            progress.addHunter(room);
-            DungeonRegions.get().progressChanged();
-        });
-        return Optional.of(mob);
     }
 
     @SubscribeEvent
