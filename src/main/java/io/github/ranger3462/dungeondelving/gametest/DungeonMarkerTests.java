@@ -70,7 +70,7 @@ public class DungeonMarkerTests {
             CompoundTag spawner = level.getBlockEntity(pos).saveWithoutMetadata(level.registryAccess());
             CompoundTag spawnData = spawner.getCompound("SpawnData");
             EntityType<?> mob = EntityType.byString(spawnData.getCompound("entity").getString("id")).orElseThrow();
-            helper.assertTrue(mob.is(DungeonMarkers.DUNGEON_MOBS), "the spawner should spawn a mob from the dungeon mob list, not " + mob);
+            helper.assertTrue(mob.is(DungeonMarkers.DUNGEON_MOBS) || mob.is(DungeonMarkers.COMMON_DUNGEON_MOBS), "the spawner should spawn a dungeon mob, not " + mob);
             // Custom spawn rules replace the mob's own "darkness only" rule. Ours allow any light (0-15), which is the
             // default range, so it's saved as an empty entry; what matters is that the entry exists.
             helper.assertTrue(spawnData.contains("custom_spawn_rules"), "dungeon spawners should ignore light level, saved: " + spawnData);

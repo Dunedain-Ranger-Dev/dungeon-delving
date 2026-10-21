@@ -35,7 +35,7 @@ public class Goblin extends Monster {
     public static final double SPEED = 0.30;
     public static final double DAMAGE = 3.0;
     /** How far a hurt goblin's call reaches. */
-    public static final double SWARM_RANGE = 20.0;
+    public static final double SWARM_RANGE = 40.0;
     /** Chance the goblin drops its spear when killed. */
     public static final float SPEAR_DROP_CHANCE = 0.05f;
 

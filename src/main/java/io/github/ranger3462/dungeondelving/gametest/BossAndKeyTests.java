@@ -9,6 +9,8 @@ import com.mojang.authlib.GameProfile;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
+import io.github.ranger3462.dungeondelving.dungeon.RoomSpec;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonChallenges;
 import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonBosses;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
@@ -27,12 +29,15 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -115,6 +120,32 @@ public class BossAndKeyTests {
         helper.assertTrue(progress.hunterSpawned(room) && progress.hunterSpawned(room), "both targets should be able to spawn");
         helper.assertFalse(progress.hunterSpawned(room), "a room shouldn't spawn more targets than it has");
         helper.assertTrue(progress.huntersLeft(room) == 2, "spawning a target doesn't count as killing it");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void aClearedHuntRoomTradesItsSpawnersForAChest(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos min = helper.absolutePos(BlockPos.ZERO).above(140);
+        BlockPos max = min.offset(RoomSpec.ROOM_SIZE - 1, RoomSpec.ROOM_HEIGHT - 1, RoomSpec.ROOM_SIZE - 1);
+        try {
+            for (BlockPos pos : List.of(min.offset(5, 1, 5), min.offset(20, 1, 9), min.offset(28, 2, 28))) {
+                level.setBlock(pos, Blocks.SPAWNER.defaultBlockState(), Block.UPDATE_CLIENTS);
+            }
+            int removed = DungeonChallenges.clearSpawners(level, min, 1);
+            int spawners = 0;
+            int chests = 0;
+            for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
+                spawners += level.getBlockState(pos).is(Blocks.SPAWNER) ? 1 : 0;
+                chests += level.getBlockState(pos).is(Blocks.CHEST) ? 1 : 0;
+            }
+            helper.assertTrue(removed == 3 && spawners == 0, "every spawner in the room should be removed");
+            helper.assertTrue(chests == 1, "one reward chest should take a spawner's place, found " + chests);
+        } finally {
+            for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
+                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            }
+        }
         helper.succeed();
     }
 

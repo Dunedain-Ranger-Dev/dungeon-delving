@@ -4,8 +4,10 @@ import java.util.Optional;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
+import io.github.ranger3462.dungeondelving.dungeon.RoomSpec;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -34,7 +36,8 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
  * <li>Each hunt marker adds a hunt target to its room, and becomes a spawner. The room's spawners then turn some of
  * the mobs they spawn into hunt targets, at random, until the room has spawned all of them. Hunt targets are tougher
  * than ordinary mobs and aren't highlighted (a skill may reveal them later). Killing every hunt target in a room drops
- * one Dungeon Key.</li>
+ * one Dungeon Key, and the room's spawners give way to a reward chest, so players can finish off the room and loot
+ * it without breaking spawners.</li>
  * <li>The boss door needs {@link DungeonProgress#keysFor tier x 2} keys. Using the last one opens the door and spawns
  * the boss.</li>
  * </ul>
@@ -115,6 +118,7 @@ public final class DungeonChallenges {
                 tellRegion(level, region, Component.translatable("message.dungeondelving.hunt_left", left).withStyle(ChatFormatting.GRAY));
                 return;
             }
+            DungeonRegions.get().progress(region).ifPresent(progress -> clearSpawners(level, BlockPos.of(hunt.getLong("room")), progress.tier()));
             ItemEntity key = new ItemEntity(level, event.getEntity().getX(), event.getEntity().getY() + 0.5, event.getEntity().getZ(),
                     DungeonKeyItem.forRegion(region));
             key.setUnlimitedLifetime();
@@ -123,6 +127,28 @@ public final class DungeonChallenges {
             level.playSound(null, event.getEntity().blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0f, 1.2f);
             tellRegion(level, region, Component.translatable("message.dungeondelving.key_dropped").withStyle(ChatFormatting.GOLD));
         });
+    }
+
+    /**
+     * Removes every spawner in a cleared room (whose minimum corner is {@code roomMin}), leaving a reward chest where
+     * the first one was. Returns how many spawners were removed.
+     */
+    public static int clearSpawners(ServerLevel level, BlockPos roomMin, int tier) {
+        BlockPos chest = null;
+        int removed = 0;
+        for (BlockPos pos : BlockPos.betweenClosed(roomMin, roomMin.offset(RoomSpec.ROOM_SIZE - 1, RoomSpec.ROOM_HEIGHT - 1, RoomSpec.ROOM_SIZE - 1))) {
+            if (level.getBlockState(pos).is(Blocks.SPAWNER)) {
+                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+                if (chest == null) {
+                    chest = pos.immutable();
+                }
+                removed++;
+            }
+        }
+        if (chest != null) {
+            DungeonMarkers.placeChest(level, chest, DungeonMarkers.roomLoot(tier), level.getRandom());
+        }
+        return removed;
     }
 
     // --- The boss door ---

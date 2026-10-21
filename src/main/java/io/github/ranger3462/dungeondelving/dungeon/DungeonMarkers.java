@@ -150,7 +150,8 @@ public final class DungeonMarkers {
         return TagKey.create(Registries.BLOCK, DungeonDelving.id("dungeon_resources/tier_" + DungeonRun.clampTier(tier)));
     }
 
-    private static void placeChest(ServerLevel level, BlockPos pos, ResourceKey<LootTable> table, RandomSource random) {
+    /** A chest facing a random way, filled from the loot table when first opened. */
+    public static void placeChest(ServerLevel level, BlockPos pos, ResourceKey<LootTable> table, RandomSource random) {
         Direction facing = Direction.Plane.HORIZONTAL.getRandomDirection(random);
         level.setBlock(pos, Blocks.CHEST.defaultBlockState().setValue(ChestBlock.FACING, facing), Block.UPDATE_CLIENTS);
         if (level.getBlockEntity(pos) instanceof RandomizableContainerBlockEntity chest) {

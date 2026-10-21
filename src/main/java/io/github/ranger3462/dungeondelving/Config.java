@@ -51,7 +51,7 @@ public final class Config {
             .comment("Chance that a dungeon spawner or hunt target is one of the common dungeon mobs (the",
                     "dungeondelving:dungeon_mobs/common entity tag, goblins by default). Otherwise it's any mob from",
                     "dungeondelving:dungeon_mobs.")
-            .defineInRange("commonMobChance", 0.6, 0.0, 1.0);
+            .defineInRange("commonMobChance", 1.0, 0.0, 1.0);
 
     public static final ModConfigSpec.BooleanValue BLOCK_NATURAL_SPAWNS = BUILDER
             .comment("Stop mobs spawning naturally in dungeons (including at world generation and as patrols), so every",

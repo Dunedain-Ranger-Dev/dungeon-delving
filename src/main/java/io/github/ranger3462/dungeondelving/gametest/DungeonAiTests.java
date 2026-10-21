@@ -29,15 +29,15 @@ public class DungeonAiTests {
     public static void hittingOneGoblinSendsTheNearbyOnes(GameTestHelper helper) {
         BlockPos base = helper.absolutePos(new BlockPos(0, 1, 0)).above(100);
         Goblin hit = goblin(helper, base);
-        Goblin near = goblin(helper, base.east(10));
-        Goblin far = goblin(helper, base.east(30));
+        Goblin near = goblin(helper, base.east(30));
+        Goblin far = goblin(helper, base.east(50));
         Zombie attacker = EntityType.ZOMBIE.create(helper.getLevel());
         attacker.moveTo(base.getX() + 0.5, base.getY(), base.getZ() + 2.5);
         helper.getLevel().addFreshEntity(attacker);
         try {
             hit.hurt(helper.getLevel().damageSources().mobAttack(attacker), 1.0f);
-            helper.assertTrue(near.getTarget() == attacker, "a goblin 10 blocks away should join the fight");
-            helper.assertTrue(far.getTarget() != attacker, "a goblin 30 blocks away is out of earshot");
+            helper.assertTrue(near.getTarget() == attacker, "a goblin 30 blocks away should join the fight");
+            helper.assertTrue(far.getTarget() != attacker, "a goblin 50 blocks away is out of earshot");
         } finally {
             for (var entity : List.of(hit, near, far, attacker)) {
                 entity.discard();

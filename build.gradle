@@ -215,6 +215,8 @@ dependencies {
         localRuntime "dev.ftb.mods:ftb-library-neoforge:2101.1.37"
         localRuntime "dev.ftb.mods:ftb-teams-neoforge:2101.1.11"
         localRuntime "dev.architectury:architectury-neoforge:13.0.8"
+        // Lootr, so world loot chests are per player
+        localRuntime "maven.modrinth:lootr:SPOrIzX8"                 // 1.21.1-1.11.38.127
         // Sophisticated Backpacks, for storage
         localRuntime "maven.modrinth:sophisticated-backpacks:QkVLEgt1" // 1.21.1-3.26.12.2208
         localRuntime "maven.modrinth:sophisticated-core:DAcZAWzl"    // 1.21.1-1.5.13.2404
