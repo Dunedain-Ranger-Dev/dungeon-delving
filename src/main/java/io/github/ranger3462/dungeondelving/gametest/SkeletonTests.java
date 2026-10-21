@@ -21,6 +21,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -96,6 +97,38 @@ public class SkeletonTests {
         }
         helper.assertTrue(tierTwo, "swordsmen should spawn in tier 2");
         helper.succeed();
+    }
+
+    /** A raised shield really blocks: a hit from the front does nothing, a hit from behind still lands. */
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 60)
+    public static void aRaisedShieldBlocksHitsFromTheFront(GameTestHelper helper) {
+        SkeletonSwordsman swordsman = spawn(helper, ModEntities.SKELETON_SWORDSMAN.get());
+        swordsman.setNoAi(true);
+        swordsman.setYRot(0.0f); // Facing south (+z).
+        swordsman.setYHeadRot(0.0f);
+        swordsman.setYBodyRot(0.0f);
+        swordsman.startUsingItem(InteractionHand.OFF_HAND);
+        Zombie front = EntityType.ZOMBIE.create(helper.getLevel());
+        front.moveTo(swordsman.getX(), swordsman.getY(), swordsman.getZ() + 2);
+        Zombie behind = EntityType.ZOMBIE.create(helper.getLevel());
+        behind.moveTo(swordsman.getX(), swordsman.getY(), swordsman.getZ() - 2);
+        // Shields only block once they've been up for 5 ticks.
+        helper.runAfterDelay(10, () -> {
+            try {
+                helper.assertTrue(swordsman.isBlocking(), "the swordsman should be blocking after raising its shield");
+                float health = swordsman.getHealth();
+                swordsman.hurt(helper.getLevel().damageSources().mobAttack(front), 6.0f);
+                helper.assertTrue(swordsman.getHealth() == health, "a hit from the front should be blocked");
+                swordsman.invulnerableTime = 0;
+                swordsman.hurt(helper.getLevel().damageSources().mobAttack(behind), 6.0f);
+                helper.assertTrue(swordsman.getHealth() < health, "a hit from behind should still land");
+            } finally {
+                swordsman.discard();
+                front.discard();
+                behind.discard();
+            }
+            helper.succeed();
+        });
     }
 
     private static <T extends SkeletonSwordsman> T spawn(GameTestHelper helper, EntityType<T> type) {
