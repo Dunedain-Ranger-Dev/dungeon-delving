@@ -109,6 +109,8 @@ public final class ModRegistries {
                 output.accept(HUNT_MARKER.get());
                 output.accept(BOSS_MARKER.get());
                 output.accept(DUNGEON_KEY.get());
+                output.accept(ModEntities.GOBLIN_SPAWN_EGG.get());
+                output.accept(ModEntities.GOBLIN_SPEAR.get());
                 output.accept(HALLSTONE_ITEM.get());
                 for (DungeonOre ore : DungeonOre.values()) {
                     output.accept(ore.oreItem.get());
@@ -130,6 +132,8 @@ public final class ModRegistries {
 
     public static void register(IEventBus modEventBus) {
         DungeonOre.init(); // Registers the ores' blocks and items before the registers are attached.
+        ModEntities.init();
+        ModEntities.register(modEventBus);
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         COMPONENTS.register(modEventBus);

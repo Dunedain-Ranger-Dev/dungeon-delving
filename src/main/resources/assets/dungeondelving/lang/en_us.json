@@ -51,5 +51,9 @@
   "message.dungeondelving.key_crumbles": "The key crumbles; it belongs to another dungeon.",
   "message.dungeondelving.key_used": "A key turns in the boss door: %s of %s.",
   "message.dungeondelving.door_open": "The boss door grinds open...",
-  "message.dungeondelving.boss_defeated": "%s is defeated!"
+  "message.dungeondelving.boss_defeated": "%s is defeated!",
+  "entity.dungeondelving.goblin": "Goblin",
+  "item.dungeondelving.goblin_spawn_egg": "Goblin Spawn Egg",
+  "item.dungeondelving.goblin_spear": "Goblin Spear",
+  "dungeondelving.configuration.commonMobChance": "Common dungeon mob chance"
 }

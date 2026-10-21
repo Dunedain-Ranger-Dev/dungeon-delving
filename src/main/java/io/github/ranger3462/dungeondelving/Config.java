@@ -47,6 +47,12 @@ public final class Config {
                     "tier and common chances is a vanilla ore from the dungeondelving:dungeon_resources block tag.")
             .defineInRange("commonOreChance", 0.45, 0.0, 1.0);
 
+    public static final ModConfigSpec.DoubleValue COMMON_MOB_CHANCE = BUILDER
+            .comment("Chance that a dungeon spawner or hunt target is one of the common dungeon mobs (the",
+                    "dungeondelving:dungeon_mobs/common entity tag, goblins by default). Otherwise it's any mob from",
+                    "dungeondelving:dungeon_mobs.")
+            .defineInRange("commonMobChance", 0.6, 0.0, 1.0);
+
     public static final ModConfigSpec.BooleanValue BLOCK_NATURAL_SPAWNS = BUILDER
             .comment("Stop mobs spawning naturally in dungeons (including at world generation and as patrols), so every",
                     "dungeon mob comes from a mob marker or spawner.")

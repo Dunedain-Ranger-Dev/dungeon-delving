@@ -2,6 +2,7 @@ package io.github.ranger3462.dungeondelving.dungeon.challenge;
 
 import java.util.Optional;
 
+import io.github.ranger3462.dungeondelving.Config;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
@@ -56,8 +57,7 @@ public final class DungeonChallenges {
 
     /** Spawns a hunt target for a challenge room. Untracked (no key) if the region has no progress, e.g. in tests. */
     public static Optional<Mob> spawnHunter(ServerLevel level, BlockPos pos, RandomSource random, int region, long room) {
-        Optional<Holder<EntityType<?>>> type = level.registryAccess().registryOrThrow(Registries.ENTITY_TYPE).getTag(DungeonMarkers.DUNGEON_MOBS)
-                .flatMap(tag -> tag.getRandomElement(random));
+        Optional<Holder<EntityType<?>>> type = DungeonMarkers.pickMob(level, random, Config.COMMON_MOB_CHANCE.get());
         if (type.isEmpty() || !(type.get().value().create(level) instanceof Mob mob)) {
             return Optional.empty();
         }
