@@ -183,6 +183,16 @@
           "weight": 1
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeondelving:runic_shard_2",
+          "weight": 1
+        }
+      ]
     }
   ]
 }

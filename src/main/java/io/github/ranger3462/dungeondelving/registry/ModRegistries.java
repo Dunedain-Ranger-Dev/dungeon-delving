@@ -11,6 +11,7 @@ import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsGoblins;
+import io.github.ranger3462.dungeondelving.workshop.RunicWorkshop;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -105,6 +106,9 @@ public final class ModRegistries {
             .displayItems((parameters, output) -> {
                 output.accept(DUNGEON_GATE_ITEM.get());
                 output.accept(DUNGEON_EXIT_ITEM.get());
+                output.accept(RunicWorkshop.BLOCK_ITEM.get());
+                RunicWorkshop.KEYS.forEach(key -> output.accept(key.get()));
+                RunicWorkshop.SHARDS.forEach(shard -> output.accept(shard.get()));
                 output.accept(LOOT_MARKER.get());
                 output.accept(MOB_MARKER.get());
                 output.accept(RESOURCE_MARKER.get());
@@ -139,6 +143,8 @@ public final class ModRegistries {
     public static void register(IEventBus modEventBus) {
         DungeonOre.init(); // Registers the ores' blocks and items before the registers are attached.
         ModEntities.init();
+        RunicWorkshop.init();
+        RunicWorkshop.register(modEventBus);
         ModEntities.register(modEventBus);
         if (ModList.get().isLoaded("irons_spellbooks")) {
             IronsGoblins.register(modEventBus);

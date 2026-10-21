@@ -60,5 +60,18 @@
   "item.dungeondelving.goblin_bow": "Goblin Bow",
   "dungeondelving.configuration.spawnerMobs": "Dungeon spawner mobs",
   "entity.dungeondelving.goblin_shaman": "Goblin Shaman",
-  "item.dungeondelving.goblin_shaman_spawn_egg": "Goblin Shaman Spawn Egg"
+  "item.dungeondelving.goblin_shaman_spawn_egg": "Goblin Shaman Spawn Egg",
+  "item.dungeondelving.runic_key_1": "Runic Key I",
+  "item.dungeondelving.runic_key_2": "Runic Key II",
+  "item.dungeondelving.runic_key_3": "Runic Key III",
+  "item.dungeondelving.runic_key_4": "Runic Key IV",
+  "item.dungeondelving.runic_shard_1": "Runic Shard I",
+  "item.dungeondelving.runic_shard_2": "Runic Shard II",
+  "item.dungeondelving.runic_shard_3": "Runic Shard III",
+  "block.dungeondelving.runic_workshop": "Runic Workshop",
+  "container.dungeondelving.runic_workshop": "Runic Workshop",
+  "item.dungeondelving.runic_key.tooltip": "Use on a Dungeon Gate to open a tier %s dungeon.",
+  "message.dungeondelving.gate_entered": "You enter a tier %s dungeon of %s rooms. Clear %s challenge rooms for the keys to the boss door, and leave through the exit to keep your loot.",
+  "message.dungeondelving.gate_needs_key": "The gate needs a Runic Key. Make one at a Runic Workshop.",
+  "message.dungeondelving.gate_already_inside": "You're already in a dungeon."
 }

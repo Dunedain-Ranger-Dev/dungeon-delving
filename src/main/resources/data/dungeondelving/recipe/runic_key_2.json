@@ -1,0 +1,17 @@
+{
+  "type": "dungeondelving:runic_workshop",
+  "key": {
+    "item": "dungeondelving:runic_key_1"
+  },
+  "shard": {
+    "item": "dungeondelving:runic_shard_1"
+  },
+  "material": {
+    "item": "dungeondelving:barrow_iron_ingot"
+  },
+  "count": 12,
+  "result": {
+    "id": "dungeondelving:runic_key_2",
+    "count": 1
+  }
+}

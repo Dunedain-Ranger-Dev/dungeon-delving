@@ -1,0 +1,17 @@
+{
+  "type": "dungeondelving:runic_workshop",
+  "key": {
+    "item": "dungeondelving:runic_key_2"
+  },
+  "shard": {
+    "item": "dungeondelving:runic_shard_2"
+  },
+  "material": {
+    "item": "dungeondelving:thraggite_ingot"
+  },
+  "count": 16,
+  "result": {
+    "id": "dungeondelving:runic_key_3",
+    "count": 1
+  }
+}

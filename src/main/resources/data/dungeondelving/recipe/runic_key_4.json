@@ -1,0 +1,17 @@
+{
+  "type": "dungeondelving:runic_workshop",
+  "key": {
+    "item": "dungeondelving:runic_key_3"
+  },
+  "shard": {
+    "item": "dungeondelving:runic_shard_3"
+  },
+  "material": {
+    "item": "dungeondelving:wardsilver_ingot"
+  },
+  "count": 20,
+  "result": {
+    "id": "dungeondelving:runic_key_4",
+    "count": 1
+  }
+}

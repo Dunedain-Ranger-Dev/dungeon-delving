@@ -1,0 +1,11 @@
+{
+  "type": "dungeondelving:runic_workshop",
+  "material": {
+    "item": "minecraft:iron_ingot"
+  },
+  "count": 8,
+  "result": {
+    "id": "dungeondelving:runic_key_1",
+    "count": 1
+  }
+}

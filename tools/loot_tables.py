@@ -139,7 +139,10 @@ def barrow_king(tier):
         valuables.append(item("minecraft:netherite_scrap", t - 1))
     if t >= 4:
         valuables.append(item("minecraft:enchanted_golden_apple", 2))
-    return {"type": "minecraft:entity", "pools": [pool(1, 1, signature), pool(1, 1, ingots), pool(1, 1, common), pool(4, 5 + t // 2, valuables)]}
+    pools = [pool(1, 1, signature), pool(1, 1, ingots), pool(1, 1, common), pool(4, 5 + t // 2, valuables)]
+    if t < 4:
+        pools.append(pool(1, 1, [item(f"{NS}:runic_shard_{t}", 1)]))  # Needed for the next tier's Runic Key.
+    return {"type": "minecraft:entity", "pools": pools}
 
 
 BOSSES = {"barrow_king": barrow_king}
