@@ -1,12 +1,17 @@
 package io.github.ranger3462.dungeondelving.registry;
 
+import java.util.List;
+
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.entity.Goblin;
+import io.github.ranger3462.dungeondelving.entity.GoblinArcher;
+import io.github.ranger3462.dungeondelving.entity.GoblinBowItem;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -30,6 +35,18 @@ public final class ModEntities {
             () -> EntityType.Builder.of(Goblin::new, MobCategory.MONSTER).sized(0.5f, 1.45f).eyeHeight(1.25f).clientTrackingRange(8)
                     .build(DungeonDelving.id("goblin").toString()));
 
+    /** The goblin archer: keeps its distance and shoots a Goblin Bow. */
+    public static final DeferredHolder<EntityType<?>, EntityType<GoblinArcher>> GOBLIN_ARCHER = ENTITIES.register("goblin_archer",
+            () -> EntityType.Builder.of(GoblinArcher::new, MobCategory.MONSTER).sized(0.5f, 1.45f).eyeHeight(1.25f).clientTrackingRange(8)
+                    .build(DungeonDelving.id("goblin_archer").toString()));
+
+    public static final DeferredItem<DeferredSpawnEggItem> GOBLIN_ARCHER_SPAWN_EGG = ModRegistries.ITEMS.registerItem("goblin_archer_spawn_egg",
+            properties -> new DeferredSpawnEggItem(GOBLIN_ARCHER, 0x5E8C3A, 0x3F5A2A, properties));
+
+    /** The bow goblin archers carry: low durability, and its arrows hit softer. */
+    public static final DeferredItem<GoblinBowItem> GOBLIN_BOW = ModRegistries.ITEMS.registerItem("goblin_bow", GoblinBowItem::new,
+            new Item.Properties().durability(96));
+
     public static final DeferredItem<DeferredSpawnEggItem> GOBLIN_SPAWN_EGG = ModRegistries.ITEMS.registerItem("goblin_spawn_egg",
             properties -> new DeferredSpawnEggItem(GOBLIN, 0x5E8C3A, 0x6B4A2B, properties));
 
@@ -46,12 +63,15 @@ public final class ModEntities {
     @SubscribeEvent
     public static void onAttributes(EntityAttributeCreationEvent event) {
         event.put(GOBLIN.get(), Goblin.createAttributes().build());
+        event.put(GOBLIN_ARCHER.get(), GoblinArcher.createAttributes().build());
     }
 
     @SubscribeEvent
     public static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {
-        event.register(GOBLIN.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        for (EntityType<? extends Monster> goblin : List.of(GOBLIN.get(), GOBLIN_ARCHER.get())) {
+            event.register(goblin, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules,
+                    RegisterSpawnPlacementsEvent.Operation.REPLACE);
+        }
     }
 
     /** Makes sure the items above are registered; call once while setting up registries. */

@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "dungeondelving:goblin",
+    "dungeondelving:goblin_archer",
+    {
+      "id": "dungeondelving:goblin_shaman",
+      "required": false
+    }
+  ]
+}

@@ -55,5 +55,10 @@
   "entity.dungeondelving.goblin": "Goblin",
   "item.dungeondelving.goblin_spawn_egg": "Goblin Spawn Egg",
   "item.dungeondelving.goblin_spear": "Goblin Spear",
-  "dungeondelving.configuration.commonMobChance": "Common dungeon mob chance"
+  "entity.dungeondelving.goblin_archer": "Goblin Archer",
+  "item.dungeondelving.goblin_archer_spawn_egg": "Goblin Archer Spawn Egg",
+  "item.dungeondelving.goblin_bow": "Goblin Bow",
+  "dungeondelving.configuration.spawnerMobs": "Dungeon spawner mobs",
+  "entity.dungeondelving.goblin_shaman": "Goblin Shaman",
+  "item.dungeondelving.goblin_shaman_spawn_egg": "Goblin Shaman Spawn Egg"
 }

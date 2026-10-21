@@ -182,6 +182,11 @@ dependencies {
 
     // Optional integration: the Curios API at compile time only. CuriosLoot is only used when Curios is installed.
     compileOnly "top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1:api"
+    // Optional integration: Iron's Spells, for the goblin shaman. Only used when Iron's Spells is installed.
+    compileOnly "maven.modrinth:irons-spells-n-spellbooks:slKLosTb"  // 1.21.1-3.16.3
+    compileOnly "maven.modrinth:irons-lib:lUwUKYPl"
+    compileOnly "maven.modrinth:geckolib:Grwn5rUB"
+    compileOnly "maven.modrinth:playeranimator:HJZB6bmA"
 
     // The pack's mods, loaded in dev runs (client, server, game tests) so features can be tested against them.
     // localRuntime keeps them out of this mod's published dependencies: Dungeon Delving doesn't require any.

@@ -36,7 +36,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * Turns the marker blocks builders place in dungeon pieces into content, freshly rolled every run:
  * <ul>
  * <li>Loot marker: a chest with the tier's {@code dungeondelving:chests/tier_<n>/room} loot, or nothing.</li>
- * <li>Mob marker: a monster spawner for a random mob from the {@code dungeondelving:dungeon_mobs} entity tag. Dungeon
+ * <li>Mob marker: a monster spawner for a random mob from the {@code spawnerMobs} config (see {@link SpawnerMobs}). Dungeon
  * spawners ignore light level, so lit rooms still spawn mobs.</li>
  * <li>Resource marker: the dungeon's tier ore, the common dungeon ore, an ore from the
  * {@code dungeondelving:dungeon_resources} block tag or the tier's {@code dungeondelving:dungeon_resources/tier_<n>}
@@ -50,8 +50,6 @@ import net.minecraft.world.level.storage.loot.LootTable;
  */
 public final class DungeonMarkers {
     public static final TagKey<EntityType<?>> DUNGEON_MOBS = TagKey.create(Registries.ENTITY_TYPE, DungeonDelving.id("dungeon_mobs"));
-    /** The everyday dungeon enemies, picked {@code commonMobChance} of the time (goblins by default). */
-    public static final TagKey<EntityType<?>> COMMON_DUNGEON_MOBS = TagKey.create(Registries.ENTITY_TYPE, DungeonDelving.id("dungeon_mobs/common"));
     public static final TagKey<Block> DUNGEON_RESOURCES = TagKey.create(Registries.BLOCK, DungeonDelving.id("dungeon_resources"));
 
     /**
@@ -164,7 +162,7 @@ public final class DungeonMarkers {
      * vanilla monsters otherwise only spawn in darkness.
      */
     private static void placeSpawner(ServerLevel level, BlockPos pos, RandomSource random) {
-        Optional<Holder<EntityType<?>>> mob = pickMob(level, random, Config.COMMON_MOB_CHANCE.get());
+        Optional<Holder<EntityType<?>>> mob = SpawnerMobs.pick(level, random);
         if (mob.isEmpty()) {
             return;
         }
@@ -202,17 +200,6 @@ public final class DungeonMarkers {
         range.add(IntTag.valueOf(0));
         range.add(IntTag.valueOf(15));
         return range;
-    }
-
-    /**
-     * A dungeon mob: one of the common dungeon mobs with the given chance, otherwise any mob from the dungeon mob list.
-     * Falls back to the other list if one is empty.
-     */
-    public static Optional<Holder<EntityType<?>>> pickMob(ServerLevel level, RandomSource random, double commonChance) {
-        var types = level.registryAccess().registryOrThrow(Registries.ENTITY_TYPE);
-        Optional<Holder<EntityType<?>>> common = pickFromTag(types.getTag(COMMON_DUNGEON_MOBS), random);
-        Optional<Holder<EntityType<?>>> any = pickFromTag(types.getTag(DUNGEON_MOBS), random);
-        return random.nextDouble() < commonChance ? common.or(() -> any) : any.or(() -> common);
     }
 
     private static <T> Optional<Holder<T>> pickFromTag(Optional<HolderSet.Named<T>> tag, RandomSource random) {

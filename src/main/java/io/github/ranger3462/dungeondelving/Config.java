@@ -3,6 +3,7 @@ package io.github.ranger3462.dungeondelving;
 import java.util.List;
 
 import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
+import io.github.ranger3462.dungeondelving.dungeon.SpawnerMobs;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 /** Settings in {@code config/dungeondelving-common.toml}. */
@@ -47,11 +48,12 @@ public final class Config {
                     "tier and common chances is a vanilla ore from the dungeondelving:dungeon_resources block tag.")
             .defineInRange("commonOreChance", 0.45, 0.0, 1.0);
 
-    public static final ModConfigSpec.DoubleValue COMMON_MOB_CHANCE = BUILDER
-            .comment("Chance that a dungeon spawner or hunt target is one of the common dungeon mobs (the",
-                    "dungeondelving:dungeon_mobs/common entity tag, goblins by default). Otherwise it's any mob from",
-                    "dungeondelving:dungeon_mobs.")
-            .defineInRange("commonMobChance", 1.0, 0.0, 1.0);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> SPAWNER_MOBS = BUILDER
+            .comment("Which mobs dungeon spawners spawn, as \"mob=weight\" entries: higher weights spawn more often. A mob is an",
+                    "entity id, or an entity tag starting with # (any mob in it, e.g. \"#dungeondelving:dungeon_mobs=10\").",
+                    "Mobs that aren't installed are skipped (the goblin shaman needs Iron's Spells).")
+            .defineList("spawnerMobs", SpawnerMobs.DEFAULTS, () -> "dungeondelving:goblin=1",
+                    value -> value instanceof String text && SpawnerMobs.parse(text).isPresent());
 
     public static final ModConfigSpec.BooleanValue BLOCK_NATURAL_SPAWNS = BUILDER
             .comment("Stop mobs spawning naturally in dungeons (including at world generation and as patrols), so every",

@@ -1,0 +1,6 @@
+{
+  "parent": "dungeondelving:item/goblin_bow",
+  "textures": {
+    "layer0": "dungeondelving:item/goblin_bow_pulling_1"
+  }
+}

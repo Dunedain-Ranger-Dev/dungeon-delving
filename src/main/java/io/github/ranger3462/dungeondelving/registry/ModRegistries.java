@@ -10,8 +10,10 @@ import io.github.ranger3462.dungeondelving.block.DungeonGateBlock;
 import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
+import io.github.ranger3462.dungeondelving.integration.irons.IronsGoblins;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -26,6 +28,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -111,6 +114,9 @@ public final class ModRegistries {
                 output.accept(DUNGEON_KEY.get());
                 output.accept(ModEntities.GOBLIN_SPAWN_EGG.get());
                 output.accept(ModEntities.GOBLIN_SPEAR.get());
+                output.accept(ModEntities.GOBLIN_ARCHER_SPAWN_EGG.get());
+                output.accept(ModEntities.GOBLIN_BOW.get());
+                BuiltInRegistries.ITEM.getOptional(DungeonDelving.id("goblin_shaman_spawn_egg")).ifPresent(output::accept);
                 output.accept(HALLSTONE_ITEM.get());
                 for (DungeonOre ore : DungeonOre.values()) {
                     output.accept(ore.oreItem.get());
@@ -134,6 +140,9 @@ public final class ModRegistries {
         DungeonOre.init(); // Registers the ores' blocks and items before the registers are attached.
         ModEntities.init();
         ModEntities.register(modEventBus);
+        if (ModList.get().isLoaded("irons_spellbooks")) {
+            IronsGoblins.register(modEventBus);
+        }
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         COMPONENTS.register(modEventBus);
