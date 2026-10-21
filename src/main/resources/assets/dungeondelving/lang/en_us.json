@@ -81,6 +81,8 @@
   "message.dungeondelving.layout.loot": "You catch the glint of gold: this dungeon is full of treasure.",
   "dungeondelving.configuration.layoutTypes": "Dungeon layout type odds",
   "entity.dungeondelving.goblin_chief": "Goblin Shaman Chief",
+  "entity.dungeondelving.skeleton_mage": "Skeleton Mage",
+  "item.dungeondelving.skeleton_mage_spawn_egg": "Skeleton Mage Spawn Egg",
   "item.dungeondelving.goblin_chief_spawn_egg": "Goblin Shaman Chief Spawn Egg",
   "item.dungeondelving.goblin_totem_staff": "Goblin Totem Staff",
   "item.dungeondelving.goblin_chief_staff": "Staff of the Goblin Chief",

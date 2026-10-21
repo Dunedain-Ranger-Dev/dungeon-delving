@@ -38,6 +38,10 @@ public final class Config {
                     "resource: mostly quarries packed with ore; loot: lots of treasure rooms with extra chests.")
             .defineList("layoutTypes", LayoutType.DEFAULTS, () -> "normal=1", value -> value instanceof String text && LayoutType.parse(text).isPresent());
 
+    public static final ModConfigSpec.DoubleValue MOB_MARKER_CHANCE = BUILDER
+            .comment("Chance that each mob marker in a dungeon becomes a spawner. Otherwise it's left empty. Hunt markers always do.")
+            .defineInRange("mobMarkerChance", 0.5, 0.0, 1.0);
+
     public static final ModConfigSpec.DoubleValue LOOT_MARKER_CHANCE = BUILDER
             .comment("Chance that each loot marker in a dungeon becomes a chest. Otherwise it's left empty.")
             .defineInRange("lootMarkerChance", 0.6, 0.0, 1.0);

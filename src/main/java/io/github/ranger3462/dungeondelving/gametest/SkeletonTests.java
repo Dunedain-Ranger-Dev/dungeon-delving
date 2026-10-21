@@ -94,14 +94,18 @@ public class SkeletonTests {
         RandomSource random = RandomSource.create(4);
         Set<EntityType<?>> tierOne = new HashSet<>();
         Set<EntityType<?>> tierTwo = new HashSet<>();
+        Set<EntityType<?>> tierThree = new HashSet<>();
         for (int i = 0; i < 400; i++) {
             tierOne.add(SpawnerMobs.pick(helper.getLevel(), random, DungeonFactions.SKELETON_DEFAULTS, 1).orElseThrow().value());
             tierTwo.add(SpawnerMobs.pick(helper.getLevel(), random, DungeonFactions.SKELETON_DEFAULTS, 2).orElseThrow().value());
+            tierThree.add(SpawnerMobs.pick(helper.getLevel(), random, DungeonFactions.SKELETON_DEFAULTS, 3).orElseThrow().value());
         }
         helper.assertTrue(tierOne.equals(Set.of(ModEntities.SKELETON_SWORDSMAN.get(), EntityType.SKELETON)),
                 "tier 1 skeleton dungeons should spawn swordsmen and skeleton archers, got " + tierOne);
-        helper.assertTrue(tierTwo.contains(ModEntities.SKELETON_KNIGHT.get()) && tierTwo.contains(EntityType.WITHER_SKELETON),
-                "tier 2 skeleton dungeons should add knights and wither skeletons, got " + tierTwo);
+        helper.assertTrue(tierTwo.equals(Set.of(ModEntities.SKELETON_SWORDSMAN.get(), EntityType.SKELETON, EntityType.STRAY, EntityType.BOGGED)),
+                "tier 2 skeleton dungeons should add strays and bogged, got " + tierTwo);
+        helper.assertTrue(tierThree.contains(ModEntities.SKELETON_KNIGHT.get()) && tierThree.contains(EntityType.WITHER_SKELETON),
+                "tier 3 skeleton dungeons should add knights and wither skeletons, got " + tierThree);
         helper.succeed();
     }
 

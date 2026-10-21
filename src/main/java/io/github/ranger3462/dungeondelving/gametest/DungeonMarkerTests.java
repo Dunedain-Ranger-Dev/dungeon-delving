@@ -141,7 +141,7 @@ public class DungeonMarkerTests {
     }
 
     /**
-     * Placing a room for real resolves every marker in it: no markers are left, every mob and hunt marker becomes a
+     * Placing a room for real resolves every marker in it: no markers are left, every hunt marker (and some mob markers) becomes a
      * spawner, and no hunt targets exist yet (they come out of the spawners later).
      */
     @GameTest(template = ANY_TEMPLATE)
@@ -167,7 +167,8 @@ public class DungeonMarkerTests {
                     spawners++;
                 }
             }
-            helper.assertTrue(spawners == 5, "the hunt room's 2 mob markers and 3 hunt markers should all become spawners, found " + spawners);
+            helper.assertTrue(spawners >= 3 && spawners <= 5,
+                    "the hunt room's 3 hunt markers should all become spawners, and its 2 mob markers maybe, found " + spawners);
             long hunters = level.getEntitiesOfClass(Mob.class, new AABB(corner.getCenter(), far.getCenter()).inflate(4)).stream()
                     .filter(mob -> mob.getPersistentData().contains(DungeonChallenges.HUNT_TAG)).count();
             helper.assertTrue(hunters == 0, "hunt targets shouldn't be waiting in the room before it spawns anything, found " + hunters);

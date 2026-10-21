@@ -22,7 +22,7 @@ public final class DungeonFactions {
     public static final List<String> GOBLIN_DEFAULTS = List.of("dungeondelving:goblin=60", "dungeondelving:goblin_archer=25",
             "dungeondelving:goblin_shaman=15");
     public static final List<String> SKELETON_DEFAULTS = List.of("dungeondelving:skeleton_swordsman=50", "minecraft:skeleton=35",
-            "dungeondelving:skeleton_knight=15@2-4", "minecraft:wither_skeleton=20@2-4");
+            "minecraft:stray=15@2-4", "minecraft:bogged=15@2-4", "dungeondelving:skeleton_knight=15@3-4", "minecraft:wither_skeleton=15@3-4");
 
     private static final Map<String, Supplier<List<? extends String>>> MOBS = new LinkedHashMap<>();
 

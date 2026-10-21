@@ -11,6 +11,7 @@ import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsGoblins;
+import io.github.ranger3462.dungeondelving.integration.irons.IronsSkeletons;
 import io.github.ranger3462.dungeondelving.testing.TestersCharm;
 import io.github.ranger3462.dungeondelving.workshop.RunicWorkshop;
 import net.minecraft.core.component.DataComponentType;
@@ -129,7 +130,8 @@ public final class ModRegistries {
                 output.accept(ModEntities.SKELETON_SWORDSMAN_SPAWN_EGG.get());
                 output.accept(ModEntities.SKELETON_KNIGHT_SPAWN_EGG.get());
                 output.accept(ModEntities.SKELETON_LORD_SPAWN_EGG.get());
-                for (String optional : new String[] { "goblin_shaman_spawn_egg", "goblin_chief_spawn_egg", "goblin_totem_staff", "goblin_chief_staff" }) {
+                for (String optional : new String[] { "goblin_shaman_spawn_egg", "goblin_chief_spawn_egg", "goblin_totem_staff", "goblin_chief_staff",
+                        "skeleton_mage_spawn_egg" }) {
                     BuiltInRegistries.ITEM.getOptional(DungeonDelving.id(optional)).ifPresent(output::accept);
                 }
                 output.accept(HALLSTONE_ITEM.get());
@@ -159,6 +161,7 @@ public final class ModRegistries {
         ModEntities.register(modEventBus);
         if (ModList.get().isLoaded("irons_spellbooks")) {
             IronsGoblins.register(modEventBus);
+            IronsSkeletons.register(modEventBus);
         }
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);

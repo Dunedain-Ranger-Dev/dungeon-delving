@@ -36,8 +36,9 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * Turns the marker blocks builders place in dungeon pieces into content, freshly rolled every run:
  * <ul>
  * <li>Loot marker: a chest with the tier's {@code dungeondelving:chests/tier_<n>/room} loot, or nothing.</li>
- * <li>Mob marker: a monster spawner for a random mob of the dungeon's faction (see {@link DungeonFactions}). Dungeon
- * spawners ignore light level, so lit rooms still spawn mobs.</li>
+ * <li>Mob marker: a monster spawner for a random mob of the dungeon's faction (see {@link DungeonFactions}), or
+ * nothing (see the {@code mobMarkerChance} config). Dungeon spawners ignore light level, so lit rooms still spawn mobs,
+ * and spawn fewer mobs at low tiers.</li>
  * <li>Resource marker: the dungeon's tier ore, the common dungeon ore, an ore from the
  * {@code dungeondelving:dungeon_resources} block tag or the tier's {@code dungeondelving:dungeon_resources/tier_<n>}
  * tag, or otherwise Hallstone, so there are never gaps.</li>
@@ -57,9 +58,9 @@ public final class DungeonMarkers {
      * placed outside a run (e.g. in tests), so hunts and the boss aren't tracked.
      */
     public record Rolls(int tier, double lootChance, double resourceChance, double tierOreChance, double commonOreChance, int region,
-            String faction) {
+            String faction, double mobChance) {
         public Rolls(int tier, double lootChance, double resourceChance, double tierOreChance, double commonOreChance) {
-            this(tier, lootChance, resourceChance, tierOreChance, commonOreChance, -1, null);
+            this(tier, lootChance, resourceChance, tierOreChance, commonOreChance, -1, null, 1.0);
         }
 
         public static Rolls fromConfig(int tier) {
@@ -69,7 +70,7 @@ public final class DungeonMarkers {
         /** The config's chances, for a run in a region held by a faction (null for none, e.g. outside a run). */
         public static Rolls fromConfig(int tier, int region, String faction) {
             return new Rolls(tier, Config.LOOT_MARKER_CHANCE.get(), Config.RESOURCE_MARKER_CHANCE.get(), Config.TIER_ORE_CHANCE.get(),
-                    Config.COMMON_ORE_CHANCE.get(), region, faction);
+                    Config.COMMON_ORE_CHANCE.get(), region, faction, Config.MOB_MARKER_CHANCE.get());
         }
     }
 
@@ -117,7 +118,9 @@ public final class DungeonMarkers {
             Block block = random.nextDouble() < rolls.resourceChance() ? pickOre(level, random, rolls).orElse(null) : null;
             level.setBlock(pos, (block != null ? block : ModRegistries.HALLSTONE.get()).defaultBlockState(), Block.UPDATE_CLIENTS);
         } else if (marker == ModRegistries.MOB_MARKER.get()) {
-            placeSpawner(level, pos, random, rolls);
+            if (random.nextDouble() < rolls.mobChance()) {
+                placeSpawner(level, pos, random, rolls);
+            }
         } else if (marker == ModRegistries.HUNT_MARKER.get()) {
             placeSpawner(level, pos, random, rolls);
             DungeonChallenges.addHunter(rolls.region(), DungeonDimension.roomMinAt(pos).asLong());
@@ -170,13 +173,22 @@ public final class DungeonMarkers {
         }
         level.setBlock(pos, Blocks.SPAWNER.defaultBlockState(), Block.UPDATE_ALL);
         if (level.getBlockEntity(pos) instanceof SpawnerBlockEntity spawner) {
-            spawner.getSpawner().load(level, pos, spawnerTag(mob.get().value()));
+            spawner.getSpawner().load(level, pos, spawnerTag(mob.get().value(), rolls.tier()));
             spawner.setChanged();
         }
     }
 
-    /** The spawner settings for a dungeon mob: vanilla timing, with spawning allowed at any light level. */
-    static CompoundTag spawnerTag(EntityType<?> type) {
+    /** Mobs a dungeon spawner spawns at once, by tier (index 0 is tier 1). Vanilla spawners spawn 4. */
+    public static final int[] SPAWN_COUNT = { 2, 3, 3, 4 };
+    /** How many mobs can be near a dungeon spawner before it stops, by tier. Vanilla spawners allow 6. */
+    public static final int[] MAX_NEARBY = { 4, 5, 6, 6 };
+
+    /**
+     * The spawner settings for a dungeon mob in a dungeon of this tier: vanilla timing, fewer mobs at low tiers (see
+     * {@link #SPAWN_COUNT}), with spawning allowed at any light level.
+     */
+    static CompoundTag spawnerTag(EntityType<?> type, int tier) {
+        int index = DungeonRun.clampTier(tier) - DungeonRun.MIN_TIER;
         CompoundTag entity = new CompoundTag();
         entity.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
         CompoundTag rules = new CompoundTag();
@@ -194,6 +206,12 @@ public final class DungeonMarkers {
         tag.put("SpawnData", spawnData);
         tag.put("SpawnPotentials", potentials);
         tag.putShort("Delay", (short) 20);
+        // Vanilla only reads the spawn count with the delays, and the nearby limit with the player range.
+        tag.putShort("MinSpawnDelay", (short) 200);
+        tag.putShort("MaxSpawnDelay", (short) 800);
+        tag.putShort("SpawnCount", (short) SPAWN_COUNT[index]);
+        tag.putShort("MaxNearbyEntities", (short) MAX_NEARBY[index]);
+        tag.putShort("RequiredPlayerRange", (short) 16);
         return tag;
     }
 

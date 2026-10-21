@@ -49,8 +49,8 @@ public class SkeletonLord extends SkeletonSwordsman {
     }
 
     /**
-     * Makes the Skeleton Lord for a boss arena, and adds his honor guard around him. The lord himself isn't added to
-     * the world yet; {@code DungeonBosses} does that.
+     * Makes the Skeleton Lord for a boss arena. He isn't added to the world yet; {@code DungeonBosses} does that, with
+     * his honor guard.
      */
     public static Mob create(ServerLevel level, BlockPos pos, int tier) {
         SkeletonLord lord = ModEntities.SKELETON_LORD.get().create(level);
@@ -58,14 +58,6 @@ public class SkeletonLord extends SkeletonSwordsman {
         EventHooks.finalizeMobSpawn(lord, level, level.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);
         lord.setCustomName(Component.translatable("entity.dungeondelving.skeleton_lord").withStyle(ChatFormatting.GOLD));
         lord.setCustomNameVisible(true);
-        for (int i = 0; i < GUARDS; i++) {
-            double angle = Math.PI * 2 * i / GUARDS;
-            SkeletonKnight knight = ModEntities.SKELETON_KNIGHT.get().create(level);
-            knight.moveTo(pos.getX() + 0.5 + Math.cos(angle) * 3, pos.getY(), pos.getZ() + 0.5 + Math.sin(angle) * 3, 180.0f, 0.0f);
-            EventHooks.finalizeMobSpawn(knight, level, level.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);
-            knight.setPersistenceRequired();
-            level.addFreshEntity(knight);
-        }
         return lord;
     }
 }

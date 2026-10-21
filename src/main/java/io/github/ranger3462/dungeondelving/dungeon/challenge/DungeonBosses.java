@@ -1,11 +1,13 @@
 package io.github.ranger3462.dungeondelving.dungeon.challenge;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.IntPredicate;
@@ -13,10 +15,14 @@ import java.util.function.IntPredicate;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
 import io.github.ranger3462.dungeondelving.entity.SkeletonLord;
+import io.github.ranger3462.dungeondelving.registry.ModEntities;
+import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -40,6 +46,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.WitherSkeleton;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -55,7 +62,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * Dungeon bosses. Each run's boss is picked from the boss types that guard its tier (see {@link #register}), and
  * fights in its own arena when there is one ({@code boss_<boss>_*} pieces). Each boss drops its own loot table,
  * {@code dungeondelving:bosses/<boss>/tier_<n>}, in place of its normal drops, and shows a boss bar to players nearby.
- * When it dies, its arena's spawners shut off.
+ * When it dies, its arena's spawners shut off and an exit appears just inside the boss room's door.
  * <p>
  * The Skeleton Lord guards tier 1, the Barrow King (a big, buffed wither skeleton) tier 2 and up; more bosses come
  * from integrations (e.g. the Goblin Shaman Chief with Iron's Spells).
@@ -68,6 +75,8 @@ public final class DungeonBosses {
     public static final String SKELETON_LORD = "skeleton_lord";
     /** How close players must be to see a boss's health bar. */
     private static final double BAR_RANGE = 48.0;
+    /** How far inside the boss room's door the exit appears. */
+    private static final int EXIT_INSET = 2;
 
     private static final Map<UUID, ServerBossEvent> BARS = new HashMap<>();
 
@@ -86,16 +95,50 @@ public final class DungeonBosses {
         Mob create(ServerLevel level, BlockPos pos, int tier);
     }
 
+    /** Mobs that spawn alongside a boss, e.g. its guards. */
+    @FunctionalInterface
+    public interface Retinue {
+        void spawn(ServerLevel level, BlockPos pos, int tier);
+    }
+
     private static final Map<String, BossType> TYPES = new LinkedHashMap<>();
+    private static final Map<String, List<Retinue>> RETINUES = new HashMap<>();
+    /** Skeleton knights guarding the Barrow King. */
+    public static final int BARROW_KING_GUARDS = 3;
 
     static {
         register(new BossType(BARROW_KING, DungeonFactions.SKELETONS, tier -> tier >= 2, DungeonBosses::createBarrowKing));
         register(new BossType(SKELETON_LORD, DungeonFactions.SKELETONS, tier -> tier == 1, SkeletonLord::create));
+        addRetinue(SKELETON_LORD, (level, pos, tier) -> ring(level, pos, ModEntities.SKELETON_KNIGHT.get(), SkeletonLord.GUARDS, 3.0, 0.0));
+        addRetinue(BARROW_KING, (level, pos, tier) -> ring(level, pos, ModEntities.SKELETON_KNIGHT.get(), BARROW_KING_GUARDS, 3.0, 0.0));
     }
 
     /** Adds a boss type, e.g. from an optional integration. */
     public static void register(BossType type) {
         TYPES.put(type.id(), type);
+    }
+
+    /** Adds mobs that spawn with a boss, e.g. from an optional integration. */
+    public static void addRetinue(String boss, Retinue retinue) {
+        RETINUES.computeIfAbsent(boss, id -> new ArrayList<>()).add(retinue);
+    }
+
+    /**
+     * Spawns {@code count} mobs of a type in a ring around a position, persistent and facing the way in. {@code turn}
+     * rotates the ring (as a fraction of a full turn), so two rings don't overlap.
+     */
+    public static void ring(ServerLevel level, BlockPos pos, EntityType<? extends Mob> type, int count, double radius, double turn) {
+        for (int i = 0; i < count; i++) {
+            double angle = Math.PI * 2 * (i + turn) / count;
+            Mob mob = type.create(level);
+            if (mob == null) {
+                continue;
+            }
+            mob.moveTo(pos.getX() + 0.5 + Math.cos(angle) * radius, pos.getY(), pos.getZ() + 0.5 + Math.sin(angle) * radius, 180.0f, 0.0f);
+            EventHooks.finalizeMobSpawn(mob, level, level.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);
+            mob.setPersistenceRequired();
+            level.addFreshEntity(mob);
+        }
     }
 
     public static Set<String> bossIds() {
@@ -138,11 +181,12 @@ public final class DungeonBosses {
         tag.putInt("region", region);
         mob.getPersistentData().put(BOSS_TAG, tag);
         level.addFreshEntity(mob);
-        DungeonChallenges.rallySpawners(level, DungeonDimension.roomMinAt(pos));
+        RETINUES.getOrDefault(type.id(), List.of()).forEach(retinue -> retinue.spawn(level, pos, tier));
+        DungeonChallenges.rallySpawners(level, DungeonDimension.roomMinAt(pos), tier);
         return mob;
     }
 
-    /** The Barrow King: a big, buffed wither skeleton in a gold crown. */
+    /** The Barrow King: a big, buffed wither skeleton in a gold crown, with his court (see {@link #addRetinue}). */
     private static Mob createBarrowKing(ServerLevel level, BlockPos pos, int tier) {
         WitherSkeleton king = EntityType.WITHER_SKELETON.create(level);
         king.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0.0f, 0.0f);
@@ -203,6 +247,26 @@ public final class DungeonBosses {
         DungeonChallenges.tellRegion(level, tag.getInt("region"),
                 Component.translatable("message.dungeondelving.boss_defeated", boss.getDisplayName()).withStyle(ChatFormatting.GOLD));
         DungeonChallenges.clearSpawners(level, DungeonDimension.roomMinAt(boss.blockPosition()), tag.getInt("tier"), false);
+        DungeonRegions.get().progress(tag.getInt("region")).flatMap(progress -> exitPos(progress.door()))
+                .ifPresent(pos -> level.setBlock(pos, ModRegistries.DUNGEON_EXIT.get().defaultBlockState(), Block.UPDATE_ALL));
+    }
+
+    /**
+     * Where the exit appears once the boss is dead: on the floor just inside the boss room's door, so players don't
+     * have to walk back to the start. Empty if there's no door.
+     */
+    public static Optional<BlockPos> exitPos(List<BlockPos> door) {
+        if (door.isEmpty()) {
+            return Optional.empty();
+        }
+        int bottom = door.stream().mapToInt(BlockPos::getY).min().getAsInt();
+        List<BlockPos> sill = door.stream().filter(pos -> pos.getY() == bottom).toList();
+        BlockPos middle = sill.get(sill.size() / 2);
+        BlockPos center = DungeonDimension.roomCenterAt(middle);
+        int dx = center.getX() - middle.getX();
+        int dz = center.getZ() - middle.getZ();
+        Direction inward = Math.abs(dx) > Math.abs(dz) ? (dx > 0 ? Direction.EAST : Direction.WEST) : (dz > 0 ? Direction.SOUTH : Direction.NORTH);
+        return Optional.of(middle.relative(inward, EXIT_INSET));
     }
 
     // --- Boss bars ---

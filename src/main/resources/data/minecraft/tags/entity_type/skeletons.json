@@ -3,6 +3,10 @@
   "values": [
     "dungeondelving:skeleton_swordsman",
     "dungeondelving:skeleton_knight",
-    "dungeondelving:skeleton_lord"
+    "dungeondelving:skeleton_lord",
+    {
+      "id": "dungeondelving:skeleton_mage",
+      "required": false
+    }
   ]
 }

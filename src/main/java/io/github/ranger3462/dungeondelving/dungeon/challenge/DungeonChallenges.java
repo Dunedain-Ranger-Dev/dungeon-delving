@@ -155,12 +155,16 @@ public final class DungeonChallenges {
     /** How often a boss arena's spawners spawn once the boss is out, in ticks (vanilla spawners wait 200 to 800). */
     public static final int RALLY_MIN_DELAY = 40;
     public static final int RALLY_MAX_DELAY = 100;
+    /** Mobs a rallied spawner spawns at once, and how many can be near it before it stops, by tier (index 0 is tier 1). */
+    public static final int[] RALLY_SPAWN_COUNT = { 1, 2, 2, 3 };
+    public static final int[] RALLY_MAX_NEARBY = { 4, 6, 8, 10 };
 
     /**
      * Speeds up every spawner in a room (whose minimum corner is {@code roomMin}): they spawn every few seconds, a few
      * mobs at a time, from farther away. Used when a boss appears, so its arena fills with its minions.
      */
-    public static int rallySpawners(ServerLevel level, BlockPos roomMin) {
+    public static int rallySpawners(ServerLevel level, BlockPos roomMin, int tier) {
+        int index = DungeonRun.clampTier(tier) - DungeonRun.MIN_TIER;
         int rallied = 0;
         for (BlockPos pos : BlockPos.betweenClosed(roomMin, roomMin.offset(RoomSpec.ROOM_SIZE - 1, RoomSpec.ROOM_HEIGHT - 1, RoomSpec.ROOM_SIZE - 1))) {
             if (level.getBlockEntity(pos) instanceof SpawnerBlockEntity spawner) {
@@ -168,8 +172,8 @@ public final class DungeonChallenges {
                 tag.putShort("Delay", (short) 20);
                 tag.putShort("MinSpawnDelay", (short) RALLY_MIN_DELAY);
                 tag.putShort("MaxSpawnDelay", (short) RALLY_MAX_DELAY);
-                tag.putShort("SpawnCount", (short) 3);
-                tag.putShort("MaxNearbyEntities", (short) 10);
+                tag.putShort("SpawnCount", (short) RALLY_SPAWN_COUNT[index]);
+                tag.putShort("MaxNearbyEntities", (short) RALLY_MAX_NEARBY[index]);
                 tag.putShort("RequiredPlayerRange", (short) 32);
                 spawner.getSpawner().load(level, pos.immutable(), tag);
                 spawner.setChanged();

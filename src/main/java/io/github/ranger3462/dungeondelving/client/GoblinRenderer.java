@@ -6,9 +6,11 @@ import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.entity.Goblin;
 import io.github.ranger3462.dungeondelving.integration.irons.GoblinShamanRenderer;
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
+import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -18,7 +20,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 /**
  * Draws goblins with the vanilla humanoid body, shrunk to three quarters size, with each goblin type's own texture
- * ({@code textures/entity/<type>.png}). A placeholder until a custom goblin model exists.
+ * ({@code textures/entity/<type>.png}) and any armor they wear. A placeholder until a custom goblin model exists.
  */
 public class GoblinRenderer<T extends Goblin> extends HumanoidMobRenderer<T, GoblinModel<T>> {
     private static final float SCALE = 0.75f;
@@ -26,6 +28,8 @@ public class GoblinRenderer<T extends Goblin> extends HumanoidMobRenderer<T, Gob
 
     public GoblinRenderer(EntityRendererProvider.Context context, String type) {
         super(context, new GoblinModel<>(context.bakeLayer(ModelLayers.ZOMBIE)), 0.4f);
+        addLayer(new HumanoidArmorLayer<>(this, new HumanoidModel<>(context.bakeLayer(ModelLayers.ZOMBIE_INNER_ARMOR)),
+                new HumanoidModel<>(context.bakeLayer(ModelLayers.ZOMBIE_OUTER_ARMOR)), context.getModelManager()));
         this.texture = DungeonDelving.id("textures/entity/" + type + ".png");
     }
 
