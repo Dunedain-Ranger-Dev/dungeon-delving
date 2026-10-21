@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -19,6 +20,7 @@ import net.minecraft.nbt.Tag;
 public final class DungeonProgress {
     private final int tier;
     private final String boss;
+    private String faction = DungeonFactions.SKELETONS;
     private final int keysNeeded;
     private final List<BlockPos> door;
     private BlockPos bossSpawn;
@@ -48,6 +50,16 @@ public final class DungeonProgress {
 
     public int tier() {
         return tier;
+    }
+
+    /** Who holds this dungeon (a {@link DungeonFactions} id). */
+    public String faction() {
+        return faction;
+    }
+
+    public DungeonProgress withFaction(String faction) {
+        this.faction = faction;
+        return this;
     }
 
     /** Which boss guards this dungeon (a {@link DungeonBosses} type id). */
@@ -148,6 +160,7 @@ public final class DungeonProgress {
         CompoundTag tag = new CompoundTag();
         tag.putInt("tier", tier);
         tag.putString("boss", boss);
+        tag.putString("faction", faction);
         tag.putInt("keys_needed", keysNeeded);
         tag.putInt("keys_used", keysUsed);
         tag.putBoolean("boss_spawned", bossSpawned);
@@ -183,6 +196,9 @@ public final class DungeonProgress {
         DungeonProgress progress = new DungeonProgress(tag.getInt("tier"), boss, tag.getInt("keys_needed"), door,
                 tag.contains("boss_spawn") ? BlockPos.of(tag.getLong("boss_spawn")) : null);
         progress.keysUsed = tag.getInt("keys_used");
+        if (tag.contains("faction")) {
+            progress.faction = tag.getString("faction");
+        }
         progress.bossSpawned = tag.getBoolean("boss_spawned");
         for (Tag huntTag : tag.getList("hunters", Tag.TAG_COMPOUND)) {
             CompoundTag hunt = (CompoundTag) huntTag;

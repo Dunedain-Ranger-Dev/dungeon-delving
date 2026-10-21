@@ -1,6 +1,7 @@
 package io.github.ranger3462.dungeondelving.integration.irons;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonBosses;
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
@@ -74,7 +75,7 @@ public final class IronsGoblins {
                         new AttributeContainer(AttributeRegistry.FIRE_SPELL_POWER, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE),
                         new AttributeContainer(AttributeRegistry.NATURE_SPELL_POWER, 0.10, AttributeModifier.Operation.ADD_MULTIPLIED_BASE))))),
                 new Item.Properties().stacksTo(1).rarity(Rarity.RARE).fireResistant());
-        DungeonBosses.register(new DungeonBosses.BossType(GOBLIN_CHIEF_BOSS, tier -> tier == 1, IronsGoblins::createChief));
+        DungeonBosses.register(new DungeonBosses.BossType(GOBLIN_CHIEF_BOSS, DungeonFactions.GOBLINS, tier -> tier == 1, IronsGoblins::createChief));
         modEventBus.addListener(IronsGoblins::onAttributes);
         modEventBus.addListener(IronsGoblins::onSpawnPlacements);
     }

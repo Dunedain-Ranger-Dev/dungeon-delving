@@ -33,7 +33,7 @@ public final class DungeonTravel {
     private DungeonTravel() {}
 
     /** The result of entering a dungeon: the run, and the layout being built for it. */
-    public record Entry(DungeonRun run, DungeonLayout layout, LayoutType type) {}
+    public record Entry(DungeonRun run, DungeonLayout layout, LayoutType type, String faction) {}
 
     /**
      * Starts a run in a fresh region: generates a layout, places the start room and its exit right away, queues the
@@ -45,6 +45,11 @@ public final class DungeonTravel {
 
     /** Starts a run with a given layout type. */
     public static Entry enter(ServerPlayer player, int roomCount, int tier, LayoutType type) {
+        return enter(player, roomCount, tier, type, DungeonFactions.pick(tier, player.getRandom()));
+    }
+
+    /** Starts a run with a given layout type, held by a given faction. */
+    public static Entry enter(ServerPlayer player, int roomCount, int tier, LayoutType type, String faction) {
         tier = DungeonRun.clampTier(tier);
         ServerLevel dungeon = dungeonLevel(player);
         DungeonRegions regions = DungeonRegions.get();
@@ -54,13 +59,13 @@ public final class DungeonTravel {
         DungeonLayout layout = DungeonLayoutGenerator.generate(dungeon.getRandom(), roomCount, DungeonProgress.keysFor(tier), type);
         int challengeRooms = (int) layout.rooms().values().stream().filter(room -> room.kind() == DungeonLayout.RoomKind.CHALLENGE).count();
         List<BlockPos> door = DungeonBuilder.bossDoor(layout, center);
-        String boss = DungeonBosses.pick(tier, dungeon.getRandom());
+        String boss = DungeonBosses.pick(tier, faction, dungeon.getRandom());
         regions.startProgress(region, new DungeonProgress(tier, boss, Math.min(DungeonProgress.keysFor(tier), challengeRooms), door,
-                DungeonBuilder.bossRoomCenter(layout, center).orElse(null)));
+                DungeonBuilder.bossRoomCenter(layout, center).orElse(null)).withFaction(faction));
 
         DungeonPieces pieces = DungeonPieces.load(player.server);
         List<Placement> placements = DungeonBuilder.plan(layout, pieces, center, dungeon.getRandom(), boss);
-        DungeonMarkers.Rolls rolls = DungeonMarkers.Rolls.fromConfig(tier, region);
+        DungeonMarkers.Rolls rolls = DungeonMarkers.Rolls.fromConfig(tier, region, faction);
         DungeonBuilder.place(dungeon, placements.getFirst(), rolls);
         dungeon.setBlock(center.above(), ModRegistries.DUNGEON_EXIT.get().defaultBlockState(), Block.UPDATE_ALL);
         DungeonBuildQueue.add(region, placements.subList(1, placements.size()), rolls);
@@ -71,7 +76,7 @@ public final class DungeonTravel {
                 player.getZ(), player.getYRot(), player.getXRot());
         regions.startRun(run);
         player.teleportTo(dungeon, center.getX() + 0.5, center.getY() + 1, center.getZ() + ARRIVAL_OFFSET + 0.5, 180.0f, 0.0f);
-        return new Entry(run, layout, type);
+        return new Entry(run, layout, type, faction);
     }
 
     /**

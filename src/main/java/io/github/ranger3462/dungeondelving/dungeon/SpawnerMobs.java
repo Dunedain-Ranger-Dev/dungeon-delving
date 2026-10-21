@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import io.github.ranger3462.dungeondelving.Config;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -15,16 +14,13 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 
 /**
- * Which mobs dungeon spawners spawn, and how often: the {@code spawnerMobs} config, a list of {@code "mob=weight"}
- * entries. A mob can be an entity id ({@code dungeondelving:goblin}) or an entity tag ({@code #dungeondelving:dungeon_mobs},
+ * Which mobs dungeon spawners spawn, and how often: each faction's {@code <faction>Mobs} config, a list of
+ * {@code "mob=weight"} entries (see {@link DungeonFactions}). A mob can be an entity id ({@code dungeondelving:goblin}) or an entity tag ({@code #dungeondelving:dungeon_mobs},
  * any mob in it). An entry can be limited to some dungeon tiers with {@code @}: {@code "...=25@2-4"} (tiers 2 to 4) or
  * {@code "...=10@3"} (tier 3 only). Entries for mobs that aren't installed (e.g. the goblin shaman without Iron's Spells)
  * are skipped.
  */
 public final class SpawnerMobs {
-    public static final List<String> DEFAULTS = List.of("dungeondelving:goblin=60", "dungeondelving:goblin_archer=25", "dungeondelving:goblin_shaman=15",
-            "dungeondelving:skeleton_swordsman=30@2-4");
-
     /** One parsed entry: an entity id or tag, its weight, and the tiers it spawns in. */
     public record Entry(ResourceLocation id, boolean tag, int weight, int minTier, int maxTier) {
         public boolean spawnsIn(int tier) {
@@ -71,9 +67,9 @@ public final class SpawnerMobs {
         }
     }
 
-    /** A random spawner mob from the config, for a dungeon of this tier. */
-    public static Optional<Holder<EntityType<?>>> pick(ServerLevel level, RandomSource random, int tier) {
-        return pick(level, random, Config.SPAWNER_MOBS.get(), tier);
+    /** A random spawner mob for a dungeon held by this faction, of this tier. An unknown faction falls back to the general mob tag. */
+    public static Optional<Holder<EntityType<?>>> pick(ServerLevel level, RandomSource random, String faction, int tier) {
+        return pick(level, random, DungeonFactions.mobs(faction), tier);
     }
 
     /** A random mob from a list of entries, ignoring tiers. */

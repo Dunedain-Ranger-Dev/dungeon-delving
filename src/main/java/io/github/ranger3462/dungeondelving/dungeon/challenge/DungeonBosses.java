@@ -12,6 +12,7 @@ import java.util.function.IntPredicate;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
 import io.github.ranger3462.dungeondelving.entity.SkeletonLord;
 import net.minecraft.ChatFormatting;
@@ -77,8 +78,8 @@ public final class DungeonBosses {
         return ResourceKey.create(Registries.LOOT_TABLE, DungeonDelving.id("bosses/" + boss + "/tier_" + DungeonRun.clampTier(tier)));
     }
 
-    /** A kind of boss: which tiers it can guard, and how to make one (without adding it to the world). */
-    public record BossType(String id, IntPredicate tiers, Spawner spawner) {}
+    /** A kind of boss: its faction, which tiers it can guard, and how to make one (without adding it to the world). */
+    public record BossType(String id, String faction, IntPredicate tiers, Spawner spawner) {}
 
     @FunctionalInterface
     public interface Spawner {
@@ -88,8 +89,8 @@ public final class DungeonBosses {
     private static final Map<String, BossType> TYPES = new LinkedHashMap<>();
 
     static {
-        register(new BossType(BARROW_KING, tier -> tier >= 2, DungeonBosses::createBarrowKing));
-        register(new BossType(SKELETON_LORD, tier -> tier == 1, SkeletonLord::create));
+        register(new BossType(BARROW_KING, DungeonFactions.SKELETONS, tier -> tier >= 2, DungeonBosses::createBarrowKing));
+        register(new BossType(SKELETON_LORD, DungeonFactions.SKELETONS, tier -> tier == 1, SkeletonLord::create));
     }
 
     /** Adds a boss type, e.g. from an optional integration. */
@@ -101,10 +102,21 @@ public final class DungeonBosses {
         return Collections.unmodifiableSet(TYPES.keySet());
     }
 
-    /** Picks the boss for a dungeon of this tier: any boss that guards the tier, or the Barrow King if none does. */
+    /** Picks the boss for a dungeon of this tier from any faction: any boss that guards the tier, or the Barrow King. */
     public static String pick(int tier, RandomSource random) {
-        List<BossType> candidates = TYPES.values().stream().filter(type -> type.tiers().test(tier)).toList();
+        return pick(tier, null, random);
+    }
+
+    /** Picks the boss for a dungeon of this tier held by this faction (any faction if null), or the Barrow King if none fits. */
+    public static String pick(int tier, String faction, RandomSource random) {
+        List<BossType> candidates = TYPES.values().stream()
+                .filter(type -> type.tiers().test(tier) && (faction == null || type.faction().equals(faction))).toList();
         return candidates.isEmpty() ? BARROW_KING : candidates.get(random.nextInt(candidates.size())).id();
+    }
+
+    /** Whether a faction has a boss for this tier. */
+    public static boolean guards(String faction, int tier) {
+        return TYPES.values().stream().anyMatch(type -> type.faction().equals(faction) && type.tiers().test(tier));
     }
 
     /** Spawns the Barrow King for a dungeon of this tier. */

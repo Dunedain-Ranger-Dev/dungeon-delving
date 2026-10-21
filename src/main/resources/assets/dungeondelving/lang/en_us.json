@@ -58,7 +58,6 @@
   "entity.dungeondelving.goblin_archer": "Goblin Archer",
   "item.dungeondelving.goblin_archer_spawn_egg": "Goblin Archer Spawn Egg",
   "item.dungeondelving.goblin_bow": "Goblin Bow",
-  "dungeondelving.configuration.spawnerMobs": "Dungeon spawner mobs",
   "entity.dungeondelving.goblin_shaman": "Goblin Shaman",
   "item.dungeondelving.goblin_shaman_spawn_egg": "Goblin Shaman Spawn Egg",
   "item.dungeondelving.runic_key_1": "Runic Key I",
@@ -90,5 +89,9 @@
   "entity.dungeondelving.skeleton_lord": "Skeleton Lord",
   "item.dungeondelving.skeleton_swordsman_spawn_egg": "Skeleton Swordsman Spawn Egg",
   "item.dungeondelving.skeleton_knight_spawn_egg": "Skeleton Knight Spawn Egg",
-  "item.dungeondelving.skeleton_lord_spawn_egg": "Skeleton Lord Spawn Egg"
+  "item.dungeondelving.skeleton_lord_spawn_egg": "Skeleton Lord Spawn Egg",
+  "message.dungeondelving.faction.goblins": "Goblin war-drums echo up from below.",
+  "message.dungeondelving.faction.skeletons": "The dead stir in these halls.",
+  "dungeondelving.configuration.goblinMobs": "Goblin dungeon mobs",
+  "dungeondelving.configuration.skeletonMobs": "Skeleton dungeon mobs"
 }

@@ -1,8 +1,11 @@
 package io.github.ranger3462.dungeondelving.gametest;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.SpawnerMobs;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonBosses;
 import io.github.ranger3462.dungeondelving.entity.SkeletonKnight;
@@ -87,15 +90,18 @@ public class SkeletonTests {
     }
 
     @GameTest(template = ANY_TEMPLATE)
-    public static void swordsmenSpawnFromTierTwo(GameTestHelper helper) {
+    public static void skeletonDungeonsSpawnSkeletons(GameTestHelper helper) {
         RandomSource random = RandomSource.create(4);
-        boolean tierTwo = false;
+        Set<EntityType<?>> tierOne = new HashSet<>();
+        Set<EntityType<?>> tierTwo = new HashSet<>();
         for (int i = 0; i < 400; i++) {
-            EntityType<?> tierOne = SpawnerMobs.pick(helper.getLevel(), random, SpawnerMobs.DEFAULTS, 1).orElseThrow().value();
-            helper.assertTrue(tierOne != ModEntities.SKELETON_SWORDSMAN.get(), "swordsmen shouldn't spawn in tier 1");
-            tierTwo |= SpawnerMobs.pick(helper.getLevel(), random, SpawnerMobs.DEFAULTS, 2).orElseThrow().value() == ModEntities.SKELETON_SWORDSMAN.get();
+            tierOne.add(SpawnerMobs.pick(helper.getLevel(), random, DungeonFactions.SKELETON_DEFAULTS, 1).orElseThrow().value());
+            tierTwo.add(SpawnerMobs.pick(helper.getLevel(), random, DungeonFactions.SKELETON_DEFAULTS, 2).orElseThrow().value());
         }
-        helper.assertTrue(tierTwo, "swordsmen should spawn in tier 2");
+        helper.assertTrue(tierOne.equals(Set.of(ModEntities.SKELETON_SWORDSMAN.get(), EntityType.SKELETON)),
+                "tier 1 skeleton dungeons should spawn swordsmen and skeleton archers, got " + tierOne);
+        helper.assertTrue(tierTwo.contains(ModEntities.SKELETON_KNIGHT.get()) && tierTwo.contains(EntityType.WITHER_SKELETON),
+                "tier 2 skeleton dungeons should add knights and wither skeletons, got " + tierTwo);
         helper.succeed();
     }
 

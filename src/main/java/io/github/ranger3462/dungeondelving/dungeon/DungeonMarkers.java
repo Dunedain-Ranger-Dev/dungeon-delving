@@ -36,7 +36,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * Turns the marker blocks builders place in dungeon pieces into content, freshly rolled every run:
  * <ul>
  * <li>Loot marker: a chest with the tier's {@code dungeondelving:chests/tier_<n>/room} loot, or nothing.</li>
- * <li>Mob marker: a monster spawner for a random mob from the {@code spawnerMobs} config (see {@link SpawnerMobs}). Dungeon
+ * <li>Mob marker: a monster spawner for a random mob of the dungeon's faction (see {@link DungeonFactions}). Dungeon
  * spawners ignore light level, so lit rooms still spawn mobs.</li>
  * <li>Resource marker: the dungeon's tier ore, the common dungeon ore, an ore from the
  * {@code dungeondelving:dungeon_resources} block tag or the tier's {@code dungeondelving:dungeon_resources/tier_<n>}
@@ -56,18 +56,20 @@ public final class DungeonMarkers {
      * The dungeon's tier and region, and the chances used when rolling its markers. The region is -1 when a piece is
      * placed outside a run (e.g. in tests), so hunts and the boss aren't tracked.
      */
-    public record Rolls(int tier, double lootChance, double resourceChance, double tierOreChance, double commonOreChance, int region) {
+    public record Rolls(int tier, double lootChance, double resourceChance, double tierOreChance, double commonOreChance, int region,
+            String faction) {
         public Rolls(int tier, double lootChance, double resourceChance, double tierOreChance, double commonOreChance) {
-            this(tier, lootChance, resourceChance, tierOreChance, commonOreChance, -1);
+            this(tier, lootChance, resourceChance, tierOreChance, commonOreChance, -1, null);
         }
 
         public static Rolls fromConfig(int tier) {
-            return fromConfig(tier, -1);
+            return fromConfig(tier, -1, null);
         }
 
-        public static Rolls fromConfig(int tier, int region) {
+        /** The config's chances, for a run in a region held by a faction (null for none, e.g. outside a run). */
+        public static Rolls fromConfig(int tier, int region, String faction) {
             return new Rolls(tier, Config.LOOT_MARKER_CHANCE.get(), Config.RESOURCE_MARKER_CHANCE.get(), Config.TIER_ORE_CHANCE.get(),
-                    Config.COMMON_ORE_CHANCE.get(), region);
+                    Config.COMMON_ORE_CHANCE.get(), region, faction);
         }
     }
 
@@ -115,9 +117,9 @@ public final class DungeonMarkers {
             Block block = random.nextDouble() < rolls.resourceChance() ? pickOre(level, random, rolls).orElse(null) : null;
             level.setBlock(pos, (block != null ? block : ModRegistries.HALLSTONE.get()).defaultBlockState(), Block.UPDATE_CLIENTS);
         } else if (marker == ModRegistries.MOB_MARKER.get()) {
-            placeSpawner(level, pos, random, rolls.tier());
+            placeSpawner(level, pos, random, rolls);
         } else if (marker == ModRegistries.HUNT_MARKER.get()) {
-            placeSpawner(level, pos, random, rolls.tier());
+            placeSpawner(level, pos, random, rolls);
             DungeonChallenges.addHunter(rolls.region(), DungeonDimension.roomMinAt(pos).asLong());
         } else if (marker == ModRegistries.BOSS_MARKER.get() && rolls.region() >= 0) {
             DungeonRegions.get().progress(rolls.region()).ifPresent(progress -> {
@@ -161,8 +163,8 @@ public final class DungeonMarkers {
      * A monster spawner for a random dungeon mob. Its spawns carry custom light rules (any block or sky light), since
      * vanilla monsters otherwise only spawn in darkness.
      */
-    private static void placeSpawner(ServerLevel level, BlockPos pos, RandomSource random, int tier) {
-        Optional<Holder<EntityType<?>>> mob = SpawnerMobs.pick(level, random, tier);
+    private static void placeSpawner(ServerLevel level, BlockPos pos, RandomSource random, Rolls rolls) {
+        Optional<Holder<EntityType<?>>> mob = SpawnerMobs.pick(level, random, rolls.faction(), rolls.tier());
         if (mob.isEmpty()) {
             return;
         }

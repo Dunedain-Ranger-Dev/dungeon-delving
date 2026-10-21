@@ -2,6 +2,7 @@ package io.github.ranger3462.dungeondelving;
 
 import java.util.List;
 
+import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
 import io.github.ranger3462.dungeondelving.dungeon.SpawnerMobs;
 import io.github.ranger3462.dungeondelving.dungeon.layout.LayoutType;
@@ -54,17 +55,23 @@ public final class Config {
                     "tier and common chances is a vanilla ore from the dungeondelving:dungeon_resources block tag.")
             .defineInRange("commonOreChance", 0.45, 0.0, 1.0);
 
-    public static final ModConfigSpec.ConfigValue<List<? extends String>> SPAWNER_MOBS = BUILDER
-            .comment("Which mobs dungeon spawners spawn, as \"mob=weight\" entries: higher weights spawn more often. A mob is an",
-                    "entity id, or an entity tag starting with # (any mob in it, e.g. \"#dungeondelving:dungeon_mobs=10\").",
-                    "Mobs that aren't installed are skipped (the goblin shaman needs Iron's Spells).")
-            .defineList("spawnerMobs", SpawnerMobs.DEFAULTS, () -> "dungeondelving:goblin=1",
-                    value -> value instanceof String text && SpawnerMobs.parse(text).isPresent());
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> GOBLIN_MOBS = mobList("goblinMobs", "goblin",
+            DungeonFactions.GOBLIN_DEFAULTS);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> SKELETON_MOBS = mobList("skeletonMobs", "skeleton",
+            DungeonFactions.SKELETON_DEFAULTS);
 
     public static final ModConfigSpec.BooleanValue BLOCK_NATURAL_SPAWNS = BUILDER
             .comment("Stop mobs spawning naturally in dungeons (including at world generation and as patrols), so every",
                     "dungeon mob comes from a mob marker or spawner.")
             .define("blockNaturalSpawns", true);
+
+    /** A faction's spawner mob list. */
+    private static ModConfigSpec.ConfigValue<List<? extends String>> mobList(String key, String faction, List<String> defaults) {
+        return BUILDER.comment("Which mobs spawners spawn in " + faction + " dungeons, as \"mob=weight\" entries: higher weights spawn more",
+                "often. A mob is an entity id, or an entity tag starting with #. Add @tiers to limit an entry, e.g. \"...=20@2-4\".",
+                "Mobs that aren't installed are skipped (the goblin shaman needs Iron's Spells).")
+                .defineList(key, defaults, () -> "minecraft:zombie=1", value -> value instanceof String text && SpawnerMobs.parse(text).isPresent());
+    }
 
     static final ModConfigSpec SPEC = BUILDER.build();
 

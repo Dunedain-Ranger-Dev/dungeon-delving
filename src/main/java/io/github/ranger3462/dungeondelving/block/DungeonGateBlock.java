@@ -50,6 +50,7 @@ public class DungeonGateBlock extends Block {
             int keys = DungeonRegions.get().progress(entry.run().region()).map(progress -> progress.keysNeeded()).orElse(0);
             serverPlayer.sendSystemMessage(Component.translatable("message.dungeondelving.gate_entered", key.tier(), entry.layout().rooms().size(), keys)
                     .withStyle(ChatFormatting.GOLD));
+            serverPlayer.sendSystemMessage(Component.translatable("message.dungeondelving.faction." + entry.faction()).withStyle(ChatFormatting.DARK_RED));
             if (entry.type() != LayoutType.NORMAL) {
                 serverPlayer.sendSystemMessage(Component.translatable("message.dungeondelving.layout." + entry.type().id()).withStyle(ChatFormatting.YELLOW));
             }

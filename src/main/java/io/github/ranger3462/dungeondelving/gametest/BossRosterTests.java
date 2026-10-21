@@ -1,8 +1,11 @@
 package io.github.ranger3462.dungeondelving.gametest;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonBosses;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonProgress;
@@ -52,6 +55,24 @@ public class BossRosterTests {
                 helper.assertTrue(DungeonBosses.pick(tier, random).equals(DungeonBosses.BARROW_KING), "tier " + tier + " should be the Barrow King's");
             }
         }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void eachDungeonBelongsToOneFaction(GameTestHelper helper) {
+        RandomSource random = RandomSource.create(6);
+        Set<String> tierOne = new HashSet<>();
+        for (int i = 0; i < 100; i++) {
+            String faction = DungeonFactions.pick(1, random);
+            tierOne.add(faction);
+            helper.assertTrue(DungeonFactions.pick(2, random).equals(DungeonFactions.SKELETONS), "tier 2 dungeons are skeleton dungeons for now");
+            String boss = DungeonBosses.pick(1, faction, random);
+            helper.assertTrue(faction.equals(DungeonFactions.GOBLINS) ? boss.equals(CHIEF) : boss.equals(DungeonBosses.SKELETON_LORD),
+                    "a tier 1 " + faction + " dungeon got the wrong boss: " + boss);
+        }
+        helper.assertTrue(tierOne.equals(irons() ? Set.of(DungeonFactions.GOBLINS, DungeonFactions.SKELETONS) : Set.of(DungeonFactions.SKELETONS)),
+                "tier 1 should roll goblins (with Iron's Spells, for the chief) and skeletons, got " + tierOne);
+        helper.assertTrue(DungeonBosses.pick(2, DungeonFactions.SKELETONS, random).equals(DungeonBosses.BARROW_KING), "tier 2 skeletons have the Barrow King");
         helper.succeed();
     }
 

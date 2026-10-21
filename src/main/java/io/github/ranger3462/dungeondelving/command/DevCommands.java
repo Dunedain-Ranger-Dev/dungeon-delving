@@ -7,12 +7,14 @@ import static io.github.ranger3462.dungeondelving.command.Feedback.tell;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
 import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
@@ -22,6 +24,7 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonTravel;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -31,7 +34,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
  * Operator-only commands for testing dungeons without the gate and exit blocks:
- * {@code /dungeondelving dungeon enter [rooms] [tier]|enter tier <tier> [normal|resource|loot]|keys|leave|fail|regions}. Without a room count, the
+ * {@code /dungeondelving dungeon enter [rooms] [tier]|enter tier <tier> [normal|resource|loot]|enter faction <faction> <tier>|keys|leave|fail|regions}. Without a room count, the
  * count is rolled from the tier's {@code roomCounts} range.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
@@ -49,6 +52,19 @@ public final class DevCommands {
                 .then(Commands.literal("dungeon")
                         .then(Commands.literal("enter")
                                 .executes(context -> enter(context, rolledRooms(context, DungeonRun.MIN_TIER), DungeonRun.MIN_TIER))
+                                .then(Commands.literal("faction")
+                                        .then(Commands.argument("faction", StringArgumentType.word())
+                                                .suggests((context, builder) -> SharedSuggestionProvider.suggest(DungeonFactions.ids(), builder))
+                                                .then(Commands.argument("tier", IntegerArgumentType.integer(DungeonRun.MIN_TIER, DungeonRun.MAX_TIER))
+                                                        .executes(context -> {
+                                                            int tier = IntegerArgumentType.getInteger(context, "tier");
+                                                            String faction = StringArgumentType.getString(context, "faction");
+                                                            if (!DungeonFactions.ids().contains(faction)) {
+                                                                fail(context.getSource(), "Unknown faction " + faction + "; try " + DungeonFactions.ids());
+                                                                return 0;
+                                                            }
+                                                            return enterFaction(context, tier, faction);
+                                                        }))))
                                 .then(Commands.literal("tier")
                                         .then(Commands.argument("tier", IntegerArgumentType.integer(DungeonRun.MIN_TIER, DungeonRun.MAX_TIER))
                                                 .executes(context -> {
@@ -78,6 +94,18 @@ public final class DevCommands {
                         .then(Commands.literal("regions").executes(DevCommands::regions))));
     }
 
+    private static int enterFaction(CommandContext<CommandSourceStack> context, int tier, String faction) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        if (DungeonRegions.get().run(player.getUUID()).isPresent()) {
+            fail(context.getSource(), "You are already in a dungeon. Leave it first.");
+            return 0;
+        }
+        DungeonTravel.Entry entry = DungeonTravel.enter(player, rolledRooms(context, tier), tier, LayoutType.roll(player.getRandom()), faction);
+        tell(context.getSource(), "Entered tier " + tier + " " + entry.type().id() + " " + faction + " dungeon: " + entry.layout().rooms().size()
+                + " rooms, boss " + DungeonRegions.get().progress(entry.run().region()).map(p -> p.boss()).orElse("?"));
+        return 1;
+    }
+
     private static int rolledRooms(CommandContext<CommandSourceStack> context, int tier) {
         return RoomCounts.roll(tier, context.getSource().getLevel().getRandom());
     }
@@ -96,7 +124,7 @@ public final class DevCommands {
         DungeonTravel.Entry entry = type == null ? DungeonTravel.enter(player, rooms, tier) : DungeonTravel.enter(player, rooms, tier, type);
         DungeonRun run = entry.run();
         BlockPos center = DungeonDimension.regionCenter(run.region());
-        tell(context.getSource(), "Entered tier " + run.tier() + " " + entry.type().id() + " dungeon region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ()
+        tell(context.getSource(), "Entered tier " + run.tier() + " " + entry.type().id() + " " + entry.faction() + " dungeon region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ()
                 + "): " + entry.layout().rooms().size() + " rooms, " + entry.layout().connections().size() + " tunnels, "
                 + DungeonRegions.get().progress(run.region()).map(DungeonProgress::keysNeeded).orElse(0) + " keys to open the boss door");
         return 1;

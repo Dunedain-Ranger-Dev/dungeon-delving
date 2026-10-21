@@ -6,6 +6,7 @@ import java.util.Map;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.SpawnerMobs;
 import io.github.ranger3462.dungeondelving.entity.Goblin;
 import io.github.ranger3462.dungeondelving.entity.GoblinArcher;
@@ -69,7 +70,7 @@ public class GoblinTests {
         Map<EntityType<?>, Integer> counts = new HashMap<>();
         int rolls = 4000;
         for (int i = 0; i < rolls; i++) {
-            counts.merge(SpawnerMobs.pick(helper.getLevel(), random, SpawnerMobs.DEFAULTS, 1).orElseThrow().value(), 1, Integer::sum);
+            counts.merge(SpawnerMobs.pick(helper.getLevel(), random, DungeonFactions.GOBLIN_DEFAULTS, 1).orElseThrow().value(), 1, Integer::sum);
         }
         boolean shamans = BuiltInRegistries.ENTITY_TYPE.containsKey(DungeonDelving.id("goblin_shaman"));
         double total = shamans ? 100 : 85;
@@ -78,7 +79,7 @@ public class GoblinTests {
         if (shamans) {
             expectShare(helper, counts, BuiltInRegistries.ENTITY_TYPE.get(DungeonDelving.id("goblin_shaman")), 15 / total, rolls);
         }
-        helper.assertTrue(counts.keySet().stream().allMatch(type -> type.is(GoblinSwarm.GOBLINS)), "tier 1 spawners should only spawn goblins");
+        helper.assertTrue(counts.keySet().stream().allMatch(type -> type.is(GoblinSwarm.GOBLINS)), "goblin dungeon spawners should only spawn goblins");
 
         helper.assertTrue(SpawnerMobs.pick(helper.getLevel(), random, List.of("dungeondelving:not_a_mob=5", "minecraft:zombie=1"))
                 .orElseThrow().value() == EntityType.ZOMBIE, "mobs that don't exist should be skipped");
