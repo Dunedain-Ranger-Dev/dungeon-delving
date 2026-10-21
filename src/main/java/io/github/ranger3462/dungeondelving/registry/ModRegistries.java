@@ -11,6 +11,7 @@ import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsGoblins;
+import io.github.ranger3462.dungeondelving.testing.TestersCharm;
 import io.github.ranger3462.dungeondelving.workshop.RunicWorkshop;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
@@ -82,6 +83,10 @@ public final class ModRegistries {
     public static final DeferredItem<DungeonKeyItem> DUNGEON_KEY = ITEMS.registerItem("dungeon_key", DungeonKeyItem::new,
             new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON));
 
+    /** Testing tool: can't die, damage readout, fast regeneration and mana, and flight. Creative tab only. */
+    public static final DeferredItem<TestersCharm.CharmItem> TESTERS_CHARM = ITEMS.registerItem("testers_charm", TestersCharm.CharmItem::new,
+            new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
+
     /** The dungeon region a Dungeon Key belongs to. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> KEY_REGION = COMPONENTS.registerComponentType("key_region",
             builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT));
@@ -116,6 +121,7 @@ public final class ModRegistries {
                 output.accept(HUNT_MARKER.get());
                 output.accept(BOSS_MARKER.get());
                 output.accept(DUNGEON_KEY.get());
+                output.accept(TESTERS_CHARM.get());
                 output.accept(ModEntities.GOBLIN_SPAWN_EGG.get());
                 output.accept(ModEntities.GOBLIN_SPEAR.get());
                 output.accept(ModEntities.GOBLIN_ARCHER_SPAWN_EGG.get());

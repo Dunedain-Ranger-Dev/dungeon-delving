@@ -73,5 +73,9 @@
   "item.dungeondelving.runic_key.tooltip": "Use on a Dungeon Gate to open a tier %s dungeon.",
   "message.dungeondelving.gate_entered": "You enter a tier %s dungeon of %s rooms. Clear %s challenge rooms for the keys to the boss door, and leave through the exit to keep your loot.",
   "message.dungeondelving.gate_needs_key": "The gate needs a Runic Key. Make one at a Runic Workshop.",
-  "message.dungeondelving.gate_already_inside": "You're already in a dungeon."
+  "message.dungeondelving.gate_already_inside": "You're already in a dungeon.",
+  "item.dungeondelving.testers_charm": "Tester's Charm",
+  "item.dungeondelving.testers_charm.tooltip": "Testing tool. While carried: can't die, hits are reported in chat, fast healing and mana, and flight.",
+  "message.dungeondelving.charm_hit": "Took %s damage (%s hearts) from %s",
+  "message.dungeondelving.charm_hit_by": "%s (%s)"
 }
