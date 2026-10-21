@@ -116,14 +116,10 @@ def named(name, color, lore):
     ]
 
 
-def barrow_king(tier):
-    """The Barrow King: the boss pays out about half a run's rewards, plus a chance at its signature crown."""
+def boss_loot(tier, signature):
+    """A boss's drops: about half a run's rewards, plus a 1 in 4 chance at its signature item."""
     t = tier
-    crown = item("minecraft:golden_helmet", 1, extra=named("Barrow King's Crown", "gold", "Still cold from the barrow.") + [{
-        "function": "minecraft:enchant_with_levels",
-        "levels": {"type": "minecraft:uniform", "min": 10 * t, "max": 10 + 10 * t},
-    }])
-    signature = [crown, nothing(3)]
+    signature = [signature, nothing(3)]
     ingots = [item(f"{NS}:{TIER_ORES[t]}_ingot", 1, 3, 3 + 2 * t)]
     common = [item(f"{NS}:{COMMON_ORE}_ingot", 1, 4, 6 + 2 * t)]
     valuables = [
@@ -145,12 +141,29 @@ def barrow_king(tier):
     return {"type": "minecraft:entity", "pools": pools}
 
 
-BOSSES = {"barrow_king": barrow_king}
+def barrow_king(tier):
+    """The Barrow King's signature drop: his crown."""
+    return boss_loot(tier, item("minecraft:golden_helmet", 1, extra=named("Barrow King's Crown", "gold", "Still cold from the barrow.") + [{
+        "function": "minecraft:enchant_with_levels",
+        "levels": {"type": "minecraft:uniform", "min": 10 * tier, "max": 10 + 10 * tier},
+    }]))
+
+
+def goblin_chief(tier):
+    """The Goblin Shaman Chief's signature drop: his staff. Needs Iron's Spells, like the chief himself."""
+    table = boss_loot(tier, item(f"{NS}:goblin_chief_staff", 1))
+    table["neoforge:conditions"] = [{"type": "neoforge:mod_loaded", "modid": "irons_spellbooks"}]
+    return table
+
+
+# Each boss and the tiers it guards (must match DungeonBosses and its integrations).
+BOSSES = {"barrow_king": (barrow_king, (1, 2, 3, 4)), "goblin_chief": (goblin_chief, (1,))}
 BOSS_LOOT = Path("src/main/resources/data/dungeondelving/loot_table/bosses")
 
 for tier in TIER_ORES:
     write(LOOT / f"tier_{tier}/room.json", room(tier))
     write(LOOT / f"tier_{tier}/objective.json", objective(tier))
-    for boss, table in BOSSES.items():
-        write(BOSS_LOOT / f"{boss}/tier_{tier}.json", table(tier))
+    for boss, (table, tiers) in BOSSES.items():
+        if tier in tiers:
+            write(BOSS_LOOT / f"{boss}/tier_{tier}.json", table(tier))
 print("Wrote chest and boss loot tables for tiers", ", ".join(map(str, TIER_ORES)))

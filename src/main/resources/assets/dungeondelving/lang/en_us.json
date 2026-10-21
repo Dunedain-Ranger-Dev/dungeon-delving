@@ -80,5 +80,9 @@
   "message.dungeondelving.charm_hit_by": "%s (%s)",
   "message.dungeondelving.layout.resource": "The walls here glitter: this dungeon is rich in ore.",
   "message.dungeondelving.layout.loot": "You catch the glint of gold: this dungeon is full of treasure.",
-  "dungeondelving.configuration.layoutTypes": "Dungeon layout type odds"
+  "dungeondelving.configuration.layoutTypes": "Dungeon layout type odds",
+  "entity.dungeondelving.goblin_chief": "Goblin Shaman Chief",
+  "item.dungeondelving.goblin_chief_spawn_egg": "Goblin Shaman Chief Spawn Egg",
+  "item.dungeondelving.goblin_totem_staff": "Goblin Totem Staff",
+  "item.dungeondelving.goblin_chief_staff": "Staff of the Goblin Chief"
 }

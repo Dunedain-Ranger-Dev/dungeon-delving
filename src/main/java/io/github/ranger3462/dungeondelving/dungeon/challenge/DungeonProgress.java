@@ -18,6 +18,7 @@ import net.minecraft.nbt.Tag;
  */
 public final class DungeonProgress {
     private final int tier;
+    private final String boss;
     private final int keysNeeded;
     private final List<BlockPos> door;
     private BlockPos bossSpawn;
@@ -29,7 +30,12 @@ public final class DungeonProgress {
     private final Map<Long, Integer> unspawned = new HashMap<>();
 
     public DungeonProgress(int tier, int keysNeeded, List<BlockPos> door, BlockPos bossSpawn) {
+        this(tier, DungeonBosses.BARROW_KING, keysNeeded, door, bossSpawn);
+    }
+
+    public DungeonProgress(int tier, String boss, int keysNeeded, List<BlockPos> door, BlockPos bossSpawn) {
         this.tier = tier;
+        this.boss = boss;
         this.keysNeeded = keysNeeded;
         this.door = List.copyOf(door);
         this.bossSpawn = bossSpawn;
@@ -42,6 +48,11 @@ public final class DungeonProgress {
 
     public int tier() {
         return tier;
+    }
+
+    /** Which boss guards this dungeon (a {@link DungeonBosses} type id). */
+    public String boss() {
+        return boss;
     }
 
     public int keysNeeded() {
@@ -136,6 +147,7 @@ public final class DungeonProgress {
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();
         tag.putInt("tier", tier);
+        tag.putString("boss", boss);
         tag.putInt("keys_needed", keysNeeded);
         tag.putInt("keys_used", keysUsed);
         tag.putBoolean("boss_spawned", bossSpawned);
@@ -167,7 +179,8 @@ public final class DungeonProgress {
         for (long pos : tag.getLongArray("door")) {
             door.add(BlockPos.of(pos));
         }
-        DungeonProgress progress = new DungeonProgress(tag.getInt("tier"), tag.getInt("keys_needed"), door,
+        String boss = tag.contains("boss") ? tag.getString("boss") : DungeonBosses.BARROW_KING;
+        DungeonProgress progress = new DungeonProgress(tag.getInt("tier"), boss, tag.getInt("keys_needed"), door,
                 tag.contains("boss_spawn") ? BlockPos.of(tag.getLong("boss_spawn")) : null);
         progress.keysUsed = tag.getInt("keys_used");
         progress.bossSpawned = tag.getBoolean("boss_spawned");

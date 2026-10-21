@@ -6,6 +6,10 @@
     {
       "id": "dungeondelving:goblin_shaman",
       "required": false
+    },
+    {
+      "id": "dungeondelving:goblin_chief",
+      "required": false
     }
   ]
 }

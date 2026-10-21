@@ -1,9 +1,14 @@
 package io.github.ranger3462.dungeondelving.dungeon.challenge;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.IntPredicate;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
@@ -18,11 +23,13 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -43,9 +50,12 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
- * Dungeon bosses. For now there is one placeholder boss, the Barrow King (a big, buffed wither skeleton), until real
- * bosses are picked. Each boss drops its own loot table, {@code dungeondelving:bosses/<boss>/tier_<n>}, in place of
- * its normal drops, and shows a boss bar to players nearby.
+ * Dungeon bosses. Each run's boss is picked from the boss types that guard its tier (see {@link #register}), and
+ * fights in its own arena when there is one ({@code boss_<boss>_*} pieces). Each boss drops its own loot table,
+ * {@code dungeondelving:bosses/<boss>/tier_<n>}, in place of its normal drops, and shows a boss bar to players nearby.
+ * When it dies, its arena's spawners shut off.
+ * <p>
+ * The Barrow King (a big, buffed wither skeleton) guards tier 2 and up, and any tier no other boss guards.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class DungeonBosses {
@@ -64,8 +74,60 @@ public final class DungeonBosses {
         return ResourceKey.create(Registries.LOOT_TABLE, DungeonDelving.id("bosses/" + boss + "/tier_" + DungeonRun.clampTier(tier)));
     }
 
-    /** Spawns the boss for a dungeon of this tier. */
+    /** A kind of boss: which tiers it can guard, and how to make one (without adding it to the world). */
+    public record BossType(String id, IntPredicate tiers, Spawner spawner) {}
+
+    @FunctionalInterface
+    public interface Spawner {
+        Mob create(ServerLevel level, BlockPos pos, int tier);
+    }
+
+    private static final Map<String, BossType> TYPES = new LinkedHashMap<>();
+
+    static {
+        register(new BossType(BARROW_KING, tier -> tier >= 2, DungeonBosses::createBarrowKing));
+    }
+
+    /** Adds a boss type, e.g. from an optional integration. */
+    public static void register(BossType type) {
+        TYPES.put(type.id(), type);
+    }
+
+    public static Set<String> bossIds() {
+        return Collections.unmodifiableSet(TYPES.keySet());
+    }
+
+    /** Picks the boss for a dungeon of this tier: any boss that guards the tier, or the Barrow King if none does. */
+    public static String pick(int tier, RandomSource random) {
+        List<BossType> candidates = TYPES.values().stream().filter(type -> type.tiers().test(tier)).toList();
+        return candidates.isEmpty() ? BARROW_KING : candidates.get(random.nextInt(candidates.size())).id();
+    }
+
+    /** Spawns the Barrow King for a dungeon of this tier. */
     public static LivingEntity spawn(ServerLevel level, BlockPos pos, int tier, int region) {
+        return spawn(level, pos, tier, region, BARROW_KING);
+    }
+
+    /**
+     * Spawns a boss for a dungeon of this tier: tagged as a boss (for its loot table and boss bar), persistent, and
+     * rallying its arena's spawners.
+     */
+    public static LivingEntity spawn(ServerLevel level, BlockPos pos, int tier, int region, String boss) {
+        BossType type = TYPES.getOrDefault(boss, TYPES.get(BARROW_KING));
+        Mob mob = type.spawner().create(level, pos, tier);
+        mob.setPersistenceRequired();
+        CompoundTag tag = new CompoundTag();
+        tag.putString("id", type.id());
+        tag.putInt("tier", tier);
+        tag.putInt("region", region);
+        mob.getPersistentData().put(BOSS_TAG, tag);
+        level.addFreshEntity(mob);
+        DungeonChallenges.rallySpawners(level, DungeonDimension.roomMinAt(pos));
+        return mob;
+    }
+
+    /** The Barrow King: a big, buffed wither skeleton in a gold crown. */
+    private static Mob createBarrowKing(ServerLevel level, BlockPos pos, int tier) {
         WitherSkeleton king = EntityType.WITHER_SKELETON.create(level);
         king.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 0.0f, 0.0f);
         EventHooks.finalizeMobSpawn(king, level, level.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);
@@ -83,17 +145,11 @@ public final class DungeonBosses {
         }
         king.setCustomName(Component.translatable("entity.dungeondelving.barrow_king").withStyle(ChatFormatting.GOLD));
         king.setCustomNameVisible(true);
-        king.setPersistenceRequired();
-        CompoundTag tag = new CompoundTag();
-        tag.putString("id", BARROW_KING);
-        tag.putInt("tier", tier);
-        tag.putInt("region", region);
-        king.getPersistentData().put(BOSS_TAG, tag);
-        level.addFreshEntity(king);
         return king;
     }
 
-    private static void setBase(LivingEntity entity, Holder<Attribute> attribute, double value) {
+    /** Sets an attribute's base value, if the mob has it. */
+    public static void setBase(LivingEntity entity, Holder<Attribute> attribute, double value) {
         AttributeInstance instance = entity.getAttribute(attribute);
         if (instance != null) {
             instance.setBaseValue(value);
@@ -130,6 +186,7 @@ public final class DungeonBosses {
         }
         DungeonChallenges.tellRegion(level, tag.getInt("region"),
                 Component.translatable("message.dungeondelving.boss_defeated", boss.getDisplayName()).withStyle(ChatFormatting.GOLD));
+        DungeonChallenges.clearSpawners(level, DungeonDimension.roomMinAt(boss.blockPosition()), tag.getInt("tier"), false);
     }
 
     // --- Boss bars ---

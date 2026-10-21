@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonBosses;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Cell;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Connection;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Room;
@@ -45,6 +46,11 @@ public final class DungeonBuilder {
 
     /** Every placement for a layout, start room first, then the other rooms nearest-first, then tunnels and caps. */
     public static List<Placement> plan(DungeonLayout layout, DungeonPieces pieces, BlockPos center, RandomSource random) {
+        return plan(layout, pieces, center, random, DungeonBosses.BARROW_KING);
+    }
+
+    /** Every placement for a layout, with the boss room picked for the given boss. */
+    public static List<Placement> plan(DungeonLayout layout, DungeonPieces pieces, BlockPos center, RandomSource random, String boss) {
         List<Placement> placements = new ArrayList<>();
         Map<Cell, Integer> distances = layout.distancesFromStart();
         List<Room> rooms = layout.rooms().values().stream()
@@ -62,7 +68,8 @@ public final class DungeonBuilder {
                 case CHALLENGE -> Kind.CHALLENGE;
                 case BOSS -> Kind.BOSS;
             };
-            placements.add(new Placement(pieces.pick(kind, random), roomMin(center, room.cell()), room.rotation(), room.mirror()));
+            ResourceLocation piece = kind == Kind.BOSS ? pieces.pickBoss(boss, DungeonBosses.bossIds(), random) : pieces.pick(kind, random);
+            placements.add(new Placement(piece, roomMin(center, room.cell()), room.rotation(), room.mirror()));
         }
 
         for (Connection connection : layout.connections().stream()

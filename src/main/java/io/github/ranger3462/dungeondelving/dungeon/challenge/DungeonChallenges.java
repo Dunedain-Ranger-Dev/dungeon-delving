@@ -25,6 +25,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
@@ -118,7 +119,7 @@ public final class DungeonChallenges {
                 tellRegion(level, region, Component.translatable("message.dungeondelving.hunt_left", left).withStyle(ChatFormatting.GRAY));
                 return;
             }
-            DungeonRegions.get().progress(region).ifPresent(progress -> clearSpawners(level, BlockPos.of(hunt.getLong("room")), progress.tier()));
+            DungeonRegions.get().progress(region).ifPresent(progress -> clearSpawners(level, BlockPos.of(hunt.getLong("room")), progress.tier(), true));
             ItemEntity key = new ItemEntity(level, event.getEntity().getX(), event.getEntity().getY() + 0.5, event.getEntity().getZ(),
                     DungeonKeyItem.forRegion(region));
             key.setUnlimitedLifetime();
@@ -130,10 +131,10 @@ public final class DungeonChallenges {
     }
 
     /**
-     * Removes every spawner in a cleared room (whose minimum corner is {@code roomMin}), leaving a reward chest where
-     * the first one was. Returns how many spawners were removed.
+     * Removes every spawner in a cleared room (whose minimum corner is {@code roomMin}), optionally leaving a reward
+     * chest where the first one was. Returns how many spawners were removed.
      */
-    public static int clearSpawners(ServerLevel level, BlockPos roomMin, int tier) {
+    public static int clearSpawners(ServerLevel level, BlockPos roomMin, int tier, boolean rewardChest) {
         BlockPos chest = null;
         int removed = 0;
         for (BlockPos pos : BlockPos.betweenClosed(roomMin, roomMin.offset(RoomSpec.ROOM_SIZE - 1, RoomSpec.ROOM_HEIGHT - 1, RoomSpec.ROOM_SIZE - 1))) {
@@ -145,10 +146,37 @@ public final class DungeonChallenges {
                 removed++;
             }
         }
-        if (chest != null) {
+        if (chest != null && rewardChest) {
             DungeonMarkers.placeChest(level, chest, DungeonMarkers.roomLoot(tier), level.getRandom());
         }
         return removed;
+    }
+
+    /** How often a boss arena's spawners spawn once the boss is out, in ticks (vanilla spawners wait 200 to 800). */
+    public static final int RALLY_MIN_DELAY = 40;
+    public static final int RALLY_MAX_DELAY = 100;
+
+    /**
+     * Speeds up every spawner in a room (whose minimum corner is {@code roomMin}): they spawn every few seconds, a few
+     * mobs at a time, from farther away. Used when a boss appears, so its arena fills with its minions.
+     */
+    public static int rallySpawners(ServerLevel level, BlockPos roomMin) {
+        int rallied = 0;
+        for (BlockPos pos : BlockPos.betweenClosed(roomMin, roomMin.offset(RoomSpec.ROOM_SIZE - 1, RoomSpec.ROOM_HEIGHT - 1, RoomSpec.ROOM_SIZE - 1))) {
+            if (level.getBlockEntity(pos) instanceof SpawnerBlockEntity spawner) {
+                CompoundTag tag = spawner.getSpawner().save(new CompoundTag());
+                tag.putShort("Delay", (short) 20);
+                tag.putShort("MinSpawnDelay", (short) RALLY_MIN_DELAY);
+                tag.putShort("MaxSpawnDelay", (short) RALLY_MAX_DELAY);
+                tag.putShort("SpawnCount", (short) 3);
+                tag.putShort("MaxNearbyEntities", (short) 10);
+                tag.putShort("RequiredPlayerRange", (short) 32);
+                spawner.getSpawner().load(level, pos.immutable(), tag);
+                spawner.setChanged();
+                rallied++;
+            }
+        }
+        return rallied;
     }
 
     // --- The boss door ---
@@ -193,7 +221,7 @@ public final class DungeonChallenges {
             }
         }
         if (!progress.bossSpawned() && progress.bossSpawn() != null) {
-            DungeonBosses.spawn(level, progress.bossSpawn(), progress.tier(), region);
+            DungeonBosses.spawn(level, progress.bossSpawn(), progress.tier(), region, progress.boss());
             progress.markBossSpawned();
             DungeonRegions.get().progressChanged();
             level.playSound(null, progress.bossSpawn(), SoundEvents.WITHER_SPAWN, SoundSource.HOSTILE, 1.0f, 0.8f);

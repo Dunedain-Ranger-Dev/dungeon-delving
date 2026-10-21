@@ -126,7 +126,9 @@ public final class ModRegistries {
                 output.accept(ModEntities.GOBLIN_SPEAR.get());
                 output.accept(ModEntities.GOBLIN_ARCHER_SPAWN_EGG.get());
                 output.accept(ModEntities.GOBLIN_BOW.get());
-                BuiltInRegistries.ITEM.getOptional(DungeonDelving.id("goblin_shaman_spawn_egg")).ifPresent(output::accept);
+                for (String optional : new String[] { "goblin_shaman_spawn_egg", "goblin_chief_spawn_egg", "goblin_totem_staff", "goblin_chief_staff" }) {
+                    BuiltInRegistries.ITEM.getOptional(DungeonDelving.id(optional)).ifPresent(output::accept);
+                }
                 output.accept(HALLSTONE_ITEM.get());
                 for (DungeonOre ore : DungeonOre.values()) {
                     output.accept(ore.oreItem.get());

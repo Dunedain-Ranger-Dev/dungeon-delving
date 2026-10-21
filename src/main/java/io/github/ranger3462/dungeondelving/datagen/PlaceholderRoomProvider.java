@@ -85,6 +85,7 @@ public class PlaceholderRoomProvider implements DataProvider {
         pieces.put("treasure_placeholder", treasureRoom());
         pieces.put("challenge_hunt_placeholder", huntRoom());
         pieces.put("boss_placeholder", bossRoom());
+        pieces.put("boss_goblin_chief_placeholder", goblinChiefArena());
         pieces.put("tunnel_placeholder", tunnel());
         pieces.put("cap_placeholder", capWall());
         return pieces;
@@ -257,6 +258,24 @@ public class PlaceholderRoomProvider implements DataProvider {
         room.set(MID, 1, MAX - 9, hunt());
         room.set(MID, 1, 9, mob());
         room.set(MID, 1, MID, mob());
+        return room;
+    }
+
+    /**
+     * The Goblin Shaman Chief's arena: a raised dais in the middle for the chief, ringed by eight spawners that pour out
+     * goblins once he appears, and low walls to duck behind.
+     */
+    private static PieceBuilder goblinChiefArena() {
+        PieceBuilder room = roomShell();
+        room.fill(MID - 2, 1, MID - 2, MID + 2, 2, MID + 2, ROOM);
+        room.set(MID, 3, MID, boss());
+        for (int[] spot : new int[][] { { 6, 6 }, { MID, 4 }, { MAX - 6, 6 }, { 4, MID - 6 }, { MAX - 4, MID + 6 }, { 6, MAX - 6 }, { MID, MAX - 4 },
+                { MAX - 6, MAX - 6 } }) {
+            room.set(spot[0], 1, spot[1], mob());
+        }
+        for (int[] wall : new int[][] { { 9, 11 }, { MAX - 11, 11 }, { 9, MAX - 11 }, { MAX - 11, MAX - 11 } }) {
+            room.fill(wall[0], 1, wall[1], wall[0] + 2, 2, wall[1], ROOM);
+        }
         return room;
     }
 

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -167,6 +168,22 @@ public final class DungeonPieces {
     /** The pieces generation picks from for a kind: real pieces if there are any, otherwise placeholders. */
     public List<ResourceLocation> pool(Kind kind) {
         return pools.get(kind);
+    }
+
+    /**
+     * A boss room for a boss: one of its own arenas ({@code boss_<boss>_*}) if there are any, otherwise any boss room
+     * that isn't another boss's arena.
+     */
+    public ResourceLocation pickBoss(String boss, Collection<String> bosses, RandomSource random) {
+        List<ResourceLocation> pool = pools.get(Kind.BOSS);
+        List<ResourceLocation> own = pool.stream().filter(id -> belongsTo(id, boss)).toList();
+        List<ResourceLocation> shared = pool.stream().filter(id -> bosses.stream().noneMatch(other -> belongsTo(id, other))).toList();
+        List<ResourceLocation> choices = !own.isEmpty() ? own : !shared.isEmpty() ? shared : pool;
+        return choices.get(random.nextInt(choices.size()));
+    }
+
+    private static boolean belongsTo(ResourceLocation piece, String boss) {
+        return piece.getPath().startsWith(FOLDER + "/" + Kind.BOSS.prefix() + boss + "_");
     }
 
     public ResourceLocation pick(Kind kind, RandomSource random) {

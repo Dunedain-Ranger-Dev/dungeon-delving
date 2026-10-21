@@ -79,6 +79,11 @@ public class PlaceholderRoomTests {
         checkRoom(helper);
     }
 
+    @GameTest(template = "dungeon/boss_goblin_chief_placeholder")
+    public static void goblinChiefArena(GameTestHelper helper) {
+        checkRoom(helper);
+    }
+
     @GameTest(template = "dungeon/tunnel_placeholder")
     public static void tunnel(GameTestHelper helper) {
         BlockPos corner = check(helper, Kind.TUNNEL, TUNNEL_WIDTH, TUNNEL_HEIGHT, TUNNEL_LENGTH);

@@ -132,7 +132,7 @@ public class BossAndKeyTests {
             for (BlockPos pos : List.of(min.offset(5, 1, 5), min.offset(20, 1, 9), min.offset(28, 2, 28))) {
                 level.setBlock(pos, Blocks.SPAWNER.defaultBlockState(), Block.UPDATE_CLIENTS);
             }
-            int removed = DungeonChallenges.clearSpawners(level, min, 1);
+            int removed = DungeonChallenges.clearSpawners(level, min, 1, true);
             int spawners = 0;
             int chests = 0;
             for (BlockPos pos : BlockPos.betweenClosed(min, max)) {

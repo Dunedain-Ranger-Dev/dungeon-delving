@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import io.github.ranger3462.dungeondelving.Config;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonBosses;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonProgress;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuildQueue;
@@ -53,11 +54,12 @@ public final class DungeonTravel {
         DungeonLayout layout = DungeonLayoutGenerator.generate(dungeon.getRandom(), roomCount, DungeonProgress.keysFor(tier), type);
         int challengeRooms = (int) layout.rooms().values().stream().filter(room -> room.kind() == DungeonLayout.RoomKind.CHALLENGE).count();
         List<BlockPos> door = DungeonBuilder.bossDoor(layout, center);
-        regions.startProgress(region, new DungeonProgress(tier, Math.min(DungeonProgress.keysFor(tier), challengeRooms), door,
+        String boss = DungeonBosses.pick(tier, dungeon.getRandom());
+        regions.startProgress(region, new DungeonProgress(tier, boss, Math.min(DungeonProgress.keysFor(tier), challengeRooms), door,
                 DungeonBuilder.bossRoomCenter(layout, center).orElse(null)));
 
         DungeonPieces pieces = DungeonPieces.load(player.server);
-        List<Placement> placements = DungeonBuilder.plan(layout, pieces, center, dungeon.getRandom());
+        List<Placement> placements = DungeonBuilder.plan(layout, pieces, center, dungeon.getRandom(), boss);
         DungeonMarkers.Rolls rolls = DungeonMarkers.Rolls.fromConfig(tier, region);
         DungeonBuilder.place(dungeon, placements.getFirst(), rolls);
         dungeon.setBlock(center.above(), ModRegistries.DUNGEON_EXIT.get().defaultBlockState(), Block.UPDATE_ALL);

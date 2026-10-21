@@ -130,6 +130,22 @@ for y in range(0, 4):
     shaman[(15, y + 1)] = shade(FEATHER, -30) + (255,)
 png(ENTITY / "goblin_shaman.png", 64, 64, shaman)
 
+# Chief: the shaman's mask and robe, dyed red, with a tall gold headdress.
+CHIEF_ROBE = (140, 36, 32)
+CHIEF_ROBE_DARK = (100, 24, 22)
+GOLD_TRIM = (232, 186, 60)
+chief = {k: v for k, v in shaman.items()}
+box(chief, 16, 16, 8, 12, 4, CHIEF_ROBE)
+fill(chief, 16, 28, 40, 30, GOLD_TRIM, 6)
+for u, v in [(0, 16), (16, 48)]:
+    box(chief, u, v, 4, 12, 4, CHIEF_ROBE)
+    fill(chief, u, v + 4 + 10, u + 16, v + 4 + 12, CHIEF_ROBE_DARK, 6)
+fill(chief, 8, 0, 16, 8, GOLD_TRIM, 10)  # headdress on top of the head
+fill(chief, 8, 8, 16, 9, GOLD_TRIM, 6)  # gold band across the brow
+for x in range(9, 15, 2):
+    chief[(x, 8)] = (240, 60, 60, 255)  # red gems in the band
+png(ENTITY / "goblin_chief.png", 64, 64, chief)
+
 # Goblin Spear: a short wooden shaft from the bottom left, with a chipped flint head at the top right.
 spear = {}
 SHAFT = (122, 86, 50)
@@ -176,4 +192,22 @@ def bow(pull):
 png(ITEM / "goblin_bow.png", 16, 16, bow(0))
 for frame in range(3):
     png(ITEM / f"goblin_bow_pulling_{frame}.png", 16, 16, bow(frame + 1))
-print("Wrote the goblin, archer and shaman textures, the Goblin Spear, and the Goblin Bow")
+
+
+def staff(head, gem, length):
+    image = {}
+    for i in range(length):
+        x, y = 2 + i, 13 - i
+        image[(x, y)] = (WOOD if i % 2 else WOOD_DARK) + (255,)
+    tip_x, tip_y = 2 + length, 13 - length
+    for dx, dy in [(0, 0), (1, 0), (0, -1), (1, -1), (-1, 0), (0, 1)]:
+        image[(tip_x + dx, tip_y + dy)] = head + (255,)
+    image[(tip_x, tip_y - 1)] = gem + (255,)
+    image[(tip_x + 1, tip_y)] = gem + (255,)
+    return image
+
+
+BONE_HEAD = (226, 218, 190)
+png(ITEM / "goblin_totem_staff.png", 16, 16, staff(BONE_HEAD, (120, 200, 90), 9))  # a bone fetish with a green glow
+png(ITEM / "goblin_chief_staff.png", 16, 16, staff((232, 186, 60), (240, 60, 60), 11))  # gold-capped, with a red gem
+print("Wrote the goblin, archer, shaman and chief textures, the Goblin Spear, the Goblin Bow, and the goblin staves")
