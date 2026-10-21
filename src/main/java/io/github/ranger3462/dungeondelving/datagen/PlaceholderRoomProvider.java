@@ -86,6 +86,7 @@ public class PlaceholderRoomProvider implements DataProvider {
         pieces.put("challenge_hunt_placeholder", huntRoom());
         pieces.put("boss_placeholder", bossRoom());
         pieces.put("boss_goblin_chief_placeholder", goblinChiefArena());
+        pieces.put("boss_skeleton_lord_placeholder", skeletonLordHall());
         pieces.put("tunnel_placeholder", tunnel());
         pieces.put("cap_placeholder", capWall());
         return pieces;
@@ -276,6 +277,18 @@ public class PlaceholderRoomProvider implements DataProvider {
         for (int[] wall : new int[][] { { 9, 11 }, { MAX - 11, 11 }, { 9, MAX - 11 }, { MAX - 11, MAX - 11 } }) {
             room.fill(wall[0], 1, wall[1], wall[0] + 2, 2, wall[1], ROOM);
         }
+        return room;
+    }
+
+    /** The Skeleton Lord's hall: two rows of pillars, and a raised throne platform where he and his guard wait. */
+    private static PieceBuilder skeletonLordHall() {
+        PieceBuilder room = roomShell();
+        for (int z = 6; z <= MAX - 6; z += 6) {
+            room.fill(9, 1, z, 9, ROOM_HEIGHT - 2, z, ROOM);
+            room.fill(MAX - 9, 1, z, MAX - 9, ROOM_HEIGHT - 2, z, ROOM);
+        }
+        room.fill(MID - 5, 1, MID - 5, MID + 5, 1, MID + 5, ROOM);
+        room.set(MID, 2, MID, boss());
         return room;
     }
 

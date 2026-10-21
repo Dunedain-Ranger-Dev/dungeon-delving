@@ -13,6 +13,7 @@ import java.util.function.IntPredicate;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
+import io.github.ranger3462.dungeondelving.entity.SkeletonLord;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -55,13 +56,15 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * {@code dungeondelving:bosses/<boss>/tier_<n>}, in place of its normal drops, and shows a boss bar to players nearby.
  * When it dies, its arena's spawners shut off.
  * <p>
- * The Barrow King (a big, buffed wither skeleton) guards tier 2 and up, and any tier no other boss guards.
+ * The Skeleton Lord guards tier 1, the Barrow King (a big, buffed wither skeleton) tier 2 and up; more bosses come
+ * from integrations (e.g. the Goblin Shaman Chief with Iron's Spells).
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class DungeonBosses {
     /** Saved on bosses: which boss it is, its tier and region. */
     public static final String BOSS_TAG = DungeonDelving.MODID + ":boss";
     public static final String BARROW_KING = "barrow_king";
+    public static final String SKELETON_LORD = "skeleton_lord";
     /** How close players must be to see a boss's health bar. */
     private static final double BAR_RANGE = 48.0;
 
@@ -86,6 +89,7 @@ public final class DungeonBosses {
 
     static {
         register(new BossType(BARROW_KING, tier -> tier >= 2, DungeonBosses::createBarrowKing));
+        register(new BossType(SKELETON_LORD, tier -> tier == 1, SkeletonLord::create));
     }
 
     /** Adds a boss type, e.g. from an optional integration. */

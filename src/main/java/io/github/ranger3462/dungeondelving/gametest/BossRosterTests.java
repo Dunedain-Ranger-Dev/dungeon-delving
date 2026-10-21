@@ -45,8 +45,9 @@ public class BossRosterTests {
     public static void eachTierHasItsBoss(GameTestHelper helper) {
         RandomSource random = RandomSource.create(1);
         for (int i = 0; i < 20; i++) {
-            helper.assertTrue(DungeonBosses.pick(1, random).equals(irons() ? CHIEF : DungeonBosses.BARROW_KING),
-                    "tier 1 should be the Goblin Shaman Chief's (or the Barrow King's without Iron's Spells)");
+            String tier1 = DungeonBosses.pick(1, random);
+            helper.assertTrue(tier1.equals(DungeonBosses.SKELETON_LORD) || (irons() && tier1.equals(CHIEF)),
+                    "tier 1 should be the Skeleton Lord's or (with Iron's Spells) the Goblin Shaman Chief's, not " + tier1);
             for (int tier = 2; tier <= 4; tier++) {
                 helper.assertTrue(DungeonBosses.pick(tier, random).equals(DungeonBosses.BARROW_KING), "tier " + tier + " should be the Barrow King's");
             }

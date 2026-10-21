@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "dungeondelving:skeleton_swordsman",
+    "dungeondelving:skeleton_knight",
+    "dungeondelving:skeleton_lord"
+  ]
+}

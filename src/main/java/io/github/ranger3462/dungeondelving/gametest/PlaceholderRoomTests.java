@@ -79,6 +79,11 @@ public class PlaceholderRoomTests {
         checkRoom(helper);
     }
 
+    @GameTest(template = "dungeon/boss_skeleton_lord_placeholder")
+    public static void skeletonLordHall(GameTestHelper helper) {
+        checkRoom(helper);
+    }
+
     @GameTest(template = "dungeon/boss_goblin_chief_placeholder")
     public static void goblinChiefArena(GameTestHelper helper) {
         checkRoom(helper);

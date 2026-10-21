@@ -84,5 +84,11 @@
   "entity.dungeondelving.goblin_chief": "Goblin Shaman Chief",
   "item.dungeondelving.goblin_chief_spawn_egg": "Goblin Shaman Chief Spawn Egg",
   "item.dungeondelving.goblin_totem_staff": "Goblin Totem Staff",
-  "item.dungeondelving.goblin_chief_staff": "Staff of the Goblin Chief"
+  "item.dungeondelving.goblin_chief_staff": "Staff of the Goblin Chief",
+  "entity.dungeondelving.skeleton_swordsman": "Skeleton Swordsman",
+  "entity.dungeondelving.skeleton_knight": "Skeleton Knight",
+  "entity.dungeondelving.skeleton_lord": "Skeleton Lord",
+  "item.dungeondelving.skeleton_swordsman_spawn_egg": "Skeleton Swordsman Spawn Egg",
+  "item.dungeondelving.skeleton_knight_spawn_egg": "Skeleton Knight Spawn Egg",
+  "item.dungeondelving.skeleton_lord_spawn_egg": "Skeleton Lord Spawn Egg"
 }

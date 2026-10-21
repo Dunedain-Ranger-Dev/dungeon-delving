@@ -115,9 +115,9 @@ public final class DungeonMarkers {
             Block block = random.nextDouble() < rolls.resourceChance() ? pickOre(level, random, rolls).orElse(null) : null;
             level.setBlock(pos, (block != null ? block : ModRegistries.HALLSTONE.get()).defaultBlockState(), Block.UPDATE_CLIENTS);
         } else if (marker == ModRegistries.MOB_MARKER.get()) {
-            placeSpawner(level, pos, random);
+            placeSpawner(level, pos, random, rolls.tier());
         } else if (marker == ModRegistries.HUNT_MARKER.get()) {
-            placeSpawner(level, pos, random);
+            placeSpawner(level, pos, random, rolls.tier());
             DungeonChallenges.addHunter(rolls.region(), DungeonDimension.roomMinAt(pos).asLong());
         } else if (marker == ModRegistries.BOSS_MARKER.get() && rolls.region() >= 0) {
             DungeonRegions.get().progress(rolls.region()).ifPresent(progress -> {
@@ -161,8 +161,8 @@ public final class DungeonMarkers {
      * A monster spawner for a random dungeon mob. Its spawns carry custom light rules (any block or sky light), since
      * vanilla monsters otherwise only spawn in darkness.
      */
-    private static void placeSpawner(ServerLevel level, BlockPos pos, RandomSource random) {
-        Optional<Holder<EntityType<?>>> mob = SpawnerMobs.pick(level, random);
+    private static void placeSpawner(ServerLevel level, BlockPos pos, RandomSource random, int tier) {
+        Optional<Holder<EntityType<?>>> mob = SpawnerMobs.pick(level, random, tier);
         if (mob.isEmpty()) {
             return;
         }

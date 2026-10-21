@@ -156,8 +156,20 @@ def goblin_chief(tier):
     return table
 
 
+def skeleton_lord(tier):
+    """The Skeleton Lord's signature drop: his shield, which adds armor and knockback resistance in the off hand."""
+    return boss_loot(tier, item("minecraft:shield", 1, extra=named("Bulwark of the Skeleton Lord", "gold", "It has turned a thousand blows.") + [
+        {"function": "minecraft:set_attributes", "replace": False, "modifiers": [
+            {"attribute": "minecraft:generic.armor", "id": f"{NS}:lord_bulwark_armor", "amount": 2, "operation": "add_value", "slot": "offhand"},
+            {"attribute": "minecraft:generic.knockback_resistance", "id": f"{NS}:lord_bulwark_knockback", "amount": 0.2, "operation": "add_value",
+             "slot": "offhand"},
+        ]},
+        {"function": "minecraft:enchant_with_levels", "levels": {"type": "minecraft:uniform", "min": 10, "max": 20}},
+    ]))
+
+
 # Each boss and the tiers it guards (must match DungeonBosses and its integrations).
-BOSSES = {"barrow_king": (barrow_king, (1, 2, 3, 4)), "goblin_chief": (goblin_chief, (1,))}
+BOSSES = {"barrow_king": (barrow_king, (1, 2, 3, 4)), "goblin_chief": (goblin_chief, (1,)), "skeleton_lord": (skeleton_lord, (1,))}
 BOSS_LOOT = Path("src/main/resources/data/dungeondelving/loot_table/bosses")
 
 for tier in TIER_ORES:

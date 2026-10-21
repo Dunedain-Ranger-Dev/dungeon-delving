@@ -69,7 +69,7 @@ public class GoblinTests {
         Map<EntityType<?>, Integer> counts = new HashMap<>();
         int rolls = 4000;
         for (int i = 0; i < rolls; i++) {
-            counts.merge(SpawnerMobs.pick(helper.getLevel(), random, SpawnerMobs.DEFAULTS).orElseThrow().value(), 1, Integer::sum);
+            counts.merge(SpawnerMobs.pick(helper.getLevel(), random, SpawnerMobs.DEFAULTS, 1).orElseThrow().value(), 1, Integer::sum);
         }
         boolean shamans = BuiltInRegistries.ENTITY_TYPE.containsKey(DungeonDelving.id("goblin_shaman"));
         double total = shamans ? 100 : 85;
@@ -78,13 +78,15 @@ public class GoblinTests {
         if (shamans) {
             expectShare(helper, counts, BuiltInRegistries.ENTITY_TYPE.get(DungeonDelving.id("goblin_shaman")), 15 / total, rolls);
         }
-        helper.assertTrue(counts.keySet().stream().allMatch(type -> type.is(GoblinSwarm.GOBLINS)), "the default spawner mobs should all be goblins");
+        helper.assertTrue(counts.keySet().stream().allMatch(type -> type.is(GoblinSwarm.GOBLINS)), "tier 1 spawners should only spawn goblins");
 
         helper.assertTrue(SpawnerMobs.pick(helper.getLevel(), random, List.of("dungeondelving:not_a_mob=5", "minecraft:zombie=1"))
                 .orElseThrow().value() == EntityType.ZOMBIE, "mobs that don't exist should be skipped");
         helper.assertTrue(SpawnerMobs.pick(helper.getLevel(), random, List.of("#dungeondelving:dungeon_mobs=1")).orElseThrow().value()
                 .is(DungeonMarkers.DUNGEON_MOBS), "a tag entry should pick a mob from the tag");
-        for (String bad : new String[] { "", "goblin=abc", "dungeondelving:goblin=-2", "a=b=c" }) {
+        helper.assertTrue(SpawnerMobs.pick(helper.getLevel(), random, List.of("minecraft:zombie=1@2-4", "minecraft:skeleton=1@1"), 1)
+                .orElseThrow().value() == EntityType.SKELETON, "entries for other tiers shouldn't spawn");
+        for (String bad : new String[] { "", "goblin=abc", "dungeondelving:goblin=-2", "a=b=c", "minecraft:zombie=1@3-2", "minecraft:zombie=1@x" }) {
             helper.assertTrue(SpawnerMobs.parse(bad).isEmpty(), "\"" + bad + "\" shouldn't be a valid entry");
         }
         helper.succeed();
