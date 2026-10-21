@@ -22,8 +22,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 /**
- * The way into dungeons. Use a Runic Key on it to open a dungeon of the key's tier; the key is used up. Works anywhere
- * outside the dungeon dimension.
+ * The way into dungeons. Use a Runic Key on it to open a dungeon of the key's tier; the key is always used up, even in
+ * creative. Works anywhere outside the dungeon dimension.
  */
 public class DungeonGateBlock extends Block {
     public static final MapCodec<DungeonGateBlock> CODEC = simpleCodec(DungeonGateBlock::new);
@@ -44,7 +44,7 @@ public class DungeonGateBlock extends Block {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         if (player instanceof ServerPlayer serverPlayer && canEnter(serverPlayer, level)) {
-            stack.consume(1, serverPlayer);
+            stack.shrink(1); // Even in creative, so every run needs a freshly made key.
             DungeonTravel.Entry entry = DungeonTravel.enter(serverPlayer, RoomCounts.roll(key.tier(), level.getRandom()), key.tier());
             int keys = DungeonRegions.get().progress(entry.run().region()).map(progress -> progress.keysNeeded()).orElse(0);
             serverPlayer.sendSystemMessage(Component.translatable("message.dungeondelving.gate_entered", key.tier(), entry.layout().rooms().size(), keys)
