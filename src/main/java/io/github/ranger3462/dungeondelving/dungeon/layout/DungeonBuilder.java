@@ -57,6 +57,8 @@ public final class DungeonBuilder {
             Kind kind = switch (room.kind()) {
                 case START -> Kind.START;
                 case COMMON -> Kind.COMMON;
+                case QUARRY -> Kind.QUARRY;
+                case TREASURE -> Kind.TREASURE;
                 case CHALLENGE -> Kind.CHALLENGE;
                 case BOSS -> Kind.BOSS;
             };

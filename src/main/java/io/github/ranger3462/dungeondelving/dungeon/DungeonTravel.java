@@ -12,6 +12,7 @@ import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder.Placeme
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces;
+import io.github.ranger3462.dungeondelving.dungeon.layout.LayoutType;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -31,20 +32,25 @@ public final class DungeonTravel {
     private DungeonTravel() {}
 
     /** The result of entering a dungeon: the run, and the layout being built for it. */
-    public record Entry(DungeonRun run, DungeonLayout layout) {}
+    public record Entry(DungeonRun run, DungeonLayout layout, LayoutType type) {}
 
     /**
      * Starts a run in a fresh region: generates a layout, places the start room and its exit right away, queues the
      * rest and the bedrock shell to be built over the next few ticks, and sends the player into the start room.
      */
     public static Entry enter(ServerPlayer player, int roomCount, int tier) {
+        return enter(player, roomCount, tier, LayoutType.roll(player.getRandom()));
+    }
+
+    /** Starts a run with a given layout type. */
+    public static Entry enter(ServerPlayer player, int roomCount, int tier, LayoutType type) {
         tier = DungeonRun.clampTier(tier);
         ServerLevel dungeon = dungeonLevel(player);
         DungeonRegions regions = DungeonRegions.get();
         int region = regions.allocate();
         BlockPos center = DungeonDimension.regionCenter(region);
 
-        DungeonLayout layout = DungeonLayoutGenerator.generate(dungeon.getRandom(), roomCount, DungeonProgress.keysFor(tier));
+        DungeonLayout layout = DungeonLayoutGenerator.generate(dungeon.getRandom(), roomCount, DungeonProgress.keysFor(tier), type);
         int challengeRooms = (int) layout.rooms().values().stream().filter(room -> room.kind() == DungeonLayout.RoomKind.CHALLENGE).count();
         List<BlockPos> door = DungeonBuilder.bossDoor(layout, center);
         regions.startProgress(region, new DungeonProgress(tier, Math.min(DungeonProgress.keysFor(tier), challengeRooms), door,
@@ -63,7 +69,7 @@ public final class DungeonTravel {
                 player.getZ(), player.getYRot(), player.getXRot());
         regions.startRun(run);
         player.teleportTo(dungeon, center.getX() + 0.5, center.getY() + 1, center.getZ() + ARRIVAL_OFFSET + 0.5, 180.0f, 0.0f);
-        return new Entry(run, layout);
+        return new Entry(run, layout, type);
     }
 
     /**

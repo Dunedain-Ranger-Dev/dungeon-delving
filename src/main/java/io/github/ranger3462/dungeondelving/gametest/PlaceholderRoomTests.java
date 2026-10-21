@@ -59,8 +59,13 @@ public class PlaceholderRoomTests {
         checkRoom(helper);
     }
 
-    @GameTest(template = "dungeon/common_quarry_placeholder")
+    @GameTest(template = "dungeon/quarry_placeholder")
     public static void quarryRoom(GameTestHelper helper) {
+        checkRoom(helper);
+    }
+
+    @GameTest(template = "dungeon/treasure_placeholder")
+    public static void treasureRoom(GameTestHelper helper) {
         checkRoom(helper);
     }
 

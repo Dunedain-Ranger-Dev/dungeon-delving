@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
 import io.github.ranger3462.dungeondelving.dungeon.SpawnerMobs;
+import io.github.ranger3462.dungeondelving.dungeon.layout.LayoutType;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 /** Settings in {@code config/dungeondelving-common.toml}. */
@@ -30,6 +31,11 @@ public final class Config {
             .comment("How many rooms a dungeon has, for tiers 1, 2, 3 and 4 in order. Each entry is a range like \"4-6\"",
                     "(rolled fresh every run) or a single number. Every dungeon has at least 2 rooms: the start and the boss room.")
             .defineList("roomCounts", RoomCounts.DEFAULTS, () -> "4-6", value -> value instanceof String text && RoomCounts.parse(text).isPresent());
+
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> LAYOUT_TYPES = BUILDER
+            .comment("How often each dungeon layout type is rolled, as \"type=weight\" entries. normal: mostly ordinary rooms;",
+                    "resource: mostly quarries packed with ore; loot: lots of treasure rooms with extra chests.")
+            .defineList("layoutTypes", LayoutType.DEFAULTS, () -> "normal=1", value -> value instanceof String text && LayoutType.parse(text).isPresent());
 
     public static final ModConfigSpec.DoubleValue LOOT_MARKER_CHANCE = BUILDER
             .comment("Chance that each loot marker in a dungeon becomes a chest. Otherwise it's left empty.")

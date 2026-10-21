@@ -42,8 +42,16 @@ public final class DungeonLayoutGenerator {
         return generate(random, roomCount, 0);
     }
 
-    /** A layout with up to {@code challengeRooms} challenge rooms (fewer if there aren't enough other rooms). */
+    /** A normal layout with up to {@code challengeRooms} challenge rooms (fewer if there aren't enough other rooms). */
     public static DungeonLayout generate(RandomSource random, int roomCount, int challengeRooms) {
+        return generate(random, roomCount, challengeRooms, LayoutType.NORMAL);
+    }
+
+    /**
+     * A layout with up to {@code challengeRooms} challenge rooms; the rooms left over become ordinary rooms, quarries
+     * or treasure rooms as the layout type prefers.
+     */
+    public static DungeonLayout generate(RandomSource random, int roomCount, int challengeRooms, LayoutType type) {
         int target = Math.max(1, Math.min(roomCount, maxRooms()));
         List<Cell> cells = new ArrayList<>();
         Set<Connection> connections = new HashSet<>();
@@ -93,6 +101,10 @@ public final class DungeonLayoutGenerator {
                 Cell cell = others.remove(random.nextInt(others.size()));
                 Room room = rooms.get(cell);
                 rooms.put(cell, new Room(cell, RoomKind.CHALLENGE, room.rotation(), room.mirror()));
+            }
+            for (Cell cell : others) {
+                Room room = rooms.get(cell);
+                rooms.put(cell, new Room(cell, type.pickRoom(random), room.rotation(), room.mirror()));
             }
         }
         return new DungeonLayout(rooms, connections);

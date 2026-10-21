@@ -6,6 +6,7 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonTravel;
 import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
+import io.github.ranger3462.dungeondelving.dungeon.layout.LayoutType;
 import io.github.ranger3462.dungeondelving.workshop.RunicKeyItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -49,6 +50,9 @@ public class DungeonGateBlock extends Block {
             int keys = DungeonRegions.get().progress(entry.run().region()).map(progress -> progress.keysNeeded()).orElse(0);
             serverPlayer.sendSystemMessage(Component.translatable("message.dungeondelving.gate_entered", key.tier(), entry.layout().rooms().size(), keys)
                     .withStyle(ChatFormatting.GOLD));
+            if (entry.type() != LayoutType.NORMAL) {
+                serverPlayer.sendSystemMessage(Component.translatable("message.dungeondelving.layout." + entry.type().id()).withStyle(ChatFormatting.YELLOW));
+            }
         }
         return ItemInteractionResult.sidedSuccess(level.isClientSide);
     }

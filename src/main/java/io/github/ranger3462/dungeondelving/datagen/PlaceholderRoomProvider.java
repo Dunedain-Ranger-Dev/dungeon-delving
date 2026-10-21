@@ -51,6 +51,10 @@ public class PlaceholderRoomProvider implements DataProvider {
         return ModRegistries.RESOURCE_MARKER.get();
     }
 
+    private static Block objective() {
+        return ModRegistries.OBJECTIVE_MARKER.get();
+    }
+
     private static Block hunt() {
         return ModRegistries.HUNT_MARKER.get();
     }
@@ -77,7 +81,8 @@ public class PlaceholderRoomProvider implements DataProvider {
         pieces.put("common_steps_placeholder", stepsRoom());
         pieces.put("common_cover_placeholder", coverRoom());
         pieces.put("common_walls_placeholder", wallsRoom());
-        pieces.put("common_quarry_placeholder", quarryRoom());
+        pieces.put("quarry_placeholder", quarryRoom());
+        pieces.put("treasure_placeholder", treasureRoom());
         pieces.put("challenge_hunt_placeholder", huntRoom());
         pieces.put("boss_placeholder", bossRoom());
         pieces.put("tunnel_placeholder", tunnel());
@@ -223,6 +228,24 @@ public class PlaceholderRoomProvider implements DataProvider {
      * A hunt challenge room: three hunt targets among the cover, plus two spawners for ordinary mobs. Killing all three
      * targets drops a Dungeon Key.
      */
+    /**
+     * A treasure room: a vault of chests on low plinths around the walls, with two reward chests on a dais in the
+     * middle, guarded by two spawners.
+     */
+    private static PieceBuilder treasureRoom() {
+        PieceBuilder room = roomShell();
+        for (int[] spot : new int[][] { { 5, 5 }, { MAX - 5, 5 }, { 5, MAX - 5 }, { MAX - 5, MAX - 5 }, { 5, MID - 6 }, { MAX - 5, MID + 6 } }) {
+            room.set(spot[0], 1, spot[1], ROOM);
+            room.set(spot[0], 2, spot[1], loot());
+        }
+        room.fill(MID - 2, 1, MID - 2, MID + 2, 1, MID + 2, ROOM);
+        room.set(MID - 1, 2, MID, objective());
+        room.set(MID + 1, 2, MID, objective());
+        room.set(MID, 1, 8, mob());
+        room.set(MID, 1, MAX - 8, mob());
+        return room;
+    }
+
     private static PieceBuilder huntRoom() {
         PieceBuilder room = roomShell();
         int[][] cover = { { 6, 6 }, { 24, 6 }, { 6, 24 }, { 24, 24 } };

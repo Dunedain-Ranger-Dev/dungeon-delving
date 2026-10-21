@@ -123,7 +123,7 @@ public class DungeonMarkerTests {
 
     @GameTest(template = ANY_TEMPLATE)
     public static void quarryRoomIsFullOfResources(GameTestHelper helper) {
-        StructureTemplate quarry = helper.getLevel().getStructureManager().get(DungeonPieces.id("common_quarry_placeholder")).orElseThrow();
+        StructureTemplate quarry = helper.getLevel().getStructureManager().get(DungeonPieces.id("quarry_placeholder")).orElseThrow();
         int markers = count(quarry, ModRegistries.RESOURCE_MARKER.get());
         helper.assertTrue(markers >= 100, "the quarry test room should be packed with resource markers, has " + markers);
         helper.succeed();

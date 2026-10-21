@@ -15,6 +15,8 @@ How to set up the mod, build a dungeon piece, check it against the spec, and exp
 
 - **start:** where players arrive. Keep the center clear; the exit goes there.
 - **common:** ordinary rooms with loot, spawners and ores.
+- **quarry:** rooms packed with resource markers; resource-heavy dungeons use more of them.
+- **treasure:** rooms with extra chests (loot and objective markers); loot-heavy dungeons use more of them.
 - **challenge:** rooms that give a Dungeon Key when cleared. For now the only challenge is a hunt (hunt markers).
 - **boss:** the goal of every run, behind the boss door. The door needs 2 keys per dungeon tier.
 
@@ -22,7 +24,7 @@ How to set up the mod, build a dungeon piece, check it against the spec, and exp
 
 | Piece | Size | Notes |
 |---|---|---|
-| Room (start / common / challenge / boss) | **33 x 13 x 33**, walls included | Full floor and ceiling. A **5 wide x 6 tall doorway hole** in the middle of every side (blocks 14-18, just above the floor), with wall around it. |
+| Room (start / common / quarry / treasure / challenge / boss) | **33 x 13 x 33**, walls included | Full floor and ceiling. A **5 wide x 6 tall doorway hole** in the middle of every side (blocks 14-18, just above the floor), with wall around it. |
 | Tunnel | **9 x 9 x 33** | Corridor between two rooms' doorways. Open ends, a floor, and a clear 5 x 6 path all the way through. |
 | Cap | **5 x 6 x 1** | Solid plug that fills an unused doorway. |
 
@@ -47,7 +49,7 @@ Every command takes the piece's lowest, north-west block (smallest X, Y, Z). Pre
 ## Steps
 
 1. **Start from a template:** `/dungeondelving room template common <x> <y> <z>`
-   Use `start`, `common`, `challenge`, `boss`, `tunnel` or `cap`. Replace the light gray. **Red wool outside the piece marks doorways that must stay open.**
+   Use `start`, `common`, `quarry`, `treasure`, `challenge`, `boss`, `tunnel` or `cap`. Replace the light gray. **Red wool outside the piece marks doorways that must stay open.**
 2. **Check:** `/dungeondelving room check common <x> <y> <z>`
    Repeat until it says **meets the spec**.
 3. **Export:** `/dungeondelving room export common <name> <x> <y> <z>`

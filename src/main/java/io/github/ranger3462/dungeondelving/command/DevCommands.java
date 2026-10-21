@@ -16,6 +16,7 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
 import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
+import io.github.ranger3462.dungeondelving.dungeon.layout.LayoutType;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonProgress;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonTravel;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
@@ -30,7 +31,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
  * Operator-only commands for testing dungeons without the gate and exit blocks:
- * {@code /dungeondelving dungeon enter [rooms] [tier]|enter tier <tier>|keys|leave|fail|regions}. Without a room count, the
+ * {@code /dungeondelving dungeon enter [rooms] [tier]|enter tier <tier> [normal|resource|loot]|keys|leave|fail|regions}. Without a room count, the
  * count is rolled from the tier's {@code roomCounts} range.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
@@ -53,7 +54,19 @@ public final class DevCommands {
                                                 .executes(context -> {
                                                     int tier = IntegerArgumentType.getInteger(context, "tier");
                                                     return enter(context, rolledRooms(context, tier), tier);
-                                                })))
+                                                })
+                                                .then(Commands.literal("normal").executes(context -> {
+                                                    int tier = IntegerArgumentType.getInteger(context, "tier");
+                                                    return enter(context, rolledRooms(context, tier), tier, LayoutType.NORMAL);
+                                                }))
+                                                .then(Commands.literal("resource").executes(context -> {
+                                                    int tier = IntegerArgumentType.getInteger(context, "tier");
+                                                    return enter(context, rolledRooms(context, tier), tier, LayoutType.RESOURCE);
+                                                }))
+                                                .then(Commands.literal("loot").executes(context -> {
+                                                    int tier = IntegerArgumentType.getInteger(context, "tier");
+                                                    return enter(context, rolledRooms(context, tier), tier, LayoutType.LOOT);
+                                                }))))
                                 .then(Commands.argument("rooms", IntegerArgumentType.integer(1, DungeonLayoutGenerator.maxRooms()))
                                         .executes(context -> enter(context, IntegerArgumentType.getInteger(context, "rooms"), DungeonRun.MIN_TIER))
                                         .then(Commands.argument("tier", IntegerArgumentType.integer(DungeonRun.MIN_TIER, DungeonRun.MAX_TIER))
@@ -70,15 +83,20 @@ public final class DevCommands {
     }
 
     private static int enter(CommandContext<CommandSourceStack> context, int rooms, int tier) throws CommandSyntaxException {
+        return enter(context, rooms, tier, null);
+    }
+
+    /** Enters a dungeon; a null layout type is rolled as usual. */
+    private static int enter(CommandContext<CommandSourceStack> context, int rooms, int tier, LayoutType type) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
         if (DungeonRegions.get().run(player.getUUID()).isPresent()) {
             fail(context.getSource(), "You are already in a dungeon. Leave it first.");
             return 0;
         }
-        DungeonTravel.Entry entry = DungeonTravel.enter(player, rooms, tier);
+        DungeonTravel.Entry entry = type == null ? DungeonTravel.enter(player, rooms, tier) : DungeonTravel.enter(player, rooms, tier, type);
         DungeonRun run = entry.run();
         BlockPos center = DungeonDimension.regionCenter(run.region());
-        tell(context.getSource(), "Entered tier " + run.tier() + " dungeon region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ()
+        tell(context.getSource(), "Entered tier " + run.tier() + " " + entry.type().id() + " dungeon region " + run.region() + " (center " + center.getX() + ", " + center.getY() + ", " + center.getZ()
                 + "): " + entry.layout().rooms().size() + " rooms, " + entry.layout().connections().size() + " tunnels, "
                 + DungeonRegions.get().progress(run.region()).map(DungeonProgress::keysNeeded).orElse(0) + " keys to open the boss door");
         return 1;
