@@ -7,6 +7,8 @@ import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.block.BossDoorBlock;
 import io.github.ranger3462.dungeondelving.block.DungeonExitBlock;
 import io.github.ranger3462.dungeondelving.block.DungeonGateBlock;
+import io.github.ranger3462.dungeondelving.block.PuzzleLockBlock;
+import io.github.ranger3462.dungeondelving.block.RelicAltarBlock;
 import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import io.github.ranger3462.dungeondelving.forging.Forging;
@@ -82,9 +84,23 @@ public final class ModRegistries {
             BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).strength(-1.0f, 3600000.0f).noLootTable().lightLevel(state -> 4)
                     .sound(SoundType.DEEPSLATE_BRICKS));
 
+    /** The end of a puzzle challenge room: the first time builders' redstone powers it, it drops a Dungeon Key. */
+    public static final DeferredBlock<PuzzleLockBlock> PUZZLE_LOCK = BLOCKS.registerBlock("puzzle_lock", PuzzleLockBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).strength(-1.0f, 3600000.0f).noLootTable()
+                    .lightLevel(state -> state.getValue(PuzzleLockBlock.SOLVED) ? 10 : 3).sound(SoundType.VAULT));
+    public static final DeferredItem<BlockItem> PUZZLE_LOCK_ITEM = ITEMS.registerSimpleBlockItem(PUZZLE_LOCK);
+    /** The heart of a collection challenge room: offer it enough Relic Shards and it gives up a Dungeon Key. */
+    public static final DeferredBlock<RelicAltarBlock> RELIC_ALTAR = BLOCKS.registerBlock("relic_altar", RelicAltarBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(-1.0f, 3600000.0f).noLootTable().lightLevel(state -> 7)
+                    .sound(SoundType.LODESTONE));
+    public static final DeferredItem<BlockItem> RELIC_ALTAR_ITEM = ITEMS.registerSimpleBlockItem(RELIC_ALTAR);
+
     /** Dropped by cleared challenge rooms; opens the boss door. Only works in the dungeon it came from. */
     public static final DeferredItem<DungeonKeyItem> DUNGEON_KEY = ITEMS.registerItem("dungeon_key", DungeonKeyItem::new,
             new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON));
+    /** Dropped by mobs in collection rooms, for the room's Relic Altar. Belongs to its dungeon, like a key. */
+    public static final DeferredItem<DungeonKeyItem> RELIC_SHARD = ITEMS.registerItem("relic_shard", DungeonKeyItem::new,
+            new Item.Properties().rarity(Rarity.UNCOMMON));
 
     /** Testing tool: can't die, damage readout, fast regeneration and mana, and flight. Creative tab only. */
     public static final DeferredItem<TestersCharm.CharmItem> TESTERS_CHARM = ITEMS.registerItem("testers_charm", TestersCharm.CharmItem::new,
@@ -123,7 +139,10 @@ public final class ModRegistries {
                 output.accept(OBJECTIVE_MARKER.get());
                 output.accept(HUNT_MARKER.get());
                 output.accept(BOSS_MARKER.get());
+                output.accept(PUZZLE_LOCK_ITEM.get());
+                output.accept(RELIC_ALTAR_ITEM.get());
                 output.accept(DUNGEON_KEY.get());
+                output.accept(RELIC_SHARD.get());
                 output.accept(TESTERS_CHARM.get());
                 output.accept(ModEntities.GOBLIN_SPAWN_EGG.get());
                 output.accept(ModEntities.GOBLIN_SPEAR.get());

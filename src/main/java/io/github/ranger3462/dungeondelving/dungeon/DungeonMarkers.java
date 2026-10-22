@@ -47,6 +47,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * out of its spawners at random (see {@link DungeonChallenges}).</li>
  * <li>Boss marker: where the boss appears when the boss door opens.</li>
  * </ul>
+ * Relic Altars aren't markers (they stay), but each one gives its room a collection challenge here.
  * Chances come from the config.
  */
 public final class DungeonMarkers {
@@ -97,6 +98,9 @@ public final class DungeonMarkers {
             for (StructureTemplate.StructureBlockInfo info : template.filterBlocks(pos, settings, marker)) {
                 resolveAt(level, info.pos(), marker, random, rolls, pieceMin);
             }
+        }
+        for (StructureTemplate.StructureBlockInfo info : template.filterBlocks(pos, settings, ModRegistries.RELIC_ALTAR.get())) {
+            DungeonChallenges.addAltar(rolls.region(), DungeonDimension.roomMinAt(info.pos()).asLong());
         }
     }
 

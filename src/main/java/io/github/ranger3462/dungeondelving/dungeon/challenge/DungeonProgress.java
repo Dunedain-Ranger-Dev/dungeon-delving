@@ -15,7 +15,8 @@ import net.minecraft.nbt.Tag;
 
 /**
  * How far a dungeon has got towards its boss: the keys needed and used on the boss door, where the door and the boss
- * are, and how many hunt targets are left in each challenge room. One per dungeon region; saved with the regions.
+ * are, and what's left to do in each challenge room (hunt targets to kill, relics to offer). One per dungeon region;
+ * saved with the regions.
  */
 public final class DungeonProgress {
     private final int tier;
@@ -30,6 +31,8 @@ public final class DungeonProgress {
     private final Map<Long, Integer> hunters = new HashMap<>();
     /** Hunt targets that haven't come out of a spawner yet, by room. */
     private final Map<Long, Integer> unspawned = new HashMap<>();
+    /** Relic Shards a room's altar still needs, by room. */
+    private final Map<Long, Integer> relics = new HashMap<>();
 
     public DungeonProgress(int tier, int keysNeeded, List<BlockPos> door, BlockPos bossSpawn) {
         this(tier, DungeonBosses.BARROW_KING, keysNeeded, door, bossSpawn);
@@ -156,6 +159,36 @@ public final class DungeonProgress {
         return hunters.getOrDefault(room, 0);
     }
 
+    /** Relic Shards a collection room's altar needs in a dungeon of this tier: 4 at tier 1, up to 7 at tier 4. */
+    public static int relicsFor(int tier) {
+        return 3 + tier;
+    }
+
+    /** Gives a room a Relic Altar, needing {@link #relicsFor} shards. A room only gets one, however many altars it has. */
+    public void addAltar(long room) {
+        relics.putIfAbsent(room, relicsFor(tier));
+    }
+
+    /** Relic Shards a room's altar still needs (0 if it has none, or it's done). */
+    public int relicsLeft(long room) {
+        return relics.getOrDefault(room, 0);
+    }
+
+    /**
+     * Offers up to {@code count} Relic Shards to a room's altar. Returns how many it took (never more than it still
+     * needs); check {@link #relicsLeft} afterwards to see whether that finished it.
+     */
+    public int offerRelics(long room, int count) {
+        int left = relicsLeft(room);
+        int taken = Math.min(left, Math.max(0, count));
+        if (left - taken <= 0) {
+            relics.remove(room);
+        } else {
+            relics.put(room, left - taken);
+        }
+        return taken;
+    }
+
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();
         tag.putInt("tier", tier);
@@ -184,6 +217,14 @@ public final class DungeonProgress {
             waiting.add(entry);
         });
         tag.put("unspawned", waiting);
+        ListTag altars = new ListTag();
+        relics.forEach((room, left) -> {
+            CompoundTag entry = new CompoundTag();
+            entry.putLong("room", room);
+            entry.putInt("left", left);
+            altars.add(entry);
+        });
+        tag.put("relics", altars);
         return tag;
     }
 
@@ -207,6 +248,10 @@ public final class DungeonProgress {
         for (Tag entryTag : tag.getList("unspawned", Tag.TAG_COMPOUND)) {
             CompoundTag entry = (CompoundTag) entryTag;
             progress.unspawned.put(entry.getLong("room"), entry.getInt("left"));
+        }
+        for (Tag entryTag : tag.getList("relics", Tag.TAG_COMPOUND)) {
+            CompoundTag entry = (CompoundTag) entryTag;
+            progress.relics.put(entry.getLong("room"), entry.getInt("left"));
         }
         return progress;
     }

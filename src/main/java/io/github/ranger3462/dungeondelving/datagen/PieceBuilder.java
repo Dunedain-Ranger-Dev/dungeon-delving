@@ -45,7 +45,11 @@ public class PieceBuilder {
     }
 
     public PieceBuilder set(int x, int y, int z, Block block) {
-        blocks[index(x, y, z)] = block.defaultBlockState();
+        return set(x, y, z, block.defaultBlockState());
+    }
+
+    public PieceBuilder set(int x, int y, int z, BlockState state) {
+        blocks[index(x, y, z)] = state;
         return this;
     }
 

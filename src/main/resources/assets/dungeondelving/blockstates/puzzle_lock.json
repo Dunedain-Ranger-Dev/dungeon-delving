@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "solved=false": {
+      "model": "dungeondelving:block/puzzle_lock"
+    },
+    "solved=true": {
+      "model": "dungeondelving:block/puzzle_lock_solved"
+    }
+  }
+}

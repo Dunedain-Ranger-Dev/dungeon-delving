@@ -21,6 +21,8 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 
 /**
  * Generates simple test pieces that follow {@link io.github.ranger3462.dungeondelving.dungeon.RoomSpec}, so dungeon
@@ -84,6 +86,8 @@ public class PlaceholderRoomProvider implements DataProvider {
         pieces.put("quarry_placeholder", quarryRoom());
         pieces.put("treasure_placeholder", treasureRoom());
         pieces.put("challenge_hunt_placeholder", huntRoom());
+        pieces.put("challenge_puzzle_placeholder", puzzleRoom());
+        pieces.put("challenge_relics_placeholder", relicRoom());
         pieces.put("boss_placeholder", bossRoom());
         pieces.put("boss_goblin_chief_placeholder", goblinChiefArena());
         pieces.put("boss_skeleton_lord_placeholder", skeletonLordHall());
@@ -227,10 +231,6 @@ public class PlaceholderRoomProvider implements DataProvider {
     }
 
     /**
-     * A hunt challenge room: three hunt targets among the cover, plus two spawners for ordinary mobs. Killing all three
-     * targets drops a Dungeon Key.
-     */
-    /**
      * A treasure room: a vault of chests on low plinths around the walls, with two reward chests on a dais in the
      * middle, guarded by two spawners.
      */
@@ -248,6 +248,10 @@ public class PlaceholderRoomProvider implements DataProvider {
         return room;
     }
 
+    /**
+     * A hunt challenge room: three hunt targets among the cover, plus two spawners for ordinary mobs. Killing all three
+     * targets drops a Dungeon Key.
+     */
     private static PieceBuilder huntRoom() {
         PieceBuilder room = roomShell();
         int[][] cover = { { 6, 6 }, { 24, 6 }, { 6, 24 }, { 24, 24 } };
@@ -259,6 +263,41 @@ public class PlaceholderRoomProvider implements DataProvider {
         room.set(MID, 1, MAX - 9, hunt());
         room.set(MID, 1, 9, mob());
         room.set(MID, 1, MID, mob());
+        return room;
+    }
+
+    /** How high the puzzle room's Puzzle Lock sits. */
+    static final int PUZZLE_LOCK_Y = 8;
+
+    /**
+     * A puzzle challenge room, standing in for a builder's redstone puzzle: a Puzzle Lock on top of a pillar, with a
+     * lever on it, reached by a spiral of stepping blocks. Flipping the lever solves the room. Two spawners keep it busy.
+     */
+    private static PieceBuilder puzzleRoom() {
+        PieceBuilder room = roomShell();
+        room.fill(MID, 1, MID, MID, PUZZLE_LOCK_Y - 1, MID, ROOM);
+        room.set(MID, PUZZLE_LOCK_Y, MID, ModRegistries.PUZZLE_LOCK.get());
+        room.set(MID, PUZZLE_LOCK_Y + 1, MID, Blocks.LEVER.defaultBlockState().setValue(LeverBlock.FACE, AttachFace.FLOOR));
+        int[][] steps = { { -2, -2 }, { 0, -2 }, { 2, -2 }, { 2, 0 }, { 2, 2 }, { 0, 2 }, { -2, 2 } };
+        for (int i = 0; i < steps.length; i++) {
+            room.set(MID + steps[i][0], 1 + i, MID + steps[i][1], ROOM);
+        }
+        room.set(8, 1, 8, mob());
+        room.set(MAX - 8, 1, MAX - 8, mob());
+        return room;
+    }
+
+    /**
+     * A collection challenge room: a Relic Altar on a dais in the middle, and six spawners around it. Monsters killed
+     * here drop the Relic Shards the altar wants.
+     */
+    private static PieceBuilder relicRoom() {
+        PieceBuilder room = roomShell();
+        room.fill(MID - 1, 1, MID - 1, MID + 1, 1, MID + 1, ROOM);
+        room.set(MID, 2, MID, ModRegistries.RELIC_ALTAR.get());
+        for (int[] spot : new int[][] { { 7, 7 }, { MAX - 7, 7 }, { 7, MAX - 7 }, { MAX - 7, MAX - 7 }, { MID - 8, MID }, { MID + 8, MID } }) {
+            room.set(spot[0], 1, spot[1], mob());
+        }
         return room;
     }
 

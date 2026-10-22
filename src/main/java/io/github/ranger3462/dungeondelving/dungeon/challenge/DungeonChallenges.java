@@ -17,28 +17,36 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.SpawnerBlockEntity;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 
 /**
- * The path to the boss: hunt targets in challenge rooms, the Dungeon Keys they drop, and the boss door.
+ * The path to the boss: challenge rooms, the Dungeon Keys they drop, and the boss door. Each challenge room gives one
+ * key, and its spawners give way to a reward chest, so players can finish off the room and loot it without breaking
+ * spawners. There are three kinds so far:
  * <ul>
  * <li>Each hunt marker adds a hunt target to its room, and becomes a spawner. The room's spawners then turn some of
  * the mobs they spawn into hunt targets, at random, until the room has spawned all of them. Hunt targets are tougher
  * than ordinary mobs and aren't highlighted (a skill may reveal them later). Killing every hunt target in a room drops
- * one Dungeon Key, and the room's spawners give way to a reward chest, so players can finish off the room and loot
- * it without breaking spawners.</li>
+ * its key.</li>
+ * <li><b>Puzzles:</b> builders wire a vanilla redstone puzzle into a Puzzle Lock. The first time it's powered, it drops
+ * the key.</li>
+ * <li><b>Collection:</b> monsters killed in a room with a Relic Altar sometimes drop Relic Shards
+ * ({@link #RELIC_CHANCE}). Offering the altar {@link DungeonProgress#relicsFor enough} of them gives the key.</li>
  * <li>The boss door needs {@link DungeonProgress#keysFor tier x 2} keys. Using the last one opens the door and spawns
  * the boss.</li>
  * </ul>
@@ -52,6 +60,8 @@ public final class DungeonChallenges {
     /** How much tougher hunt targets are than ordinary mobs. */
     private static final double HUNTER_HEALTH = 2.0;
     private static final double HUNTER_DAMAGE = 2.0;
+    /** Chance a monster killed in a collection room drops a Relic Shard, while the room's altar still needs some. */
+    public static final double RELIC_CHANCE = 0.35;
 
     private DungeonChallenges() {}
 
@@ -108,7 +118,11 @@ public final class DungeonChallenges {
 
     @SubscribeEvent
     public static void onDeath(LivingDeathEvent event) {
-        if (!(event.getEntity().level() instanceof ServerLevel level) || !event.getEntity().getPersistentData().contains(HUNT_TAG)) {
+        if (!(event.getEntity().level() instanceof ServerLevel level)) {
+            return;
+        }
+        if (!event.getEntity().getPersistentData().contains(HUNT_TAG)) {
+            maybeDropRelic(level, event.getEntity());
             return;
         }
         CompoundTag hunt = event.getEntity().getPersistentData().getCompound(HUNT_TAG);
@@ -119,15 +133,96 @@ public final class DungeonChallenges {
                 tellRegion(level, region, Component.translatable("message.dungeondelving.hunt_left", left).withStyle(ChatFormatting.GRAY));
                 return;
             }
-            DungeonRegions.get().progress(region).ifPresent(progress -> clearSpawners(level, BlockPos.of(hunt.getLong("room")), progress.tier(), true));
-            ItemEntity key = new ItemEntity(level, event.getEntity().getX(), event.getEntity().getY() + 0.5, event.getEntity().getZ(),
-                    DungeonKeyItem.forRegion(region));
-            key.setUnlimitedLifetime();
-            key.setGlowingTag(true);
-            level.addFreshEntity(key);
-            level.playSound(null, event.getEntity().blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0f, 1.2f);
-            tellRegion(level, region, Component.translatable("message.dungeondelving.key_dropped").withStyle(ChatFormatting.GOLD));
+            roomCleared(level, region, BlockPos.of(hunt.getLong("room")), event.getEntity().position().add(0, 0.5, 0),
+                    Component.translatable("message.dungeondelving.key_dropped"));
         });
+    }
+
+    /**
+     * A challenge room is done: its spawners give way to a reward chest, and its Dungeon Key appears at {@code at},
+     * glowing so it isn't lost.
+     */
+    public static void roomCleared(ServerLevel level, int region, BlockPos roomMin, Vec3 at, Component message) {
+        DungeonRegions.get().progress(region).ifPresent(progress -> clearSpawners(level, roomMin, progress.tier(), true));
+        dropGlowing(level, at, DungeonKeyItem.forRegion(region));
+        level.playSound(null, BlockPos.containing(at), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0f, 1.2f);
+        tellRegion(level, region, message.copy().withStyle(ChatFormatting.GOLD));
+    }
+
+    private static void dropGlowing(ServerLevel level, Vec3 at, ItemStack stack) {
+        ItemEntity item = new ItemEntity(level, at.x, at.y, at.z, stack);
+        item.setUnlimitedLifetime();
+        item.setGlowingTag(true);
+        level.addFreshEntity(item);
+    }
+
+    // --- Puzzles ---
+
+    /** A Puzzle Lock was powered for the first time: its room is solved. Nothing happens outside a tracked dungeon. */
+    public static void puzzleSolved(ServerLevel level, BlockPos lock) {
+        level.playSound(null, lock, SoundEvents.VAULT_OPEN_SHUTTER, SoundSource.BLOCKS, 1.0f, 1.0f);
+        int region = DungeonDimension.regionAt(lock);
+        if (level.dimension() != DungeonDimension.DUNGEON || DungeonRegions.get().progress(region).isEmpty()) {
+            return;
+        }
+        roomCleared(level, region, DungeonDimension.roomMinAt(lock), Vec3.atCenterOf(lock.above()),
+                Component.translatable("message.dungeondelving.puzzle_solved"));
+    }
+
+    // --- Collection ---
+
+    /** Gives a room a Relic Altar. Nothing is tracked if the region has no progress, e.g. in tests. */
+    public static void addAltar(int region, long room) {
+        if (region < 0) {
+            return;
+        }
+        DungeonRegions.get().progress(region).ifPresent(progress -> {
+            progress.addAltar(room);
+            DungeonRegions.get().progressChanged();
+        });
+    }
+
+    /** A monster killed in a room whose altar still needs relics may drop one. */
+    private static void maybeDropRelic(ServerLevel level, LivingEntity entity) {
+        if (level.dimension() != DungeonDimension.DUNGEON || !(entity instanceof Monster) || DungeonBosses.isBoss(entity)) {
+            return;
+        }
+        BlockPos pos = entity.blockPosition();
+        int region = DungeonDimension.regionAt(pos);
+        long room = DungeonDimension.roomMinAt(pos).asLong();
+        DungeonRegions.get().progress(region).ifPresent(progress -> {
+            if (progress.relicsLeft(room) > 0 && entity.getRandom().nextDouble() < RELIC_CHANCE) {
+                dropGlowing(level, entity.position().add(0, 0.5, 0), DungeonKeyItem.relicFor(region));
+            }
+        });
+    }
+
+    /** A player using a Relic Altar, holding a stack (possibly empty): offers any of this dungeon's shards it holds. */
+    public static void useAltar(ServerPlayer player, BlockPos altar, ItemStack held) {
+        int region = DungeonDimension.regionAt(altar);
+        long room = DungeonDimension.roomMinAt(altar).asLong();
+        Optional<DungeonProgress> found = player.level().dimension() == DungeonDimension.DUNGEON ? DungeonRegions.get().progress(region) : Optional.empty();
+        if (found.isEmpty() || found.get().relicsLeft(room) <= 0) {
+            player.displayClientMessage(Component.translatable("message.dungeondelving.altar_quiet").withStyle(ChatFormatting.GRAY), true);
+            return;
+        }
+        DungeonProgress progress = found.get();
+        int taken = DungeonKeyItem.isRelicFrom(held, region) ? progress.offerRelics(room, held.getCount()) : 0;
+        if (taken == 0) {
+            player.displayClientMessage(Component.translatable("message.dungeondelving.altar_needs", progress.relicsLeft(room))
+                    .withStyle(ChatFormatting.GOLD), true);
+            return;
+        }
+        held.shrink(taken);
+        DungeonRegions.get().progressChanged();
+        ServerLevel level = player.serverLevel();
+        level.playSound(null, altar, SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.BLOCKS, 1.0f, 1.0f);
+        int left = progress.relicsLeft(room);
+        if (left > 0) {
+            player.displayClientMessage(Component.translatable("message.dungeondelving.altar_needs", left).withStyle(ChatFormatting.GOLD), true);
+            return;
+        }
+        roomCleared(level, region, BlockPos.of(room), Vec3.atCenterOf(altar.above()), Component.translatable("message.dungeondelving.altar_done"));
     }
 
     /**
