@@ -7,6 +7,7 @@ import java.util.Optional;
 import io.github.ranger3462.dungeondelving.Config;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonChallenges;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonWaves;
 import io.github.ranger3462.dungeondelving.registry.DungeonOre;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.core.BlockPos;
@@ -47,7 +48,8 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * out of its spawners at random (see {@link DungeonChallenges}).</li>
  * <li>Boss marker: where the boss appears when the boss door opens.</li>
  * </ul>
- * Relic Altars aren't markers (they stay), but each one gives its room a collection challenge here.
+ * Relic Altars and War Drums aren't markers (they stay), but each one gives its room a collection or wave defense
+ * challenge here.
  * Chances come from the config.
  */
 public final class DungeonMarkers {
@@ -101,6 +103,9 @@ public final class DungeonMarkers {
         }
         for (StructureTemplate.StructureBlockInfo info : template.filterBlocks(pos, settings, ModRegistries.RELIC_ALTAR.get())) {
             DungeonChallenges.addAltar(rolls.region(), DungeonDimension.roomMinAt(info.pos()).asLong());
+        }
+        for (StructureTemplate.StructureBlockInfo info : template.filterBlocks(pos, settings, ModRegistries.WAR_DRUM.get())) {
+            DungeonWaves.addDrum(rolls.region(), info.pos());
         }
     }
 

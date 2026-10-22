@@ -9,6 +9,7 @@ import io.github.ranger3462.dungeondelving.block.DungeonExitBlock;
 import io.github.ranger3462.dungeondelving.block.DungeonGateBlock;
 import io.github.ranger3462.dungeondelving.block.PuzzleLockBlock;
 import io.github.ranger3462.dungeondelving.block.RelicAltarBlock;
+import io.github.ranger3462.dungeondelving.block.WarDrumBlock;
 import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import io.github.ranger3462.dungeondelving.forging.Forging;
@@ -94,6 +95,14 @@ public final class ModRegistries {
             BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(-1.0f, 3600000.0f).noLootTable().lightLevel(state -> 7)
                     .sound(SoundType.LODESTONE));
     public static final DeferredItem<BlockItem> RELIC_ALTAR_ITEM = ITEMS.registerSimpleBlockItem(RELIC_ALTAR);
+    /** The heart of a wave defense challenge room: strike it to seal the room and call the waves. */
+    public static final DeferredBlock<WarDrumBlock> WAR_DRUM = BLOCKS.registerBlock("war_drum", WarDrumBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BROWN).strength(-1.0f, 3600000.0f).noLootTable().sound(SoundType.WOOD));
+    public static final DeferredItem<BlockItem> WAR_DRUM_ITEM = ITEMS.registerSimpleBlockItem(WAR_DRUM);
+    /** Seals a wave defense room's doorways while its waves run. Placed by the mod; can't be broken. */
+    public static final DeferredBlock<Block> WAVE_SEAL = BLOCKS.registerSimpleBlock("wave_seal",
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(-1.0f, 3600000.0f).noLootTable().lightLevel(state -> 6)
+                    .sound(SoundType.DEEPSLATE_BRICKS));
 
     /** Dropped by cleared challenge rooms; opens the boss door. Only works in the dungeon it came from. */
     public static final DeferredItem<DungeonKeyItem> DUNGEON_KEY = ITEMS.registerItem("dungeon_key", DungeonKeyItem::new,
@@ -141,6 +150,7 @@ public final class ModRegistries {
                 output.accept(BOSS_MARKER.get());
                 output.accept(PUZZLE_LOCK_ITEM.get());
                 output.accept(RELIC_ALTAR_ITEM.get());
+                output.accept(WAR_DRUM_ITEM.get());
                 output.accept(DUNGEON_KEY.get());
                 output.accept(RELIC_SHARD.get());
                 output.accept(TESTERS_CHARM.get());

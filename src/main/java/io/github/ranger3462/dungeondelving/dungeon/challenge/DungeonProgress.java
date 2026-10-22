@@ -15,7 +15,7 @@ import net.minecraft.nbt.Tag;
 
 /**
  * How far a dungeon has got towards its boss: the keys needed and used on the boss door, where the door and the boss
- * are, and what's left to do in each challenge room (hunt targets to kill, relics to offer). One per dungeon region;
+ * are, and what's left to do in each challenge room (hunt targets to kill, relics to offer, waves to fight). One per dungeon region;
  * saved with the regions.
  */
 public final class DungeonProgress {
@@ -33,6 +33,8 @@ public final class DungeonProgress {
     private final Map<Long, Integer> unspawned = new HashMap<>();
     /** Relic Shards a room's altar still needs, by room. */
     private final Map<Long, Integer> relics = new HashMap<>();
+    /** Wave defense rooms not yet beaten, by room. */
+    private final Map<Long, WaveRoom> waveRooms = new HashMap<>();
 
     public DungeonProgress(int tier, int keysNeeded, List<BlockPos> door, BlockPos bossSpawn) {
         this(tier, DungeonBosses.BARROW_KING, keysNeeded, door, bossSpawn);
@@ -189,6 +191,24 @@ public final class DungeonProgress {
         return taken;
     }
 
+    /** Gives a room a wave defense challenge, started from a War Drum. A room only gets one, however many drums it has. */
+    public void addWaveRoom(long room, BlockPos drum) {
+        waveRooms.putIfAbsent(room, new WaveRoom(drum, WaveRoom.wavesFor(tier)));
+    }
+
+    /** A room's wave defense, unless it has none or it's beaten. */
+    public Optional<WaveRoom> waveRoom(long room) {
+        return Optional.ofNullable(waveRooms.get(room));
+    }
+
+    public void removeWaveRoom(long room) {
+        waveRooms.remove(room);
+    }
+
+    public Map<Long, WaveRoom> waveRooms() {
+        return waveRooms;
+    }
+
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();
         tag.putInt("tier", tier);
@@ -225,6 +245,13 @@ public final class DungeonProgress {
             altars.add(entry);
         });
         tag.put("relics", altars);
+        ListTag waves = new ListTag();
+        waveRooms.forEach((room, wave) -> {
+            CompoundTag entry = wave.save();
+            entry.putLong("room", room);
+            waves.add(entry);
+        });
+        tag.put("wave_rooms", waves);
         return tag;
     }
 
@@ -252,6 +279,10 @@ public final class DungeonProgress {
         for (Tag entryTag : tag.getList("relics", Tag.TAG_COMPOUND)) {
             CompoundTag entry = (CompoundTag) entryTag;
             progress.relics.put(entry.getLong("room"), entry.getInt("left"));
+        }
+        for (Tag entryTag : tag.getList("wave_rooms", Tag.TAG_COMPOUND)) {
+            CompoundTag entry = (CompoundTag) entryTag;
+            progress.waveRooms.put(entry.getLong("room"), WaveRoom.load(entry));
         }
         return progress;
     }

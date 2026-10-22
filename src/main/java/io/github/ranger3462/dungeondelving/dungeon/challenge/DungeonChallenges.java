@@ -37,7 +37,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 /**
  * The path to the boss: challenge rooms, the Dungeon Keys they drop, and the boss door. Each challenge room gives one
  * key, and its spawners give way to a reward chest, so players can finish off the room and loot it without breaking
- * spawners. There are three kinds so far:
+ * spawners. There are four kinds:
  * <ul>
  * <li>Each hunt marker adds a hunt target to its room, and becomes a spawner. The room's spawners then turn some of
  * the mobs they spawn into hunt targets, at random, until the room has spawned all of them. Hunt targets are tougher
@@ -47,6 +47,8 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
  * the key.</li>
  * <li><b>Collection:</b> monsters killed in a room with a Relic Altar sometimes drop Relic Shards
  * ({@link #RELIC_CHANCE}). Offering the altar {@link DungeonProgress#relicsFor enough} of them gives the key.</li>
+ * <li><b>Wave defense:</b> striking a War Drum seals the room and calls waves of mobs; beating the last one gives the
+ * key (see {@link DungeonWaves}).</li>
  * <li>The boss door needs {@link DungeonProgress#keysFor tier x 2} keys. Using the last one opens the door and spawns
  * the boss.</li>
  * </ul>

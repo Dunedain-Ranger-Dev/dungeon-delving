@@ -88,6 +88,7 @@ public class PlaceholderRoomProvider implements DataProvider {
         pieces.put("challenge_hunt_placeholder", huntRoom());
         pieces.put("challenge_puzzle_placeholder", puzzleRoom());
         pieces.put("challenge_relics_placeholder", relicRoom());
+        pieces.put("challenge_waves_placeholder", waveRoom());
         pieces.put("boss_placeholder", bossRoom());
         pieces.put("boss_goblin_chief_placeholder", goblinChiefArena());
         pieces.put("boss_skeleton_lord_placeholder", skeletonLordHall());
@@ -291,6 +292,19 @@ public class PlaceholderRoomProvider implements DataProvider {
      * A collection challenge room: a Relic Altar on a dais in the middle, and six spawners around it. Monsters killed
      * here drop the Relic Shards the altar wants.
      */
+    /**
+     * A wave defense challenge room: a War Drum in the middle and some low cover. No spawners; the waves come from the
+     * drum.
+     */
+    private static PieceBuilder waveRoom() {
+        PieceBuilder room = roomShell();
+        room.set(MID, 1, MID, ModRegistries.WAR_DRUM.get());
+        for (int[] c : new int[][] { { 8, 8 }, { MAX - 10, 8 }, { 8, MAX - 10 }, { MAX - 10, MAX - 10 } }) {
+            room.fill(c[0], 1, c[1], c[0] + 2, 2, c[1] + 2, ROOM);
+        }
+        return room;
+    }
+
     private static PieceBuilder relicRoom() {
         PieceBuilder room = roomShell();
         room.fill(MID - 1, 1, MID - 1, MID + 1, 1, MID + 1, ROOM);

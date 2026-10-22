@@ -10,6 +10,8 @@ import io.github.ranger3462.dungeondelving.block.PuzzleLockBlock;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonProgress;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonWaves;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.WaveRoom;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.core.BlockPos;
@@ -26,7 +28,7 @@ import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
-/** Checks the puzzle and collection challenge rooms: the Puzzle Lock, the Relic Altar and its Relic Shards. */
+/** Checks the puzzle, collection and wave defense challenge rooms. */
 @GameTestHolder(DungeonDelving.MODID)
 @PrefixGameTestTemplate(false)
 public class ChallengeRoomTests {
@@ -99,6 +101,67 @@ public class ChallengeRoomTests {
         StructureTemplate relics = structures.get(DungeonPieces.id("challenge_relics_placeholder")).orElseThrow();
         helper.assertTrue(count(relics, ModRegistries.RELIC_ALTAR.get()) == 1 && count(relics, ModRegistries.MOB_MARKER.get()) == 6,
                 "the relic room should have an altar and six mob markers");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void waveRoomsGrowWithTier(GameTestHelper helper) {
+        helper.assertTrue(WaveRoom.wavesFor(1) == 3 && WaveRoom.wavesFor(2) == 3 && WaveRoom.wavesFor(3) == 4 && WaveRoom.wavesFor(4) == 4,
+                "tiers 1-2 should have 3 waves, tiers 3-4 four");
+        helper.assertTrue(WaveRoom.mobsFor(1, 1) == 3 && WaveRoom.mobsFor(4, 4) == 9, "waves should grow by wave and tier");
+        WaveRoom room = new WaveRoom(BlockPos.ZERO, 3);
+        helper.assertFalse(room.started(), "a new wave room hasn't started");
+        helper.assertTrue(room.advance() && room.advance() && room.advance() && room.lastWave(), "three waves, then the last");
+        helper.assertFalse(room.advance(), "there's no fourth wave");
+        room.reset();
+        helper.assertTrue(!room.started() && room.advance() && room.wave() == 1, "a reset room starts again from wave 1");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void waveRoomsAreSaved(GameTestHelper helper) {
+        DungeonRegions regions = new DungeonRegions();
+        DungeonProgress progress = new DungeonProgress(3, 6, List.of(), BlockPos.ZERO);
+        progress.addWaveRoom(42L, new BlockPos(1, 2, 3));
+        WaveRoom room = progress.waveRoom(42L).orElseThrow();
+        room.advance();
+        room.seal().add(new BlockPos(4, 5, 6));
+        regions.startProgress(5, progress);
+        DungeonRegions loaded = DungeonRegions.load(regions.save(new CompoundTag(), helper.getLevel().registryAccess()), helper.getLevel().registryAccess());
+        WaveRoom back = loaded.progress(5).orElseThrow().waveRoom(42L).orElseThrow();
+        helper.assertTrue(back.wave() == 1 && back.waves() == 4 && back.drum().equals(new BlockPos(1, 2, 3)) && back.seal().size() == 1,
+                "a running wave room should be saved");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void aWaveRoomSealsOnlyItsOpenDoorways(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos min = helper.absolutePos(BlockPos.ZERO).above(140);
+        List<BlockPos> doorways = DungeonWaves.doorways(min);
+        helper.assertTrue(doorways.size() == 4 * 30, "four 5x6 doorways, got " + doorways.size());
+        try {
+            // A cap fills the north doorway; the other three are open.
+            doorways.stream().filter(pos -> pos.getZ() == min.getZ()).forEach(pos -> level.setBlock(pos, Blocks.RED_CONCRETE.defaultBlockState(), Block.UPDATE_CLIENTS));
+            WaveRoom room = new WaveRoom(min, 3);
+            DungeonWaves.seal(level, min, room);
+            long sealed = doorways.stream().filter(pos -> level.getBlockState(pos).is(ModRegistries.WAVE_SEAL.get())).count();
+            helper.assertTrue(sealed == 90 && room.seal().size() == 90, "the three open doorways should be sealed, sealed " + sealed);
+            DungeonWaves.unseal(level, room);
+            helper.assertTrue(doorways.stream().noneMatch(pos -> level.getBlockState(pos).is(ModRegistries.WAVE_SEAL.get())), "the seal should come down");
+            helper.assertTrue(doorways.stream().filter(pos -> pos.getZ() == min.getZ()).allMatch(pos -> level.getBlockState(pos).is(Blocks.RED_CONCRETE)),
+                    "the cap should be left alone");
+        } finally {
+            doorways.forEach(pos -> level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS));
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void placeholderWaveRoomHasADrumAndNoSpawners(GameTestHelper helper) {
+        StructureTemplate waves = helper.getLevel().getStructureManager().get(DungeonPieces.id("challenge_waves_placeholder")).orElseThrow();
+        helper.assertTrue(count(waves, ModRegistries.WAR_DRUM.get()) == 1 && count(waves, ModRegistries.MOB_MARKER.get()) == 0
+                && count(waves, ModRegistries.HUNT_MARKER.get()) == 0, "the wave room should have one drum and no spawners");
         helper.succeed();
     }
 
