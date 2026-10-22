@@ -4,22 +4,18 @@ import java.util.List;
 
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonBosses;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
-import io.redspace.ironsspellbooks.entity.mobs.SupportMob;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
-import io.redspace.ironsspellbooks.entity.mobs.goals.FindSupportableTargetGoal;
 import io.redspace.ironsspellbooks.entity.mobs.goals.WizardAttackGoal;
-import io.redspace.ironsspellbooks.entity.mobs.goals.WizardSupportGoal;
+import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
@@ -31,24 +27,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 /**
- * The skeleton mage, the Barrow King's court caster: it hangs back, heals the King (and other skeletons) when they're
- * hurt, wraps them in Fortify, and otherwise throws the odd Wither Skull. Casts real Iron's Spells spells, so it only
+ * The skeleton mage, the Barrow King's court caster: it heals the King (and other skeletons) when they're hurt, keeps
+ * Fortify and Haste on them in a fight, and only throws the odd Wither Skull between casts. Casts real Iron's Spells spells, so it only
  * exists when Iron's Spells is installed.
  */
-public class SkeletonMage extends AbstractSpellCastingMob implements Enemy, SupportMob {
+public class SkeletonMage extends AbstractSpellCastingMob implements Enemy {
     public static final double MAX_HEALTH = 20.0;
-    /** Heals an ally once it's below this share of its health. */
-    private static final float HEAL_BELOW = 0.8f;
-
-    private final GoalSelector supportTargetSelector;
-    private LivingEntity supportTarget;
 
     public SkeletonMage(EntityType<? extends SkeletonMage> type, Level level) {
         super(type, level);
         xpReward = 10;
-        supportTargetSelector = new GoalSelector(level.getProfilerSupplier());
-        supportTargetSelector.addGoal(0, new FindSupportableTargetGoal<>(this, LivingEntity.class, true,
-                ally -> ally != this && isAlliedTo(ally) && ally.getHealth() < ally.getMaxHealth() * HEAL_BELOW));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
@@ -62,11 +50,13 @@ public class SkeletonMage extends AbstractSpellCastingMob implements Enemy, Supp
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
-        goalSelector.addGoal(2, new WizardSupportGoal<>(this, 1.2, 40, 80)
-                .setSpells(List.of(SpellRegistry.BLESSING_OF_LIFE_SPELL.get(), SpellRegistry.BLESSING_OF_LIFE_SPELL.get(),
-                        SpellRegistry.HEALING_CIRCLE_SPELL.get()), List.of(SpellRegistry.FORTIFY_SPELL.get()))
+        // Healing and buffing come first; it only attacks between casts.
+        goalSelector.addGoal(1, new SupportCastGoal(this, ally -> ally == this || isAlliedTo(ally), 20.0, 6.0, 30, 60,
+                List.of(SpellRegistry.BLESSING_OF_LIFE_SPELL.get(), SpellRegistry.HEALING_CIRCLE_SPELL.get()),
+                List.of(new SupportCastGoal.Buff(SpellRegistry.FORTIFY_SPELL.get(), MobEffectRegistry.FORTIFY),
+                        new SupportCastGoal.Buff(SpellRegistry.HASTE_SPELL.get(), MobEffectRegistry.HASTENED)))
                 .setSpellQuality(0.2f, 0.4f));
-        goalSelector.addGoal(3, new WizardAttackGoal(this, 1.0, 60, 100)
+        goalSelector.addGoal(3, new WizardAttackGoal(this, 1.0, 100, 160)
                 .setSpells(List.of(SpellRegistry.WITHER_SKULL_SPELL.get()), List.of(), List.of(), List.of(SpellRegistry.HEAL_SPELL.get()))
                 .setSpellQuality(0.1f, 0.25f));
         goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.8));
@@ -76,28 +66,10 @@ public class SkeletonMage extends AbstractSpellCastingMob implements Enemy, Supp
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
     }
 
-    @Override
-    protected void customServerAiStep() {
-        super.customServerAiStep();
-        if (tickCount % 4 == 0 && tickCount > 1) {
-            supportTargetSelector.tick();
-        }
-    }
-
     /** Skeletons and dungeon bosses are its allies: they're who it heals and buffs. */
     @Override
     public boolean isAlliedTo(Entity entity) {
         return super.isAlliedTo(entity) || entity.getType().is(EntityTypeTags.SKELETONS) || DungeonBosses.isBoss(entity);
-    }
-
-    @Override
-    public LivingEntity getSupportTarget() {
-        return supportTarget;
-    }
-
-    @Override
-    public void setSupportTarget(LivingEntity target) {
-        supportTarget = target;
     }
 
     @Override

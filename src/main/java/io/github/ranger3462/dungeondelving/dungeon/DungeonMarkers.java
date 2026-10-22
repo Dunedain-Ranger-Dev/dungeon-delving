@@ -178,14 +178,17 @@ public final class DungeonMarkers {
         }
     }
 
+    /** Ticks between a dungeon spawner's waves: 6 to 20 seconds (vanilla spawners wait 10 to 40). */
+    public static final int MIN_SPAWN_DELAY = 120;
+    public static final int MAX_SPAWN_DELAY = 400;
     /** Mobs a dungeon spawner spawns at once, by tier (index 0 is tier 1). Vanilla spawners spawn 4. */
     public static final int[] SPAWN_COUNT = { 2, 3, 3, 4 };
     /** How many mobs can be near a dungeon spawner before it stops, by tier. Vanilla spawners allow 6. */
     public static final int[] MAX_NEARBY = { 4, 5, 6, 6 };
 
     /**
-     * The spawner settings for a dungeon mob in a dungeon of this tier: vanilla timing, fewer mobs at low tiers (see
-     * {@link #SPAWN_COUNT}), with spawning allowed at any light level.
+     * The spawner settings for a dungeon mob in a dungeon of this tier: quicker waves than vanilla, fewer mobs at low
+     * tiers (see {@link #SPAWN_COUNT}), with spawning allowed at any light level.
      */
     static CompoundTag spawnerTag(EntityType<?> type, int tier) {
         int index = DungeonRun.clampTier(tier) - DungeonRun.MIN_TIER;
@@ -207,8 +210,8 @@ public final class DungeonMarkers {
         tag.put("SpawnPotentials", potentials);
         tag.putShort("Delay", (short) 20);
         // Vanilla only reads the spawn count with the delays, and the nearby limit with the player range.
-        tag.putShort("MinSpawnDelay", (short) 200);
-        tag.putShort("MaxSpawnDelay", (short) 800);
+        tag.putShort("MinSpawnDelay", (short) MIN_SPAWN_DELAY);
+        tag.putShort("MaxSpawnDelay", (short) MAX_SPAWN_DELAY);
         tag.putShort("SpawnCount", (short) SPAWN_COUNT[index]);
         tag.putShort("MaxNearbyEntities", (short) MAX_NEARBY[index]);
         tag.putShort("RequiredPlayerRange", (short) 16);

@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.entity.mobs.goals.WizardAttackGoal;
+import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -17,8 +18,8 @@ import net.minecraft.world.level.Level;
 
 /**
  * The Goblin Shaman Chief, the tier 1 goblin boss: a shaman who has taken over a goblin clan. Not very tough, but hard
- * to pin down: he flings fire and poison, shields himself, dodges, teleports away and heals, while the arena's
- * spawners pour out his goblins.
+ * to pin down: he flings fire and poison, shields himself and teleports away, and whenever he's hurt he heals and keeps
+ * Evasion and Oakskin up, while the arena's spawners pour out his goblins.
  */
 public class GoblinChief extends GoblinShaman {
     public static final double MAX_HEALTH = 70.0;
@@ -39,6 +40,11 @@ public class GoblinChief extends GoblinShaman {
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
+        // Looks after himself first, even when nobody is fighting back properly (e.g. a creative player hitting him).
+        goalSelector.addGoal(1, new SupportCastGoal(this, self -> self == this, 1.0, 0.0, 40, 80, List.of(SpellRegistry.HEAL_SPELL.get()),
+                List.of(new SupportCastGoal.Buff(SpellRegistry.EVASION_SPELL.get(), MobEffectRegistry.EVASION),
+                        new SupportCastGoal.Buff(SpellRegistry.OAKSKIN_SPELL.get(), MobEffectRegistry.OAKSKIN)))
+                .setSpellQuality(0.3f, 0.5f));
         goalSelector.addGoal(2, new WizardAttackGoal(this, 1.2, 25, 45)
                 .setSpells(
                         List.of(SpellRegistry.FIREBOLT_SPELL.get(), SpellRegistry.ACID_ORB_SPELL.get(), SpellRegistry.POISON_ARROW_SPELL.get()),

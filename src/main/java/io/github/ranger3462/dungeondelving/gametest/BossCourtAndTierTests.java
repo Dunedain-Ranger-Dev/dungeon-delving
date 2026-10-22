@@ -91,6 +91,56 @@ public class BossCourtAndTierTests {
         helper.succeed();
     }
 
+    /** With Iron's Spells, the King's mages heal him when he's hurt, even with nobody to fight. */
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 300)
+    public static void theMagesHealTheBarrowKing(GameTestHelper helper) {
+        if (!ModList.get().isLoaded("irons_spellbooks")) {
+            helper.succeed();
+            return;
+        }
+        BlockPos pos = platform(helper);
+        LivingEntity king = DungeonBosses.spawn(helper.getLevel(), pos, 2, -1, DungeonBosses.BARROW_KING);
+        king.setHealth(king.getMaxHealth() / 2);
+        float hurt = king.getHealth();
+        helper.succeedWhen(() -> {
+            helper.assertTrue(king.getHealth() > hurt, "the mages should have healed the King by now");
+            cleanUp(helper, pos);
+        });
+    }
+
+    /** With Iron's Spells, a hurt Goblin Shaman Chief heals himself. */
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 300)
+    public static void theGoblinChiefHealsHimself(GameTestHelper helper) {
+        if (!ModList.get().isLoaded("irons_spellbooks")) {
+            helper.succeed();
+            return;
+        }
+        BlockPos pos = platform(helper);
+        LivingEntity chief = DungeonBosses.spawn(helper.getLevel(), pos, 1, -1, "goblin_chief");
+        chief.setHealth(chief.getMaxHealth() / 2);
+        float hurt = chief.getHealth();
+        helper.succeedWhen(() -> {
+            helper.assertTrue(chief.getHealth() > hurt, "the chief should have healed himself by now");
+            cleanUp(helper, pos);
+        });
+    }
+
+    /** A stone floor high above the test, for mobs that need to stand around for a while. Returns the spot above its middle. */
+    private static BlockPos platform(GameTestHelper helper) {
+        BlockPos pos = helper.absolutePos(new BlockPos(0, 1, 0)).above(100);
+        for (BlockPos floor : BlockPos.betweenClosed(pos.offset(-8, -1, -8), pos.offset(8, -1, 8))) {
+            helper.getLevel().setBlock(floor, Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        return pos;
+    }
+
+    private static void cleanUp(GameTestHelper helper, BlockPos pos) {
+        helper.getLevel().getEntitiesOfClass(Mob.class, new AABB(pos).inflate(16)).forEach(Mob::discard);
+        for (BlockPos floor : BlockPos.betweenClosed(pos.offset(-8, -1, -8), pos.offset(8, -1, 8))) {
+            helper.getLevel().setBlock(floor, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
     /** Tier 1 mobs get a little leather; tier 4 mobs get plenty of diamond, some of it enchanted. None of it drops. */
     @GameTest(template = ANY_TEMPLATE)
     public static void dungeonMobsGearUpByTier(GameTestHelper helper) {
