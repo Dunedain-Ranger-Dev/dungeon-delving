@@ -288,9 +288,265 @@ def items():
         (ASSETS / f"textures/item/{stale}.png").unlink(missing_ok=True)
 
 
+# --- Flux, parts, leather, cloth and gear ---
+
+def speckle(x, y, seed=0):
+    """A cheap repeatable noise value from 0 to 9 for pixel (x, y)."""
+    return (x * 7 + y * 13 + seed * 31 + (x * y) % 5) % 10
+
+
+def powder(color):
+    """A little mound of powder."""
+    image = {}
+    for y in range(8, 14):
+        half = (y - 7) + 1
+        for x in range(8 - half, 8 + half):
+            edge = y == 13 or x in (8 - half, 7 + half)
+            image[(x, y)] = shade(color, -40 if edge else (25 if speckle(x, y) > 6 else 0))
+    return image
+
+
+def crystals(color):
+    """A small cluster of pale crystals."""
+    image = {}
+    for cx, top, bottom in ((5, 6, 13), (8, 3, 13), (11, 7, 13)):
+        for y in range(top, bottom + 1):
+            for x in (cx - 1, cx, cx + 1):
+                if y == top and x != cx:
+                    continue
+                image[(x, y)] = shade(color, 40 if x == cx - 1 else (-35 if x == cx + 1 else 0))
+    return image
+
+
+STEEL = (176, 182, 196)
+
+
+def plate():
+    """A square steel plate with a rivet in each corner."""
+    image = {}
+    for y in range(3, 13):
+        for x in range(3, 13):
+            edge = x in (3, 12) or y in (3, 12)
+            image[(x, y)] = shade(STEEL, -45 if edge else (30 if x + y < 12 else 0))
+    for x, y in ((4, 4), (11, 4), (4, 11), (11, 11)):
+        image[(x, y)] = shade(STEEL, 60)
+    return image
+
+
+def rivets():
+    """A handful of rivets."""
+    image = {}
+    for cx, cy in ((4, 5), (10, 4), (7, 9), (12, 10), (4, 12)):
+        for x, y in ((cx, cy), (cx + 1, cy), (cx, cy + 1), (cx + 1, cy + 1)):
+            image[(x, y)] = shade(STEEL, 40 if (x, y) == (cx, cy) else -10)
+        image[(cx, cy + 2)] = shade(STEEL, -50)
+    return image
+
+
+def links():
+    """A short length of chain."""
+    image = {}
+    for i, (cx, cy) in enumerate(((3, 3), (6, 6), (9, 9), (12, 12))):
+        for x, y in ((cx - 1, cy), (cx + 1, cy), (cx, cy - 1), (cx, cy + 1), (cx - 1, cy - 1), (cx + 1, cy + 1)):
+            if 0 <= x < 16 and 0 <= y < 16:
+                image[(x, y)] = shade(STEEL, 30 if i % 2 else -20)
+    return image
+
+
+def hide(color, stitched=False):
+    """A square of leather, with a stitched border if it's been worked."""
+    image = {}
+    for y in range(3, 14):
+        for x in range(2, 14):
+            if (x, y) in ((2, 3), (13, 3), (2, 13), (13, 13)):
+                continue
+            edge = x in (2, 13) or y in (3, 13)
+            image[(x, y)] = shade(color, -35 if edge else (12 if speckle(x, y, 1) > 7 else 0))
+    if stitched:
+        for x in range(4, 12, 2):
+            image[(x, 5)] = image[(x, 11)] = shade(color, 70)
+    return image
+
+
+def cloth(color, padded=False):
+    """Woven cloth: a checked weave, quilted if padded."""
+    image = {}
+    for y in range(3, 13):
+        for x in range(3, 13):
+            weave = (x + y) % 2 == 0
+            quilt = padded and (x in (5, 10) or y in (5, 10))
+            image[(x, y)] = shade(color, -30 if quilt else (15 if weave else -5))
+    return image
+
+
+def backing(color):
+    """A vest-shaped backing that armor is built on."""
+    image = {}
+    for y in range(2, 15):
+        for x in range(3, 13):
+            if y < 5 and 6 <= x <= 9:
+                continue  # neck
+            if y > 6 and x in (3, 12):
+                continue  # arms
+            edge = x in (3, 4, 11, 12) and y < 5 or y == 14 or x in (4, 11)
+            image[(x, y)] = shade(color, -30 if edge else 0)
+    for y in range(6, 14, 2):
+        image[(8, y)] = shade(color, 60)
+    return image
+
+
+# A forged piece's maker's mark: a little gold star in the corner of the vanilla icon.
+FORGED_MARK = {(13, 12): (255, 210, 60, 255), (12, 13): (255, 210, 60, 255), (13, 13): (255, 240, 150, 255), (14, 13): (255, 210, 60, 255),
+               (13, 14): (255, 210, 60, 255)}
+
+GEAR_TEXTURES = {
+    "sand_flux": powder((214, 196, 140)),
+    "borax": crystals((228, 236, 240)),
+    "borax_flux": powder((236, 240, 244)),
+    "runic_flux": powder((164, 91, 216)),
+    "runeforged_flux": powder((242, 181, 58)),
+    "armor_plate": plate(),
+    "rivets": rivets(),
+    "chain_links": links(),
+    "refined_leather": hide((160, 100, 60)),
+    "boiled_leather": hide((120, 72, 40)),
+    "hardened_leather": hide((95, 58, 34), stitched=True),
+    "leather_base": backing((140, 88, 52)),
+    "woven_cloth": cloth((222, 214, 196)),
+    "padded_cloth": cloth((206, 196, 172), padded=True),
+    "gambeson_base": backing((210, 198, 170)),
+    "forged_mark": FORGED_MARK,
+}
+
+ARMOR_SLOTS = ("helmet", "chestplate", "leggings", "boots")
+WEIGHTS = {"brigandine": "leather", "hauberk": "chainmail", "plate": "iron"}
+
+
+def borax_deposit():
+    """Grey stone flecked with pale borax crystals."""
+    image = {}
+    for y in range(16):
+        for x in range(16):
+            n = speckle(x, y, 2)
+            image[(x, y)] = shade((120, 120, 124), -12 if n < 3 else (10 if n > 7 else 0))
+    for x, y in ((3, 3), (4, 3), (3, 4), (11, 2), (12, 3), (7, 7), (8, 7), (8, 8), (2, 11), (3, 12), (12, 10), (13, 11), (12, 11), (9, 13)):
+        image[(x, y)] = shade((232, 240, 246), 0 if (x + y) % 2 else -20)
+    return image
+
+
+def gear():
+    for name, image in GEAR_TEXTURES.items():
+        png(ASSETS / f"textures/item/{name}.png", image)
+        if name != "forged_mark":
+            item_model(name)
+
+    # Gear icons are vanilla icons with the maker's mark on top (brigandine is dyeable, like leather).
+    for weight, vanilla in WEIGHTS.items():
+        for slot in ARMOR_SLOTS:
+            layers = {"layer0": f"minecraft:item/{vanilla}_{slot}"}
+            if vanilla == "leather":
+                layers["layer1"] = f"minecraft:item/leather_{slot}_overlay"
+            layers[f"layer{len(layers)}"] = f"{MOD}:item/forged_mark"
+            write(ASSETS / f"models/item/{weight}_{slot}.json", {"parent": "minecraft:item/generated", "textures": layers})
+    for weapon, vanilla in (("forged_sword", "iron_sword"), ("forged_axe", "iron_axe")):
+        write(ASSETS / f"models/item/{weapon}.json", {"parent": "minecraft:item/handheld",
+                                                      "textures": {"layer0": f"minecraft:item/{vanilla}", "layer1": f"{MOD}:item/forged_mark"}})
+
+    # Borax deposits: found in tier 2+ dungeons, through resource markers.
+    png(ASSETS / "textures/block/borax_deposit.png", borax_deposit())
+    write(ASSETS / "models/block/borax_deposit.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/borax_deposit"}})
+    write(ASSETS / "blockstates/borax_deposit.json", {"variants": {"": {"model": f"{MOD}:block/borax_deposit"}}})
+    item_model("borax_deposit", f"{MOD}:block/borax_deposit")
+    write(DATA / "loot_table/blocks/borax_deposit.json", {
+        "type": "minecraft:block",
+        "pools": [{"rolls": 1, "entries": [{"type": "minecraft:alternatives", "children": [
+            {"type": "minecraft:item", "name": f"{MOD}:borax_deposit", "conditions": [{"condition": "minecraft:match_tool", "predicate": {
+                "predicates": {"minecraft:enchantments": [{"enchantments": "minecraft:silk_touch", "levels": {"min": 1}}]}}}]},
+            {"type": "minecraft:item", "name": f"{MOD}:borax", "functions": [
+                {"function": "minecraft:set_count", "count": {"type": "minecraft:uniform", "min": 1, "max": 2}},
+                {"function": "minecraft:apply_bonus", "enchantment": "minecraft:fortune", "formula": "minecraft:ore_drops"},
+                {"function": "minecraft:explosion_decay"}]}]}]}],
+    })
+
+
+def starred_shapeless(name, ingredients, count=1):
+    write(DATA / f"recipe/{name}.json", {
+        "type": f"{MOD}:starred_shapeless", "category": "equipment",
+        "ingredients": [({"tag": v[1:]} if v.startswith("#") else {"item": v}) for v in ingredients],
+        "result": {"id": f"{MOD}:{name}", "count": count},
+    })
+
+
+def starred_shaped(name, pattern, key):
+    write(DATA / f"recipe/{name}.json", {
+        "type": f"{MOD}:starred_shaped", "category": "equipment", "pattern": pattern,
+        "key": {k: ({"tag": v[1:]} if v.startswith("#") else {"item": v}) for k, v in key.items()},
+        "result": {"id": f"{MOD}:{name}", "count": 1},
+    })
+
+
+def gear_recipes():
+    tempered, flux = f"{MOD}:tempered_iron_ingot", f"#{MOD}:flux"
+    shapeless("sand_flux", ["minecraft:sand", "minecraft:bone_meal"], count=2)
+    shapeless("borax_flux", [f"{MOD}:borax", "minecraft:sand"], count=2)
+    shapeless("runic_flux", [f"{MOD}:borax_flux", f"{MOD}:borax_flux", f"{MOD}:runic_shard_3"], count=2)
+    shapeless("runeforged_flux", [f"{MOD}:runic_flux", f"{MOD}:runic_flux", f"{MOD}:thailite_ingot"], count=2)
+    starred_shapeless("armor_plate", [tempered, tempered, flux])
+    starred_shapeless("rivets", [tempered, flux, "minecraft:iron_nugget"], count=4)
+    starred_shapeless("chain_links", [tempered, flux], count=4)
+
+    shapeless("refined_leather", ["minecraft:leather", "minecraft:honeycomb"])
+    shapeless("hardened_leather", [f"{MOD}:boiled_leather"] * 3 + ["minecraft:string", "minecraft:honeycomb"], count=3)
+    shapeless("leather_base", [f"{MOD}:refined_leather"] * 3)
+    shapeless("padded_cloth", [f"{MOD}:woven_cloth", f"{MOD}:woven_cloth", "#minecraft:wool"])
+    shapeless("gambeson_base", [f"{MOD}:padded_cloth", f"{MOD}:padded_cloth"])
+
+    base, gambeson, hardened = f"{MOD}:leather_base", f"{MOD}:gambeson_base", f"{MOD}:hardened_leather"
+    plate_, rivet, link = f"{MOD}:armor_plate", f"{MOD}:rivets", f"{MOD}:chain_links"
+    # (plates or links, rivets, hardened leather) per slot; heavy and medium also take a leather base, light a gambeson.
+    heavy = {"helmet": (2, 2, 1), "chestplate": (4, 2, 2), "leggings": (3, 2, 2), "boots": (2, 1, 1)}
+    medium = {"helmet": (3, 1, 0), "chestplate": (6, 2, 0), "leggings": (5, 1, 0), "boots": (3, 1, 0)}
+    light = {"helmet": (0, 1, 1), "chestplate": (0, 2, 3), "leggings": (0, 2, 2), "boots": (0, 1, 1)}
+    for slot in ARMOR_SLOTS:
+        p, r, h = heavy[slot]
+        starred_shapeless(f"plate_{slot}", [plate_] * p + [rivet] * r + [base] + [hardened] * h)
+        c, r, _ = medium[slot]
+        starred_shapeless(f"hauberk_{slot}", [link] * c + [rivet] * r + [base])
+        _, r, h = light[slot]
+        starred_shapeless(f"brigandine_{slot}", [gambeson] + [hardened] * h + [rivet] * r)
+    starred_shaped("forged_sword", ["P", "P", "S"], {"P": plate_, "S": "minecraft:stick"})
+    starred_shaped("forged_axe", ["PP", "PS", " S"], {"P": plate_, "S": "minecraft:stick"})
+
+
+def add_to_tag(path, values):
+    """Adds values to a tag file, keeping whatever's already in it."""
+    tag = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {"replace": False, "values": []}
+    for value in values:
+        if value not in tag["values"]:
+            tag["values"].append(value)
+    write(path, tag)
+
+
+def gear_tags():
+    write(DATA / "tags/item/flux.json", {"replace": False, "values": [f"{MOD}:{name}" for name in
+                                                                      ("sand_flux", "borax_flux", "runic_flux", "runeforged_flux")]})
+    vanilla_tags = RES / "data/minecraft/tags/item"
+    for slot, tag in (("helmet", "head_armor"), ("chestplate", "chest_armor"), ("leggings", "leg_armor"), ("boots", "foot_armor")):
+        add_to_tag(vanilla_tags / f"{tag}.json", [f"{MOD}:{weight}_{slot}" for weight in WEIGHTS])
+    add_to_tag(vanilla_tags / "dyeable.json", [f"{MOD}:brigandine_{slot}" for slot in ARMOR_SLOTS])
+    add_to_tag(vanilla_tags / "swords.json", [f"{MOD}:forged_sword"])
+    add_to_tag(vanilla_tags / "axes.json", [f"{MOD}:forged_axe"])
+    for tier in (2, 3, 4):
+        add_to_tag(DATA / f"tags/block/dungeon_resources/tier_{tier}.json", [f"{MOD}:borax_deposit"])
+    add_to_tag(RES / "data/minecraft/tags/block/mineable/pickaxe.json", [f"{MOD}:borax_deposit"])
+
+
 if __name__ == "__main__":
     blocks()
     recipes()
     tags()
     items()
+    gear()
+    gear_recipes()
+    gear_tags()
     print("forging resources written")

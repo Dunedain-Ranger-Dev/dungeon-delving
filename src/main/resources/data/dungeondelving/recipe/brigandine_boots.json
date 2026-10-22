@@ -1,0 +1,19 @@
+{
+  "type": "dungeondelving:starred_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "dungeondelving:gambeson_base"
+    },
+    {
+      "item": "dungeondelving:hardened_leather"
+    },
+    {
+      "item": "dungeondelving:rivets"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:brigandine_boots",
+    "count": 1
+  }
+}

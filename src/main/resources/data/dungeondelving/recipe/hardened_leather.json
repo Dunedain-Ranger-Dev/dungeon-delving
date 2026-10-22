@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "dungeondelving:boiled_leather"
+    },
+    {
+      "item": "dungeondelving:boiled_leather"
+    },
+    {
+      "item": "dungeondelving:boiled_leather"
+    },
+    {
+      "item": "minecraft:string"
+    },
+    {
+      "item": "minecraft:honeycomb"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:hardened_leather",
+    "count": 3
+  }
+}

@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "dungeondelving:goblin_spear"
+    "dungeondelving:goblin_spear",
+    "dungeondelving:forged_sword"
   ]
 }

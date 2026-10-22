@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "dungeondelving:borax_flux"
+    },
+    {
+      "item": "dungeondelving:borax_flux"
+    },
+    {
+      "item": "dungeondelving:runic_shard_3"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:runic_flux",
+    "count": 2
+  }
+}

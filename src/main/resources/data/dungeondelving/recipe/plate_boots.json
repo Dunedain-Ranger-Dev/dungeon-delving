@@ -1,0 +1,25 @@
+{
+  "type": "dungeondelving:starred_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "dungeondelving:armor_plate"
+    },
+    {
+      "item": "dungeondelving:armor_plate"
+    },
+    {
+      "item": "dungeondelving:rivets"
+    },
+    {
+      "item": "dungeondelving:leather_base"
+    },
+    {
+      "item": "dungeondelving:hardened_leather"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:plate_boots",
+    "count": 1
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "dungeondelving:refined_leather"
+    },
+    {
+      "item": "dungeondelving:refined_leather"
+    },
+    {
+      "item": "dungeondelving:refined_leather"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:leather_base",
+    "count": 1
+  }
+}

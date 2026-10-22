@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "dungeondelving:brigandine_helmet",
+    "dungeondelving:brigandine_chestplate",
+    "dungeondelving:brigandine_leggings",
+    "dungeondelving:brigandine_boots"
+  ]
+}

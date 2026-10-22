@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "dungeondelving:sand_flux",
+    "dungeondelving:borax_flux",
+    "dungeondelving:runic_flux",
+    "dungeondelving:runeforged_flux"
+  ]
+}

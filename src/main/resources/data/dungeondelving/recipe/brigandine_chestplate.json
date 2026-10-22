@@ -1,0 +1,28 @@
+{
+  "type": "dungeondelving:starred_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "dungeondelving:gambeson_base"
+    },
+    {
+      "item": "dungeondelving:hardened_leather"
+    },
+    {
+      "item": "dungeondelving:hardened_leather"
+    },
+    {
+      "item": "dungeondelving:hardened_leather"
+    },
+    {
+      "item": "dungeondelving:rivets"
+    },
+    {
+      "item": "dungeondelving:rivets"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:brigandine_chestplate",
+    "count": 1
+  }
+}

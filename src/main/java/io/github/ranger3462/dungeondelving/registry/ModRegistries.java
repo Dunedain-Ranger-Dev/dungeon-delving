@@ -138,9 +138,13 @@ public final class ModRegistries {
                 }
                 for (var forging : java.util.List.of(Forging.FORGE_HEARTH_ITEM, Forging.BELLOWS_ITEM, Forging.DWARVEN_ANVIL_ITEM,
                         Forging.GRINDING_WHEEL_ITEM, Forging.QUENCHING_OIL, Forging.HEATED_INGOT, Forging.STRUCK_INGOT,
-                        Forging.QUENCHED_INGOT, Forging.UNSTABLE_INGOT, Forging.TEMPERED_IRON_INGOT)) {
+                        Forging.QUENCHED_INGOT, Forging.UNSTABLE_INGOT, Forging.TEMPERED_IRON_INGOT, Forging.SAND_FLUX, Forging.BORAX,
+                        Forging.BORAX_DEPOSIT_ITEM, Forging.BORAX_FLUX, Forging.RUNIC_FLUX, Forging.RUNEFORGED_FLUX, Forging.ARMOR_PLATE, Forging.RIVETS,
+                        Forging.CHAIN_LINKS, Forging.REFINED_LEATHER, Forging.BOILED_LEATHER, Forging.HARDENED_LEATHER, Forging.LEATHER_BASE,
+                        Forging.WOVEN_CLOTH, Forging.PADDED_CLOTH, Forging.GAMBESON_BASE)) {
                     output.accept(forging.get());
                 }
+                Forging.gear().forEach(output::accept);
                 output.accept(HALLSTONE_ITEM.get());
                 for (DungeonOre ore : DungeonOre.values()) {
                     output.accept(ore.oreItem.get());

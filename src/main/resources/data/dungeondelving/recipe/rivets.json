@@ -1,0 +1,19 @@
+{
+  "type": "dungeondelving:starred_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "dungeondelving:tempered_iron_ingot"
+    },
+    {
+      "tag": "dungeondelving:flux"
+    },
+    {
+      "item": "minecraft:iron_nugget"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:rivets",
+    "count": 4
+  }
+}

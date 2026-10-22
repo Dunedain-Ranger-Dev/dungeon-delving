@@ -1,12 +1,14 @@
 package io.github.ranger3462.dungeondelving.client;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.forging.ForgedGear;
 import io.github.ranger3462.dungeondelving.forging.Forging;
 import io.github.ranger3462.dungeondelving.forging.HotMetalItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -32,6 +34,9 @@ public final class ForgingItemColors {
         event.register((stack, tintIndex) -> tintIndex == 0 ? heatColor(stack) : -1, Forging.HEATED_INGOT.get(), Forging.STRUCK_INGOT.get());
         event.register((stack, tintIndex) -> tintIndex == 0 ? QUENCHED : -1, Forging.QUENCHED_INGOT.get(), Forging.UNSTABLE_INGOT.get());
         event.register((stack, tintIndex) -> tintIndex == 0 ? TEMPERED : -1, Forging.TEMPERED_IRON_INGOT.get());
+        // Brigandine is dyeable, like leather armor (and brown like it until dyed).
+        event.register((stack, tintIndex) -> tintIndex == 0 ? DyedItemColor.getOrDefault(stack, DyedItemColor.LEATHER_COLOR) : -1,
+                Forging.ARMOR.get(ForgedGear.Weight.LIGHT).values().stream().map(item -> item.get()).toArray(net.minecraft.world.item.Item[]::new));
     }
 
     private static int heatColor(ItemStack stack) {

@@ -26,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -65,6 +66,11 @@ public final class ForgeActions {
     private static final float MAX_CRACK = 0.95f;
 
     public static final float STRIKE_WIDTH = 0.09f;
+    /** Weaving: the loom's sweet spot, how much string a weave takes, and its passes and sweep period. */
+    public static final float WEAVE_WIDTH = 0.12f;
+    public static final int WEAVE_STRING = 3;
+    public static final int WEAVE_PASSES = 2;
+    public static final int WEAVE_PERIOD = 30;
     public static final float GRIND_WIDTH = 0.10f;
 
     private static final Map<UUID, Session> SESSIONS = new HashMap<>();
@@ -181,12 +187,14 @@ public final class ForgeActions {
                 case STRIKE -> useBar(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.STRIKE);
                 case GRIND -> useBar(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.GRIND);
                 case QUENCH -> quench(serverPlayer, serverLevel, pos, state, held);
+                case WEAVE -> useBar(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.WEAVE);
+                case BOIL -> boil(serverPlayer, serverLevel, pos, state, held);
             }
         }
     }
 
     private enum Action {
-        STRIKE, QUENCH, GRIND
+        STRIKE, QUENCH, GRIND, WEAVE, BOIL
     }
 
     private static Action actionFor(ItemStack held, BlockState state) {
@@ -198,7 +206,21 @@ public final class ForgeActions {
         } else if (isGrindable(held) && (state.is(Blocks.GRINDSTONE) || state.is(Forging.GRINDING_WHEEL.get()))) {
             return Action.GRIND;
         }
+        if (held.is(Items.STRING) && state.is(Blocks.LOOM)) {
+            return Action.WEAVE;
+        } else if (held.is(Items.LEATHER) && state.is(Blocks.WATER_CAULDRON)) {
+            return Action.BOIL;
+        }
         return null;
+    }
+
+    /** Whether a stack is what a kind of bar works on: hot metal for striking, quenched metal for grinding, string for weaving. */
+    public static boolean worksOn(TimingBar.Kind kind, ItemStack stack) {
+        return switch (kind) {
+            case STRIKE -> stack.is(Forging.HEATED_INGOT.get());
+            case GRIND -> isGrindable(stack);
+            case WEAVE -> stack.is(Items.STRING);
+        };
     }
 
     /** Quenched ingots, and unstable ones getting their second chance. */
@@ -222,6 +244,9 @@ public final class ForgeActions {
         Session current = SESSIONS.get(player.getUUID());
         if (current != null && current.kind == kind && current.station.equals(pos) && now - current.lastAction < TIMEOUT) {
             return Optional.of(current); // Strikes come in as StrikePayloads, so a click on the station mid-bar does nothing.
+        }
+        if (kind == TimingBar.Kind.WEAVE) {
+            return beginWeaving(player, level, pos, held, now);
         }
         Optional<ForgeWorkshop> workshop = ForgeWorkshop.around(level, pos);
         if (workshop.isEmpty()) {
@@ -266,6 +291,21 @@ public final class ForgeActions {
         SESSIONS.put(player.getUUID(), session);
         send(player, session);
         level.playSound(null, pos, kind == TimingBar.Kind.STRIKE ? SoundEvents.ANVIL_PLACE : SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 0.3f, 1.2f);
+        return Optional.of(session);
+    }
+
+    /** Weaving needs no forge, just a loom and {@link #WEAVE_STRING} string. */
+    private static Optional<Session> beginWeaving(ServerPlayer player, ServerLevel level, BlockPos pos, ItemStack held, long now) {
+        if (held.getCount() < WEAVE_STRING) {
+            tell(player, Component.translatable("message.dungeondelving.weave.not_enough", WEAVE_STRING).withStyle(ChatFormatting.RED));
+            return Optional.empty();
+        }
+        float width = WEAVE_WIDTH + CraftPerks.weavingSweetSpotBonus(CraftingSkills.level(player, CraftSkill.WEAVING));
+        Session session = new Session(TimingBar.Kind.WEAVE, pos.immutable(), now, WEAVE_PERIOD, false, false, 1, WEAVE_PASSES, width);
+        nextSpot(session, 1.0f, level, now);
+        SESSIONS.put(player.getUUID(), session);
+        send(player, session);
+        level.playSound(null, pos, SoundEvents.UI_LOOM_SELECT_PATTERN, SoundSource.BLOCKS, 0.6f, 1.0f);
         return Optional.of(session);
     }
 
@@ -324,8 +364,7 @@ public final class ForgeActions {
     static void onStrike(ServerPlayer player, int bar, float elapsed) {
         Session session = SESSIONS.get(player.getUUID());
         ItemStack held = player.getMainHandItem();
-        if (session == null || session.bar != bar
-                || !(session.kind == TimingBar.Kind.STRIKE ? held.is(Forging.HEATED_INGOT.get()) : isGrindable(held))) {
+        if (session == null || session.bar != bar || !worksOn(session.kind, held)) {
             return;
         }
         long now = player.level().getGameTime();
@@ -344,31 +383,35 @@ public final class ForgeActions {
         }
         BlockPos pos = session.station;
         boolean grinding = session.kind == TimingBar.Kind.GRIND;
+        boolean weaving = session.kind == TimingBar.Kind.WEAVE;
+        CraftSkill skill = weaving ? CraftSkill.WEAVING : CraftSkill.FORGING;
+        net.minecraft.sounds.SoundEvent sound = weaving ? SoundEvents.UI_LOOM_TAKE_RESULT : grinding ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_USE;
         TimingBar.Hit hit = TimingBar.judge(marker, session.low, session.high);
         float chance = 0.0f;
         switch (hit) {
             case GOLD -> {
                 session.done += 2;
-                CraftingSkills.addXp(player, CraftSkill.FORGING, 5);
-                level.playSound(null, pos, grinding ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.7f, 1.6f);
+                CraftingSkills.addXp(player, skill, 5);
+                level.playSound(null, pos, sound, SoundSource.BLOCKS, 0.7f, 1.6f);
                 level.sendParticles(ParticleTypes.WAX_OFF, pos.getX() + 0.5, pos.getY() + 1.1, pos.getZ() + 0.5, 10, 0.2, 0.1, 0.2, 0.1);
                 tell(player, Component.translatable("message.dungeondelving.forge.critical").withStyle(ChatFormatting.GOLD));
             }
             case GREEN -> {
                 session.done++;
-                CraftingSkills.addXp(player, CraftSkill.FORGING, 3);
-                level.playSound(null, pos, grinding ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.6f, 1.3f);
-                level.sendParticles(grinding ? ParticleTypes.CRIT : ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 1.05, pos.getZ() + 0.5, 6,
-                        0.15, 0.05, 0.15, 0.05);
+                CraftingSkills.addXp(player, skill, 3);
+                level.playSound(null, pos, sound, SoundSource.BLOCKS, 0.6f, 1.3f);
+                level.sendParticles(weaving ? ParticleTypes.HAPPY_VILLAGER : grinding ? ParticleTypes.CRIT : ParticleTypes.LAVA, pos.getX() + 0.5,
+                        pos.getY() + 1.05, pos.getZ() + 0.5, 6, 0.15, 0.05, 0.15, 0.05);
                 tell(player, Component.translatable("message.dungeondelving.forge.good").withStyle(ChatFormatting.GREEN));
             }
             case MISS -> {
                 session.done++;
                 session.misses++;
-                // A missed strike can crack the ingot. A missed grinding pass doesn't, but leaves it unstable (see finish).
-                chance = grinding ? 0.0f : missChance(session.kind, session.misses);
-                CraftingSkills.addXp(player, CraftSkill.FORGING, 1);
-                level.playSound(null, pos, grinding ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.6f, 0.7f);
+                // A missed strike can crack the ingot. A missed grinding pass doesn't, but leaves it unstable (see finish);
+                // a missed weave just loses the bonus cloth.
+                chance = grinding || weaving ? 0.0f : missChance(session.kind, session.misses);
+                CraftingSkills.addXp(player, skill, 1);
+                level.playSound(null, pos, sound, SoundSource.BLOCKS, 0.6f, 0.7f);
             }
         }
         float crackMultiplier = ForgingPerks.crackMultiplier(ForgingPerks.level(player));
@@ -378,7 +421,9 @@ public final class ForgeActions {
             crack(player, level, pos, held);
             return;
         }
-        if (hit == TimingBar.Hit.MISS && grinding) {
+        if (hit == TimingBar.Hit.MISS && weaving) {
+            tell(player, Component.translatable("message.dungeondelving.weave.miss").withStyle(ChatFormatting.YELLOW));
+        } else if (hit == TimingBar.Hit.MISS && grinding) {
             tell(player, Component.translatable(session.unstable ? "message.dungeondelving.forge.grind_miss_unstable" : "message.dungeondelving.forge.grind_miss")
                     .withStyle(ChatFormatting.YELLOW));
         } else if (hit == TimingBar.Hit.MISS) {
@@ -392,6 +437,10 @@ public final class ForgeActions {
             return;
         }
         end(player);
+        if (weaving) {
+            finishWeaving(player, level, session, held);
+            return;
+        }
         boolean failedGrind = grinding && session.misses > 0;
         if (failedGrind && session.unstable) {
             crack(player, level, pos, held); // Its second chance, missed.
@@ -403,6 +452,41 @@ public final class ForgeActions {
             return;
         }
         finish(player, level, session, held, failedGrind);
+    }
+
+    /** Turns the string into woven cloth: a second cloth if every pass was clean. */
+    private static void finishWeaving(ServerPlayer player, ServerLevel level, Session session, ItemStack held) {
+        int cloth = session.misses == 0 ? 2 : 1;
+        held.shrink(WEAVE_STRING);
+        give(player, new ItemStack(Forging.WOVEN_CLOTH.get(), cloth));
+        CraftingSkills.addXp(player, CraftSkill.WEAVING, 5);
+        level.playSound(null, session.station, SoundEvents.UI_LOOM_TAKE_RESULT, SoundSource.BLOCKS, 1.0f, 1.0f);
+        tell(player, Component.translatable(cloth > 1 ? "message.dungeondelving.weave.done_bonus" : "message.dungeondelving.weave.done")
+                .withStyle(ChatFormatting.GOLD));
+    }
+
+    // --- Boiling leather ---
+
+    /** Whether there's heat under a cauldron: a lit campfire, fire, magma or lava. */
+    public static boolean heatedFromBelow(Level level, BlockPos cauldron) {
+        BlockState below = level.getBlockState(cauldron.below());
+        return CampfireBlock.isLitCampfire(below) || below.is(BlockTags.FIRE) || below.is(Blocks.MAGMA_BLOCK) || below.is(Blocks.LAVA);
+    }
+
+    /** Boils a piece of leather in a water cauldron over heat, toughening it for hardened leather. Uses a level of water. */
+    public static void boil(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState state, ItemStack held) {
+        if (!heatedFromBelow(level, pos)) {
+            tell(player, Component.translatable("message.dungeondelving.boil.no_heat").withStyle(ChatFormatting.RED));
+            return;
+        }
+        if (level.getRandom().nextFloat() >= CraftPerks.boilSavesWater(CraftingSkills.level(player, CraftSkill.LEATHERWORKING))) {
+            LayeredCauldronBlock.lowerFillLevel(state, level, pos);
+        }
+        held.shrink(1);
+        give(player, new ItemStack(Forging.BOILED_LEATHER.get()));
+        CraftingSkills.addXp(player, CraftSkill.LEATHERWORKING, 3);
+        level.playSound(null, pos, SoundEvents.BUBBLE_COLUMN_UPWARDS_AMBIENT, SoundSource.BLOCKS, 0.8f, 1.0f);
+        level.sendParticles(ParticleTypes.BUBBLE_POP, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 10, 0.25, 0.1, 0.25, 0.02);
     }
 
     /** The chance the {@code misses}th missed strike in a bar cracks the piece, before the Forging skill: it climbs with every miss. */
@@ -523,8 +607,7 @@ public final class ForgeActions {
             Map.Entry<UUID, Session> entry = sessions.next();
             ServerPlayer player = event.getServer().getPlayerList().getPlayer(entry.getKey());
             Session session = entry.getValue();
-            boolean holding = player != null && (session.kind == TimingBar.Kind.STRIKE ? player.getMainHandItem().is(Forging.HEATED_INGOT.get())
-                    : isGrindable(player.getMainHandItem()));
+            boolean holding = player != null && worksOn(session.kind, player.getMainHandItem());
             if (!holding || player.level().getGameTime() - session.lastAction >= TIMEOUT) {
                 sessions.remove();
                 if (player != null) {
