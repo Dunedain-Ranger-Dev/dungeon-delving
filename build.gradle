@@ -189,6 +189,10 @@ dependencies {
     compileOnly "maven.modrinth:playeranimator:HJZB6bmA"
     // Optional integration: Ars Nouveau mana, for the Tester's Charm. Only used when Ars Nouveau is installed.
     compileOnly "maven.modrinth:ars-nouveau:yWDnir1o"                // 5.13.3
+    // Apotheosis, for forged gear's sockets and affix multipliers (integration/apotheosis); optional too.
+    compileOnly "maven.modrinth:apotheosis:veL1ccTb"                 // 1.21.1-8.9.0
+    compileOnly "maven.modrinth:placebo:B5zbSVlT"                    // 1.21.1-9.9.4
+    compileOnly "maven.modrinth:apothic-attributes:64fZbLnj"         // 1.21.1-2.11.0
 
     // The pack's mods, loaded in dev runs (client, server, game tests) so features can be tested against them.
     // localRuntime keeps them out of this mod's published dependencies: Dungeon Delving doesn't require any.

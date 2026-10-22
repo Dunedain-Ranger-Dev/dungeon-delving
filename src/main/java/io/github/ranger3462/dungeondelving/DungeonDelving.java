@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import io.github.ranger3462.dungeondelving.dungeon.CuriosLoot;
+import io.github.ranger3462.dungeondelving.integration.apotheosis.ApotheosisForging;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -27,6 +28,9 @@ public class DungeonDelving {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         if (ModList.get().isLoaded("curios")) {
             CuriosLoot.register();
+        }
+        if (ModList.get().isLoaded("apotheosis")) {
+            ApotheosisForging.register();
         }
     }
 
