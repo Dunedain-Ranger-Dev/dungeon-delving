@@ -81,8 +81,8 @@ public class ForgingTests {
             ForgeWorkshop basic = ForgeWorkshop.scan(level, hearth);
             helper.assertTrue(basic.complete() && basic.forgeLevel() == 1 && basic.maxStars() == 3, "the basic stations make a level 1 forge (up to ★3)");
             set(level, hearth.offset(3, 0, 0), Blocks.BLAST_FURNACE.defaultBlockState());
-            set(level, hearth.offset(-3, 0, 2), Forging.DWARVEN_ANVIL.get().defaultBlockState());
-            helper.assertTrue(ForgeWorkshop.scan(level, hearth).forgeLevel() == 2, "a blast furnace and Dwarven Anvil make a level 2 forge");
+            set(level, hearth.offset(-3, 0, 2), Forging.MASTER_ANVIL.get().defaultBlockState());
+            helper.assertTrue(ForgeWorkshop.scan(level, hearth).forgeLevel() == 2, "a blast furnace and Master Anvil make a level 2 forge");
             set(level, hearth.offset(4, 0, 0), Forging.BELLOWS.get().defaultBlockState());
             set(level, hearth.offset(0, 0, 4), Forging.OIL_CAULDRON.get().defaultBlockState());
             set(level, hearth.offset(0, 0, -4), Forging.GRINDING_WHEEL.get().defaultBlockState());
@@ -114,7 +114,7 @@ public class ForgingTests {
             heated.set(Forging.STARS.get(), 1);
             player.setItemInHand(InteractionHand.MAIN_HAND, heated);
             BlockPos anvil = hearth.offset(3, 0, 3);
-            set(level, anvil, Forging.DWARVEN_ANVIL.get().defaultBlockState());
+            set(level, anvil, Forging.MASTER_ANVIL.get().defaultBlockState());
             long now = level.getGameTime();
             ForgeActions.Session strike = ForgeActions.begin(player, level, anvil, level.getBlockState(anvil), player.getMainHandItem(),
                     TimingBar.Kind.STRIKE, now).orElseThrow();
@@ -238,7 +238,7 @@ public class ForgingTests {
             set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
             buildBasicForge(level, hearth);
             BlockPos anvil = hearth.offset(3, 0, 3);
-            set(level, anvil, Forging.DWARVEN_ANVIL.get().defaultBlockState());
+            set(level, anvil, Forging.MASTER_ANVIL.get().defaultBlockState());
             ForgeActions.Session session = tryStrike(player, level, anvil, 1).orElseThrow();
             long now = level.getGameTime();
             ForgeActions.strike(player, level, session, player.getMainHandItem(), now + 3, session.goldMarker());
@@ -255,7 +255,7 @@ public class ForgingTests {
         helper.succeed();
     }
 
-    /** A vanilla anvil spoils about 1 in 10 pieces, however well they're struck; the Dwarven Anvil never does. */
+    /** A vanilla anvil spoils about 1 in 10 pieces, however well they're struck; the Master Anvil never does. */
     @GameTest(template = ANY_TEMPLATE)
     public static void basicStationsSometimesSpoilThePiece(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -264,12 +264,12 @@ public class ForgingTests {
         try {
             set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
             buildBasicForge(level, hearth);
-            BlockPos dwarven = hearth.offset(3, 0, 3);
-            set(level, dwarven, Forging.DWARVEN_ANVIL.get().defaultBlockState());
+            BlockPos master = hearth.offset(3, 0, 3);
+            set(level, master, Forging.MASTER_ANVIL.get().defaultBlockState());
             int basicCracks = strikeGold(player, level, hearth.offset(2, 0, 0), 200);
-            int dwarvenCracks = strikeGold(player, level, dwarven, 50);
+            int masterCracks = strikeGold(player, level, master, 50);
             helper.assertTrue(basicCracks > 5 && basicCracks < 40, "about 10% of 200 perfect bars on a vanilla anvil should crack; got " + basicCracks);
-            helper.assertTrue(dwarvenCracks == 0, "perfect bars on the Dwarven Anvil never crack; got " + dwarvenCracks);
+            helper.assertTrue(masterCracks == 0, "perfect bars on the Master Anvil never crack; got " + masterCracks);
         } finally {
             clear(level, hearth);
         }

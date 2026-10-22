@@ -64,9 +64,9 @@ public final class Forging {
     public static final DeferredBlock<BellowsBlock> BELLOWS = ModRegistries.BLOCKS.registerBlock("bellows", BellowsBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.0f).sound(SoundType.WOOD).noOcclusion());
     public static final DeferredItem<BlockItem> BELLOWS_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(BELLOWS);
-    public static final DeferredBlock<DwarvenAnvilBlock> DWARVEN_ANVIL = ModRegistries.BLOCKS.registerBlock("dwarven_anvil", DwarvenAnvilBlock::new,
+    public static final DeferredBlock<MasterAnvilBlock> MASTER_ANVIL = ModRegistries.BLOCKS.registerBlock("master_anvil", MasterAnvilBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(5.0f, 1200.0f).requiresCorrectToolForDrops().sound(SoundType.ANVIL).noOcclusion());
-    public static final DeferredItem<BlockItem> DWARVEN_ANVIL_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(DWARVEN_ANVIL);
+    public static final DeferredItem<BlockItem> MASTER_ANVIL_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(MASTER_ANVIL);
     public static final DeferredBlock<GrindingWheelBlock> GRINDING_WHEEL = ModRegistries.BLOCKS.registerBlock("grinding_wheel", GrindingWheelBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(2.0f, 6.0f).requiresCorrectToolForDrops().sound(SoundType.STONE).noOcclusion());
     public static final DeferredItem<BlockItem> GRINDING_WHEEL_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(GRINDING_WHEEL);

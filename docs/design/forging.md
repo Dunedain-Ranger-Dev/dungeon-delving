@@ -14,7 +14,7 @@ can be arranged any way:
 | Station | Basic | Upgrade (raises the forge level) |
 |---|---|---|
 | Heat | Furnace | Blast Furnace (twice as fast), plus **Bellows** next to it (each pump pushes the heating along) |
-| Strike | Anvil (any damage state) | **Dwarven Anvil**: wider sweet spot |
+| Strike | Anvil (any damage state) | **Master Anvil**: wider sweet spot |
 | Quench | Water cauldron | **Oil Cauldron** (pour Quenching Oil into a cauldron): no crack chance |
 | Grind | Grindstone | **Grinding Wheel**: wider sweet spot |
 
@@ -23,7 +23,7 @@ can be arranged any way:
 | Level | Needs | Highest ★ |
 |---|---|---|
 | 1 | The basic stations | ★3 |
-| 2 | Blast Furnace and Dwarven Anvil | ★5 |
+| 2 | Blast Furnace and Master Anvil | ★5 |
 | 3 | Level 2, plus Bellows, Oil Cauldron and Grinding Wheel | ★7 |
 
 **Workshop bonus:** decoration blocks near the hearth (the `dungeondelving:forge_decor` tag: bricks, stone and
@@ -43,14 +43,14 @@ the forge is complete. Striking, quenching and grinding only work at stations th
 2. **Strike.** Hold the hot ingot and right-click the anvil. A bar appears with a marker sweeping back and forth across
    it. Each fresh right-click is one strike; holding the button down doesn't repeat it. You need 3 strikes, plus 1 more
    for every 2 ★ you're aiming for. The result is a **Struck Ingot**, which is still hot.
-   - **The bar:** the green sweet spot is 9% of the bar (13% on a Dwarven Anvil), narrowing a little as the target ★
+   - **The bar:** the green sweet spot is 9% of the bar (13% on a Master Anvil), narrowing a little as the target ★
      rises. Its middle quarter is **gold**. The marker restarts from the left for each strike.
    - **Cooling metal sweeps faster:** up to 40% faster as the metal goes from glowing to cold. Reheating resets it.
    - **Gold:** the strike counts twice and never cracks.
    - **Green:** safe on glowing-hot metal.
    - **Miss:** may crack the piece. The first miss in a bar has a 30% crack chance, and each further miss adds 15%.
    - **Basic anvil:** a vanilla anvil spoils the piece 10% of the time when a bar is finished, however well it went.
-     The Dwarven Anvil never does.
+     The Master Anvil never does.
    - **Lag:** the client times each bar itself. The marker starts sweeping when the bar arrives, and a click sends how
      long the bar had been sweeping, so lag never shifts it: what the player sees is what's judged. Each strike is
      tied to its bar, and the bar freezes after a click until the next one arrives, so a late packet can't land on the

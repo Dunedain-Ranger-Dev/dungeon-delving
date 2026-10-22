@@ -15,11 +15,11 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * The Dwarven Anvil: a forging anvil that widens the sweet spot when striking. Unlike a vanilla anvil it doesn't fall
+ * The Master Anvil: a forging anvil that widens the sweet spot when striking. Unlike a vanilla anvil it doesn't fall
  * or wear out, and it's only for forging (repairs still happen at a vanilla anvil). Part of a level 2 forge.
  */
-public class DwarvenAnvilBlock extends HorizontalDirectionalBlock {
-    public static final MapCodec<DwarvenAnvilBlock> CODEC = simpleCodec(DwarvenAnvilBlock::new);
+public class MasterAnvilBlock extends HorizontalDirectionalBlock {
+    public static final MapCodec<MasterAnvilBlock> CODEC = simpleCodec(MasterAnvilBlock::new);
     /** Extra sweet-spot width, as a share of the bar. */
     public static final float SWEET_SPOT_BONUS = 0.04f;
     private static final VoxelShape BASE = Block.box(2.0, 0.0, 2.0, 14.0, 4.0, 14.0);
@@ -28,7 +28,7 @@ public class DwarvenAnvilBlock extends HorizontalDirectionalBlock {
     private static final VoxelShape Z_SHAPE = Shapes.or(BASE, Block.box(4.0, 4.0, 3.0, 12.0, 5.0, 13.0), Block.box(6.0, 5.0, 4.0, 10.0, 10.0, 12.0),
             Block.box(3.0, 10.0, 0.0, 13.0, 16.0, 16.0));
 
-    public DwarvenAnvilBlock(Properties properties) {
+    public MasterAnvilBlock(Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
     }

@@ -265,7 +265,7 @@ public final class ForgeActions {
     }
 
     public static boolean isAnvil(BlockState state) {
-        return state.is(BlockTags.ANVIL) || state.is(Forging.DWARVEN_ANVIL.get());
+        return state.is(BlockTags.ANVIL) || state.is(Forging.MASTER_ANVIL.get());
     }
 
     // --- Starting a minigame ---
@@ -312,8 +312,8 @@ public final class ForgeActions {
         int period;
         boolean basic;
         if (kind == TimingBar.Kind.STRIKE) {
-            basic = !state.is(Forging.DWARVEN_ANVIL.get());
-            width = STRIKE_WIDTH + (basic ? 0.0f : DwarvenAnvilBlock.SWEET_SPOT_BONUS) - 0.0075f * (stars - 1);
+            basic = !state.is(Forging.MASTER_ANVIL.get());
+            width = STRIKE_WIDTH + (basic ? 0.0f : MasterAnvilBlock.SWEET_SPOT_BONUS) - 0.0075f * (stars - 1);
             needed = strikesFor(stars);
             period = Math.max(16, 28 - (stars - 1));
         } else {

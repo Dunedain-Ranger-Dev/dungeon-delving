@@ -145,16 +145,16 @@ def blocks():
         f"facing={facing}": {"model": f"{MOD}:block/bellows", "y": y} for facing, y in HORIZONTAL.items()}})
     item_model("bellows", f"{MOD}:block/bellows")
 
-    # Dwarven Anvil: the anvil shape in dark deepslate.
-    write(ASSETS / "models/block/dwarven_anvil.json", {
+    # Master Anvil: the anvil shape in dark deepslate.
+    write(ASSETS / "models/block/master_anvil.json", {
         "parent": "minecraft:block/template_anvil",
         "textures": {"particle": "minecraft:block/polished_deepslate", "body": "minecraft:block/polished_deepslate",
                      "top": "minecraft:block/chiseled_deepslate"},
     })
     anvil_y = {"south": 0, "west": 90, "north": 180, "east": 270}
-    write(ASSETS / "blockstates/dwarven_anvil.json", {"variants": {
-        f"facing={facing}": {"model": f"{MOD}:block/dwarven_anvil", "y": y} for facing, y in anvil_y.items()}})
-    item_model("dwarven_anvil", f"{MOD}:block/dwarven_anvil")
+    write(ASSETS / "blockstates/master_anvil.json", {"variants": {
+        f"facing={facing}": {"model": f"{MOD}:block/master_anvil", "y": y} for facing, y in anvil_y.items()}})
+    item_model("master_anvil", f"{MOD}:block/master_anvil")
 
     # Grinding Wheel: the grindstone shape with a finer stone wheel.
     write(ASSETS / "models/block/grinding_wheel.json", {
@@ -184,7 +184,7 @@ def blocks():
                    "conditions": [{"condition": "minecraft:survives_explosion"}]}],
     })
 
-    for name in ("forge_hearth", "bellows", "dwarven_anvil", "grinding_wheel"):
+    for name in ("forge_hearth", "bellows", "master_anvil", "grinding_wheel"):
         block_loot(name)
 
 
@@ -231,7 +231,7 @@ def heating(name, ingredient, result):
 def recipes():
     shaped("forge_hearth", ["BBB", "BCB", "BIB"], {"B": "minecraft:bricks", "C": "minecraft:campfire", "I": "minecraft:iron_block"})
     shaped("bellows", ["PPP", "LLL", "PIP"], {"P": "#minecraft:planks", "L": "minecraft:leather", "I": "minecraft:iron_ingot"})
-    shaped("dwarven_anvil", ["WWW", " A ", "DDD"],
+    shaped("master_anvil", ["WWW", " A ", "DDD"],
            {"W": f"{MOD}:wardsilver_ingot", "A": "minecraft:anvil", "D": "minecraft:polished_deepslate"})
     shaped("grinding_wheel", ["SES", "EGE", "LEL"],
            {"S": "minecraft:smooth_stone", "E": f"{MOD}:emberstone_ingot", "G": "minecraft:grindstone", "L": "minecraft:stripped_dark_oak_log"})
@@ -262,7 +262,7 @@ def tags():
     write(DATA / "tags/block/forge_decor.json", {"replace": False, "values": DECOR})
     pickaxe = RES / "data/minecraft/tags/block/mineable/pickaxe.json"
     tag = json.loads(pickaxe.read_text(encoding="utf-8"))
-    for name in ("forge_hearth", "dwarven_anvil", "grinding_wheel"):
+    for name in ("forge_hearth", "master_anvil", "grinding_wheel"):
         if f"{MOD}:{name}" not in tag["values"]:
             tag["values"].append(f"{MOD}:{name}")
     write(pickaxe, tag)

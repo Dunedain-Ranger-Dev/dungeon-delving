@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * @param bellows a Bellows next to one of the workshop's furnaces
  * @param decor how many decoration blocks ({@link Forging#FORGE_DECOR}) are in range
  */
-public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurnace, boolean bellows, boolean anvil, boolean dwarvenAnvil,
+public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurnace, boolean bellows, boolean anvil, boolean masterAnvil,
         boolean waterCauldron, boolean oilCauldron, boolean grindstone, boolean grindingWheel, int decor) {
     public static final int RADIUS = 7;
     public static final int HEIGHT = 4;
@@ -29,7 +29,7 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
 
     /** Looks over everything in range of a hearth. */
     public static ForgeWorkshop scan(Level level, BlockPos hearth) {
-        boolean furnace = false, blastFurnace = false, bellows = false, anvil = false, dwarvenAnvil = false, waterCauldron = false,
+        boolean furnace = false, blastFurnace = false, bellows = false, anvil = false, masterAnvil = false, waterCauldron = false,
                 oilCauldron = false, grindstone = false, grindingWheel = false;
         int decor = 0;
         for (BlockPos pos : BlockPos.betweenClosed(hearth.offset(-RADIUS, -HEIGHT, -RADIUS), hearth.offset(RADIUS, HEIGHT, RADIUS))) {
@@ -44,8 +44,8 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
                 bellows |= besideFurnace(level, pos);
             } else if (state.is(BlockTags.ANVIL)) {
                 anvil = true;
-            } else if (state.is(Forging.DWARVEN_ANVIL.get())) {
-                dwarvenAnvil = true;
+            } else if (state.is(Forging.MASTER_ANVIL.get())) {
+                masterAnvil = true;
             } else if (state.is(Blocks.WATER_CAULDRON) || state.is(Blocks.CAULDRON)) {
                 waterCauldron = true; // An empty cauldron still counts: it just needs refilling before the next quench.
             } else if (state.is(Forging.OIL_CAULDRON.get())) {
@@ -59,7 +59,7 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
                 decor++;
             }
         }
-        return new ForgeWorkshop(hearth.immutable(), furnace, blastFurnace, bellows, anvil, dwarvenAnvil, waterCauldron, oilCauldron, grindstone,
+        return new ForgeWorkshop(hearth.immutable(), furnace, blastFurnace, bellows, anvil, masterAnvil, waterCauldron, oilCauldron, grindstone,
                 grindingWheel, decor);
     }
 
@@ -98,7 +98,7 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
         if (!furnace) {
             missing.add(Component.translatable("forge.dungeondelving.station.furnace"));
         }
-        if (!anvil && !dwarvenAnvil) {
+        if (!anvil && !masterAnvil) {
             missing.add(Component.translatable("forge.dungeondelving.station.anvil"));
         }
         if (!waterCauldron && !oilCauldron) {
@@ -110,12 +110,12 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
         return missing;
     }
 
-    /** 0 if incomplete; 1 with the basic stations; 2 with a Blast Furnace and Dwarven Anvil; 3 with every upgrade. */
+    /** 0 if incomplete; 1 with the basic stations; 2 with a Blast Furnace and Master Anvil; 3 with every upgrade. */
     public int forgeLevel() {
         if (!complete()) {
             return 0;
         }
-        if (blastFurnace && dwarvenAnvil) {
+        if (blastFurnace && masterAnvil) {
             return bellows && oilCauldron && grindingWheel ? 3 : 2;
         }
         return 1;

@@ -12,7 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-/** The Runic Workshop: a dwarven work station for making Runic Keys. Right-click to open it. */
+/** The Runic Workshop: a rune-carving work station for making Runic Keys. Right-click to open it. */
 public class RunicWorkshopBlock extends Block {
     public static final MapCodec<RunicWorkshopBlock> CODEC = simpleCodec(RunicWorkshopBlock::new);
 

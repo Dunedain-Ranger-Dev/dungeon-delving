@@ -76,18 +76,18 @@ ENTRIES = {
         "levels": ("Forge Levels", "minecraft:blast_furnace", [
             text("A forge's level caps how fine a piece it can work, in stars ($(item)★$()):"
                  "$(li)$(bold)Level 1$(): the basic stations. Up to ★3."
-                 "$(li)$(bold)Level 2$(): a $(item)Blast Furnace$() and a $(item)Dwarven Anvil$(). Up to ★5."
+                 "$(li)$(bold)Level 2$(): a $(item)Blast Furnace$() and a $(item)Master Anvil$(). Up to ★5."
                  "$(li)$(bold)Level 3$(): also $(item)Bellows$() by a furnace, an $(item)Oil Cauldron$() and a $(item)Grinding Wheel$(). Up to ★7.",
                  "Forge Levels"),
             text("The basic anvil and grindstone also wear on your work: one in ten pieces finished on them spoils, however well you "
-                 "struck it. The Dwarven Anvil and Grinding Wheel never do."),
+                 "struck it. The Master Anvil and Grinding Wheel never do."),
         ]),
-        "upgrades": ("Station Upgrades", f"{MOD}:dwarven_anvil", [
+        "upgrades": ("Station Upgrades", f"{MOD}:master_anvil", [
             spotlight(f"{MOD}:bellows", "Set next to a furnace or blast furnace. Each pump (right-click) pushes along whatever it's heating.", "Bellows"),
             crafting("bellows"),
-            spotlight(f"{MOD}:dwarven_anvil", "Widens the sweet spot when striking, never wears on your work, and never falls. Forged from "
-                      "Wardsilver, found in tier 2 dungeons.", "Dwarven Anvil"),
-            crafting("dwarven_anvil"),
+            spotlight(f"{MOD}:master_anvil", "Widens the sweet spot when striking, never wears on your work, and never falls. Forged from "
+                      "Wardsilver, found in tier 2 dungeons.", "Master Anvil"),
+            crafting("master_anvil"),
             spotlight(f"{MOD}:quenching_oil", "Pour bottles of Quenching Oil into a cauldron (up to three) to make an $(item)Oil Cauldron$(). "
                       "Quenching in oil never cracks the metal.", "Oil Cauldron"),
             crafting("quenching_oil"),

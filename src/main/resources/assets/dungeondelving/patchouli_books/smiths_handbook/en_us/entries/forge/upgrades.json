@@ -1,6 +1,6 @@
 {
   "name": "Station Upgrades",
-  "icon": "dungeondelving:dwarven_anvil",
+  "icon": "dungeondelving:master_anvil",
   "category": "dungeondelving:forge",
   "sortnum": 2,
   "pages": [
@@ -16,13 +16,13 @@
     },
     {
       "type": "patchouli:spotlight",
-      "item": "dungeondelving:dwarven_anvil",
+      "item": "dungeondelving:master_anvil",
       "text": "Widens the sweet spot when striking, never wears on your work, and never falls. Forged from Wardsilver, found in tier 2 dungeons.",
-      "title": "Dwarven Anvil"
+      "title": "Master Anvil"
     },
     {
       "type": "patchouli:crafting",
-      "recipe": "dungeondelving:dwarven_anvil"
+      "recipe": "dungeondelving:master_anvil"
     },
     {
       "type": "patchouli:spotlight",

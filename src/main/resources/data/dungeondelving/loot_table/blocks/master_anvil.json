@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "dungeondelving:dwarven_anvil"
+          "name": "dungeondelving:master_anvil"
         }
       ],
       "conditions": [
