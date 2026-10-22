@@ -77,6 +77,9 @@ public final class Forging {
     /** A quenched ingot, waiting to be ground. */
     public static final DeferredItem<StarredItem> QUENCHED_INGOT = ModRegistries.ITEMS.registerItem("quenched_ingot", StarredItem::new,
             new Item.Properties().stacksTo(16));
+    /** A quenched ingot that was ground badly: one more clean grind tempers it, another miss breaks it. */
+    public static final DeferredItem<StarredItem> UNSTABLE_INGOT = ModRegistries.ITEMS.registerItem("unstable_ingot", StarredItem.WithTooltip.of(
+            "tooltip.dungeondelving.unstable_ingot"), new Item.Properties().stacksTo(16));
     /** The finished metal: the ★ says how many times it's been through the forge. */
     public static final DeferredItem<StarredItem> TEMPERED_IRON_INGOT = ModRegistries.ITEMS.registerItem("tempered_iron_ingot", StarredItem::new,
             new Item.Properties());

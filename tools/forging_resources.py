@@ -72,13 +72,32 @@ def bottle(liquid):
     return image
 
 
+def overlay(points):
+    """Pixels to draw over the vanilla iron ingot, which is drawn diagonally with its top face on rows 3 to 7."""
+    return {pos: color for pos, color in points}
+
+
+WHITE = (255, 255, 255, 255)
+GLINT = (255, 255, 255, 170)
+CRACK = (35, 25, 25, 235)
+
+# Tempered: two little sparkles on the ingot's top face.
+TEMPERED_SHINE = overlay([((10, 4), WHITE), ((10, 3), GLINT), ((9, 4), GLINT), ((11, 4), GLINT), ((10, 5), GLINT),
+                          ((5, 6), WHITE), ((5, 5), GLINT), ((4, 6), GLINT), ((6, 6), GLINT), ((5, 7), GLINT)])
+# Unstable: a jagged crack along the ingot.
+UNSTABLE_CRACKS = overlay([((x, y), CRACK) for x, y in [(2, 8), (3, 8), (4, 9), (5, 9), (6, 8), (7, 8), (7, 7), (8, 9), (9, 9),
+                                                         (10, 8), (11, 8), (12, 9), (6, 10)]])
+
+# Heated, quenched, unstable and tempered ingots use the vanilla iron ingot, tinted at runtime (see ForgingItemColors);
+# these are only the extra layers and the struck ingot's flattened bar, drawn in plain grey so the tint colors it.
 ITEM_TEXTURES = {
-    "heated_ingot": ingot((255, 140, 40)),
-    "struck_ingot": ingot((240, 110, 30), flat=True),
-    "quenched_ingot": ingot((80, 82, 90), flat=True),
-    "tempered_iron_ingot": ingot((205, 215, 228), flat=True),
-    "quenching_oil": bottle((170, 120, 30)),
+    "struck_ingot": ingot((215, 215, 215), flat=True),
+    "tempered_shine": TEMPERED_SHINE,
+    "unstable_cracks": UNSTABLE_CRACKS,
 }
+
+# Item models built on the vanilla iron ingot: name -> extra layer (or None).
+IRON_INGOT_ITEMS = {"heated_ingot": None, "quenched_ingot": None, "unstable_ingot": "unstable_cracks", "tempered_iron_ingot": "tempered_shine"}
 
 # --- Blocks ---
 
@@ -253,7 +272,16 @@ def tags():
 def items():
     for name, image in ITEM_TEXTURES.items():
         png(ASSETS / f"textures/item/{name}.png", image)
+    for name in ("struck_ingot", "quenching_oil"):
         item_model(name)
+    png(ASSETS / "textures/item/quenching_oil.png", bottle((170, 120, 30)))
+    for name, extra in IRON_INGOT_ITEMS.items():
+        layers = {"layer0": "minecraft:item/iron_ingot"}
+        if extra:
+            layers["layer1"] = f"{MOD}:item/{extra}"
+        write(ASSETS / f"models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": layers})
+    for stale in ("heated_ingot", "quenched_ingot", "tempered_iron_ingot"):
+        (ASSETS / f"textures/item/{stale}.png").unlink(missing_ok=True)
 
 
 if __name__ == "__main__":

@@ -142,5 +142,11 @@
   "gui.dungeondelving.timing.grind": "Grind in the green; gold counts twice!",
   "gui.dungeondelving.timing.weave": "Weave in the green; gold counts twice!",
   "message.dungeondelving.forge.good": "Good strike.",
-  "message.dungeondelving.forge.critical": "Critical! That counts twice."
+  "message.dungeondelving.forge.critical": "Critical! That counts twice.",
+  "item.dungeondelving.unstable_ingot": "Unstable Ingot",
+  "tooltip.dungeondelving.unstable_ingot": "One more chance: grind it cleanly, or it breaks.",
+  "message.dungeondelving.forge.grind_miss": "A rough pass... it'll come out unstable.",
+  "message.dungeondelving.forge.grind_miss_unstable": "A rough pass... it's going to break!",
+  "message.dungeondelving.forge.unstable": "It came out unstable. Grind it once more, cleanly.",
+  "message.dungeondelving.forge.basic_station": "The old station gave out under it."
 }

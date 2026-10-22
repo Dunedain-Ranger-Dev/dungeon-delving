@@ -43,20 +43,24 @@ the forge is complete. Striking, quenching and grinding only work at stations th
 2. **Strike.** Hold the hot ingot and right-click the anvil. A bar appears with a marker sweeping back and forth across
    it. Each fresh right-click is one strike; holding the button down doesn't repeat it. You need 3 strikes, plus 1 more
    for every 2 ★ you're aiming for. The result is a **Struck Ingot**, which is still hot.
-   - **The bar:** the green sweet spot is 9% of the bar (13% on a Dwarven Anvil). It narrows a little as the ingot
-     cools and as the target ★ rises. Its middle quarter is **gold**.
+   - **The bar:** the green sweet spot is 9% of the bar (13% on a Dwarven Anvil), narrowing a little as the target ★
+     rises. Its middle quarter is **gold**. The marker restarts from the left for each strike.
+   - **Cooling metal sweeps faster:** up to 40% faster as the metal goes from glowing to cold. Reheating resets it.
    - **Gold:** the strike counts twice and never cracks.
    - **Green:** safe on glowing-hot metal.
    - **Miss:** may crack the piece. The first miss in a bar has a 30% crack chance, and each further miss adds 15%.
-   - **Cooling metal:** every strike but a gold one gets an extra crack chance: +12% once the metal is merely hot, and
-     +25% once it's cooling. Reheating resets it.
+   - **Basic anvil:** a vanilla anvil spoils the piece 10% of the time when a bar is finished, however well it went.
+     The Dwarven Anvil never does.
    - The client sends the marker's exact position with each strike, because the marker moves faster than server ticks.
      The server only accepts it if the marker could really have been there in the last few ticks.
 3. **Quench.** Right-click a water cauldron while the struck ingot is still hot. Water has a flat 30% crack chance that
    skill doesn't lower; only the Quench Tub's oil avoids it. You get a **Quenched Ingot**.
 4. **Grind.** Right-click the grindstone and use the same timing bar, with 2 passes. The green is 10% of the bar (14%
-   on the Grinding Wheel). Gold works the same as on the anvil. Misses start at a 20% crack chance and add 10% each.
-   Metal can be ground cold. The result is a **Tempered Ingot ★n**.
+   on the Grinding Wheel), and gold works the same as on the anvil. Metal can be ground cold.
+   - Every pass clean: you get a **Tempered Ingot ★n**.
+   - Any pass missed: you get an **Unstable Ingot** instead. Grind it again: clean, and it's tempered; another miss,
+     and it breaks.
+   - A vanilla grindstone spoils a clean grind 10% of the time; the Grinding Wheel never does.
 
 **Cracking** turns the piece into 5 iron nuggets. That rises with Forging level, and talents raise it further later.
 

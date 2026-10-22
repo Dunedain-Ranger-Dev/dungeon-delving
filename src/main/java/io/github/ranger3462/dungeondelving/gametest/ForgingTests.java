@@ -111,7 +111,8 @@ public class ForgingTests {
             ItemStack heated = new ItemStack(Forging.HEATED_INGOT.get());
             heated.set(Forging.STARS.get(), 1);
             player.setItemInHand(InteractionHand.MAIN_HAND, heated);
-            BlockPos anvil = hearth.offset(2, 0, 0);
+            BlockPos anvil = hearth.offset(3, 0, 3);
+            set(level, anvil, Forging.DWARVEN_ANVIL.get().defaultBlockState());
             long now = level.getGameTime();
             ForgeActions.Session strike = ForgeActions.begin(player, level, anvil, level.getBlockState(anvil), player.getMainHandItem(),
                     TimingBar.Kind.STRIKE, now).orElseThrow();
@@ -139,7 +140,8 @@ public class ForgingTests {
 
             player.setItemInHand(InteractionHand.MAIN_HAND, quenched.copy());
             quenched.setCount(0);
-            BlockPos grindstone = hearth.offset(-2, 0, 0);
+            BlockPos grindstone = hearth.offset(-3, 0, 3);
+            set(level, grindstone, Forging.GRINDING_WHEEL.get().defaultBlockState());
             ForgeActions.Session grind = ForgeActions.begin(player, level, grindstone, level.getBlockState(grindstone), player.getMainHandItem(),
                     TimingBar.Kind.GRIND, now).orElseThrow();
             while (ForgeActions.session(player).isPresent()) {
@@ -214,10 +216,11 @@ public class ForgingTests {
                     "the first miss has a " + ForgeActions.STRIKE_MISS_CRACK + " crack chance");
             helper.assertTrue(ForgeActions.missChance(TimingBar.Kind.STRIKE, 3) > ForgeActions.missChance(TimingBar.Kind.STRIKE, 2),
                     "each miss in a bar makes the next likelier to crack");
-            helper.assertTrue(ForgeActions.coldPenalty(TimingBar.Kind.STRIKE, 0.9f) == 0.0f && ForgeActions.coldPenalty(TimingBar.Kind.STRIKE, 0.5f) > 0.0f
-                    && ForgeActions.coldPenalty(TimingBar.Kind.STRIKE, 0.1f) > ForgeActions.coldPenalty(TimingBar.Kind.STRIKE, 0.5f),
-                    "the cooler the metal, the riskier every strike");
-            helper.assertTrue(ForgeActions.coldPenalty(TimingBar.Kind.GRIND, 0.1f) == 0.0f, "grinding works cold metal, so it has no cold penalty");
+            helper.assertTrue(ForgeActions.periodFor(TimingBar.Kind.STRIKE, 28, 1.0f) == 28
+                    && ForgeActions.periodFor(TimingBar.Kind.STRIKE, 28, 0.5f) < 28
+                    && ForgeActions.periodFor(TimingBar.Kind.STRIKE, 28, 0.1f) < ForgeActions.periodFor(TimingBar.Kind.STRIKE, 28, 0.5f),
+                    "the cooler the metal, the faster the sweep");
+            helper.assertTrue(ForgeActions.periodFor(TimingBar.Kind.GRIND, 24, 0.1f) == 24, "grinding works cold metal, so its sweep doesn't speed up");
             helper.assertTrue(ForgingPerks.scrapNuggets(1) == 5 && ForgingPerks.scrapNuggets(30) == 8, "cracks return 5 nuggets, up to 8 with skill");
         } finally {
             clear(level, hearth);
@@ -234,7 +237,9 @@ public class ForgingTests {
         try {
             set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
             buildBasicForge(level, hearth);
-            ForgeActions.Session session = tryStrike(player, level, hearth.offset(2, 0, 0), 1).orElseThrow();
+            BlockPos anvil = hearth.offset(3, 0, 3);
+            set(level, anvil, Forging.DWARVEN_ANVIL.get().defaultBlockState());
+            ForgeActions.Session session = tryStrike(player, level, anvil, 1).orElseThrow();
             long now = level.getGameTime();
             ForgeActions.strike(player, level, session, player.getMainHandItem(), now + 3, session.goldMarker());
             helper.assertTrue(session.done() == 2, "a gold strike counts as two");
@@ -248,6 +253,87 @@ public class ForgingTests {
             clear(level, hearth);
         }
         helper.succeed();
+    }
+
+    /** A vanilla anvil spoils about 1 in 10 pieces, however well they're struck; the Dwarven Anvil never does. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void basicStationsSometimesSpoilThePiece(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos hearth = forgeOrigin(helper);
+        ServerPlayer player = smith(helper);
+        try {
+            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
+            buildBasicForge(level, hearth);
+            BlockPos dwarven = hearth.offset(3, 0, 3);
+            set(level, dwarven, Forging.DWARVEN_ANVIL.get().defaultBlockState());
+            int basicCracks = strikeGold(player, level, hearth.offset(2, 0, 0), 200);
+            int dwarvenCracks = strikeGold(player, level, dwarven, 50);
+            helper.assertTrue(basicCracks > 5 && basicCracks < 40, "about 10% of 200 perfect bars on a vanilla anvil should crack; got " + basicCracks);
+            helper.assertTrue(dwarvenCracks == 0, "perfect bars on the Dwarven Anvil never crack; got " + dwarvenCracks);
+        } finally {
+            clear(level, hearth);
+        }
+        helper.succeed();
+    }
+
+    /** Strikes {@code runs} ingots with nothing but gold strikes, and returns how many cracked. */
+    private static int strikeGold(ServerPlayer player, ServerLevel level, BlockPos anvil, int runs) {
+        int cracks = 0;
+        long now = level.getGameTime();
+        for (int i = 0; i < runs; i++) {
+            player.getInventory().clearContent();
+            ForgeActions.end(player);
+            ForgeActions.Session session = tryStrike(player, level, anvil, 1).orElseThrow();
+            while (ForgeActions.session(player).isPresent()) {
+                now += 3;
+                ForgeActions.strike(player, level, session, player.getMainHandItem(), now, session.goldMarker());
+            }
+            if (find(player, Forging.STRUCK_INGOT.get()).isEmpty()) {
+                cracks++;
+            }
+        }
+        return cracks;
+    }
+
+    /** A grind with a miss leaves an Unstable Ingot; a clean second grind tempers it, and a second miss breaks it. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void aBadGrindLeavesAnUnstableIngot(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos hearth = forgeOrigin(helper);
+        ServerPlayer player = smith(helper);
+        try {
+            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
+            buildBasicForge(level, hearth);
+            BlockPos wheel = hearth.offset(-3, 0, 3);
+            set(level, wheel, Forging.GRINDING_WHEEL.get().defaultBlockState());
+            long now = level.getGameTime();
+            now = grind(player, level, wheel, new ItemStack(Forging.QUENCHED_INGOT.get()), now, true);
+            ItemStack unstable = find(player, Forging.UNSTABLE_INGOT.get());
+            helper.assertTrue(!unstable.isEmpty() && find(player, Forging.TEMPERED_IRON_INGOT.get()).isEmpty(), "a missed pass leaves it unstable, not tempered");
+            now = grind(player, level, wheel, unstable.copy(), now, false);
+            helper.assertTrue(!find(player, Forging.TEMPERED_IRON_INGOT.get()).isEmpty(), "a clean second grind tempers an unstable ingot");
+            grind(player, level, wheel, new ItemStack(Forging.UNSTABLE_INGOT.get()), now, true);
+            helper.assertTrue(find(player, Forging.TEMPERED_IRON_INGOT.get()).isEmpty() && find(player, Forging.UNSTABLE_INGOT.get()).isEmpty()
+                    && !find(player, Items.IRON_NUGGET).isEmpty(), "missing on an unstable ingot breaks it");
+        } finally {
+            clear(level, hearth);
+        }
+        helper.succeed();
+    }
+
+    /** Grinds {@code piece}, missing the first pass if {@code missFirst}, and returns the game time after. */
+    private static long grind(ServerPlayer player, ServerLevel level, BlockPos wheel, ItemStack piece, long now, boolean missFirst) {
+        player.getInventory().clearContent();
+        ForgeActions.end(player);
+        player.setItemInHand(InteractionHand.MAIN_HAND, piece);
+        ForgeActions.Session session = ForgeActions.begin(player, level, wheel, level.getBlockState(wheel), piece, TimingBar.Kind.GRIND, now).orElseThrow();
+        boolean first = true;
+        while (ForgeActions.session(player).isPresent()) {
+            now += 3;
+            ForgeActions.strike(player, level, session, player.getMainHandItem(), now, first && missFirst ? session.missMarker() : session.greenMarker());
+            first = false;
+        }
+        return now;
     }
 
     /** Water quenching cracks about 30% of the time, whatever the smith's skill; only oil is safe. */

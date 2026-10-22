@@ -138,7 +138,7 @@ public final class ModRegistries {
                 }
                 for (var forging : java.util.List.of(Forging.FORGE_HEARTH_ITEM, Forging.BELLOWS_ITEM, Forging.DWARVEN_ANVIL_ITEM,
                         Forging.GRINDING_WHEEL_ITEM, Forging.QUENCH_TUB_ITEM, Forging.QUENCHING_OIL, Forging.HEATED_INGOT, Forging.STRUCK_INGOT,
-                        Forging.QUENCHED_INGOT, Forging.TEMPERED_IRON_INGOT)) {
+                        Forging.QUENCHED_INGOT, Forging.UNSTABLE_INGOT, Forging.TEMPERED_IRON_INGOT)) {
                     output.accept(forging.get());
                 }
                 output.accept(HALLSTONE_ITEM.get());

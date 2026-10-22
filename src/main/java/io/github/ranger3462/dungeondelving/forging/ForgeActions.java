@@ -43,8 +43,12 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public final class ForgeActions {
     /** A bar left alone this long (in ticks) is put away. */
     public static final int TIMEOUT = 200;
-    /** How many ticks of lag a client's reported marker position is allowed to be behind the server's. */
-    private static final int LAG_TICKS = 4;
+    /**
+     * How many ticks a client's reported marker position may be behind the server's (lag), or ahead of it (the client's
+     * clock can run a tick or two ahead between time syncs).
+     */
+    private static final int LAG_TICKS = 6;
+    private static final int LEAD_TICKS = 3;
     /** How far outside the marker's lag window a reported position may be, as a share of the bar. */
     private static final float LAG_SLACK = 0.08f;
     /** Fewest ticks between two strikes. */
@@ -55,11 +59,14 @@ public final class ForgeActions {
     /** Crack chance for the first missed strike, and how much each further miss in the same bar adds. */
     public static final float STRIKE_MISS_CRACK = 0.30f;
     public static final float STRIKE_MISS_STEP = 0.15f;
-    public static final float GRIND_MISS_CRACK = 0.20f;
-    public static final float GRIND_MISS_STEP = 0.10f;
-    /** Extra crack chance on every strike but a gold one, once the metal is merely hot, and once it's cooling. */
-    public static final float HOT_PENALTY = 0.12f;
-    public static final float COOLING_PENALTY = 0.25f;
+    /**
+     * Chance a basic station (a vanilla anvil or grindstone) spoils the piece when a bar is finished, however well it
+     * went. The upgraded stations don't; that's much of why they're worth building.
+     */
+    public static final float BASIC_STATION_CRACK = 0.10f;
+    /** The sweep is this much faster (as a share of its period) on metal that's gone from glowing to nearly cold. */
+    public static final float COLD_SPEEDUP = 0.4f;
+    private static final int MIN_PERIOD = 10;
     /** Crack chance when quenching in water. Only oil avoids it. */
     public static final float WATER_CRACK = 0.30f;
     private static final float MAX_CRACK = 0.95f;
@@ -75,8 +82,13 @@ public final class ForgeActions {
     public static final class Session {
         final TimingBar.Kind kind;
         final BlockPos station;
-        final long start;
-        final int period;
+        long start;
+        int period;
+        final int basePeriod;
+        /** A vanilla anvil or grindstone, which can spoil the piece however well the bar went. */
+        final boolean basicStation;
+        /** Grinding an unstable ingot: any miss breaks it. */
+        final boolean unstable;
         final int stars;
         final int needed;
         final float baseWidth;
@@ -134,11 +146,15 @@ public final class ForgeActions {
             return high - low;
         }
 
-        Session(TimingBar.Kind kind, BlockPos station, long start, int period, int stars, int needed, float baseWidth) {
+        Session(TimingBar.Kind kind, BlockPos station, long start, int period, boolean basicStation, boolean unstable, int stars, int needed,
+                float baseWidth) {
             this.kind = kind;
             this.station = station;
             this.start = start;
             this.period = period;
+            this.basePeriod = period;
+            this.basicStation = basicStation;
+            this.unstable = unstable;
             this.stars = stars;
             this.needed = needed;
             this.baseWidth = baseWidth;
@@ -180,10 +196,15 @@ public final class ForgeActions {
             return Action.STRIKE;
         } else if (held.is(Forging.STRUCK_INGOT.get()) && (state.is(Blocks.WATER_CAULDRON) || state.is(Forging.QUENCH_TUB.get()))) {
             return Action.QUENCH;
-        } else if (held.is(Forging.QUENCHED_INGOT.get()) && (state.is(Blocks.GRINDSTONE) || state.is(Forging.GRINDING_WHEEL.get()))) {
+        } else if (isGrindable(held) && (state.is(Blocks.GRINDSTONE) || state.is(Forging.GRINDING_WHEEL.get()))) {
             return Action.GRIND;
         }
         return null;
+    }
+
+    /** Quenched ingots, and unstable ones getting their second chance. */
+    public static boolean isGrindable(ItemStack stack) {
+        return stack.is(Forging.QUENCHED_INGOT.get()) || stack.is(Forging.UNSTABLE_INGOT.get());
     }
 
     public static boolean isAnvil(BlockState state) {
@@ -228,18 +249,21 @@ public final class ForgeActions {
         float width;
         int needed;
         int period;
+        boolean basic;
         if (kind == TimingBar.Kind.STRIKE) {
-            width = STRIKE_WIDTH + (state.is(Forging.DWARVEN_ANVIL.get()) ? DwarvenAnvilBlock.SWEET_SPOT_BONUS : 0.0f) - 0.0075f * (stars - 1);
+            basic = !state.is(Forging.DWARVEN_ANVIL.get());
+            width = STRIKE_WIDTH + (basic ? 0.0f : DwarvenAnvilBlock.SWEET_SPOT_BONUS) - 0.0075f * (stars - 1);
             needed = strikesFor(stars);
             period = Math.max(16, 28 - (stars - 1));
         } else {
-            width = GRIND_WIDTH + (state.is(Forging.GRINDING_WHEEL.get()) ? GrindingWheelBlock.SWEET_SPOT_BONUS : 0.0f) - 0.005f * (stars - 1);
+            basic = !state.is(Forging.GRINDING_WHEEL.get());
+            width = GRIND_WIDTH + (basic ? 0.0f : GrindingWheelBlock.SWEET_SPOT_BONUS) - 0.005f * (stars - 1);
             needed = passesFor(stars);
             period = Math.max(16, 24 - (stars - 1));
         }
         width += ForgingPerks.sweetSpotBonus(skill) + workshop.get().decorBonus();
-        Session session = new Session(kind, pos.immutable(), now, period, stars, needed, width);
-        nextSpot(session, heat, level);
+        Session session = new Session(kind, pos.immutable(), now, period, basic, held.is(Forging.UNSTABLE_INGOT.get()), stars, needed, width);
+        nextSpot(session, heat, level, now);
         SESSIONS.put(player.getUUID(), session);
         send(player, session);
         level.playSound(null, pos, kind == TimingBar.Kind.STRIKE ? SoundEvents.ANVIL_PLACE : SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 0.3f, 1.2f);
@@ -256,13 +280,26 @@ public final class ForgeActions {
         return stars >= 5 ? 3 : 2;
     }
 
-    /** Places the sweet spot for the next strike somewhere along the bar. It's a little narrower the cooler the metal. */
-    private static void nextSpot(Session session, float heat, ServerLevel level) {
-        float width = Math.max(MIN_WIDTH, session.baseWidth * (session.kind == TimingBar.Kind.STRIKE ? 0.75f + 0.25f * heat : 1.0f));
+    /**
+     * Sets up the next strike: the sweet spot goes somewhere new along the bar, and the marker restarts from the left.
+     * Striking metal that has cooled sweeps faster (see {@link #periodFor}).
+     */
+    private static void nextSpot(Session session, float heat, ServerLevel level, long now) {
+        session.start = now;
+        session.period = periodFor(session.kind, session.basePeriod, heat);
+        float width = Math.max(MIN_WIDTH, session.baseWidth);
         float margin = 0.05f;
         float center = margin + width / 2 + level.getRandom().nextFloat() * Math.max(0.0f, 1.0f - 2 * margin - width);
         session.low = center - width / 2;
         session.high = center + width / 2;
+    }
+
+    /** The sweep's period (ticks there and back): striking cooler metal sweeps faster, up to {@link #COLD_SPEEDUP} faster. */
+    public static int periodFor(TimingBar.Kind kind, int basePeriod, float heat) {
+        if (kind != TimingBar.Kind.STRIKE) {
+            return basePeriod;
+        }
+        return Math.max(MIN_PERIOD, Math.round(basePeriod * (1.0f - COLD_SPEEDUP * (1.0f - heat))));
     }
 
     /** A hot ingot's heat for this player (their Forging level slows cooling); 1 for anything that isn't hot metal. */
@@ -278,7 +315,7 @@ public final class ForgeActions {
     public static float checkedMarker(Session session, long now, float reported) {
         float min = Float.MAX_VALUE;
         float max = -Float.MAX_VALUE;
-        for (int lag = 0; lag <= LAG_TICKS; lag++) {
+        for (int lag = -LEAD_TICKS; lag <= LAG_TICKS; lag++) {
             float marker = TimingBar.marker(now - lag - session.start, session.period);
             min = Math.min(min, marker);
             max = Math.max(max, marker);
@@ -293,7 +330,7 @@ public final class ForgeActions {
     static void onStrike(ServerPlayer player, float reported) {
         Session session = SESSIONS.get(player.getUUID());
         ItemStack held = player.getMainHandItem();
-        if (session == null || !held.is(session.kind == TimingBar.Kind.STRIKE ? Forging.HEATED_INGOT.get() : Forging.QUENCHED_INGOT.get())) {
+        if (session == null || !(session.kind == TimingBar.Kind.STRIKE ? held.is(Forging.HEATED_INGOT.get()) : isGrindable(held))) {
             return;
         }
         long now = player.level().getGameTime();
@@ -326,7 +363,6 @@ public final class ForgeActions {
             }
             case GREEN -> {
                 session.done++;
-                chance = coldPenalty(session.kind, heat);
                 CraftingSkills.addXp(player, CraftSkill.FORGING, 3);
                 level.playSound(null, pos, grinding ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.6f, 1.3f);
                 level.sendParticles(grinding ? ParticleTypes.CRIT : ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 1.05, pos.getZ() + 0.5, 6,
@@ -336,7 +372,8 @@ public final class ForgeActions {
             case MISS -> {
                 session.done++;
                 session.misses++;
-                chance = missChance(session.kind, session.misses) + coldPenalty(session.kind, heat);
+                // A missed strike can crack the ingot. A missed grinding pass doesn't, but leaves it unstable (see finish).
+                chance = grinding ? 0.0f : missChance(session.kind, session.misses);
                 CraftingSkills.addXp(player, CraftSkill.FORGING, 1);
                 level.playSound(null, pos, grinding ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.6f, 0.7f);
             }
@@ -348,37 +385,48 @@ public final class ForgeActions {
             crack(player, level, pos, held);
             return;
         }
-        if (hit == TimingBar.Hit.MISS) {
+        if (hit == TimingBar.Hit.MISS && grinding) {
+            tell(player, Component.translatable(session.unstable ? "message.dungeondelving.forge.grind_miss_unstable" : "message.dungeondelving.forge.grind_miss")
+                    .withStyle(ChatFormatting.YELLOW));
+        } else if (hit == TimingBar.Hit.MISS) {
             int nextRisk = Math.round(100 * Math.min(MAX_CRACK, missChance(session.kind, session.misses + 1) * crackMultiplier));
             tell(player, Component.translatable("message.dungeondelving.forge.off", nextRisk).withStyle(ChatFormatting.YELLOW));
         }
         session.lastAction = now;
         if (session.done < session.needed) {
-            nextSpot(session, heat, level);
+            nextSpot(session, heat, level, now);
             send(player, session);
             return;
         }
         end(player);
-        finish(player, level, session, held);
+        boolean failedGrind = grinding && session.misses > 0;
+        if (failedGrind && session.unstable) {
+            crack(player, level, pos, held); // Its second chance, missed.
+            return;
+        }
+        if (!failedGrind && session.basicStation && level.getRandom().nextFloat() < BASIC_STATION_CRACK) {
+            tell(player, Component.translatable("message.dungeondelving.forge.basic_station").withStyle(ChatFormatting.RED));
+            crack(player, level, pos, held);
+            return;
+        }
+        finish(player, level, session, held, failedGrind);
     }
 
     /** The chance the {@code misses}th missed strike in a bar cracks the piece, before the Forging skill: it climbs with every miss. */
     public static float missChance(TimingBar.Kind kind, int misses) {
-        return kind == TimingBar.Kind.GRIND ? GRIND_MISS_CRACK + GRIND_MISS_STEP * (misses - 1) : STRIKE_MISS_CRACK + STRIKE_MISS_STEP * (misses - 1);
+        return STRIKE_MISS_CRACK + STRIKE_MISS_STEP * (misses - 1);
     }
 
-    /** Extra crack chance for striking metal that's no longer glowing hot. Grinding works cold metal, so it has none. */
-    public static float coldPenalty(TimingBar.Kind kind, float heat) {
-        if (kind != TimingBar.Kind.STRIKE || heat > 0.66f) {
-            return 0.0f;
-        }
-        return heat > 0.33f ? HOT_PENALTY : COOLING_PENALTY;
-    }
-
-    /** Turns the last strike's piece into the next stage: a struck ingot, or a Tempered Ingot. */
-    private static void finish(ServerPlayer player, ServerLevel level, Session session, ItemStack held) {
+    /**
+     * Turns the last strike's piece into the next stage: a struck ingot, a Tempered Ingot, or (after a grind with a
+     * miss) an Unstable Ingot, which gets one more try at the grindstone.
+     */
+    private static void finish(ServerPlayer player, ServerLevel level, Session session, ItemStack held, boolean failedGrind) {
         ItemStack result;
-        if (session.kind == TimingBar.Kind.STRIKE) {
+        if (failedGrind) {
+            result = new ItemStack(Forging.UNSTABLE_INGOT.get());
+            tell(player, Component.translatable("message.dungeondelving.forge.unstable").withStyle(ChatFormatting.YELLOW));
+        } else if (session.kind == TimingBar.Kind.STRIKE) {
             result = new ItemStack(Forging.STRUCK_INGOT.get());
             Long heatedAt = held.get(Forging.HEATED_AT.get());
             if (heatedAt != null) {
@@ -481,8 +529,9 @@ public final class ForgeActions {
             Map.Entry<UUID, Session> entry = sessions.next();
             ServerPlayer player = event.getServer().getPlayerList().getPlayer(entry.getKey());
             Session session = entry.getValue();
-            Item expected = session.kind == TimingBar.Kind.STRIKE ? Forging.HEATED_INGOT.get() : Forging.QUENCHED_INGOT.get();
-            if (player == null || !player.getMainHandItem().is(expected) || player.level().getGameTime() - session.lastAction >= TIMEOUT) {
+            boolean holding = player != null && (session.kind == TimingBar.Kind.STRIKE ? player.getMainHandItem().is(Forging.HEATED_INGOT.get())
+                    : isGrindable(player.getMainHandItem()));
+            if (!holding || player.level().getGameTime() - session.lastAction >= TIMEOUT) {
                 sessions.remove();
                 if (player != null) {
                     PacketDistributor.sendToPlayer(player, TimingBarPayload.HIDE);
