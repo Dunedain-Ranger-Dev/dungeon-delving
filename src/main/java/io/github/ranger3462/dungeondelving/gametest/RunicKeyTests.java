@@ -9,6 +9,7 @@ import com.mojang.authlib.GameProfile;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonBosses;
 import io.github.ranger3462.dungeondelving.registry.DungeonOre;
+import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import io.github.ranger3462.dungeondelving.workshop.RunicWorkshop;
 import io.github.ranger3462.dungeondelving.workshop.RunicWorkshopMenu;
 import io.github.ranger3462.dungeondelving.workshop.RunicWorkshopRecipe;
@@ -18,6 +19,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -36,6 +39,25 @@ public class RunicKeyTests {
     private static final List<Item> MATERIALS = List.of(Items.IRON_INGOT, DungeonOre.COMMON.ingot.get(), DungeonOre.TIER_1.ingot.get(),
             DungeonOre.TIER_2.ingot.get());
     private static final int[] COUNTS = { 8, 12, 16, 20 };
+
+    /** A survival player can reach a dungeon without commands: the gate and the workshop are both craftable. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void theDungeonGateAndWorkshopAreCraftable(GameTestHelper helper) {
+        ItemStack deepslate = new ItemStack(Items.POLISHED_DEEPSLATE);
+        ItemStack iron = new ItemStack(Items.IRON_INGOT);
+        ItemStack gate = craft(helper, deepslate, iron, deepslate, iron, new ItemStack(Items.ENDER_EYE), iron, deepslate, iron, deepslate);
+        helper.assertTrue(gate.is(ModRegistries.DUNGEON_GATE_ITEM.get()), "deepslate, iron and an Eye of Ender should make a Dungeon Gate, got " + gate);
+        ItemStack workshop = craft(helper, iron, iron, iron, deepslate, new ItemStack(Items.SMITHING_TABLE), deepslate, deepslate, deepslate, deepslate);
+        helper.assertTrue(workshop.is(RunicWorkshop.BLOCK_ITEM.get()), "the Runic Workshop should be craftable, got " + workshop);
+        helper.succeed();
+    }
+
+    /** Crafts whatever these items make in a 3x3 grid (filled row by row), or an empty stack. */
+    private static ItemStack craft(GameTestHelper helper, ItemStack... items) {
+        CraftingInput input = CraftingInput.of(3, 3, List.of(items));
+        return helper.getLevel().getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, helper.getLevel())
+                .map(recipe -> recipe.value().assemble(input, helper.getLevel().registryAccess())).orElse(ItemStack.EMPTY);
+    }
 
     @GameTest(template = ANY_TEMPLATE)
     public static void eachKeyIsMadeFromTheOneBelow(GameTestHelper helper) {
