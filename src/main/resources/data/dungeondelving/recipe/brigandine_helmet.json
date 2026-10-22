@@ -1,17 +1,21 @@
 {
-  "type": "dungeondelving:starred_shapeless",
+  "type": "dungeondelving:starred_shaped",
   "category": "equipment",
-  "ingredients": [
-    {
-      "item": "dungeondelving:gambeson_base"
-    },
-    {
+  "pattern": [
+    "HRH",
+    "HBH"
+  ],
+  "key": {
+    "H": {
       "item": "dungeondelving:hardened_leather"
     },
-    {
+    "R": {
       "item": "dungeondelving:rivets"
+    },
+    "B": {
+      "item": "dungeondelving:gambeson_base"
     }
-  ],
+  },
   "result": {
     "id": "dungeondelving:brigandine_helmet",
     "count": 1

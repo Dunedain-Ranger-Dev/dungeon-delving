@@ -3,28 +3,42 @@ package io.github.ranger3462.dungeondelving.forging;
 import net.minecraft.util.Mth;
 
 /**
- * The timing bar used for striking, grinding and weaving: a marker sweeps back and forth across the bar, and each
- * strike should land while it's inside the sweet spot. The server and the client draw the same bar from the same
- * numbers, so what the player sees is what the server checks.
+ * The timing minigames behind the crafting skills. The server and the client work them out from the same numbers, so
+ * what the player sees is what the server checks.
+ * <ul>
+ * <li>{@link Kind#STRIKE} and {@link Kind#GRIND} (smithing): a marker sweeps back and forth across a bar; click while
+ * it's in the green sweet spot, ideally in its gold middle.</li>
+ * <li>{@link Kind#WEAVE} (weaving, "thread the needle"): the needle's eye and the thread's tip bob up and down at
+ * different speeds; click when the thread lines up with the eye.</li>
+ * <li>{@link Kind#SCRAPE} (leatherworking): the scraper makes one pass across the hide; click as it crosses each patch,
+ * in order. A patch passed without a click is a miss.</li>
+ * </ul>
  */
 public final class TimingBar {
-    /** What the bar is for. */
+    /** Which minigame. */
     public enum Kind {
-        STRIKE, GRIND, WEAVE
+        STRIKE, GRIND, WEAVE, SCRAPE
+    }
+
+    /** How a click landed: gold (the very middle: counts twice, never fails), green, or a miss. */
+    public enum Hit {
+        GOLD, GREEN, MISS
     }
 
     private TimingBar() {}
 
-    /** Where the marker is, from 0 to 1, {@code ticks} after the bar started, for a full sweep (there and back) of {@code period} ticks. */
+    /** Where a back-and-forth marker is, from 0 to 1, {@code ticks} after it started, for a full sweep (there and back) of {@code period} ticks. */
     public static float marker(double ticks, int period) {
         double phase = Mth.positiveModulo(ticks, period) / period;
         return (float) (phase < 0.5 ? phase * 2.0 : 2.0 - phase * 2.0);
     }
 
-    /** How a strike landed: in the gold zone (counts twice, never cracks), in the green, or outside it. */
-    public enum Hit {
-        GOLD, GREEN, MISS
+    /** Where a one-way marker (the scraper) is, from 0 to 1, {@code ticks} into a pass of {@code period} ticks. */
+    public static float pass(double ticks, int period) {
+        return (float) Mth.clamp(ticks / period, 0.0, 1.0);
     }
+
+    // --- Sweet spots (smithing and scraping) ---
 
     /** The gold zone is this share of the green, in its middle, but never narrower than {@link #MIN_GOLD}. */
     public static final float GOLD_SHARE = 0.25f;
@@ -42,7 +56,7 @@ public final class TimingBar {
         return Math.min(high - low, Math.max(MIN_GOLD, (high - low) * GOLD_SHARE));
     }
 
-    /** Where a strike with the marker at {@code marker} landed, for the sweet spot {@code [low, high]}. */
+    /** Where a click with the marker at {@code marker} landed, for the sweet spot {@code [low, high]}. */
     public static Hit judge(float marker, float low, float high) {
         if (marker >= goldLow(low, high) && marker <= goldHigh(low, high)) {
             return Hit.GOLD;
@@ -53,5 +67,26 @@ public final class TimingBar {
     /** How far a marker position is outside the sweet spot {@code [low, high]}: 0 inside it. */
     public static float offBy(float marker, float low, float high) {
         return marker < low ? low - marker : marker > high ? marker - high : 0.0f;
+    }
+
+    // --- Threading the needle (weaving) ---
+
+    /** The needle's eye: a back-and-forth at the bar's period. */
+    public static float eye(double ticks, int period) {
+        return marker(ticks, period);
+    }
+
+    /** The thread's tip: a back-and-forth at its own period, offset by {@code phase} ticks. */
+    public static float thread(double ticks, float threadPeriod, float phase) {
+        return marker(ticks + phase, Math.max(1, Math.round(threadPeriod)));
+    }
+
+    /** How a stitch landed: gold if the thread is in the middle of the eye, green if it's anywhere in the eye ({@code gap} tall). */
+    public static Hit judgeStitch(double ticks, int period, float threadPeriod, float phase, float gap) {
+        float off = Math.abs(thread(ticks, threadPeriod, phase) - eye(ticks, period));
+        if (off <= gap * GOLD_SHARE / 2) {
+            return Hit.GOLD;
+        }
+        return off <= gap / 2 ? Hit.GREEN : Hit.MISS;
     }
 }

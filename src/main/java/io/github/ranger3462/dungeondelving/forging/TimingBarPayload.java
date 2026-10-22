@@ -1,5 +1,7 @@
 package io.github.ranger3462.dungeondelving.forging;
 
+import java.util.List;
+
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -7,30 +9,35 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /**
- * Tells the client to show (or, with {@code needed == 0}, hide) a timing bar. The client starts the marker sweeping the
- * moment this arrives, on its own clock, so lag doesn't shift it (see {@link StrikePayload}).
+ * Tells the client to show (or, with {@code needed == 0}, hide) a minigame ({@link TimingBar}). The client starts it the
+ * moment a new {@code bar} arrives, on its own clock, so lag doesn't shift it (see {@link StrikePayload}).
  *
- * @param bar which bar this is: each strike gets a new one
- * @param low the sweet spot's start, from 0 to 1
- * @param high the sweet spot's end
+ * @param bar which bar this is: smithing and weaving get a new one each strike; scraping keeps one for its whole pass
+ * @param values the minigame's layout: the sweet spot {@code [low, high]} for smithing; {@code [thread period, phase,
+ *        gap]} for weaving; each patch's {@code [low, high]}, in order, for scraping
  * @param done strikes made so far
  * @param needed strikes needed in all
  */
-public record TimingBarPayload(int kind, int bar, int period, float low, float high, int done, int needed) implements CustomPacketPayload {
+public record TimingBarPayload(int kind, int bar, int period, List<Float> values, int done, int needed) implements CustomPacketPayload {
     public static final Type<TimingBarPayload> TYPE = new Type<>(DungeonDelving.id("timing_bar"));
-    public static final StreamCodec<ByteBuf, TimingBarPayload> STREAM_CODEC = StreamCodec.of((buffer, payload) -> {
-        ByteBufCodecs.VAR_INT.encode(buffer, payload.kind());
-        ByteBufCodecs.VAR_INT.encode(buffer, payload.bar());
-        ByteBufCodecs.VAR_INT.encode(buffer, payload.period());
-        ByteBufCodecs.FLOAT.encode(buffer, payload.low());
-        ByteBufCodecs.FLOAT.encode(buffer, payload.high());
-        ByteBufCodecs.VAR_INT.encode(buffer, payload.done());
-        ByteBufCodecs.VAR_INT.encode(buffer, payload.needed());
-    }, buffer -> new TimingBarPayload(ByteBufCodecs.VAR_INT.decode(buffer), ByteBufCodecs.VAR_INT.decode(buffer), ByteBufCodecs.VAR_INT.decode(buffer),
-            ByteBufCodecs.FLOAT.decode(buffer), ByteBufCodecs.FLOAT.decode(buffer), ByteBufCodecs.VAR_INT.decode(buffer),
-            ByteBufCodecs.VAR_INT.decode(buffer)));
+    public static final StreamCodec<ByteBuf, TimingBarPayload> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, TimingBarPayload::kind,
+            ByteBufCodecs.VAR_INT, TimingBarPayload::bar,
+            ByteBufCodecs.VAR_INT, TimingBarPayload::period,
+            ByteBufCodecs.FLOAT.apply(ByteBufCodecs.list()), TimingBarPayload::values,
+            ByteBufCodecs.VAR_INT, TimingBarPayload::done,
+            ByteBufCodecs.VAR_INT, TimingBarPayload::needed,
+            TimingBarPayload::new);
 
-    public static final TimingBarPayload HIDE = new TimingBarPayload(0, 0, 1, 0, 0, 0, 0);
+    public static final TimingBarPayload HIDE = new TimingBarPayload(0, 0, 1, List.of(), 0, 0);
+
+    public TimingBar.Kind barKind() {
+        return TimingBar.Kind.values()[Math.min(kind, TimingBar.Kind.values().length - 1)];
+    }
+
+    public float value(int index) {
+        return index < values.size() ? values.get(index) : 0.0f;
+    }
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

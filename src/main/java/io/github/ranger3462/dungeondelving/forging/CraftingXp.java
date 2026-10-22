@@ -27,7 +27,7 @@ public final class CraftingXp {
             CraftingSkills.addXp(event.getEntity(), CraftSkill.FORGING, GEAR_XP_PER_STAR * stars);
         } else if (crafted.is(Forging.ARMOR_PLATE.get()) || crafted.is(Forging.RIVETS.get()) || crafted.is(Forging.CHAIN_LINKS.get())) {
             CraftingSkills.addXp(event.getEntity(), CraftSkill.FORGING, PART_XP_PER_STAR * stars);
-        } else if (crafted.is(Forging.REFINED_LEATHER.get()) || crafted.is(Forging.HARDENED_LEATHER.get()) || crafted.is(Forging.LEATHER_BASE.get())) {
+        } else if (crafted.is(Forging.HARDENED_LEATHER.get()) || crafted.is(Forging.LEATHER_BASE.get())) {
             CraftingSkills.addXp(event.getEntity(), CraftSkill.LEATHERWORKING, MATERIAL_XP);
         } else if (crafted.is(Forging.PADDED_CLOTH.get()) || crafted.is(Forging.GAMBESON_BASE.get())) {
             CraftingSkills.addXp(event.getEntity(), CraftSkill.WEAVING, MATERIAL_XP);

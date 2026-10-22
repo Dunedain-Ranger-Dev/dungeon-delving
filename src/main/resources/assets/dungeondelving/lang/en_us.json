@@ -137,7 +137,7 @@
   "message.dungeondelving.forge.tempered": "Tempered Iron Ingot %s!",
   "gui.dungeondelving.timing.strike": "Strike in the green; gold counts twice!",
   "gui.dungeondelving.timing.grind": "Grind in the green; gold counts twice!",
-  "gui.dungeondelving.timing.weave": "Weave in the green; gold counts twice!",
+  "gui.dungeondelving.timing.weave": "Click when the thread lines up with the needle's eye!",
   "message.dungeondelving.forge.good": "Good strike.",
   "message.dungeondelving.forge.critical": "Critical! That counts twice.",
   "item.dungeondelving.unstable_ingot": "Unstable Ingot",
@@ -181,9 +181,14 @@
   "block.dungeondelving.borax_deposit": "Borax Deposit",
   "tooltip.dungeondelving.flux": "Good for parts up to %s",
   "message.dungeondelving.weave.not_enough": "You need %s string to weave.",
-  "message.dungeondelving.weave.miss": "A loose weave... no extra cloth this time.",
   "message.dungeondelving.weave.done": "Woven!",
-  "message.dungeondelving.weave.done_bonus": "A tight weave: two cloths!",
   "message.dungeondelving.boil.no_heat": "The water needs heat under it: a lit campfire, fire, magma or lava.",
-  "message.dungeondelving.forge.salvaged": "Salvaged %s tempered ingots %s and %s nuggets."
+  "message.dungeondelving.forge.salvaged": "Salvaged %s tempered ingots %s and %s nuggets.",
+  "block.dungeondelving.tanning_rack": "Tanning Rack",
+  "item.dungeondelving.leather_scraps": "Leather Scraps",
+  "message.dungeondelving.forge.perfect": "Perfect!",
+  "message.dungeondelving.weave.snapped": "The thread snapped! You save one string.",
+  "message.dungeondelving.scrape.done": "Scraped clean: refined leather!",
+  "message.dungeondelving.scrape.torn": "The hide tore! Only scraps are left.",
+  "gui.dungeondelving.timing.scrape": "Click as the scraper crosses each dark patch!"
 }

@@ -379,6 +379,16 @@ def cloth(color, padded=False):
     return image
 
 
+def scraps(color):
+    """A few torn strips of leather."""
+    image = {}
+    for x0, y0, length in ((3, 4, 6), (8, 7, 6), (4, 10, 5), (10, 3, 3)):
+        for i in range(length):
+            for dy in (0, 1):
+                image[(x0 + i, y0 + dy + (i // 3))] = shade(color, -30 if dy else (10 if i % 2 else 0))
+    return image
+
+
 def backing(color):
     """A vest-shaped backing that armor is built on."""
     image = {}
@@ -409,6 +419,7 @@ GEAR_TEXTURES = {
     "rivets": rivets(),
     "chain_links": links(),
     "refined_leather": hide((160, 100, 60)),
+    "leather_scraps": scraps((130, 82, 48)),
     "boiled_leather": hide((120, 72, 40)),
     "hardened_leather": hide((95, 58, 34), stitched=True),
     "leather_base": backing((140, 88, 52)),
@@ -452,6 +463,23 @@ def gear():
         write(ASSETS / f"models/item/{weapon}.json", {"parent": "minecraft:item/handheld",
                                                       "textures": {"layer0": f"minecraft:item/{vanilla}", "layer1": f"{MOD}:item/forged_mark"}})
 
+    # Tanning Rack: two posts and crossbars with a hide stretched between them.
+    write(ASSETS / "models/block/tanning_rack.json", {
+        "parent": "minecraft:block/block",
+        "textures": {"wood": "minecraft:block/stripped_spruce_log", "hide": "minecraft:block/brown_wool", "particle": "minecraft:block/stripped_spruce_log"},
+        "elements": [
+            box([0, 0, 7], [2, 16, 9], "wood"),
+            box([14, 0, 7], [16, 16, 9], "wood"),
+            box([2, 13, 7], [14, 15, 9], "wood"),
+            box([2, 2, 7], [14, 4, 9], "wood"),
+            box([3, 4, 7.5], [13, 13, 8.5], "hide"),
+        ],
+    })
+    write(ASSETS / "blockstates/tanning_rack.json", {"variants": {
+        f"facing={facing}": {"model": f"{MOD}:block/tanning_rack", "y": y} for facing, y in HORIZONTAL.items()}})
+    item_model("tanning_rack", f"{MOD}:block/tanning_rack")
+    block_loot("tanning_rack")
+
     # Borax deposits: found in tier 2+ dungeons, through resource markers.
     png(ASSETS / "textures/block/borax_deposit.png", borax_deposit())
     write(ASSETS / "models/block/borax_deposit.json", {"parent": "minecraft:block/cube_all", "textures": {"all": f"{MOD}:block/borax_deposit"}})
@@ -491,11 +519,14 @@ def gear_recipes():
     shapeless("borax_flux", [f"{MOD}:borax", "minecraft:sand"], count=2)
     shapeless("runic_flux", [f"{MOD}:borax_flux", f"{MOD}:borax_flux", f"{MOD}:runic_shard_3"], count=2)
     shapeless("runeforged_flux", [f"{MOD}:runic_flux", f"{MOD}:runic_flux", f"{MOD}:thailite_ingot"], count=2)
-    starred_shapeless("armor_plate", [tempered, tempered, flux])
+    starred_shapeless("armor_plate", [tempered, flux])
     starred_shapeless("rivets", [tempered, flux, "minecraft:iron_nugget"], count=4)
-    starred_shapeless("chain_links", [tempered, flux], count=4)
+    starred_shapeless("chain_links", [tempered, tempered, flux], count=8)
 
-    shapeless("refined_leather", ["minecraft:leather", "minecraft:honeycomb"])
+    # Refined leather is scraped on a Tanning Rack, not crafted. Torn hides leave scraps; four make a leather again.
+    (DATA / "recipe/refined_leather.json").unlink(missing_ok=True)
+    shapeless("leather_from_scraps", [f"{MOD}:leather_scraps"] * 4, result="minecraft:leather")
+    shaped("tanning_rack", ["S S", "SLS", "P P"], {"S": "minecraft:stick", "L": "minecraft:leather", "P": "#minecraft:planks"})
     shapeless("hardened_leather", [f"{MOD}:boiled_leather"] * 3 + ["minecraft:string", "minecraft:honeycomb"], count=3)
     shapeless("leather_base", [f"{MOD}:refined_leather"] * 3)
     shapeless("padded_cloth", [f"{MOD}:woven_cloth", f"{MOD}:woven_cloth", "#minecraft:wool"])
@@ -503,17 +534,24 @@ def gear_recipes():
 
     base, gambeson, hardened = f"{MOD}:leather_base", f"{MOD}:gambeson_base", f"{MOD}:hardened_leather"
     plate_, rivet, link = f"{MOD}:armor_plate", f"{MOD}:rivets", f"{MOD}:chain_links"
-    # (plates or links, rivets, hardened leather) per slot; heavy and medium also take a leather base, light a gambeson.
-    heavy = {"helmet": (2, 2, 1), "chestplate": (4, 2, 2), "leggings": (3, 2, 2), "boots": (2, 1, 1)}
-    medium = {"helmet": (3, 1, 0), "chestplate": (6, 2, 0), "leggings": (5, 1, 0), "boots": (3, 1, 0)}
-    light = {"helmet": (0, 1, 1), "chestplate": (0, 2, 3), "leggings": (0, 2, 2), "boots": (0, 1, 1)}
+    # Vanilla armor shapes: the main material (M) where the ingots go, the backing (B) in the gap.
+    shapes = {
+        "helmet": ["MMM", "MBM"],
+        "chestplate": ["MBM", "MMM", "MMM"],
+        "leggings": ["MMM", "MBM", "M M"],
+        "boots": ["MBM", "M M"],
+    }
+    # Brigandine is hardened leather (H) studded with rivets (R): the same shapes, with rivets in some of the leather's places.
+    brigandine = {
+        "helmet": ["HRH", "HBH"],
+        "chestplate": ["HBH", "RHR", "HHH"],
+        "leggings": ["HRH", "HBH", "R R"],
+        "boots": ["RBR", "H H"],
+    }
     for slot in ARMOR_SLOTS:
-        p, r, h = heavy[slot]
-        starred_shapeless(f"plate_{slot}", [plate_] * p + [rivet] * r + [base] + [hardened] * h)
-        c, r, _ = medium[slot]
-        starred_shapeless(f"hauberk_{slot}", [link] * c + [rivet] * r + [base])
-        _, r, h = light[slot]
-        starred_shapeless(f"brigandine_{slot}", [gambeson] + [hardened] * h + [rivet] * r)
+        starred_shaped(f"plate_{slot}", shapes[slot], {"M": plate_, "B": base})
+        starred_shaped(f"hauberk_{slot}", shapes[slot], {"M": link, "B": base})
+        starred_shaped(f"brigandine_{slot}", brigandine[slot], {"H": hardened, "R": rivet, "B": gambeson})
     starred_shaped("forged_sword", ["P", "P", "S"], {"P": plate_, "S": "minecraft:stick"})
     starred_shaped("forged_axe", ["PP", "PS", " S"], {"P": plate_, "S": "minecraft:stick"})
 
@@ -539,6 +577,7 @@ def gear_tags():
     for tier in (2, 3, 4):
         add_to_tag(DATA / f"tags/block/dungeon_resources/tier_{tier}.json", [f"{MOD}:borax_deposit"])
     add_to_tag(RES / "data/minecraft/tags/block/mineable/pickaxe.json", [f"{MOD}:borax_deposit"])
+    add_to_tag(RES / "data/minecraft/tags/block/mineable/axe.json", [f"{MOD}:tanning_rack"])
 
 
 if __name__ == "__main__":

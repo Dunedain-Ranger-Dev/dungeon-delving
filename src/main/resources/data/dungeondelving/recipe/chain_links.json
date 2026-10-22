@@ -6,11 +6,14 @@
       "item": "dungeondelving:tempered_iron_ingot"
     },
     {
+      "item": "dungeondelving:tempered_iron_ingot"
+    },
+    {
       "tag": "dungeondelving:flux"
     }
   ],
   "result": {
     "id": "dungeondelving:chain_links",
-    "count": 4
+    "count": 8
   }
 }

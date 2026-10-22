@@ -107,32 +107,32 @@ public final class ForgedGear {
         }
     }
 
-    /** Tempered ingots that went into a piece (plates take 2, rivets and chain links are a quarter each), for salvaging. */
+    /**
+     * Tempered ingots that went into a piece, for salvaging: a plate is an ingot, and rivets and chain links are a
+     * quarter of one each. Armor follows the vanilla shapes (5, 8, 7 and 4 of its main material).
+     */
     public static float ingotCost(ItemStack stack) {
         if (stack.getItem() instanceof Armor armor) {
+            float pieces = switch (armor.getType()) {
+                case HELMET -> 5;
+                case CHESTPLATE -> 8;
+                case LEGGINGS -> 7;
+                default -> 4;
+            };
             return switch (armor.weight) {
-                case HEAVY -> switch (armor.getType()) {
-                    case HELMET -> 4.5f;
-                    case CHESTPLATE -> 8.5f;
-                    case LEGGINGS -> 6.5f;
-                    default -> 4.25f;
-                };
-                case MEDIUM -> switch (armor.getType()) {
-                    case HELMET -> 1.0f;
-                    case CHESTPLATE -> 2.0f;
-                    case LEGGINGS -> 1.5f;
-                    default -> 1.0f;
-                };
+                case HEAVY -> pieces;
+                case MEDIUM -> pieces * 0.25f;
                 case LIGHT -> switch (armor.getType()) {
-                    case CHESTPLATE, LEGGINGS -> 0.5f;
-                    default -> 0.25f;
+                    case HELMET -> 0.25f;
+                    case LEGGINGS -> 0.75f;
+                    default -> 0.5f;
                 };
             };
         }
         if (stack.getItem() instanceof Sword) {
-            return 4.0f;
+            return 2.0f;
         }
-        return stack.getItem() instanceof Axe ? 6.0f : 0.0f;
+        return stack.getItem() instanceof Axe ? 3.0f : 0.0f;
     }
 
     public static boolean isGear(ItemStack stack) {

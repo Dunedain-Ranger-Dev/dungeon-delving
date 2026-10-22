@@ -1,32 +1,19 @@
 {
-  "type": "dungeondelving:starred_shapeless",
+  "type": "dungeondelving:starred_shaped",
   "category": "equipment",
-  "ingredients": [
-    {
-      "item": "dungeondelving:armor_plate"
-    },
-    {
-      "item": "dungeondelving:armor_plate"
-    },
-    {
-      "item": "dungeondelving:armor_plate"
-    },
-    {
-      "item": "dungeondelving:rivets"
-    },
-    {
-      "item": "dungeondelving:rivets"
-    },
-    {
-      "item": "dungeondelving:leather_base"
-    },
-    {
-      "item": "dungeondelving:hardened_leather"
-    },
-    {
-      "item": "dungeondelving:hardened_leather"
-    }
+  "pattern": [
+    "MMM",
+    "MBM",
+    "M M"
   ],
+  "key": {
+    "M": {
+      "item": "dungeondelving:armor_plate"
+    },
+    "B": {
+      "item": "dungeondelving:leather_base"
+    }
+  },
   "result": {
     "id": "dungeondelving:plate_leggings",
     "count": 1

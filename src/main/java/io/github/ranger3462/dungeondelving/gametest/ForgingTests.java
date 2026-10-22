@@ -213,9 +213,8 @@ public class ForgingTests {
                 player.getInventory().clearContent();
             }
             helper.assertTrue(cracked, "badly-timed strikes should crack an ingot sooner or later");
-            helper.assertTrue(ForgeActions.missChance(TimingBar.Kind.STRIKE, 1) == ForgeActions.STRIKE_MISS_CRACK,
-                    "the first miss has a " + ForgeActions.STRIKE_MISS_CRACK + " crack chance");
-            helper.assertTrue(ForgeActions.missChance(TimingBar.Kind.STRIKE, 3) > ForgeActions.missChance(TimingBar.Kind.STRIKE, 2),
+            helper.assertTrue(ForgeActions.missChance(1) == ForgeActions.MISS_FAIL, "the first miss has a " + ForgeActions.MISS_FAIL + " crack chance");
+            helper.assertTrue(ForgeActions.missChance(3) > ForgeActions.missChance(2),
                     "each miss in a bar makes the next likelier to crack");
             helper.assertTrue(ForgeActions.periodFor(TimingBar.Kind.STRIKE, 28, 1.0f) == 28
                     && ForgeActions.periodFor(TimingBar.Kind.STRIKE, 28, 0.5f) < 28

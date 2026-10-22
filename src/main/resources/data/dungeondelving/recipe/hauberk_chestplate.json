@@ -1,35 +1,19 @@
 {
-  "type": "dungeondelving:starred_shapeless",
+  "type": "dungeondelving:starred_shaped",
   "category": "equipment",
-  "ingredients": [
-    {
+  "pattern": [
+    "MBM",
+    "MMM",
+    "MMM"
+  ],
+  "key": {
+    "M": {
       "item": "dungeondelving:chain_links"
     },
-    {
-      "item": "dungeondelving:chain_links"
-    },
-    {
-      "item": "dungeondelving:chain_links"
-    },
-    {
-      "item": "dungeondelving:chain_links"
-    },
-    {
-      "item": "dungeondelving:chain_links"
-    },
-    {
-      "item": "dungeondelving:chain_links"
-    },
-    {
-      "item": "dungeondelving:rivets"
-    },
-    {
-      "item": "dungeondelving:rivets"
-    },
-    {
+    "B": {
       "item": "dungeondelving:leather_base"
     }
-  ],
+  },
   "result": {
     "id": "dungeondelving:hauberk_chestplate",
     "count": 1

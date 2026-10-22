@@ -140,7 +140,7 @@ public final class ModRegistries {
                         Forging.GRINDING_WHEEL_ITEM, Forging.QUENCHING_OIL, Forging.HEATED_INGOT, Forging.STRUCK_INGOT,
                         Forging.QUENCHED_INGOT, Forging.UNSTABLE_INGOT, Forging.TEMPERED_IRON_INGOT, Forging.SAND_FLUX, Forging.BORAX,
                         Forging.BORAX_DEPOSIT_ITEM, Forging.BORAX_FLUX, Forging.RUNIC_FLUX, Forging.RUNEFORGED_FLUX, Forging.ARMOR_PLATE, Forging.RIVETS,
-                        Forging.CHAIN_LINKS, Forging.REFINED_LEATHER, Forging.BOILED_LEATHER, Forging.HARDENED_LEATHER, Forging.LEATHER_BASE,
+                        Forging.CHAIN_LINKS, Forging.TANNING_RACK_ITEM, Forging.LEATHER_SCRAPS, Forging.REFINED_LEATHER, Forging.BOILED_LEATHER, Forging.HARDENED_LEATHER, Forging.LEATHER_BASE,
                         Forging.WOVEN_CLOTH, Forging.PADDED_CLOTH, Forging.GAMBESON_BASE)) {
                     output.accept(forging.get());
                 }

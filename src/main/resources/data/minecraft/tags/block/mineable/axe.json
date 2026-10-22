@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "dungeondelving:bellows"
+    "dungeondelving:bellows",
+    "dungeondelving:tanning_rack"
   ]
 }

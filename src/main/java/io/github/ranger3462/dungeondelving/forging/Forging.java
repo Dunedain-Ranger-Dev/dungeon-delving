@@ -122,6 +122,12 @@ public final class Forging {
 
     // --- Leather and cloth ---
 
+    /** Where leather is scraped into refined leather. */
+    public static final DeferredBlock<TanningRackBlock> TANNING_RACK = ModRegistries.BLOCKS.registerBlock("tanning_rack", TanningRackBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.0f).sound(SoundType.WOOD).noOcclusion());
+    public static final DeferredItem<BlockItem> TANNING_RACK_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(TANNING_RACK);
+    /** What's left of a hide torn while scraping. Four make a leather again. */
+    public static final DeferredItem<Item> LEATHER_SCRAPS = ModRegistries.ITEMS.registerSimpleItem("leather_scraps", new Item.Properties());
     public static final DeferredItem<Item> REFINED_LEATHER = ModRegistries.ITEMS.registerSimpleItem("refined_leather", new Item.Properties());
     public static final DeferredItem<Item> BOILED_LEATHER = ModRegistries.ITEMS.registerSimpleItem("boiled_leather", new Item.Properties());
     public static final DeferredItem<Item> HARDENED_LEATHER = ModRegistries.ITEMS.registerSimpleItem("hardened_leather", new Item.Properties());
