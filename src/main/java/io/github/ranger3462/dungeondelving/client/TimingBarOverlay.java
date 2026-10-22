@@ -28,19 +28,29 @@ public final class TimingBarOverlay {
     private static final int WIDTH = 160;
     private static final int HEIGHT = 8;
     private static TimingBarPayload bar = TimingBarPayload.HIDE;
+    /** The client time (in ticks, with the partial tick) this bar arrived: its marker sweeps from then. */
+    private static double barArrived;
+    /** Set once this bar has been struck: the marker holds still until the next bar arrives. */
+    private static float struckAt = -1.0f;
 
     private TimingBarOverlay() {}
 
-    /** Shows or hides the bar. Called on the client when the server sends it. */
+    /** Shows or hides the bar. Called on the client when the server sends it; the marker starts sweeping now. */
     public static void handle(TimingBarPayload payload) {
         bar = payload;
+        barArrived = clientTicks();
+        struckAt = -1.0f;
     }
 
-    /** Where the marker is right now, between ticks too. */
-    private static float markerNow(float partialTick) {
+    /** The client's game time in ticks, between ticks too. */
+    private static double clientTicks() {
         Minecraft minecraft = Minecraft.getInstance();
-        double ticks = minecraft.level.getGameTime() + partialTick - bar.startTick();
-        return TimingBar.marker(ticks, bar.period());
+        return minecraft.level == null ? 0.0 : minecraft.level.getGameTime() + minecraft.getTimer().getGameTimeDeltaPartialTick(false);
+    }
+
+    /** How long this bar has been sweeping. */
+    private static float elapsed() {
+        return (float) (clientTicks() - barArrived);
     }
 
     /** Whether the use button was down at the end of the last tick: a click only counts if it wasn't. */
@@ -58,11 +68,13 @@ public final class TimingBarOverlay {
         }
         event.setCanceled(true);
         event.setSwingHand(false);
-        if (useWasDown) {
-            return;
+        if (useWasDown || struckAt >= 0.0f) {
+            return; // Held down, or this bar is already struck and the next hasn't arrived yet.
         }
         useWasDown = true; // One strike per press, even if this fires again before the tick ends.
-        PacketDistributor.sendToServer(new StrikePayload(markerNow(minecraft.getTimer().getGameTimeDeltaPartialTick(false))));
+        float elapsed = elapsed();
+        struckAt = TimingBar.marker(elapsed, bar.period());
+        PacketDistributor.sendToServer(new StrikePayload(bar.bar(), elapsed));
         minecraft.player.swing(InteractionHand.MAIN_HAND);
     }
 
@@ -78,7 +90,7 @@ public final class TimingBarOverlay {
         }
         int left = (graphics.guiWidth() - WIDTH) / 2;
         int top = graphics.guiHeight() - 72;
-        float marker = markerNow(delta.getGameTimeDeltaPartialTick(false));
+        float marker = struckAt >= 0.0f ? struckAt : TimingBar.marker(elapsed(), bar.period());
 
         graphics.fill(left - 1, top - 1, left + WIDTH + 1, top + HEIGHT + 1, 0xFF000000);
         graphics.fill(left, top, left + WIDTH, top + HEIGHT, 0xFF3A2A20);

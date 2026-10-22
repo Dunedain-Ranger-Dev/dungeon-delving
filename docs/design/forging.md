@@ -51,10 +51,15 @@ the forge is complete. Striking, quenching and grinding only work at stations th
    - **Miss:** may crack the piece. The first miss in a bar has a 30% crack chance, and each further miss adds 15%.
    - **Basic anvil:** a vanilla anvil spoils the piece 10% of the time when a bar is finished, however well it went.
      The Dwarven Anvil never does.
-   - The client sends the marker's exact position with each strike, because the marker moves faster than server ticks.
-     The server only accepts it if the marker could really have been there in the last few ticks.
+   - **Lag:** the client times each bar itself. The marker starts sweeping when the bar arrives, and a click sends how
+     long the bar had been sweeping, so lag never shifts it: what the player sees is what's judged. Each strike is
+     tied to its bar, and the bar freezes after a click until the next one arrives, so a late packet can't land on the
+     wrong bar. The server only pulls back a timing that the player's ping can't explain (more than 10 ticks out).
+     A hacked client could cheat this; that's accepted for a co-op pack.
 3. **Quench.** Right-click a water cauldron while the struck ingot is still hot. Water has a flat 30% crack chance that
-   skill doesn't lower; only the Quench Tub's oil avoids it. You get a **Quenched Ingot**.
+   skill doesn't lower; only the Quench Tub's oil avoids it. Each quench uses a level of water (or of oil), so a full
+   cauldron does 3 quenches before it needs refilling. An empty cauldron still counts as the forge's quench station.
+   You get a **Quenched Ingot**.
 4. **Grind.** Right-click the grindstone and use the same timing bar, with 2 passes. The green is 10% of the bar (14%
    on the Grinding Wheel), and gold works the same as on the anvil. Metal can be ground cold.
    - Every pass clean: you get a **Tempered Ingot ★n**.

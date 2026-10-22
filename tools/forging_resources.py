@@ -88,16 +88,15 @@ TEMPERED_SHINE = overlay([((10, 4), WHITE), ((10, 3), GLINT), ((9, 4), GLINT), (
 UNSTABLE_CRACKS = overlay([((x, y), CRACK) for x, y in [(2, 8), (3, 8), (4, 9), (5, 9), (6, 8), (7, 8), (7, 7), (8, 9), (9, 9),
                                                          (10, 8), (11, 8), (12, 9), (6, 10)]])
 
-# Heated, quenched, unstable and tempered ingots use the vanilla iron ingot, tinted at runtime (see ForgingItemColors);
-# these are only the extra layers and the struck ingot's flattened bar, drawn in plain grey so the tint colors it.
+# Heated, struck, quenched, unstable and tempered ingots use the vanilla iron ingot, tinted at runtime (see
+# ForgingItemColors); these are only the extra layers drawn over it.
 ITEM_TEXTURES = {
-    "struck_ingot": ingot((215, 215, 215), flat=True),
     "tempered_shine": TEMPERED_SHINE,
     "unstable_cracks": UNSTABLE_CRACKS,
 }
 
 # Item models built on the vanilla iron ingot: name -> extra layer (or None).
-IRON_INGOT_ITEMS = {"heated_ingot": None, "quenched_ingot": None, "unstable_ingot": "unstable_cracks", "tempered_iron_ingot": "tempered_shine"}
+IRON_INGOT_ITEMS = {"heated_ingot": None, "struck_ingot": None, "quenched_ingot": None, "unstable_ingot": "unstable_cracks", "tempered_iron_ingot": "tempered_shine"}
 
 # --- Blocks ---
 
@@ -247,7 +246,7 @@ DECOR = [
     "minecraft:cracked_deepslate_bricks", "minecraft:deepslate_tiles", "minecraft:deepslate_tile_stairs", "minecraft:deepslate_tile_slab",
     "minecraft:polished_deepslate", "minecraft:chiseled_deepslate", "minecraft:polished_blackstone_bricks",
     "minecraft:chain", "minecraft:lantern", "minecraft:soul_lantern", "minecraft:iron_bars", "minecraft:barrel",
-    "minecraft:smithing_table", "minecraft:campfire", "minecraft:soul_campfire", "minecraft:cauldron", "minecraft:stonecutter",
+    "minecraft:smithing_table", "minecraft:campfire", "minecraft:soul_campfire", "minecraft:stonecutter",
     "minecraft:iron_block", "minecraft:coal_block", "minecraft:magma_block",
     "dungeondelving:hallstone",
 ]
@@ -272,15 +271,14 @@ def tags():
 def items():
     for name, image in ITEM_TEXTURES.items():
         png(ASSETS / f"textures/item/{name}.png", image)
-    for name in ("struck_ingot", "quenching_oil"):
-        item_model(name)
+    item_model("quenching_oil")
     png(ASSETS / "textures/item/quenching_oil.png", bottle((170, 120, 30)))
     for name, extra in IRON_INGOT_ITEMS.items():
         layers = {"layer0": "minecraft:item/iron_ingot"}
         if extra:
             layers["layer1"] = f"{MOD}:item/{extra}"
         write(ASSETS / f"models/item/{name}.json", {"parent": "minecraft:item/generated", "textures": layers})
-    for stale in ("heated_ingot", "quenched_ingot", "tempered_iron_ingot"):
+    for stale in ("heated_ingot", "struck_ingot", "quenched_ingot", "tempered_iron_ingot"):
         (ASSETS / f"textures/item/{stale}.png").unlink(missing_ok=True)
 
 

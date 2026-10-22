@@ -26,6 +26,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -43,16 +44,8 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public final class ForgeActions {
     /** A bar left alone this long (in ticks) is put away. */
     public static final int TIMEOUT = 200;
-    /**
-     * How many ticks a client's reported marker position may be behind the server's (lag), or ahead of it (the client's
-     * clock can run a tick or two ahead between time syncs).
-     */
-    private static final int LAG_TICKS = 6;
-    private static final int LEAD_TICKS = 3;
-    /** How far outside the marker's lag window a reported position may be, as a share of the bar. */
-    private static final float LAG_SLACK = 0.08f;
-    /** Fewest ticks between two strikes. */
-    private static final int MIN_STRIKE_GAP = 2;
+    /** Ticks of slack, either way, on top of the player's ping, when checking a client-timed strike. */
+    private static final int TIMING_SLACK = 10;
     /** Narrowest a sweet spot can get, as a share of the bar. */
     private static final float MIN_WIDTH = 0.03f;
 
@@ -97,7 +90,8 @@ public final class ForgeActions {
         int done;
         int misses;
         long lastAction;
-        long lastStrike = Long.MIN_VALUE / 2;
+        /** Counts up with each strike, so a strike can't be applied to a bar it wasn't aimed at. */
+        int bar;
 
         /** A marker position in the gold zone. For tests. */
         public float goldMarker() {
@@ -128,6 +122,10 @@ public final class ForgeActions {
 
         public long start() {
             return start;
+        }
+
+        public int bar() {
+            return bar;
         }
 
         public int period() {
@@ -194,7 +192,8 @@ public final class ForgeActions {
     private static Action actionFor(ItemStack held, BlockState state) {
         if (held.is(Forging.HEATED_INGOT.get()) && isAnvil(state)) {
             return Action.STRIKE;
-        } else if (held.is(Forging.STRUCK_INGOT.get()) && (state.is(Blocks.WATER_CAULDRON) || state.is(Forging.QUENCH_TUB.get()))) {
+        } else if (held.is(Forging.STRUCK_INGOT.get()) && (state.is(Blocks.WATER_CAULDRON) || state.is(Blocks.CAULDRON)
+                || state.is(Forging.QUENCH_TUB.get()))) {
             return Action.QUENCH;
         } else if (isGrindable(held) && (state.is(Blocks.GRINDSTONE) || state.is(Forging.GRINDING_WHEEL.get()))) {
             return Action.GRIND;
@@ -285,6 +284,7 @@ public final class ForgeActions {
      * Striking metal that has cooled sweeps faster (see {@link #periodFor}).
      */
     private static void nextSpot(Session session, float heat, ServerLevel level, long now) {
+        session.bar++;
         session.start = now;
         session.period = periodFor(session.kind, session.basePeriod, heat);
         float width = Math.max(MIN_WIDTH, session.baseWidth);
@@ -308,41 +308,34 @@ public final class ForgeActions {
     }
 
     /**
-     * Where the marker was for a strike the client reports. The client draws the marker smoothly, between server ticks,
-     * so its position is the precise one; but it has to fall within where the marker could have been over the last few
-     * ticks (allowing for lag), or the server's own guess is used instead.
+     * How long the bar had been sweeping when the player struck, as the client timed it, kept to what's believable. The
+     * client's bar starts when the bar reaches it (half a ping after the server sent it) and the strike reaches the
+     * server half a ping after the click, so the client's time should trail the server's by about one ping. A time far
+     * outside that (more than {@link #TIMING_SLACK} ticks either way) is pulled back into it.
      */
-    public static float checkedMarker(Session session, long now, float reported) {
-        float min = Float.MAX_VALUE;
-        float max = -Float.MAX_VALUE;
-        for (int lag = -LEAD_TICKS; lag <= LAG_TICKS; lag++) {
-            float marker = TimingBar.marker(now - lag - session.start, session.period);
-            min = Math.min(min, marker);
-            max = Math.max(max, marker);
-        }
-        if (reported >= min - LAG_SLACK && reported <= max + LAG_SLACK) {
-            return reported;
-        }
-        return TimingBar.marker(now - 1 - session.start, session.period);
+    public static float checkedElapsed(Session session, long now, float reported, float pingTicks) {
+        float serverElapsed = now - session.start;
+        float earliest = serverElapsed - pingTicks - TIMING_SLACK;
+        float latest = serverElapsed + TIMING_SLACK;
+        return Math.clamp(reported, Math.max(0.0f, earliest), latest);
     }
 
-    /** A strike reported by the client, with where it saw the marker. */
-    static void onStrike(ServerPlayer player, float reported) {
+    /** A strike reported by the client: which bar it was for, and how long that bar had been sweeping on the client. */
+    static void onStrike(ServerPlayer player, int bar, float elapsed) {
         Session session = SESSIONS.get(player.getUUID());
         ItemStack held = player.getMainHandItem();
-        if (session == null || !(session.kind == TimingBar.Kind.STRIKE ? held.is(Forging.HEATED_INGOT.get()) : isGrindable(held))) {
+        if (session == null || session.bar != bar
+                || !(session.kind == TimingBar.Kind.STRIKE ? held.is(Forging.HEATED_INGOT.get()) : isGrindable(held))) {
             return;
         }
         long now = player.level().getGameTime();
-        strike(player, (ServerLevel) player.level(), session, held, now, checkedMarker(session, now, reported));
+        float pingTicks = player.connection.latency() / 50.0f;
+        strike(player, (ServerLevel) player.level(), session, held, now,
+                TimingBar.marker(checkedElapsed(session, now, elapsed, pingTicks), session.period));
     }
 
     /** One strike (or grinding pass) at game time {@code now}, with the marker at {@code marker}. */
     public static void strike(ServerPlayer player, ServerLevel level, Session session, ItemStack held, long now, float marker) {
-        if (now - session.lastStrike < MIN_STRIKE_GAP) {
-            return;
-        }
-        session.lastStrike = now;
         float heat = heatOf(player, held, now);
         if (heat <= 0.0f) {
             end(player);
@@ -462,8 +455,12 @@ public final class ForgeActions {
                 return;
             }
             chance = 0.0f;
-        } else {
+        } else if (state.is(Blocks.WATER_CAULDRON)) {
+            LayeredCauldronBlock.lowerFillLevel(state, level, pos); // Each quench boils off a level of water.
             chance = WATER_CRACK;
+        } else {
+            tell(player, Component.translatable("message.dungeondelving.forge.cauldron_empty").withStyle(ChatFormatting.RED));
+            return;
         }
         level.playSound(null, pos, SoundEvents.LAVA_EXTINGUISH, SoundSource.BLOCKS, 0.8f, 1.0f);
         level.sendParticles(ParticleTypes.CLOUD, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 12, 0.25, 0.2, 0.25, 0.02);
@@ -502,7 +499,7 @@ public final class ForgeActions {
     }
 
     private static void send(ServerPlayer player, Session session) {
-        PacketDistributor.sendToPlayer(player, new TimingBarPayload(session.kind.ordinal(), session.start, session.period, session.low, session.high,
+        PacketDistributor.sendToPlayer(player, new TimingBarPayload(session.kind.ordinal(), session.bar, session.period, session.low, session.high,
                 session.done, session.needed));
     }
 

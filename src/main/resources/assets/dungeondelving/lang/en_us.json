@@ -148,5 +148,6 @@
   "message.dungeondelving.forge.grind_miss": "A rough pass... it'll come out unstable.",
   "message.dungeondelving.forge.grind_miss_unstable": "A rough pass... it's going to break!",
   "message.dungeondelving.forge.unstable": "It came out unstable. Grind it once more, cleanly.",
-  "message.dungeondelving.forge.basic_station": "The old station gave out under it."
+  "message.dungeondelving.forge.basic_station": "The old station gave out under it.",
+  "message.dungeondelving.forge.cauldron_empty": "The cauldron is empty. Fill it with water first."
 }

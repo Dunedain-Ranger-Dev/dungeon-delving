@@ -46,8 +46,8 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
                 anvil = true;
             } else if (state.is(Forging.DWARVEN_ANVIL.get())) {
                 dwarvenAnvil = true;
-            } else if (state.is(Blocks.WATER_CAULDRON)) {
-                waterCauldron = true;
+            } else if (state.is(Blocks.WATER_CAULDRON) || state.is(Blocks.CAULDRON)) {
+                waterCauldron = true; // An empty cauldron still counts: it just needs refilling before the next quench.
             } else if (state.is(Forging.QUENCH_TUB.get())) {
                 quenchTub = true;
             } else if (state.is(Blocks.GRINDSTONE)) {

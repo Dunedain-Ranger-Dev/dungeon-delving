@@ -28,6 +28,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
@@ -350,21 +351,34 @@ public class ForgingTests {
             int cracks = 0;
             for (int i = 0; i < 200; i++) {
                 player.getInventory().clearContent();
+                set(level, cauldron, Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3));
                 ItemStack struck = new ItemStack(Forging.STRUCK_INGOT.get());
                 player.setItemInHand(InteractionHand.MAIN_HAND, struck);
                 ForgeActions.quench(player, level, cauldron, level.getBlockState(cauldron), struck);
+                helper.assertTrue(level.getBlockState(cauldron).getValue(LayeredCauldronBlock.LEVEL) == 2, "each quench uses a level of water");
                 if (find(player, Forging.QUENCHED_INGOT.get()).isEmpty()) {
                     cracks++;
                 }
             }
             helper.assertTrue(cracks > 35 && cracks < 85, "about 30% of 200 water quenches should crack, even at max level; got " + cracks);
+            set(level, cauldron, Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 1));
+            player.getInventory().clearContent();
+            ItemStack last = new ItemStack(Forging.STRUCK_INGOT.get());
+            player.setItemInHand(InteractionHand.MAIN_HAND, last);
+            ForgeActions.quench(player, level, cauldron, level.getBlockState(cauldron), last);
+            helper.assertTrue(level.getBlockState(cauldron).is(Blocks.CAULDRON), "the last level of water leaves an empty cauldron");
+            ItemStack dry = new ItemStack(Forging.STRUCK_INGOT.get());
+            player.setItemInHand(InteractionHand.MAIN_HAND, dry);
+            ForgeActions.quench(player, level, cauldron, level.getBlockState(cauldron), dry);
+            helper.assertTrue(player.getMainHandItem().is(Forging.STRUCK_INGOT.get()), "an empty cauldron can't quench until it's refilled");
+            helper.assertTrue(ForgeWorkshop.scan(level, hearth).complete(), "an empty cauldron still counts as the forge's quench station");
         } finally {
             clear(level, hearth);
         }
         helper.succeed();
     }
 
-    /** The client's marker position is trusted only if it's where the marker could have been lately. */
+    /** The client times each bar itself, so lag doesn't matter; the server only pulls back timings no ping could explain. */
     @GameTest(template = ANY_TEMPLATE)
     public static void reportedMarkersAreChecked(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -374,11 +388,14 @@ public class ForgingTests {
             set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
             buildBasicForge(level, hearth);
             ForgeActions.Session session = tryStrike(player, level, hearth.offset(2, 0, 0), 1).orElseThrow();
-            long now = level.getGameTime() + 7;
-            float there = TimingBar.marker(now - 1 - session.start(), session.period());
-            helper.assertTrue(ForgeActions.checkedMarker(session, now, there) == there, "a plausible position is taken as reported");
-            float far = there > 0.5f ? 0.0f : 1.0f;
-            helper.assertTrue(Math.abs(ForgeActions.checkedMarker(session, now, far) - far) > 0.1f, "an impossible position is replaced");
+            long now = session.start() + 30;
+            helper.assertTrue(ForgeActions.checkedElapsed(session, now, 28.5f, 1.0f) == 28.5f, "a timing that fits a good connection is taken as is");
+            helper.assertTrue(ForgeActions.checkedElapsed(session, now, 12.0f, 10.0f) == 12.0f, "a laggy player's timing is taken as is too");
+            helper.assertTrue(ForgeActions.checkedElapsed(session, now, 2.0f, 1.0f) > 2.0f, "a timing far older than the ping explains is pulled back");
+            helper.assertTrue(ForgeActions.checkedElapsed(session, now, 90.0f, 1.0f) < 90.0f, "a timing from the future is pulled back");
+            int bar = session.bar();
+            ForgeActions.strike(player, level, session, player.getMainHandItem(), now, session.greenMarker());
+            helper.assertTrue(session.bar() == bar + 1, "each strike moves on to a new bar, so a late or doubled strike can't land on it");
         } finally {
             clear(level, hearth);
         }
