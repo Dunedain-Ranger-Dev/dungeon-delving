@@ -1,0 +1,27 @@
+{
+  "name": "Building a Forge",
+  "icon": "dungeondelving:forge_hearth",
+  "category": "dungeondelving:forge",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "dungeondelving:forge_hearth",
+      "text": "Every forge starts with a $(item)Forge Hearth$(). Around it, within 7 blocks across and 4 up or down, it needs four stations, set out however you like:",
+      "title": "The Hearth"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "$(li)a $(item)furnace$() or $(item)blast furnace$(), to heat metal$(li)an $(item)anvil$(), to strike it$(li)a $(item)cauldron$() of water (or oil), to quench it$(li)a $(item)grindstone$(), to finish it$(br2)Right-click the hearth to see what's missing. Its fire lights once the forge is complete; striking, quenching and grinding only work at stations near a lit hearth."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:forge_hearth"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Decoration counts too. Bricks, stone and deepslate bricks, chains, lanterns, iron bars, barrels and the like near the hearth widen every sweet spot a little: +0.5% for every 8 blocks, up to +2.5%. A forge that looks like a forge works like one.",
+      "title": "A Proper Workshop"
+    }
+  ]
+}

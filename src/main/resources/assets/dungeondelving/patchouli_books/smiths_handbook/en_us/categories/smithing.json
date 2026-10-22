@@ -1,0 +1,6 @@
+{
+  "name": "Smithing",
+  "description": "Heating, striking, quenching and grinding iron into tempered ingots.",
+  "icon": "dungeondelving:tempered_iron_ingot",
+  "sortnum": 1
+}

@@ -1,0 +1,13 @@
+{
+  "name": "Crafting Skills",
+  "icon": "minecraft:experience_bottle",
+  "category": "dungeondelving:skills",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Forging, Leatherworking and Weaving each level from 1 to 30 as you practice. Use $(item)/skills$() to see where you stand.$(br2)Higher levels widen sweet spots, lower the odds of ruining a piece, and (for smiths) slow cooling and save more scrap from cracks.",
+      "title": "Crafting Skills"
+    }
+  ]
+}

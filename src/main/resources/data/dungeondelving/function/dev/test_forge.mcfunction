@@ -1,4 +1,5 @@
-# Builds a level 3 test forge in a superflat world, west of the test dungeon, and gives forging supplies.
+# Builds a level 3 test forge in a superflat world, west of the test dungeon, with a leatherworking and weaving corner
+# (crafting table, loom, Tanning Rack, and a cauldron over a campfire), and gives forging supplies.
 # Run with /function dungeondelving:dev/test_forge, or put that command in a command block.
 function dungeondelving:dev/clear_test_forge
 
@@ -21,6 +22,13 @@ setblock -18 -60 7 minecraft:water_cauldron[level=3]
 setblock -17 -60 7 dungeondelving:oil_cauldron[level=3]
 setblock -12 -60 7 minecraft:grindstone[face=floor,facing=north]
 setblock -11 -60 7 dungeondelving:grinding_wheel[facing=north]
+
+# Leather and cloth: a crafting table, a loom, a Tanning Rack, and a water cauldron over a lit campfire for boiling
+setblock -20 -60 10 minecraft:crafting_table
+setblock -19 -60 10 minecraft:loom[facing=south]
+setblock -17 -60 10 dungeondelving:tanning_rack[facing=south]
+setblock -14 -61 10 minecraft:campfire[lit=true]
+setblock -14 -60 10 minecraft:water_cauldron[level=3]
 
 give @p minecraft:iron_ingot 16
 give @p minecraft:coal 16

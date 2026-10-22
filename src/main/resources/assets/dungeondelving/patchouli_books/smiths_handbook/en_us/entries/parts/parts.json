@@ -1,0 +1,28 @@
+{
+  "name": "Parts",
+  "icon": "dungeondelving:armor_plate",
+  "category": "dungeondelving:parts",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Parts are made at a crafting table from tempered ingots and flux. A part takes the worst star among its ingots.",
+      "title": "Parts"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:armor_plate",
+      "text": "An ingot and flux make an Armor Plate."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:rivets",
+      "text": "An ingot, flux and a nugget make four Rivets."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:chain_links",
+      "text": "Two ingots and flux make eight Chain Links."
+    }
+  ]
+}

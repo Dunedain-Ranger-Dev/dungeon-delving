@@ -15,4 +15,5 @@ give @p minecraft:string 32
 give @p minecraft:white_wool 8
 give @p minecraft:stick 8
 give @p dungeondelving:quenching_oil 3
+give @p patchouli:guide_book[patchouli:book="dungeondelving:smiths_handbook"]
 tellraw @a {"text":"Forging kit given.","color":"green"}

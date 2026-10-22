@@ -1,0 +1,19 @@
+{
+  "name": "Grinding",
+  "icon": "minecraft:grindstone",
+  "category": "dungeondelving:smithing",
+  "sortnum": 3,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Hold the quenched ingot and right-click the grindstone: the same bar, two passes. Get both clean and you have a $(item)Tempered Iron Ingot$(). Miss either and it comes out an $(item)Unstable Ingot$(): grind it again, cleanly, or it breaks.",
+      "title": "Grinding"
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "dungeondelving:tempered_iron_ingot",
+      "text": "The finished metal. Its stars say how many times it's been through the forge.",
+      "title": "Tempered Iron"
+    }
+  ]
+}

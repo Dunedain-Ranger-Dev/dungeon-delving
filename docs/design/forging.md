@@ -89,21 +89,27 @@ flux: ★5 ingots with Sand Flux make a ★3 part.
 
 | Part | Recipe |
 |---|---|
-| Armor Plate | 2 tempered ingots + flux → 1 |
+| Armor Plate | 1 tempered ingot + flux → 1 |
 | Rivets | 1 tempered ingot + flux + iron nugget → 4 |
-| Chain Links | 1 tempered ingot + flux → 4 |
+| Chain Links | 2 tempered ingots + flux → 8 |
 
 ## Leather and weaving
 
 **Leather:**
-- Refined Leather: leather + honeycomb.
-- Boiled Leather: hold leather and right-click a water cauldron with heat under it (a lit campfire, fire, magma or
-  lava). Each piece uses a level of water.
-- Hardened Leather: 3 boiled leather + string + honeycomb → 3.
+- Refined Leather: hold leather and right-click a **Tanning Rack**. The scraper makes one pass across the hide, over 3
+  dark patches; click as it crosses each, in order. A patch you miss (or pass without clicking) can tear the hide:
+  30% for the first miss, then +15% per miss, lowered by Leatherworking. A torn hide leaves **Leather Scraps**, and 4
+  scraps make a leather.
+- Boiled Leather: hold refined leather and right-click a water cauldron with heat under it (a lit campfire, fire,
+  magma or lava). Each piece uses a level of water.
+- Hardened Leather: 3 boiled leather + string + honeycomb (the wax) → 3.
 
 **Weaving:**
-- Woven Cloth: hold 3 string and right-click a loom (any loom, no forge needed). The same timing bar plays, with 2
-  passes. A clean weave gives 2 cloth; a weave with a miss gives 1.
+- Woven Cloth: hold 3 string and right-click a loom (any loom, no forge needed). Weaving is "thread the needle": the
+  needle's eye and the thread's tip both bob up and down, at different speeds. Click when the thread lines up with the
+  eye (gold dead center). Three stitches make a cloth. A missed stitch can snap the thread, stacking like smithing; a
+  snap saves 1 of the 3 string.
+- Bonus results (a second cloth, extra leather) are for talents (DD-70), not the default.
 - Padded Cloth: 2 woven cloth + wool.
 
 **Backings** go under every armor piece, one per piece:
@@ -122,14 +128,12 @@ like vanilla gear.
 | Medium (Hauberk) | chainmail | ×0.8 | ×0.5 | none |
 | Heavy (Plate) | iron | ×1.0 | ×1.0 | knockback resistance from ★4, −1.25% speed per piece |
 
-Recipes are shapeless:
-
-| Piece | Plate (heavy) | Hauberk (medium) | Brigandine (light) |
-|---|---|---|---|
-| Helm | 2 plates, 2 rivets, backing, 1 hardened | 3 links, 1 rivets, backing | gambeson, 1 hardened, 1 rivets |
-| Cuirass | 4 plates, 2 rivets, backing, 2 hardened | 6 links, 2 rivets, backing | gambeson, 3 hardened, 2 rivets |
-| Greaves | 3 plates, 2 rivets, backing, 2 hardened | 5 links, 1 rivets, backing | gambeson, 2 hardened, 2 rivets |
-| Sabatons | 2 plates, 1 rivets, backing, 1 hardened | 3 links, 1 rivets, backing | gambeson, 1 hardened, 1 rivets |
+Recipes use the vanilla armor shapes:
+- Plate puts armor plates where the ingots go, and Hauberk puts chain links there. Both have a Leather Backing in the
+  gap: the helmet's hole, the chestplate's neck, the leggings' crotch, and the boots' middle.
+- Brigandine uses the same shapes in hardened leather, with rivets in some of the leather's places (the ★ comes from
+  them) and a Gambeson Backing in the gap.
+- A plate set costs 24 tempered ingots, like a vanilla iron set.
 
 Heavy set totals for comparison: iron is 15 armor; diamond is 20 armor and 8 toughness; netherite is 20 armor, 12
 toughness and 0.4 knockback resistance.
@@ -196,6 +200,6 @@ at set levels instead.
 ## Later
 
 - The talent tree (DD-70).
-- A JEI page and a Patchouli guide for the process.
+- JEI pages for the in-world steps (the Smith's Handbook, a Patchouli book, covers them for now).
 - More metals: gold, then dungeon ores.
 - Weapon types beyond the sword and axe, and a forged shield.

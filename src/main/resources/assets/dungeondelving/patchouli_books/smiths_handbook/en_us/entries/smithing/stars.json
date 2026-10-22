@@ -1,0 +1,13 @@
+{
+  "name": "Raising the Stars",
+  "icon": "dungeondelving:tempered_iron_ingot",
+  "category": "dungeondelving:smithing",
+  "sortnum": 4,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Put a Tempered Ingot ★ back in the furnace and it comes out aiming one star higher. Each pass is riskier: more strikes, a narrower sweet spot.$(br2)Your forge's level and your Forging skill both cap how high you can go:$(li)★2 at Forging 3, ★3 at 6, ★4 at 10$(li)★5 at 15, ★6 at 20, ★7 at 25",
+      "title": "Raising the Stars"
+    }
+  ]
+}

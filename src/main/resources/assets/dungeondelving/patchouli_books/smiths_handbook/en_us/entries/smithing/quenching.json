@@ -1,0 +1,13 @@
+{
+  "name": "Quenching",
+  "icon": "minecraft:cauldron",
+  "category": "dungeondelving:smithing",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Right-click a cauldron with the hot struck ingot. Water quenches, but cracks the metal 30% of the time, however skilled you are. Oil never does. Each quench uses a level of water or oil; refill the cauldron when it's empty.$(br2)You get a $(item)Quenched Ingot$().",
+      "title": "Quenching"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "Weapons",
+  "icon": "dungeondelving:forged_sword",
+  "category": "dungeondelving:gear",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:forged_sword",
+      "recipe2": "dungeondelving:forged_axe",
+      "text": "Two plates over a stick."
+    }
+  ]
+}
