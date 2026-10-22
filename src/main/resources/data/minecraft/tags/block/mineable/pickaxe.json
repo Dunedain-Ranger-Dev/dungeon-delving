@@ -12,6 +12,9 @@
     "dungeondelving:thailite_ore",
     "dungeondelving:thailite_block",
     "dungeondelving:hallstone",
-    "dungeondelving:runic_workshop"
+    "dungeondelving:runic_workshop",
+    "dungeondelving:forge_hearth",
+    "dungeondelving:dwarven_anvil",
+    "dungeondelving:grinding_wheel"
   ]
 }

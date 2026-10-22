@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "dungeondelving:block/grinding_wheel",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "dungeondelving:block/grinding_wheel",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "dungeondelving:block/grinding_wheel",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "dungeondelving:block/grinding_wheel",
+      "y": 270
+    }
+  }
+}

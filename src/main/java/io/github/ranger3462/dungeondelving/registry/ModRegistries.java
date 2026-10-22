@@ -9,6 +9,8 @@ import io.github.ranger3462.dungeondelving.block.DungeonExitBlock;
 import io.github.ranger3462.dungeondelving.block.DungeonGateBlock;
 import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
+import io.github.ranger3462.dungeondelving.forging.Forging;
+import io.github.ranger3462.dungeondelving.skill.CraftingSkills;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsGoblins;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsSkeletons;
@@ -134,6 +136,11 @@ public final class ModRegistries {
                         "skeleton_mage_spawn_egg" }) {
                     BuiltInRegistries.ITEM.getOptional(DungeonDelving.id(optional)).ifPresent(output::accept);
                 }
+                for (var forging : java.util.List.of(Forging.FORGE_HEARTH_ITEM, Forging.BELLOWS_ITEM, Forging.DWARVEN_ANVIL_ITEM,
+                        Forging.GRINDING_WHEEL_ITEM, Forging.QUENCH_TUB_ITEM, Forging.QUENCHING_OIL, Forging.HEATED_INGOT, Forging.STRUCK_INGOT,
+                        Forging.QUENCHED_INGOT, Forging.TEMPERED_IRON_INGOT)) {
+                    output.accept(forging.get());
+                }
                 output.accept(HALLSTONE_ITEM.get());
                 for (DungeonOre ore : DungeonOre.values()) {
                     output.accept(ore.oreItem.get());
@@ -158,6 +165,9 @@ public final class ModRegistries {
         ModEntities.init();
         RunicWorkshop.init();
         RunicWorkshop.register(modEventBus);
+        Forging.init();
+        Forging.register(modEventBus);
+        CraftingSkills.register(modEventBus);
         ModEntities.register(modEventBus);
         if (ModList.get().isLoaded("irons_spellbooks")) {
             IronsGoblins.register(modEventBus);

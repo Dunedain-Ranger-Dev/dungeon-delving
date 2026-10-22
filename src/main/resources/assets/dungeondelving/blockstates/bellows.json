@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "dungeondelving:block/bellows",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "dungeondelving:block/bellows",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "dungeondelving:block/bellows",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "dungeondelving:block/bellows",
+      "y": 270
+    }
+  }
+}
