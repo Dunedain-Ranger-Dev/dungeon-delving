@@ -39,6 +39,11 @@ public final class ForgingPerks {
         return level >= 25 ? 8 : level >= 20 ? 7 : level >= 10 ? 6 : 5;
     }
 
+    /** The share of a piece's metal that salvaging it gets back: 40%, plus 1% a level (up to 70% at level 30). */
+    public static float salvageShare(int level) {
+        return 0.4f + 0.01f * (level - 1) + (level >= 30 ? 0.01f : 0.0f);
+    }
+
     /** Scales the chance that a strike cracks the piece (not a water quench: only oil helps there). */
     public static float crackMultiplier(int level) {
         return level >= 30 ? 0.5f : level >= 15 ? 0.75f : 1.0f;

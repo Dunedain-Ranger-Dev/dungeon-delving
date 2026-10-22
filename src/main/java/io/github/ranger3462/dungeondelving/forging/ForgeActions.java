@@ -176,7 +176,7 @@ public final class ForgeActions {
         BlockPos pos = event.getPos();
         BlockState state = level.getBlockState(pos);
         ItemStack held = player.getMainHandItem();
-        Action action = actionFor(held, state);
+        Action action = actionFor(player, held, state);
         if (action == null) {
             return;
         }
@@ -189,15 +189,19 @@ public final class ForgeActions {
                 case QUENCH -> quench(serverPlayer, serverLevel, pos, state, held);
                 case WEAVE -> useBar(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.WEAVE);
                 case BOIL -> boil(serverPlayer, serverLevel, pos, state, held);
+                case SALVAGE -> salvage(serverPlayer, serverLevel, pos, held);
             }
         }
     }
 
     private enum Action {
-        STRIKE, QUENCH, GRIND, WEAVE, BOIL
+        STRIKE, QUENCH, GRIND, WEAVE, BOIL, SALVAGE
     }
 
-    private static Action actionFor(ItemStack held, BlockState state) {
+    private static Action actionFor(Player player, ItemStack held, BlockState state) {
+        if (player.isShiftKeyDown() && ForgedGear.isGear(held) && (state.is(Blocks.GRINDSTONE) || state.is(Forging.GRINDING_WHEEL.get()))) {
+            return Action.SALVAGE;
+        }
         if (held.is(Forging.HEATED_INGOT.get()) && isAnvil(state)) {
             return Action.STRIKE;
         } else if (held.is(Forging.STRUCK_INGOT.get()) && (state.is(Blocks.WATER_CAULDRON) || state.is(Blocks.CAULDRON)
@@ -462,6 +466,37 @@ public final class ForgeActions {
         CraftingSkills.addXp(player, CraftSkill.WEAVING, 5);
         level.playSound(null, session.station, SoundEvents.UI_LOOM_TAKE_RESULT, SoundSource.BLOCKS, 1.0f, 1.0f);
         tell(player, Component.translatable(cloth > 1 ? "message.dungeondelving.weave.done_bonus" : "message.dungeondelving.weave.done")
+                .withStyle(ChatFormatting.GOLD));
+    }
+
+    // --- Salvage ---
+
+    /**
+     * Grinds a piece of forged gear back down to tempered ingots of its ★: some of the metal it took (see
+     * {@link ForgingPerks#salvageShare}), less for worn gear, with the leftover as iron nuggets.
+     */
+    public static void salvage(ServerPlayer player, ServerLevel level, BlockPos pos, ItemStack held) {
+        if (ForgeWorkshop.around(level, pos).isEmpty()) {
+            tell(player, Component.translatable("message.dungeondelving.forge.no_hearth").withStyle(ChatFormatting.RED));
+            return;
+        }
+        float condition = held.isDamageableItem() ? 1.0f - (float) held.getDamageValue() / held.getMaxDamage() : 1.0f;
+        float metal = ForgedGear.ingotCost(held) * ForgingPerks.salvageShare(ForgingPerks.level(player)) * condition;
+        int ingots = (int) metal;
+        int nuggets = Math.round((metal - ingots) * 9);
+        int stars = Forging.stars(held);
+        held.shrink(1);
+        if (ingots > 0) {
+            ItemStack tempered = new ItemStack(Forging.TEMPERED_IRON_INGOT.get(), ingots);
+            tempered.set(Forging.STARS.get(), stars);
+            give(player, tempered);
+        }
+        if (nuggets > 0) {
+            give(player, new ItemStack(Items.IRON_NUGGET, nuggets));
+        }
+        CraftingSkills.addXp(player, CraftSkill.FORGING, 5);
+        level.playSound(null, pos, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 1.0f, 0.8f);
+        tell(player, Component.translatable("message.dungeondelving.forge.salvaged", ingots, StarredItem.starsText(stars), nuggets)
                 .withStyle(ChatFormatting.GOLD));
     }
 

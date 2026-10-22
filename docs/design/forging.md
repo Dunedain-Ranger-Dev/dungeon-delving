@@ -15,7 +15,7 @@ can be arranged any way:
 |---|---|---|
 | Heat | Furnace | Blast Furnace (twice as fast), plus **Bellows** next to it (each pump pushes the heating along) |
 | Strike | Anvil (any damage state) | **Dwarven Anvil**: wider sweet spot |
-| Quench | Water cauldron | **Quench Tub** filled with Quenching Oil: no crack chance |
+| Quench | Water cauldron | **Oil Cauldron** (pour Quenching Oil into a cauldron): no crack chance |
 | Grind | Grindstone | **Grinding Wheel**: wider sweet spot |
 
 **Forge level** caps the highest ★ you can make:
@@ -24,7 +24,7 @@ can be arranged any way:
 |---|---|---|
 | 1 | The basic stations | ★3 |
 | 2 | Blast Furnace and Dwarven Anvil | ★5 |
-| 3 | Level 2, plus Bellows, Quench Tub and Grinding Wheel | ★7 |
+| 3 | Level 2, plus Bellows, Oil Cauldron and Grinding Wheel | ★7 |
 
 **Workshop bonus:** decoration blocks near the hearth (the `dungeondelving:forge_decor` tag: bricks, stone and
 deepslate bricks, chains, lanterns, iron bars, barrels, smithing tables, campfires and so on) widen every sweet spot.
@@ -57,8 +57,10 @@ the forge is complete. Striking, quenching and grinding only work at stations th
      wrong bar. The server only pulls back a timing that the player's ping can't explain (more than 10 ticks out).
      A hacked client could cheat this; that's accepted for a co-op pack.
 3. **Quench.** Right-click a water cauldron while the struck ingot is still hot. Water has a flat 30% crack chance that
-   skill doesn't lower; only the Quench Tub's oil avoids it. Each quench uses a level of water (or of oil), so a full
-   cauldron does 3 quenches before it needs refilling. An empty cauldron still counts as the forge's quench station.
+   skill doesn't lower; only oil avoids it. Each quench uses a level of water or oil, so a full cauldron does 3
+   quenches before it needs refilling. An empty cauldron still counts as the forge's quench station.
+   - **Oil:** Quenching Oil is a glass bottle and 4 seeds. Pour a bottle into a cauldron to make an Oil Cauldron, up to
+     3 levels, one per bottle. Its last quench leaves an empty cauldron.
    You get a **Quenched Ingot**.
 4. **Grind.** Right-click the grindstone and use the same timing bar, with 2 passes. The green is 10% of the bar (14%
    on the Grinding Wheel), and gold works the same as on the anvil. Metal can be ground cold.
@@ -77,43 +79,57 @@ Flux is based on real smithing flux: blacksmiths used silica sand, then borax.
 |---|---|---|
 | Sand Flux | sand + bone meal | ★3 |
 | Borax Flux | Borax (a dungeon mineral, T2+ resource markers) + sand | ★5 |
-| Runic Flux | Borax Flux + Runic Shard III | ★6 |
-| Runeforged Flux | Borax Flux + Runic Shard IV | ★7 |
+| Runic Flux | 2 Borax Flux + Runic Shard III → 2 | ★6 |
+| Runeforged Flux | 2 Runic Flux + Thailite ingot (tier 4) → 2 | ★7 |
 
-Parts are crafted from tempered ingots plus flux. Each part takes the **lowest ★** among its ingots.
+Sand flux makes 2 per craft, and Borax Flux makes 2 per craft too.
+
+Parts are crafted from tempered ingots plus flux. Each part takes the **lowest ★** among its ingots, capped by the
+flux: ★5 ingots with Sand Flux make a ★3 part.
 
 | Part | Recipe |
 |---|---|
 | Armor Plate | 2 tempered ingots + flux → 1 |
-| Rivets | 1 tempered ingot + flux → 4 |
+| Rivets | 1 tempered ingot + flux + iron nugget → 4 |
 | Chain Links | 1 tempered ingot + flux → 4 |
 
 ## Leather and weaving
 
 **Leather:**
 - Refined Leather: leather + honeycomb.
-- Boiled Leather: right-click a water cauldron over a campfire or fire while holding leather.
+- Boiled Leather: hold leather and right-click a water cauldron with heat under it (a lit campfire, fire, magma or
+  lava). Each piece uses a level of water.
 - Hardened Leather: 3 boiled leather + string + honeycomb → 3.
 
 **Weaving:**
-- Woven Cloth: hold string and right-click a loom. The same timing bar plays, with 2 passes. A miss wastes nothing, but
-  a perfect weave gives a second cloth.
+- Woven Cloth: hold 3 string and right-click a loom (any loom, no forge needed). The same timing bar plays, with 2
+  passes. A clean weave gives 2 cloth; a weave with a miss gives 1.
 - Padded Cloth: 2 woven cloth + wool.
 
-**Bases** go under every armor piece, one per slot:
-- Leather Base: refined leather, for medium and heavy armor.
-- Gambeson Base: padded cloth, for light armor.
+**Backings** go under every armor piece, one per piece:
+- Leather Backing: 3 refined leather, for medium and heavy armor.
+- Gambeson Backing: 2 padded cloth, for light armor.
 
 ## Forged gear
 
-Each piece takes the lowest ★ among its parts. Stats are set on the piece when it's crafted (armor, toughness,
-knockback resistance and durability), so one item per slot covers every ★.
+Each piece takes the lowest ★ among its parts. The stats come from the stack's ★ (worked out whenever they're read, so
+Apotheosis sees them like any armor's), and the durability is set when the piece is crafted. All of it is enchantable
+like vanilla gear.
 
-| Weight | Recipe per piece | Armor | Toughness | Other |
+| Weight | Looks like | Armor | Toughness | Other |
 |---|---|---|---|---|
-| Light (Brigandine) | gambeson base + hardened leather + rivets | ×0.6 | none | no penalty |
-| Medium (Hauberk) | leather base + chain links + rivets | ×0.8 | ×0.5 | none |
-| Heavy (Plate) | leather base + armor plates + rivets + hardened leather | ×1.0 | ×1.0 | knockback resistance, −1.25% speed per piece |
+| Light (Brigandine) | leather, dyeable | ×0.6 | none | no penalty |
+| Medium (Hauberk) | chainmail | ×0.8 | ×0.5 | none |
+| Heavy (Plate) | iron | ×1.0 | ×1.0 | knockback resistance from ★4, −1.25% speed per piece |
+
+Recipes are shapeless:
+
+| Piece | Plate (heavy) | Hauberk (medium) | Brigandine (light) |
+|---|---|---|---|
+| Helm | 2 plates, 2 rivets, backing, 1 hardened | 3 links, 1 rivets, backing | gambeson, 1 hardened, 1 rivets |
+| Cuirass | 4 plates, 2 rivets, backing, 2 hardened | 6 links, 2 rivets, backing | gambeson, 3 hardened, 2 rivets |
+| Greaves | 3 plates, 2 rivets, backing, 2 hardened | 5 links, 1 rivets, backing | gambeson, 2 hardened, 2 rivets |
+| Sabatons | 2 plates, 1 rivets, backing, 1 hardened | 3 links, 1 rivets, backing | gambeson, 1 hardened, 1 rivets |
 
 Heavy set totals for comparison: iron is 15 armor; diamond is 20 armor and 8 toughness; netherite is 20 armor, 12
 toughness and 0.4 knockback resistance.
@@ -128,8 +144,9 @@ toughness and 0.4 knockback resistance.
 | ★6 | 22 | 14 | 0.3 | 39 | +2 sockets, attribute affixes ×1.15 |
 | ★7 | 23 | 15 | 0.4 | 43 | +2 sockets, affixes ×1.3, crafted with a rolled Apotheosis rarity |
 
-**Weapons:** Forged Sword (plate + plate + grip), Forged Axe and Forged Shield. Sword damage goes from 6.5 at ★1 to 8.6
-at ★7, against iron 6, diamond 7 and netherite 8.
+**Weapons:** the Forged Sword (2 plates over a stick) and Forged Axe (3 plates, 2 sticks, like an axe). Sword damage goes
+from 6.5 at ★1 to 8.6 at ★7, against iron 6, diamond 7 and netherite 8. The axe hits 2 harder and swings slower.
+Durability runs from 400 at ★1 to 2400 at ★7. A forged shield is for later: shields need their own renderer.
 
 **Apotheosis** is optional, and all of this is skipped without it. The ★ is stored separately from Apotheosis's data,
 so reforging keeps it. Sockets come from `GetItemSocketsEvent`. The multiplier scales the attribute modifiers that
@@ -137,8 +154,8 @@ affixes add; other affix effects are untouched.
 
 **Repair:** in the vanilla anvil, with a tempered ingot of the same ★ or higher.
 
-**Salvage:** sneak and right-click the grindstone with forged gear. You get back some of its parts, and how many
-depends on Forging level.
+**Salvage:** sneak and right-click a grindstone (at a forge) with forged gear. You get back tempered ingots of its ★:
+40% of the metal it took, plus 1% per Forging level, less for worn gear, with the leftover as iron nuggets.
 
 ## Skills
 
@@ -181,4 +198,4 @@ at set levels instead.
 - The talent tree (DD-70).
 - A JEI page and a Patchouli guide for the process.
 - More metals: gold, then dungeon ores.
-- Weapon types beyond the sword and axe.
+- Weapon types beyond the sword and axe, and a forged shield.

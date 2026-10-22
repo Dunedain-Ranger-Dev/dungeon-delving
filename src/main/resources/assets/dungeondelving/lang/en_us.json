@@ -184,5 +184,6 @@
   "message.dungeondelving.weave.miss": "A loose weave... no extra cloth this time.",
   "message.dungeondelving.weave.done": "Woven!",
   "message.dungeondelving.weave.done_bonus": "A tight weave: two cloths!",
-  "message.dungeondelving.boil.no_heat": "The water needs heat under it: a lit campfire, fire, magma or lava."
+  "message.dungeondelving.boil.no_heat": "The water needs heat under it: a lit campfire, fire, magma or lava.",
+  "message.dungeondelving.forge.salvaged": "Salvaged %s tempered ingots %s and %s nuggets."
 }

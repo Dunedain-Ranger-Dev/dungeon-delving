@@ -11,6 +11,7 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
 import io.github.ranger3462.dungeondelving.forging.ForgeActions;
 import io.github.ranger3462.dungeondelving.forging.ForgedGear;
 import io.github.ranger3462.dungeondelving.forging.Forging;
+import io.github.ranger3462.dungeondelving.forging.ForgingPerks;
 import io.github.ranger3462.dungeondelving.forging.TimingBar;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
@@ -172,6 +173,34 @@ public class ForgedGearTests {
         } finally {
             level.setBlock(cauldron, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             level.setBlock(cauldron.below(), Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        helper.succeed();
+    }
+
+    /** Salvaging a piece gives back some of its metal as tempered ingots of its ★, more with skill, less when worn. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void salvagingReturnsTemperedIngots(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos hearth = helper.absolutePos(new BlockPos(0, 1, 0)).above(110);
+        ServerPlayer player = FakePlayerFactory.get(level, new GameProfile(UUID.randomUUID(), "salvage_tester"));
+        try {
+            level.setBlock(hearth, Forging.FORGE_HEARTH.get().defaultBlockState(), Block.UPDATE_CLIENTS);
+            level.setBlock(hearth.offset(0, 0, 2), Blocks.FURNACE.defaultBlockState(), Block.UPDATE_CLIENTS);
+            level.setBlock(hearth.offset(2, 0, 0), Blocks.ANVIL.defaultBlockState(), Block.UPDATE_CLIENTS);
+            level.setBlock(hearth.offset(0, 0, -2), Blocks.WATER_CAULDRON.defaultBlockState(), Block.UPDATE_CLIENTS);
+            BlockPos grindstone = hearth.offset(-2, 0, 0);
+            level.setBlock(grindstone, Blocks.GRINDSTONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+            ItemStack chest = starred(Forging.ARMOR.get(ForgedGear.Weight.HEAVY).get(ArmorItem.Type.CHESTPLATE).get(), 3);
+            player.setItemInHand(InteractionHand.MAIN_HAND, chest);
+            ForgeActions.salvage(player, level, grindstone, chest);
+            int ingots = player.getInventory().items.stream().filter(stack -> stack.is(Forging.TEMPERED_IRON_INGOT.get()) && Forging.stars(stack) == 3)
+                    .mapToInt(ItemStack::getCount).sum();
+            helper.assertTrue(ingots == 3, "a new ★3 plate cuirass (8.5 ingots) salvages to 3 ★3 ingots at level 1, got " + ingots);
+            helper.assertTrue(ForgingPerks.salvageShare(30) > ForgingPerks.salvageShare(1), "skilled smiths salvage more");
+        } finally {
+            for (BlockPos pos : BlockPos.betweenClosed(hearth.offset(-3, 0, -3), hearth.offset(3, 0, 3))) {
+                level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            }
         }
         helper.succeed();
     }

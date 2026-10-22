@@ -107,6 +107,38 @@ public final class ForgedGear {
         }
     }
 
+    /** Tempered ingots that went into a piece (plates take 2, rivets and chain links are a quarter each), for salvaging. */
+    public static float ingotCost(ItemStack stack) {
+        if (stack.getItem() instanceof Armor armor) {
+            return switch (armor.weight) {
+                case HEAVY -> switch (armor.getType()) {
+                    case HELMET -> 4.5f;
+                    case CHESTPLATE -> 8.5f;
+                    case LEGGINGS -> 6.5f;
+                    default -> 4.25f;
+                };
+                case MEDIUM -> switch (armor.getType()) {
+                    case HELMET -> 1.0f;
+                    case CHESTPLATE -> 2.0f;
+                    case LEGGINGS -> 1.5f;
+                    default -> 1.0f;
+                };
+                case LIGHT -> switch (armor.getType()) {
+                    case CHESTPLATE, LEGGINGS -> 0.5f;
+                    default -> 0.25f;
+                };
+            };
+        }
+        if (stack.getItem() instanceof Sword) {
+            return 4.0f;
+        }
+        return stack.getItem() instanceof Axe ? 6.0f : 0.0f;
+    }
+
+    public static boolean isGear(ItemStack stack) {
+        return stack.getItem() instanceof Armor || stack.getItem() instanceof Sword || stack.getItem() instanceof Axe;
+    }
+
     /** Whether {@code repair} can repair {@code gear}: a tempered ingot of the same ★ or better. */
     static boolean repairs(ItemStack gear, ItemStack repair) {
         return repair.is(Forging.TEMPERED_IRON_INGOT.get()) && Forging.stars(repair) >= Forging.stars(gear);
