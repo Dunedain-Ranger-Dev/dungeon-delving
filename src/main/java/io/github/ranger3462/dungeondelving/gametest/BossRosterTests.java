@@ -48,12 +48,11 @@ public class BossRosterTests {
     public static void eachTierHasItsBoss(GameTestHelper helper) {
         RandomSource random = RandomSource.create(1);
         for (int i = 0; i < 20; i++) {
-            String tier1 = DungeonBosses.pick(1, random);
-            helper.assertTrue(tier1.equals(DungeonBosses.SKELETON_LORD) || (irons() && tier1.equals(CHIEF)),
-                    "tier 1 should be the Skeleton Lord's or (with Iron's Spells) the Goblin Shaman Chief's, not " + tier1);
-            for (int tier = 2; tier <= 4; tier++) {
-                helper.assertTrue(DungeonBosses.pick(tier, random).equals(DungeonBosses.BARROW_KING), "tier " + tier + " should be the Barrow King's");
-            }
+            helper.assertTrue(DungeonBosses.pick(1, DungeonFactions.UNDEAD, random).equals(DungeonBosses.ZOMBIE_LORD), "undead tier 1: the Zombie Lord");
+            helper.assertTrue(DungeonBosses.pick(2, DungeonFactions.UNDEAD, random).equals(DungeonBosses.SKELETON_LORD), "undead tier 2: the Skeleton Lord");
+            helper.assertTrue(DungeonBosses.pick(3, DungeonFactions.UNDEAD, random).equals(DungeonBosses.BARROW_KING), "undead tier 3: the Barrow King");
+            helper.assertTrue(DungeonBosses.pick(4, DungeonFactions.UNDEAD, random).equals(irons() ? DungeonBosses.LICH_LORD : DungeonBosses.BARROW_KING),
+                    "undead tier 4: the Lich Lord (or the Barrow King without Iron's Spells)");
         }
         helper.succeed();
     }
@@ -63,16 +62,19 @@ public class BossRosterTests {
         RandomSource random = RandomSource.create(6);
         Set<String> tierOne = new HashSet<>();
         for (int i = 0; i < 100; i++) {
-            String faction = DungeonFactions.pick(1, random);
+            for (int tier = 1; tier <= 4; tier++) {
+                helper.assertTrue(DungeonFactions.pick(tier, random, DungeonFactions.ENABLED_DEFAULTS).equals(DungeonFactions.UNDEAD),
+                        "with the default factions, every dungeon is undead");
+            }
+            String faction = DungeonFactions.pick(1, random, List.of(DungeonFactions.UNDEAD, DungeonFactions.GOBLINS));
             tierOne.add(faction);
-            helper.assertTrue(DungeonFactions.pick(2, random).equals(DungeonFactions.SKELETONS), "tier 2 dungeons are skeleton dungeons for now");
             String boss = DungeonBosses.pick(1, faction, random);
-            helper.assertTrue(faction.equals(DungeonFactions.GOBLINS) ? boss.equals(CHIEF) : boss.equals(DungeonBosses.SKELETON_LORD),
+            helper.assertTrue(faction.equals(DungeonFactions.GOBLINS) ? boss.equals(CHIEF) : boss.equals(DungeonBosses.ZOMBIE_LORD),
                     "a tier 1 " + faction + " dungeon got the wrong boss: " + boss);
         }
-        helper.assertTrue(tierOne.equals(irons() ? Set.of(DungeonFactions.GOBLINS, DungeonFactions.SKELETONS) : Set.of(DungeonFactions.SKELETONS)),
-                "tier 1 should roll goblins (with Iron's Spells, for the chief) and skeletons, got " + tierOne);
-        helper.assertTrue(DungeonBosses.pick(2, DungeonFactions.SKELETONS, random).equals(DungeonBosses.BARROW_KING), "tier 2 skeletons have the Barrow King");
+        helper.assertTrue(tierOne.equals(irons() ? Set.of(DungeonFactions.GOBLINS, DungeonFactions.UNDEAD) : Set.of(DungeonFactions.UNDEAD)),
+                "with goblins turned on, tier 1 should roll goblins (with Iron's Spells, for the chief) and undead, got " + tierOne);
+        helper.assertTrue(DungeonFactions.current("skeletons").equals(DungeonFactions.UNDEAD), "saved skeleton runs load as undead");
         helper.succeed();
     }
 

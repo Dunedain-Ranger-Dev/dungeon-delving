@@ -19,10 +19,10 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.event.EventHooks;
 
 /**
- * The Skeleton Lord, a tier 1 boss: a towering skeleton with a mace and a shield he raises to block, guarded by
- * {@link #GUARDS} armored skeleton knights.
+ * The Skeleton Lord, the tier 2 undead boss: a towering stray swordsman in full armor, with a mace and a shield he
+ * raises to block. His blows chill like any stray swordsman's. Guarded by {@link #GUARDS} armored skeleton knights.
  */
-public class SkeletonLord extends SkeletonSwordsman {
+public class SkeletonLord extends StraySwordsman {
     public static final double MAX_HEALTH = 120.0;
     /** Skeleton knights in his honor guard. */
     public static final int GUARDS = 4;
@@ -33,7 +33,7 @@ public class SkeletonLord extends SkeletonSwordsman {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return SkeletonSwordsman.createAttributes().add(Attributes.MAX_HEALTH, MAX_HEALTH).add(Attributes.ATTACK_DAMAGE, 5.0)
+        return StraySwordsman.createAttributes().add(Attributes.MAX_HEALTH, MAX_HEALTH).add(Attributes.ATTACK_DAMAGE, 5.0)
                 .add(Attributes.ARMOR, 6.0).add(Attributes.KNOCKBACK_RESISTANCE, 0.8).add(Attributes.SCALE, 1.5).add(Attributes.FOLLOW_RANGE, 40.0);
     }
 
@@ -43,6 +43,8 @@ public class SkeletonLord extends SkeletonSwordsman {
         setItemSlot(EquipmentSlot.OFFHAND, new ItemStack(Items.SHIELD));
         setItemSlot(EquipmentSlot.HEAD, new ItemStack(Items.IRON_HELMET));
         setItemSlot(EquipmentSlot.CHEST, new ItemStack(Items.IRON_CHESTPLATE));
+        setItemSlot(EquipmentSlot.LEGS, new ItemStack(Items.IRON_LEGGINGS));
+        setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS));
         for (EquipmentSlot slot : EquipmentSlot.values()) {
             setDropChance(slot, 0.0f);
         }

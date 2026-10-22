@@ -3,6 +3,8 @@
   "values": [
     "dungeondelving:skeleton_swordsman",
     "dungeondelving:skeleton_knight",
-    "dungeondelving:skeleton_lord"
+    "dungeondelving:skeleton_lord",
+    "dungeondelving:stray_swordsman",
+    "dungeondelving:bogged_swordsman"
   ]
 }

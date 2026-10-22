@@ -206,5 +206,17 @@
   "message.dungeondelving.weave.snapped": "The thread snapped! You save one string.",
   "message.dungeondelving.scrape.done": "Scraped clean: refined leather!",
   "message.dungeondelving.scrape.torn": "The hide tore! Only scraps are left.",
-  "gui.dungeondelving.timing.scrape": "Click as the scraper crosses each dark patch!"
+  "gui.dungeondelving.timing.scrape": "Click as the scraper crosses each dark patch!",
+  "entity.dungeondelving.stray_swordsman": "Stray Swordsman",
+  "entity.dungeondelving.bogged_swordsman": "Bogged Swordsman",
+  "entity.dungeondelving.wither_skeleton_archer": "Wither Skeleton Archer",
+  "entity.dungeondelving.wither_skeleton_mage": "Wither Skeleton Mage",
+  "entity.dungeondelving.zombie_lord": "Zombie Lord",
+  "entity.dungeondelving.lich_lord": "Lich Lord",
+  "item.dungeondelving.stray_swordsman_spawn_egg": "Stray Swordsman Spawn Egg",
+  "item.dungeondelving.bogged_swordsman_spawn_egg": "Bogged Swordsman Spawn Egg",
+  "item.dungeondelving.wither_skeleton_archer_spawn_egg": "Wither Skeleton Archer Spawn Egg",
+  "item.dungeondelving.wither_skeleton_mage_spawn_egg": "Wither Skeleton Mage Spawn Egg",
+  "item.dungeondelving.zombie_lord_spawn_egg": "Zombie Lord Spawn Egg",
+  "item.dungeondelving.lich_lord_spawn_egg": "Lich Lord Spawn Egg"
 }

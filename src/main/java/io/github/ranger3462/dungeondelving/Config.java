@@ -61,8 +61,12 @@ public final class Config {
 
     public static final ModConfigSpec.ConfigValue<List<? extends String>> GOBLIN_MOBS = mobList("goblinMobs", "goblin",
             DungeonFactions.GOBLIN_DEFAULTS);
-    public static final ModConfigSpec.ConfigValue<List<? extends String>> SKELETON_MOBS = mobList("skeletonMobs", "skeleton",
-            DungeonFactions.SKELETON_DEFAULTS);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> UNDEAD_MOBS = mobList("undeadMobs", "undead",
+            DungeonFactions.UNDEAD_DEFAULTS);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> ENABLED_FACTIONS = BUILDER
+            .comment("Which factions can hold dungeons: undead, goblins. Each dungeon rolls one of these that has a boss for",
+                    "its tier. Goblins are being reworked (Phase 2), so only the undead are on by default.")
+            .defineList("enabledFactions", DungeonFactions.ENABLED_DEFAULTS, () -> DungeonFactions.UNDEAD, value -> value instanceof String);
 
     public static final ModConfigSpec.BooleanValue BLOCK_NATURAL_SPAWNS = BUILDER
             .comment("Stop mobs spawning naturally in dungeons (including at world generation and as patrols), so every",

@@ -21,7 +21,7 @@ import net.minecraft.nbt.Tag;
 public final class DungeonProgress {
     private final int tier;
     private final String boss;
-    private String faction = DungeonFactions.SKELETONS;
+    private String faction = DungeonFactions.UNDEAD;
     private final int keysNeeded;
     private final List<BlockPos> door;
     private BlockPos bossSpawn;
@@ -265,7 +265,7 @@ public final class DungeonProgress {
                 tag.contains("boss_spawn") ? BlockPos.of(tag.getLong("boss_spawn")) : null);
         progress.keysUsed = tag.getInt("keys_used");
         if (tag.contains("faction")) {
-            progress.faction = tag.getString("faction");
+            progress.faction = DungeonFactions.current(tag.getString("faction"));
         }
         progress.bossSpawned = tag.getBoolean("boss_spawned");
         for (Tag huntTag : tag.getList("hunters", Tag.TAG_COMPOUND)) {

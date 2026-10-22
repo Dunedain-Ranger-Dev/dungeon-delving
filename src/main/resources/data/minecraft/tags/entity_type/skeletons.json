@@ -7,6 +7,13 @@
     {
       "id": "dungeondelving:skeleton_mage",
       "required": false
+    },
+    "dungeondelving:stray_swordsman",
+    "dungeondelving:bogged_swordsman",
+    "dungeondelving:wither_skeleton_archer",
+    {
+      "id": "dungeondelving:wither_skeleton_mage",
+      "required": false
     }
   ]
 }

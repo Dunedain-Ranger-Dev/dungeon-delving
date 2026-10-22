@@ -18,6 +18,7 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
 import io.github.ranger3462.dungeondelving.entity.SkeletonLord;
+import io.github.ranger3462.dungeondelving.entity.ZombieLord;
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.ChatFormatting;
@@ -64,8 +65,9 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * {@code dungeondelving:bosses/<boss>/tier_<n>}, in place of its normal drops, and shows a boss bar to players nearby.
  * When it dies, its arena's spawners shut off and an exit appears just inside the boss room's door.
  * <p>
- * The Skeleton Lord guards tier 1, the Barrow King (a big, buffed wither skeleton) tier 2 and up; more bosses come
- * from integrations (e.g. the Goblin Shaman Chief with Iron's Spells).
+ * The undead's bosses: the Zombie Lord (tier 1), the Skeleton Lord (tier 2), the Barrow King (a big, buffed wither
+ * skeleton, tier 3) and, with Iron's Spells, the Lich Lord (tier 4; the Barrow King guards tier 4 without it). More
+ * bosses come from integrations (e.g. the Goblin Shaman Chief with Iron's Spells).
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class DungeonBosses {
@@ -73,6 +75,9 @@ public final class DungeonBosses {
     public static final String BOSS_TAG = DungeonDelving.MODID + ":boss";
     public static final String BARROW_KING = "barrow_king";
     public static final String SKELETON_LORD = "skeleton_lord";
+    public static final String ZOMBIE_LORD = "zombie_lord";
+    /** Registered by the Iron's Spells integration; without it, the Barrow King guards tier 4 as well. */
+    public static final String LICH_LORD = "lich_lord";
     /** How close players must be to see a boss's health bar. */
     private static final double BAR_RANGE = 48.0;
     /** How far inside the boss room's door the exit appears. */
@@ -107,8 +112,10 @@ public final class DungeonBosses {
     public static final int BARROW_KING_GUARDS = 3;
 
     static {
-        register(new BossType(BARROW_KING, DungeonFactions.SKELETONS, tier -> tier >= 2, DungeonBosses::createBarrowKing));
-        register(new BossType(SKELETON_LORD, DungeonFactions.SKELETONS, tier -> tier == 1, SkeletonLord::create));
+        register(new BossType(ZOMBIE_LORD, DungeonFactions.UNDEAD, tier -> tier == 1, ZombieLord::create));
+        register(new BossType(SKELETON_LORD, DungeonFactions.UNDEAD, tier -> tier == 2, SkeletonLord::create));
+        register(new BossType(BARROW_KING, DungeonFactions.UNDEAD, tier -> tier == 3 || (tier == 4 && !TYPES.containsKey(LICH_LORD)),
+                DungeonBosses::createBarrowKing));
         addRetinue(SKELETON_LORD, (level, pos, tier) -> ring(level, pos, ModEntities.SKELETON_KNIGHT.get(), SkeletonLord.GUARDS, 3.0, 0.0));
         addRetinue(BARROW_KING, (level, pos, tier) -> ring(level, pos, ModEntities.SKELETON_KNIGHT.get(), BARROW_KING_GUARDS, 3.0, 0.0));
     }

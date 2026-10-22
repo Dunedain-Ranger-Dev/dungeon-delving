@@ -11,6 +11,9 @@
     "minecraft:wither_skeleton",
     "minecraft:zombie",
     "minecraft:husk",
-    "minecraft:drowned"
+    "minecraft:drowned",
+    "dungeondelving:stray_swordsman",
+    "dungeondelving:bogged_swordsman",
+    "dungeondelving:wither_skeleton_archer"
   ]
 }

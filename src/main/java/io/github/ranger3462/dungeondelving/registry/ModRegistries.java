@@ -161,8 +161,12 @@ public final class ModRegistries {
                 output.accept(ModEntities.SKELETON_SWORDSMAN_SPAWN_EGG.get());
                 output.accept(ModEntities.SKELETON_KNIGHT_SPAWN_EGG.get());
                 output.accept(ModEntities.SKELETON_LORD_SPAWN_EGG.get());
+                output.accept(ModEntities.STRAY_SWORDSMAN_SPAWN_EGG.get());
+                output.accept(ModEntities.BOGGED_SWORDSMAN_SPAWN_EGG.get());
+                output.accept(ModEntities.WITHER_SKELETON_ARCHER_SPAWN_EGG.get());
+                output.accept(ModEntities.ZOMBIE_LORD_SPAWN_EGG.get());
                 for (String optional : new String[] { "goblin_shaman_spawn_egg", "goblin_chief_spawn_egg", "goblin_totem_staff", "goblin_chief_staff",
-                        "skeleton_mage_spawn_egg" }) {
+                        "skeleton_mage_spawn_egg", "wither_skeleton_mage_spawn_egg", "lich_lord_spawn_egg" }) {
                     BuiltInRegistries.ITEM.getOptional(DungeonDelving.id(optional)).ifPresent(output::accept);
                 }
                 for (var forging : java.util.List.of(Forging.FORGE_HEARTH_ITEM, Forging.BELLOWS_ITEM, Forging.DWARVEN_ANVIL_ITEM,

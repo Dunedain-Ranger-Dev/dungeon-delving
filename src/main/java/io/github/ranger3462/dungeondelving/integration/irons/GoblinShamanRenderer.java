@@ -29,6 +29,7 @@ public class GoblinShamanRenderer extends AbstractSpellCastingMobRenderer {
         // Skeleton mages borrow Iron's own necromancer look until they get their own texture.
         event.registerEntityRenderer(IronsSkeletons.SKELETON_MAGE.get(),
                 context -> new GoblinShamanRenderer(context, ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "textures/entity/necromancer.png"), 1.0f));
+        UndeadCasterRenderer.register(event);
     }
 
     private static final class Model extends AbstractSpellCastingMobModel {

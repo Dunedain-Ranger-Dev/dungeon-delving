@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "dungeondelving:zombie_lord",
+    {
+      "id": "dungeondelving:lich_lord",
+      "required": false
+    }
+  ]
+}
