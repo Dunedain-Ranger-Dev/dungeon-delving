@@ -81,8 +81,8 @@ public class BossCourtAndTierTests {
             if (ModList.get().isLoaded("irons_spellbooks")) {
                 EntityType<?> mageType = BuiltInRegistries.ENTITY_TYPE.get(DungeonDelving.id("skeleton_mage"));
                 List<Mob> mages = court.stream().filter(mob -> mob.getType() == mageType).toList();
-                helper.assertTrue(mages.size() == 2, "with Iron's Spells, the King should have 2 skeleton mages, has " + mages.size());
-                helper.assertTrue(mages.stream().allMatch(mage -> mage.isAlliedTo(king)), "the mages should count the King as an ally, to heal him");
+                helper.assertTrue(mages.size() == 1, "with Iron's Spells, the King should have 1 skeleton mage, has " + mages.size());
+                helper.assertTrue(mages.stream().allMatch(mage -> mage.isAlliedTo(king)), "the mage should count the King as an ally, to heal him");
             }
         } finally {
             king.discard();
@@ -91,7 +91,7 @@ public class BossCourtAndTierTests {
         helper.succeed();
     }
 
-    /** With Iron's Spells, the King's mages heal him when he's hurt, even with nobody to fight. */
+    /** With Iron's Spells, the King's mage heals him when he's hurt, even with nobody to fight. */
     @GameTest(template = ANY_TEMPLATE, timeoutTicks = 300)
     public static void theMagesHealTheBarrowKing(GameTestHelper helper) {
         if (!ModList.get().isLoaded("irons_spellbooks")) {
@@ -103,7 +103,7 @@ public class BossCourtAndTierTests {
         king.setHealth(king.getMaxHealth() / 2);
         float hurt = king.getHealth();
         helper.succeedWhen(() -> {
-            helper.assertTrue(king.getHealth() > hurt, "the mages should have healed the King by now");
+            helper.assertTrue(king.getHealth() > hurt, "the mage should have healed the King by now");
             cleanUp(helper, pos);
         });
     }

@@ -52,7 +52,7 @@ public class SkeletonMage extends AbstractSpellCastingMob implements Enemy {
         goalSelector.addGoal(0, new FloatGoal(this));
         // Healing and buffing come first; it only attacks between casts.
         goalSelector.addGoal(1, new SupportCastGoal(this, ally -> ally == this || isAlliedTo(ally), 20.0, 6.0, 30, 60,
-                List.of(SpellRegistry.BLESSING_OF_LIFE_SPELL.get(), SpellRegistry.HEALING_CIRCLE_SPELL.get()),
+                List.of(SpellRegistry.BLESSING_OF_LIFE_SPELL.get()),
                 List.of(new SupportCastGoal.Buff(SpellRegistry.FORTIFY_SPELL.get(), MobEffectRegistry.FORTIFY),
                         new SupportCastGoal.Buff(SpellRegistry.HASTE_SPELL.get(), MobEffectRegistry.HASTENED)))
                 .setSpellQuality(0.2f, 0.4f));

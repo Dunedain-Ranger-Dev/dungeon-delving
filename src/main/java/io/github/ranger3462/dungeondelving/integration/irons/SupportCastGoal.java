@@ -30,6 +30,8 @@ public class SupportCastGoal extends Goal {
     private static final float HEAL_BELOW = 0.85f;
     /** How long after being hurt an ally still counts as fighting, in ticks. */
     private static final int FIGHT_MEMORY = 200;
+    /** Ticks spent turning to face an ally before casting, since aimed spells like Blessing of Life need to see them. */
+    private static final int AIM_TICKS = 10;
 
     private final AbstractSpellCastingMob mob;
     private final Predicate<LivingEntity> allies;
@@ -46,6 +48,7 @@ public class SupportCastGoal extends Goal {
     private int nextCast;
     private LivingEntity ally;
     private AbstractSpell spell;
+    private int aimed;
 
     /**
      * @param allies who it supports (include the caster itself to let it heal and buff itself)
@@ -126,7 +129,10 @@ public class SupportCastGoal extends Goal {
         }
         mob.getNavigation().stop();
         if (ally != mob) {
-            mob.getLookControl().setLookAt(ally, 180.0f, 180.0f);
+            face(ally);
+            if (++aimed < AIM_TICKS) {
+                return;
+            }
         }
         if (spell != null) {
             cast(spell);
@@ -141,6 +147,22 @@ public class SupportCastGoal extends Goal {
         ally = null;
     }
 
+    /**
+     * Turns the caster's whole body to face an entity. Aimed spells look along the body, not the head, which is all a
+     * mob's look control turns.
+     */
+    private void face(LivingEntity target) {
+        double dx = target.getX() - mob.getX();
+        double dz = target.getZ() - mob.getZ();
+        double dy = target.getEyeY() - mob.getEyeY();
+        float yaw = (float) (Mth.atan2(dz, dx) * Mth.RAD_TO_DEG) - 90.0f;
+        float pitch = (float) -(Mth.atan2(dy, Math.sqrt(dx * dx + dz * dz)) * Mth.RAD_TO_DEG);
+        mob.setYRot(yaw);
+        mob.setYHeadRot(yaw);
+        mob.setYBodyRot(yaw);
+        mob.setXRot(pitch);
+    }
+
     /** Starts casting a spell at the ally. False if the spell couldn't be cast. */
     private boolean cast(AbstractSpell toCast) {
         int level = Math.max(1, (int) (toCast.getMaxLevel() * Mth.lerp(mob.getRandom().nextFloat(), minQuality, maxQuality)));
@@ -151,6 +173,11 @@ public class SupportCastGoal extends Goal {
         // Aim it at the ally, whatever the caster's own aim found.
         MagicData.getPlayerMagicData(mob).setAdditionalCastData(new TargetEntityCastData(ally));
         return true;
+    }
+
+    @Override
+    public void start() {
+        aimed = 0;
     }
 
     @Override

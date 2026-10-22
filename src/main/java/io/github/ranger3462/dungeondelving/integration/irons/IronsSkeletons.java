@@ -20,7 +20,7 @@ public final class IronsSkeletons {
     public static DeferredHolder<EntityType<?>, EntityType<SkeletonMage>> SKELETON_MAGE;
     public static DeferredItem<DeferredSpawnEggItem> SKELETON_MAGE_SPAWN_EGG;
     /** Skeleton mages in the Barrow King's court. */
-    public static final int BARROW_KING_MAGES = 2;
+    public static final int BARROW_KING_MAGES = 1;
 
     private IronsSkeletons() {}
 
@@ -31,7 +31,7 @@ public final class IronsSkeletons {
                         .build(DungeonDelving.id("skeleton_mage").toString()));
         SKELETON_MAGE_SPAWN_EGG = ModRegistries.ITEMS.registerItem("skeleton_mage_spawn_egg",
                 properties -> new DeferredSpawnEggItem(SKELETON_MAGE, 0xC1C1C1, 0x4A2E6A, properties));
-        // Two mages behind the King, out past his knights.
+        // A mage behind the King, out past his knights.
         DungeonBosses.addRetinue(DungeonBosses.BARROW_KING,
                 (level, pos, tier) -> DungeonBosses.ring(level, pos, SKELETON_MAGE.get(), BARROW_KING_MAGES, 6.0, 0.5));
         modEventBus.addListener(IronsSkeletons::onAttributes);
