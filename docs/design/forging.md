@@ -175,7 +175,7 @@ at set levels instead.
 | Quench | 2 |
 | Grind | 3 |
 | Tempered ingot | 10 × ★ |
-| Gear piece crafted | 15 × ★ |
+| Gear piece crafted | 15 × ★ (hauberks give it to Leatherworking, brigandine to Weaving) |
 
 **Forging perks:**
 - Every level: +0.25% sweet-spot width.

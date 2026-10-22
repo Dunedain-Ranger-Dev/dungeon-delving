@@ -80,7 +80,7 @@ public final class ForgeActions {
     /** Weaving: string per cloth, stitches, how tall the needle's eye is, and how fast the eye and thread bob. */
     public static final int WEAVE_STRING = 3;
     public static final int WEAVE_STITCHES = 3;
-    public static final float WEAVE_GAP = 0.14f;
+    public static final float WEAVE_GAP = 0.28f;
     public static final int EYE_PERIOD = 34;
     public static final int THREAD_PERIOD = 22;
 

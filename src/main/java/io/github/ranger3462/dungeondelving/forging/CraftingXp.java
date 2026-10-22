@@ -8,7 +8,11 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
-/** Crafting skill XP for crafting forged parts and gear, leather and cloth (on top of the XP from the stations themselves). */
+/**
+ * Crafting skill XP for crafting forged parts and gear, leather and cloth (on top of the XP from the stations themselves).
+ * Gear trains the skill it's mostly made with: plate and weapons Forging, a hauberk (on its leather backing)
+ * Leatherworking, and brigandine (on its woven gambeson) Weaving.
+ */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class CraftingXp {
     /** Forging XP for a forged piece of gear, per ★; and for a forged part, per ★. */
@@ -19,12 +23,24 @@ public final class CraftingXp {
 
     private CraftingXp() {}
 
+    /** The skill crafting a piece of forged gear trains. */
+    public static CraftSkill skillFor(ItemStack gear) {
+        if (gear.getItem() instanceof ForgedGear.Armor armor) {
+            return switch (armor.weight) {
+                case LIGHT -> CraftSkill.WEAVING;
+                case MEDIUM -> CraftSkill.LEATHERWORKING;
+                case HEAVY -> CraftSkill.FORGING;
+            };
+        }
+        return CraftSkill.FORGING;
+    }
+
     @SubscribeEvent
     public static void onCrafted(PlayerEvent.ItemCraftedEvent event) {
         ItemStack crafted = event.getCrafting();
         int stars = Forging.stars(crafted);
         if (crafted.getItem() instanceof ForgedGear.Armor || crafted.getItem() instanceof ForgedGear.Sword || crafted.getItem() instanceof ForgedGear.Axe) {
-            CraftingSkills.addXp(event.getEntity(), CraftSkill.FORGING, GEAR_XP_PER_STAR * stars);
+            CraftingSkills.addXp(event.getEntity(), skillFor(crafted), GEAR_XP_PER_STAR * stars);
         } else if (crafted.is(Forging.ARMOR_PLATE.get()) || crafted.is(Forging.RIVETS.get()) || crafted.is(Forging.CHAIN_LINKS.get())) {
             CraftingSkills.addXp(event.getEntity(), CraftSkill.FORGING, PART_XP_PER_STAR * stars);
         } else if (crafted.is(Forging.HARDENED_LEATHER.get()) || crafted.is(Forging.LEATHER_BASE.get())) {

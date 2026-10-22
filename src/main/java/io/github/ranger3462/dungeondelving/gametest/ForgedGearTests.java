@@ -8,11 +8,13 @@ import com.mojang.authlib.GameProfile;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
+import io.github.ranger3462.dungeondelving.forging.CraftingXp;
 import io.github.ranger3462.dungeondelving.forging.ForgeActions;
 import io.github.ranger3462.dungeondelving.forging.ForgedGear;
 import io.github.ranger3462.dungeondelving.forging.Forging;
 import io.github.ranger3462.dungeondelving.forging.ForgingPerks;
 import io.github.ranger3462.dungeondelving.forging.TimingBar;
+import io.github.ranger3462.dungeondelving.skill.CraftSkill;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
@@ -79,6 +81,9 @@ public class ForgedGearTests {
         ItemStack sword = craft(level, part(Forging.ARMOR_PLATE.get(), 4), ItemStack.EMPTY, ItemStack.EMPTY, part(Forging.ARMOR_PLATE.get(), 4),
                 ItemStack.EMPTY, ItemStack.EMPTY, new ItemStack(Items.STICK));
         helper.assertTrue(sword.is(Forging.FORGED_SWORD.get()) && Forging.stars(sword) == 4, "two ★4 plates and a stick make a ★4 sword");
+        helper.assertTrue(CraftingXp.skillFor(helmet) == CraftSkill.FORGING && CraftingXp.skillFor(brigandine) == CraftSkill.WEAVING
+                && CraftingXp.skillFor(new ItemStack(Forging.ARMOR.get(ForgedGear.Weight.MEDIUM).get(ArmorItem.Type.HELMET).get())) == CraftSkill.LEATHERWORKING,
+                "plate trains Forging, hauberks Leatherworking, brigandine Weaving");
         helper.succeed();
     }
 
