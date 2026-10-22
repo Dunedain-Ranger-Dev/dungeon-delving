@@ -17,7 +17,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class GrindingWheelBlock extends HorizontalDirectionalBlock {
     public static final MapCodec<GrindingWheelBlock> CODEC = simpleCodec(GrindingWheelBlock::new);
     /** Extra sweet-spot width, as a share of the bar. */
-    public static final float SWEET_SPOT_BONUS = 0.08f;
+    public static final float SWEET_SPOT_BONUS = 0.04f;
     private static final VoxelShape SHAPE = Block.box(2.0, 0.0, 2.0, 14.0, 16.0, 14.0);
 
     public GrindingWheelBlock(Properties properties) {

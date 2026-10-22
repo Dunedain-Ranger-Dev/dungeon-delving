@@ -104,6 +104,7 @@ public final class Forging {
         // The handler only ever runs on the client, so the client class it names is never loaded on a server.
         event.registrar("1").playToClient(TimingBarPayload.TYPE, TimingBarPayload.STREAM_CODEC,
                 (payload, context) -> io.github.ranger3462.dungeondelving.client.TimingBarOverlay.handle(payload));
+        event.registrar("1").playToServer(StrikePayload.TYPE, StrikePayload.STREAM_CODEC, StrikePayload::handle);
     }
 
     /** A stack's ★ (1 if it has none). */

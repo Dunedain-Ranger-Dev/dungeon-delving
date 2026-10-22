@@ -43,21 +43,29 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public final class ForgeActions {
     /** A bar left alone this long (in ticks) is put away. */
     public static final int TIMEOUT = 200;
-    /** Strikes are checked against where the marker was this many ticks back too, to make up for lag. */
-    private static final int LAG_TICKS = 2;
+    /** How many ticks of lag a client's reported marker position is allowed to be behind the server's. */
+    private static final int LAG_TICKS = 4;
+    /** How far outside the marker's lag window a reported position may be, as a share of the bar. */
+    private static final float LAG_SLACK = 0.08f;
+    /** Fewest ticks between two strikes. */
+    private static final int MIN_STRIKE_GAP = 2;
     /** Narrowest a sweet spot can get, as a share of the bar. */
-    private static final float MIN_WIDTH = 0.05f;
+    private static final float MIN_WIDTH = 0.03f;
 
-    /** Crack chance for an off strike: this, plus how far off it was (as a share of the bar). */
-    public static final float STRIKE_CRACK_BASE = 0.12f;
-    public static final float GRIND_CRACK_BASE = 0.06f;
-    public static final float GRIND_CRACK_SLOPE = 0.6f;
-    /** Crack chance when quenching in water, before the Forging skill. */
-    public static final float WATER_CRACK = 0.10f;
-    private static final float MAX_CRACK = 0.9f;
+    /** Crack chance for the first missed strike, and how much each further miss in the same bar adds. */
+    public static final float STRIKE_MISS_CRACK = 0.30f;
+    public static final float STRIKE_MISS_STEP = 0.15f;
+    public static final float GRIND_MISS_CRACK = 0.20f;
+    public static final float GRIND_MISS_STEP = 0.10f;
+    /** Extra crack chance on every strike but a gold one, once the metal is merely hot, and once it's cooling. */
+    public static final float HOT_PENALTY = 0.12f;
+    public static final float COOLING_PENALTY = 0.25f;
+    /** Crack chance when quenching in water. Only oil avoids it. */
+    public static final float WATER_CRACK = 0.30f;
+    private static final float MAX_CRACK = 0.95f;
 
-    public static final float STRIKE_WIDTH = 0.18f;
-    public static final float GRIND_WIDTH = 0.20f;
+    public static final float STRIKE_WIDTH = 0.09f;
+    public static final float GRIND_WIDTH = 0.10f;
 
     private static final Map<UUID, Session> SESSIONS = new HashMap<>();
 
@@ -75,30 +83,43 @@ public final class ForgeActions {
         float low;
         float high;
         int done;
+        int misses;
         long lastAction;
+        long lastStrike = Long.MIN_VALUE / 2;
 
-        /** A game time when the marker is in the middle of the sweet spot, at or after {@code from}. For tests. */
-        public long perfectTickAfter(long from) {
-            for (long tick = from; tick < from + period; tick++) {
-                if (TimingBar.offBy(TimingBar.marker(tick - start, period), low + 0.01f, high - 0.01f) <= 0.0f) {
-                    return tick;
-                }
-            }
-            return from;
+        /** A marker position in the gold zone. For tests. */
+        public float goldMarker() {
+            return (low + high) / 2;
         }
 
-        /** A game time when the marker is as far from the sweet spot as it gets, at or after {@code from}. For tests. */
-        public long worstTickAfter(long from) {
-            long worst = from;
-            float off = -1.0f;
-            for (long tick = from; tick < from + period; tick++) {
-                float here = TimingBar.offBy(TimingBar.marker(tick - start, period), low, high);
-                if (here > off) {
-                    off = here;
-                    worst = tick;
-                }
-            }
-            return worst;
+        /** A marker position in the green but outside the gold. For tests. */
+        public float greenMarker() {
+            return low + (TimingBar.goldLow(low, high) - low) / 2;
+        }
+
+        /** A marker position well outside the sweet spot. For tests. */
+        public float missMarker() {
+            return low > 0.5f ? 0.0f : 1.0f;
+        }
+
+        public int misses() {
+            return misses;
+        }
+
+        public float low() {
+            return low;
+        }
+
+        public float high() {
+            return high;
+        }
+
+        public long start() {
+            return start;
+        }
+
+        public int period() {
+            return period;
         }
 
         public int done() {
@@ -171,18 +192,17 @@ public final class ForgeActions {
 
     // --- Striking and grinding ---
 
+    /** Right-clicking a station starts its timing bar. The strikes themselves come from the client ({@link StrikePayload}). */
     private static void useBar(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState state, ItemStack held, TimingBar.Kind kind) {
-        long now = level.getGameTime();
-        Session session = SESSIONS.get(player.getUUID());
-        if (session != null && session.kind == kind && session.station.equals(pos) && now - session.lastAction < TIMEOUT) {
-            strike(player, level, session, held, now);
-        } else {
-            begin(player, level, pos, state, held, kind, now);
-        }
+        begin(player, level, pos, state, held, kind, level.getGameTime());
     }
 
     /** Starts a timing bar, if the forge, the player's skill and the metal are all up to it. */
     public static Optional<Session> begin(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState state, ItemStack held, TimingBar.Kind kind, long now) {
+        Session current = SESSIONS.get(player.getUUID());
+        if (current != null && current.kind == kind && current.station.equals(pos) && now - current.lastAction < TIMEOUT) {
+            return Optional.of(current); // Strikes come in as StrikePayloads, so a click on the station mid-bar does nothing.
+        }
         Optional<ForgeWorkshop> workshop = ForgeWorkshop.around(level, pos);
         if (workshop.isEmpty()) {
             tell(player, Component.translatable("message.dungeondelving.forge.no_hearth").withStyle(ChatFormatting.RED));
@@ -209,11 +229,11 @@ public final class ForgeActions {
         int needed;
         int period;
         if (kind == TimingBar.Kind.STRIKE) {
-            width = STRIKE_WIDTH + (state.is(Forging.DWARVEN_ANVIL.get()) ? DwarvenAnvilBlock.SWEET_SPOT_BONUS : 0.0f) - 0.015f * (stars - 1);
+            width = STRIKE_WIDTH + (state.is(Forging.DWARVEN_ANVIL.get()) ? DwarvenAnvilBlock.SWEET_SPOT_BONUS : 0.0f) - 0.0075f * (stars - 1);
             needed = strikesFor(stars);
             period = Math.max(16, 28 - (stars - 1));
         } else {
-            width = GRIND_WIDTH + (state.is(Forging.GRINDING_WHEEL.get()) ? GrindingWheelBlock.SWEET_SPOT_BONUS : 0.0f) - 0.01f * (stars - 1);
+            width = GRIND_WIDTH + (state.is(Forging.GRINDING_WHEEL.get()) ? GrindingWheelBlock.SWEET_SPOT_BONUS : 0.0f) - 0.005f * (stars - 1);
             needed = passesFor(stars);
             period = Math.max(16, 24 - (stars - 1));
         }
@@ -236,9 +256,9 @@ public final class ForgeActions {
         return stars >= 5 ? 3 : 2;
     }
 
-    /** Places the sweet spot for the next strike somewhere along the bar. It's narrower the cooler the metal. */
+    /** Places the sweet spot for the next strike somewhere along the bar. It's a little narrower the cooler the metal. */
     private static void nextSpot(Session session, float heat, ServerLevel level) {
-        float width = Math.max(MIN_WIDTH, session.baseWidth * (session.kind == TimingBar.Kind.STRIKE ? 0.5f + 0.5f * heat : 1.0f));
+        float width = Math.max(MIN_WIDTH, session.baseWidth * (session.kind == TimingBar.Kind.STRIKE ? 0.75f + 0.25f * heat : 1.0f));
         float margin = 0.05f;
         float center = margin + width / 2 + level.getRandom().nextFloat() * Math.max(0.0f, 1.0f - 2 * margin - width);
         session.low = center - width / 2;
@@ -250,45 +270,88 @@ public final class ForgeActions {
         return stack.getItem() instanceof HotMetalItem ? HotMetalItem.temperature(stack, now, ForgingPerks.coolTicks(ForgingPerks.level(player))) : 1.0f;
     }
 
-    /** How far off a strike made now would be, allowing for a couple of ticks of lag. */
-    static float offBy(Session session, long now) {
-        float best = Float.MAX_VALUE;
+    /**
+     * Where the marker was for a strike the client reports. The client draws the marker smoothly, between server ticks,
+     * so its position is the precise one; but it has to fall within where the marker could have been over the last few
+     * ticks (allowing for lag), or the server's own guess is used instead.
+     */
+    public static float checkedMarker(Session session, long now, float reported) {
+        float min = Float.MAX_VALUE;
+        float max = -Float.MAX_VALUE;
         for (int lag = 0; lag <= LAG_TICKS; lag++) {
-            best = Math.min(best, TimingBar.offBy(TimingBar.marker(now - lag - session.start, session.period), session.low, session.high));
+            float marker = TimingBar.marker(now - lag - session.start, session.period);
+            min = Math.min(min, marker);
+            max = Math.max(max, marker);
         }
-        return best;
+        if (reported >= min - LAG_SLACK && reported <= max + LAG_SLACK) {
+            return reported;
+        }
+        return TimingBar.marker(now - 1 - session.start, session.period);
     }
 
-    /** One strike (or grinding pass) at game time {@code now}. */
-    public static void strike(ServerPlayer player, ServerLevel level, Session session, ItemStack held, long now) {
+    /** A strike reported by the client, with where it saw the marker. */
+    static void onStrike(ServerPlayer player, float reported) {
+        Session session = SESSIONS.get(player.getUUID());
+        ItemStack held = player.getMainHandItem();
+        if (session == null || !held.is(session.kind == TimingBar.Kind.STRIKE ? Forging.HEATED_INGOT.get() : Forging.QUENCHED_INGOT.get())) {
+            return;
+        }
+        long now = player.level().getGameTime();
+        strike(player, (ServerLevel) player.level(), session, held, now, checkedMarker(session, now, reported));
+    }
+
+    /** One strike (or grinding pass) at game time {@code now}, with the marker at {@code marker}. */
+    public static void strike(ServerPlayer player, ServerLevel level, Session session, ItemStack held, long now, float marker) {
+        if (now - session.lastStrike < MIN_STRIKE_GAP) {
+            return;
+        }
+        session.lastStrike = now;
         float heat = heatOf(player, held, now);
         if (heat <= 0.0f) {
             end(player);
             tell(player, Component.translatable("message.dungeondelving.forge.cold").withStyle(ChatFormatting.RED));
             return;
         }
-        float off = offBy(session, now);
-        int skill = ForgingPerks.level(player);
         BlockPos pos = session.station;
         boolean grinding = session.kind == TimingBar.Kind.GRIND;
-        if (off <= 0.0f) {
-            CraftingSkills.addXp(player, CraftSkill.FORGING, 3);
-            level.playSound(null, pos, grinding ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.6f, 1.3f);
-            level.sendParticles(grinding ? ParticleTypes.CRIT : ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 1.05, pos.getZ() + 0.5, 6, 0.15, 0.05,
-                    0.15, 0.05);
-            tell(player, Component.translatable("message.dungeondelving.forge.perfect").withStyle(ChatFormatting.GREEN));
-        } else {
-            float chance = Math.min(MAX_CRACK, crackChance(session.kind, off) * ForgingPerks.crackMultiplier(skill));
-            CraftingSkills.addXp(player, CraftSkill.FORGING, 1);
-            if (level.getRandom().nextFloat() < chance) {
-                end(player);
-                crack(player, level, pos, held);
-                return;
+        TimingBar.Hit hit = TimingBar.judge(marker, session.low, session.high);
+        float chance = 0.0f;
+        switch (hit) {
+            case GOLD -> {
+                session.done += 2;
+                CraftingSkills.addXp(player, CraftSkill.FORGING, 5);
+                level.playSound(null, pos, grinding ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.7f, 1.6f);
+                level.sendParticles(ParticleTypes.WAX_OFF, pos.getX() + 0.5, pos.getY() + 1.1, pos.getZ() + 0.5, 10, 0.2, 0.1, 0.2, 0.1);
+                tell(player, Component.translatable("message.dungeondelving.forge.critical").withStyle(ChatFormatting.GOLD));
             }
-            level.playSound(null, pos, grinding ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.6f, 0.7f);
-            tell(player, Component.translatable("message.dungeondelving.forge.off").withStyle(ChatFormatting.YELLOW));
+            case GREEN -> {
+                session.done++;
+                chance = coldPenalty(session.kind, heat);
+                CraftingSkills.addXp(player, CraftSkill.FORGING, 3);
+                level.playSound(null, pos, grinding ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.6f, 1.3f);
+                level.sendParticles(grinding ? ParticleTypes.CRIT : ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 1.05, pos.getZ() + 0.5, 6,
+                        0.15, 0.05, 0.15, 0.05);
+                tell(player, Component.translatable("message.dungeondelving.forge.good").withStyle(ChatFormatting.GREEN));
+            }
+            case MISS -> {
+                session.done++;
+                session.misses++;
+                chance = missChance(session.kind, session.misses) + coldPenalty(session.kind, heat);
+                CraftingSkills.addXp(player, CraftSkill.FORGING, 1);
+                level.playSound(null, pos, grinding ? SoundEvents.GRINDSTONE_USE : SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.6f, 0.7f);
+            }
         }
-        session.done++;
+        float crackMultiplier = ForgingPerks.crackMultiplier(ForgingPerks.level(player));
+        chance = Math.min(MAX_CRACK, chance * crackMultiplier);
+        if (chance > 0.0f && level.getRandom().nextFloat() < chance) {
+            end(player);
+            crack(player, level, pos, held);
+            return;
+        }
+        if (hit == TimingBar.Hit.MISS) {
+            int nextRisk = Math.round(100 * Math.min(MAX_CRACK, missChance(session.kind, session.misses + 1) * crackMultiplier));
+            tell(player, Component.translatable("message.dungeondelving.forge.off", nextRisk).withStyle(ChatFormatting.YELLOW));
+        }
         session.lastAction = now;
         if (session.done < session.needed) {
             nextSpot(session, heat, level);
@@ -299,9 +362,17 @@ public final class ForgeActions {
         finish(player, level, session, held);
     }
 
-    /** The chance an off strike cracks the piece, before the Forging skill, if it's {@code off} away from the sweet spot. */
-    public static float crackChance(TimingBar.Kind kind, float off) {
-        return kind == TimingBar.Kind.GRIND ? GRIND_CRACK_BASE + off * GRIND_CRACK_SLOPE : STRIKE_CRACK_BASE + off;
+    /** The chance the {@code misses}th missed strike in a bar cracks the piece, before the Forging skill: it climbs with every miss. */
+    public static float missChance(TimingBar.Kind kind, int misses) {
+        return kind == TimingBar.Kind.GRIND ? GRIND_MISS_CRACK + GRIND_MISS_STEP * (misses - 1) : STRIKE_MISS_CRACK + STRIKE_MISS_STEP * (misses - 1);
+    }
+
+    /** Extra crack chance for striking metal that's no longer glowing hot. Grinding works cold metal, so it has none. */
+    public static float coldPenalty(TimingBar.Kind kind, float heat) {
+        if (kind != TimingBar.Kind.STRIKE || heat > 0.66f) {
+            return 0.0f;
+        }
+        return heat > 0.33f ? HOT_PENALTY : COOLING_PENALTY;
     }
 
     /** Turns the last strike's piece into the next stage: a struck ingot, or a Tempered Ingot. */
@@ -344,7 +415,7 @@ public final class ForgeActions {
             }
             chance = 0.0f;
         } else {
-            chance = WATER_CRACK * ForgingPerks.crackMultiplier(ForgingPerks.level(player));
+            chance = WATER_CRACK;
         }
         level.playSound(null, pos, SoundEvents.LAVA_EXTINGUISH, SoundSource.BLOCKS, 0.8f, 1.0f);
         level.sendParticles(ParticleTypes.CLOUD, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 12, 0.25, 0.2, 0.25, 0.02);
@@ -388,7 +459,7 @@ public final class ForgeActions {
     }
 
     /** Puts away a player's timing bar. */
-    static void end(ServerPlayer player) {
+    public static void end(ServerPlayer player) {
         if (SESSIONS.remove(player.getUUID()) != null) {
             PacketDistributor.sendToPlayer(player, TimingBarPayload.HIDE);
         }

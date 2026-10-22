@@ -133,13 +133,14 @@
   "message.dungeondelving.forge.cold": "It's gone cold. Heat it again in a furnace.",
   "message.dungeondelving.forge.too_cold_to_quench": "Too cold to quench. Heat it again in a furnace.",
   "message.dungeondelving.forge.tub_dry": "The tub is dry. Pour in some Quenching Oil.",
-  "message.dungeondelving.forge.perfect": "Perfect!",
-  "message.dungeondelving.forge.off": "Off the mark...",
+  "message.dungeondelving.forge.off": "Off the mark! Next miss: %s%% to crack",
   "message.dungeondelving.forge.cracked": "It cracked! You salvage %s iron nuggets.",
   "message.dungeondelving.forge.struck": "Shaped! Quench it while it's hot.",
   "message.dungeondelving.forge.quenched": "Quenched. Now grind it.",
   "message.dungeondelving.forge.tempered": "Tempered Iron Ingot %s!",
-  "gui.dungeondelving.timing.strike": "Strike when the marker is in the green!",
-  "gui.dungeondelving.timing.grind": "Grind when the marker is in the green!",
-  "gui.dungeondelving.timing.weave": "Weave when the marker is in the green!"
+  "gui.dungeondelving.timing.strike": "Strike in the green; gold counts twice!",
+  "gui.dungeondelving.timing.grind": "Grind in the green; gold counts twice!",
+  "gui.dungeondelving.timing.weave": "Weave in the green; gold counts twice!",
+  "message.dungeondelving.forge.good": "Good strike.",
+  "message.dungeondelving.forge.critical": "Critical! That counts twice."
 }

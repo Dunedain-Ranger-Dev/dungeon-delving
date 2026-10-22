@@ -28,7 +28,7 @@ can be arranged any way:
 
 **Workshop bonus:** decoration blocks near the hearth (the `dungeondelving:forge_decor` tag: bricks, stone and
 deepslate bricks, chains, lanterns, iron bars, barrels, smithing tables, campfires and so on) widen every sweet spot.
-Each 8 blocks add +1%, up to +5%.
+Each 8 blocks add +0.5%, up to +2.5%.
 
 Right-click the hearth to see what's missing, the forge level and the workshop bonus. The hearth's fire lights up once
 the forge is complete. Striking, quenching and grinding only work at stations that are in range of a complete hearth.
@@ -41,14 +41,22 @@ the forge is complete. Striking, quenching and grinding only work at stations th
    as a heated ingot aiming for ★n+1. Bellows next to the furnace: right-click to pump, and each pump pushes the
    heating along.
 2. **Strike.** Hold the hot ingot and right-click the anvil. A bar appears with a marker sweeping back and forth across
-   it; right-click the anvil again to strike. A strike inside the green sweet spot is **perfect** and can't crack the
-   ingot. A strike outside it may crack it, and the further off you are, the more likely. You need 3 strikes, plus 1
-   more for every 2 ★ you're aiming for. The sweet spot narrows as the ingot cools and as the target ★ rises. The
-   result is a **Struck Ingot**, which is still hot.
-3. **Quench.** Right-click a water cauldron while the struck ingot is still hot. Water has a 10% crack chance, which
-   Forging lowers. The Quench Tub has none. You get a **Quenched Ingot**.
-4. **Grind.** Right-click the grindstone, using the same timing bar with 2 passes. A miss has a lower crack chance than
-   a missed strike. The result is a **Tempered Ingot ★n**.
+   it. Each fresh right-click is one strike; holding the button down doesn't repeat it. You need 3 strikes, plus 1 more
+   for every 2 ★ you're aiming for. The result is a **Struck Ingot**, which is still hot.
+   - **The bar:** the green sweet spot is 9% of the bar (13% on a Dwarven Anvil). It narrows a little as the ingot
+     cools and as the target ★ rises. Its middle quarter is **gold**.
+   - **Gold:** the strike counts twice and never cracks.
+   - **Green:** safe on glowing-hot metal.
+   - **Miss:** may crack the piece. The first miss in a bar has a 30% crack chance, and each further miss adds 15%.
+   - **Cooling metal:** every strike but a gold one gets an extra crack chance: +12% once the metal is merely hot, and
+     +25% once it's cooling. Reheating resets it.
+   - The client sends the marker's exact position with each strike, because the marker moves faster than server ticks.
+     The server only accepts it if the marker could really have been there in the last few ticks.
+3. **Quench.** Right-click a water cauldron while the struck ingot is still hot. Water has a flat 30% crack chance that
+   skill doesn't lower; only the Quench Tub's oil avoids it. You get a **Quenched Ingot**.
+4. **Grind.** Right-click the grindstone and use the same timing bar, with 2 passes. The green is 10% of the bar (14%
+   on the Grinding Wheel). Gold works the same as on the anvil. Misses start at a 20% crack chance and add 10% each.
+   Metal can be ground cold. The result is a **Tempered Ingot ★n**.
 
 **Cracking** turns the piece into 5 iron nuggets. That rises with Forging level, and talents raise it further later.
 
@@ -140,13 +148,13 @@ at set levels instead.
 | Gear piece crafted | 15 × ★ |
 
 **Forging perks:**
-- Every level: +0.5% sweet-spot width.
+- Every level: +0.25% sweet-spot width.
 - L5: ingots cool 25% slower.
 - L10: cracks return 6 nuggets.
-- L15: off strikes are 25% less likely to crack.
+- L15: strikes are 25% less likely to crack.
 - L20: cracks return 7 nuggets, and ingots cool 50% slower.
 - L25: cracks return 8 nuggets.
-- L30: off strikes are 50% less likely to crack.
+- L30: strikes are 50% less likely to crack.
 
 **Forging level needed for each ★:**
 

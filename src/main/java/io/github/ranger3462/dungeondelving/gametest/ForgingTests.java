@@ -89,7 +89,7 @@ public class ForgingTests {
             for (int i = 0; i < 16; i++) {
                 set(level, hearth.offset(-6 + i % 8, 1, 6 - i / 8), Blocks.BRICKS.defaultBlockState());
             }
-            helper.assertTrue(Math.abs(ForgeWorkshop.scan(level, hearth).decorBonus() - 0.02f) < 0.001f, "16 bricks give a +2% workshop bonus");
+            helper.assertTrue(Math.abs(ForgeWorkshop.scan(level, hearth).decorBonus() - 0.01f) < 0.001f, "16 bricks give a +1% workshop bonus");
             helper.assertTrue(ForgeWorkshop.around(level, hearth.offset(0, 0, 3)).isPresent(), "a station in range belongs to the workshop");
             helper.assertTrue(ForgeWorkshop.around(level, hearth.offset(ForgeWorkshop.RADIUS * 3, 0, 0)).isEmpty(),
                     "a spot far from any hearth has no workshop");
@@ -99,7 +99,7 @@ public class ForgingTests {
         helper.succeed();
     }
 
-    /** Heats, strikes, quenches and grinds an ingot with perfect timing, and gets a ★1 Tempered Iron Ingot. */
+    /** Heats, strikes, quenches and grinds an ingot with good timing, and gets a ★1 Tempered Iron Ingot. */
     @GameTest(template = ANY_TEMPLATE)
     public static void aPerfectRunMakesATemperedIngot(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -118,14 +118,14 @@ public class ForgingTests {
             helper.assertTrue(strike.needed() == ForgeActions.strikesFor(1), "a ★1 ingot takes " + ForgeActions.strikesFor(1) + " strikes");
             int xpBefore = CraftingSkills.xp(player, CraftSkill.FORGING);
             while (ForgeActions.session(player).isPresent()) {
-                now = strike.perfectTickAfter(now + 1);
-                ForgeActions.strike(player, level, strike, player.getMainHandItem(), now);
+                now += 3;
+                ForgeActions.strike(player, level, strike, player.getMainHandItem(), now, strike.greenMarker());
             }
             ItemStack struck = find(player, Forging.STRUCK_INGOT.get());
-            helper.assertTrue(!struck.isEmpty() && Forging.stars(struck) == 1, "perfect strikes should shape the ingot");
+            helper.assertTrue(!struck.isEmpty() && Forging.stars(struck) == 1, "strikes in the green on glowing-hot metal never crack");
             helper.assertTrue(find(player, Forging.HEATED_INGOT.get()).isEmpty(), "the heated ingot is used up");
             helper.assertTrue(player.getMainHandItem().is(Forging.STRUCK_INGOT.get()), "the struck ingot lands in hand, ready to quench");
-            helper.assertTrue(CraftingSkills.xp(player, CraftSkill.FORGING) == xpBefore + 3 * strike.needed(), "each perfect strike gives 3 XP");
+            helper.assertTrue(CraftingSkills.xp(player, CraftSkill.FORGING) == xpBefore + 3 * strike.needed(), "each good strike gives 3 XP");
 
             player.setItemInHand(InteractionHand.MAIN_HAND, struck.copy());
             struck.setCount(0);
@@ -143,8 +143,8 @@ public class ForgingTests {
             ForgeActions.Session grind = ForgeActions.begin(player, level, grindstone, level.getBlockState(grindstone), player.getMainHandItem(),
                     TimingBar.Kind.GRIND, now).orElseThrow();
             while (ForgeActions.session(player).isPresent()) {
-                now = grind.perfectTickAfter(now + 1);
-                ForgeActions.strike(player, level, grind, player.getMainHandItem(), now);
+                now += 3;
+                ForgeActions.strike(player, level, grind, player.getMainHandItem(), now, grind.greenMarker());
             }
             ItemStack tempered = find(player, Forging.TEMPERED_IRON_INGOT.get());
             helper.assertTrue(!tempered.isEmpty() && Forging.stars(tempered) == 1, "grinding finishes a ★1 Tempered Iron Ingot");
@@ -170,6 +170,7 @@ public class ForgingTests {
             CraftingSkills.setLevel(player, CraftSkill.FORGING, ForgingPerks.levelFor(2));
             Optional<ForgeActions.Session> session = tryStrike(player, level, anvil, 2);
             helper.assertTrue(session.isPresent(), "a level " + ForgingPerks.levelFor(2) + " smith can forge ★2 at a level 1 forge");
+            ForgeActions.end(player);
             ItemStack cold = new ItemStack(Forging.HEATED_INGOT.get());
             cold.set(Forging.HEATED_AT.get(), level.getGameTime() - 10_000);
             player.setItemInHand(InteractionHand.MAIN_HAND, cold);
@@ -202,16 +203,96 @@ public class ForgingTests {
             for (int attempt = 0; attempt < 30 && !cracked; attempt++) {
                 ForgeActions.Session session = tryStrike(player, level, anvil, 1).orElseThrow();
                 while (ForgeActions.session(player).isPresent()) {
-                    now = session.worstTickAfter(now + 1);
-                    ForgeActions.strike(player, level, session, player.getMainHandItem(), now);
+                    now += 3;
+                    ForgeActions.strike(player, level, session, player.getMainHandItem(), now, session.missMarker());
                 }
                 cracked = find(player, Forging.STRUCK_INGOT.get()).isEmpty() && find(player, Items.IRON_NUGGET).getCount() == ForgingPerks.scrapNuggets(1);
                 player.getInventory().clearContent();
             }
             helper.assertTrue(cracked, "badly-timed strikes should crack an ingot sooner or later");
-            helper.assertTrue(ForgeActions.crackChance(TimingBar.Kind.STRIKE, 0.5f) > ForgeActions.crackChance(TimingBar.Kind.STRIKE, 0.1f),
-                    "the further off a strike, the likelier a crack");
+            helper.assertTrue(ForgeActions.missChance(TimingBar.Kind.STRIKE, 1) == ForgeActions.STRIKE_MISS_CRACK,
+                    "the first miss has a " + ForgeActions.STRIKE_MISS_CRACK + " crack chance");
+            helper.assertTrue(ForgeActions.missChance(TimingBar.Kind.STRIKE, 3) > ForgeActions.missChance(TimingBar.Kind.STRIKE, 2),
+                    "each miss in a bar makes the next likelier to crack");
+            helper.assertTrue(ForgeActions.coldPenalty(TimingBar.Kind.STRIKE, 0.9f) == 0.0f && ForgeActions.coldPenalty(TimingBar.Kind.STRIKE, 0.5f) > 0.0f
+                    && ForgeActions.coldPenalty(TimingBar.Kind.STRIKE, 0.1f) > ForgeActions.coldPenalty(TimingBar.Kind.STRIKE, 0.5f),
+                    "the cooler the metal, the riskier every strike");
+            helper.assertTrue(ForgeActions.coldPenalty(TimingBar.Kind.GRIND, 0.1f) == 0.0f, "grinding works cold metal, so it has no cold penalty");
             helper.assertTrue(ForgingPerks.scrapNuggets(1) == 5 && ForgingPerks.scrapNuggets(30) == 8, "cracks return 5 nuggets, up to 8 with skill");
+        } finally {
+            clear(level, hearth);
+        }
+        helper.succeed();
+    }
+
+    /** A strike in the gold zone counts twice, so a 3-strike bar is done in 2. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void goldStrikesCountTwice(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos hearth = forgeOrigin(helper);
+        ServerPlayer player = smith(helper);
+        try {
+            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
+            buildBasicForge(level, hearth);
+            ForgeActions.Session session = tryStrike(player, level, hearth.offset(2, 0, 0), 1).orElseThrow();
+            long now = level.getGameTime();
+            ForgeActions.strike(player, level, session, player.getMainHandItem(), now + 3, session.goldMarker());
+            helper.assertTrue(session.done() == 2, "a gold strike counts as two");
+            ForgeActions.strike(player, level, session, player.getMainHandItem(), now + 6, session.goldMarker());
+            helper.assertTrue(ForgeActions.session(player).isEmpty() && !find(player, Forging.STRUCK_INGOT.get()).isEmpty(),
+                    "two gold strikes finish a 3-strike bar");
+            helper.assertTrue(TimingBar.judge(session.goldMarker(), session.low(), session.high()) == TimingBar.Hit.GOLD
+                    && TimingBar.judge(session.greenMarker(), session.low(), session.high()) == TimingBar.Hit.GREEN
+                    && TimingBar.judge(session.missMarker(), session.low(), session.high()) == TimingBar.Hit.MISS, "the zones judge strikes");
+        } finally {
+            clear(level, hearth);
+        }
+        helper.succeed();
+    }
+
+    /** Water quenching cracks about 30% of the time, whatever the smith's skill; only oil is safe. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void waterQuenchingIsRisky(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos hearth = forgeOrigin(helper);
+        ServerPlayer player = smith(helper);
+        try {
+            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
+            buildBasicForge(level, hearth);
+            CraftingSkills.setLevel(player, CraftSkill.FORGING, CraftingSkills.MAX_LEVEL);
+            BlockPos cauldron = hearth.offset(0, 0, -2);
+            int cracks = 0;
+            for (int i = 0; i < 200; i++) {
+                player.getInventory().clearContent();
+                ItemStack struck = new ItemStack(Forging.STRUCK_INGOT.get());
+                player.setItemInHand(InteractionHand.MAIN_HAND, struck);
+                ForgeActions.quench(player, level, cauldron, level.getBlockState(cauldron), struck);
+                if (find(player, Forging.QUENCHED_INGOT.get()).isEmpty()) {
+                    cracks++;
+                }
+            }
+            helper.assertTrue(cracks > 35 && cracks < 85, "about 30% of 200 water quenches should crack, even at max level; got " + cracks);
+        } finally {
+            clear(level, hearth);
+        }
+        helper.succeed();
+    }
+
+    /** The client's marker position is trusted only if it's where the marker could have been lately. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void reportedMarkersAreChecked(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos hearth = forgeOrigin(helper);
+        ServerPlayer player = smith(helper);
+        try {
+            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
+            buildBasicForge(level, hearth);
+            ForgeActions.Session session = tryStrike(player, level, hearth.offset(2, 0, 0), 1).orElseThrow();
+            long now = level.getGameTime() + 7;
+            float there = TimingBar.marker(now - 1 - session.start(), session.period());
+            helper.assertTrue(ForgeActions.checkedMarker(session, now, there) == there, "a plausible position is taken as reported");
+            float far = there > 0.5f ? 0.0f : 1.0f;
+            helper.assertTrue(Math.abs(ForgeActions.checkedMarker(session, now, far) - far) > 0.1f, "an impossible position is replaced");
         } finally {
             clear(level, hearth);
         }

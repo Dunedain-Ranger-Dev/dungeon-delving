@@ -21,7 +21,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class DwarvenAnvilBlock extends HorizontalDirectionalBlock {
     public static final MapCodec<DwarvenAnvilBlock> CODEC = simpleCodec(DwarvenAnvilBlock::new);
     /** Extra sweet-spot width, as a share of the bar. */
-    public static final float SWEET_SPOT_BONUS = 0.08f;
+    public static final float SWEET_SPOT_BONUS = 0.04f;
     private static final VoxelShape BASE = Block.box(2.0, 0.0, 2.0, 14.0, 4.0, 14.0);
     private static final VoxelShape X_SHAPE = Shapes.or(BASE, Block.box(3.0, 4.0, 4.0, 13.0, 5.0, 12.0), Block.box(4.0, 5.0, 6.0, 12.0, 10.0, 10.0),
             Block.box(0.0, 10.0, 3.0, 16.0, 16.0, 13.0));

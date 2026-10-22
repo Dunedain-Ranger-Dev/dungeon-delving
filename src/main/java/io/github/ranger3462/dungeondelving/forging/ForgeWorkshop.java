@@ -23,9 +23,9 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
         boolean waterCauldron, boolean quenchTub, boolean grindstone, boolean grindingWheel, int decor) {
     public static final int RADIUS = 7;
     public static final int HEIGHT = 4;
-    /** Decoration blocks for each +1% of sweet-spot width, and the most that can add. */
+    /** Decoration blocks for each +0.5% of sweet-spot width, and the most that can add. */
     public static final int DECOR_PER_BONUS = 8;
-    public static final float MAX_DECOR_BONUS = 0.05f;
+    public static final float MAX_DECOR_BONUS = 0.025f;
 
     /** Looks over everything in range of a hearth. */
     public static ForgeWorkshop scan(Level level, BlockPos hearth) {
@@ -131,8 +131,8 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
         };
     }
 
-    /** Extra sweet-spot width from decoration: +1% per {@link #DECOR_PER_BONUS} blocks, up to {@link #MAX_DECOR_BONUS}. */
+    /** Extra sweet-spot width from decoration: +0.5% per {@link #DECOR_PER_BONUS} blocks, up to {@link #MAX_DECOR_BONUS}. */
     public float decorBonus() {
-        return Math.min(MAX_DECOR_BONUS, 0.01f * (decor / DECOR_PER_BONUS));
+        return Math.min(MAX_DECOR_BONUS, 0.005f * (decor / DECOR_PER_BONUS));
     }
 }

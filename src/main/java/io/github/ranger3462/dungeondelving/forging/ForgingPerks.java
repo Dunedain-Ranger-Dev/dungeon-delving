@@ -23,9 +23,9 @@ public final class ForgingPerks {
         return LEVEL_FOR_STARS[Math.clamp(stars, 1, Forging.MAX_STARS) - 1];
     }
 
-    /** Extra sweet-spot width, as a share of the bar: +0.5% a level. */
+    /** Extra sweet-spot width, as a share of the bar: +0.25% a level. */
     public static float sweetSpotBonus(int level) {
-        return 0.005f * (level - 1);
+        return 0.0025f * (level - 1);
     }
 
     /** How long hot metal stays workable for a smith of this level, in ticks. */
@@ -39,7 +39,7 @@ public final class ForgingPerks {
         return level >= 25 ? 8 : level >= 20 ? 7 : level >= 10 ? 6 : 5;
     }
 
-    /** Scales the chance that an off strike (or a water quench) cracks the piece. */
+    /** Scales the chance that a strike cracks the piece (not a water quench: only oil helps there). */
     public static float crackMultiplier(int level) {
         return level >= 30 ? 0.5f : level >= 15 ? 0.75f : 1.0f;
     }
