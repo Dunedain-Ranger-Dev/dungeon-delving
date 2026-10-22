@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import com.mojang.logging.LogUtils;
 
 import io.github.ranger3462.dungeondelving.dungeon.CuriosLoot;
+import io.github.ranger3462.dungeondelving.integration.apotheosis.ApotheosisDungeons;
 import io.github.ranger3462.dungeondelving.integration.apotheosis.ApotheosisForging;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -31,6 +32,7 @@ public class DungeonDelving {
         }
         if (ModList.get().isLoaded("apotheosis")) {
             ApotheosisForging.register();
+            ApotheosisDungeons.register();
         }
     }
 

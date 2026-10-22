@@ -29,6 +29,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
@@ -89,6 +90,7 @@ public final class DevCommands {
                                                 .executes(context -> enter(context, IntegerArgumentType.getInteger(context, "rooms"),
                                                         IntegerArgumentType.getInteger(context, "tier"))))))
                         .then(Commands.literal("keys").executes(DevCommands::keys))
+                        .then(Commands.literal("invader").executes(DevCommands::invader))
                         .then(Commands.literal("leave").executes(DevCommands::leave))
                         .then(Commands.literal("fail").executes(DevCommands::failRun))
                         .then(Commands.literal("regions").executes(DevCommands::regions))));
@@ -148,6 +150,27 @@ public final class DevCommands {
         tell(context.getSource(), "Gave " + Math.max(1, missing) + " Dungeon Key(s). The boss door has " + progress.get().keysUsed() + " of "
                 + progress.get().keysNeeded() + ".");
         return 1;
+    }
+
+    /** Calls an Apotheosis invader in next to the player, the way dungeon spawners sometimes do. For testing. */
+    private static int invader(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        if (!ModList.get().isLoaded("apotheosis")) {
+            fail(context.getSource(), "Apotheosis isn't installed.");
+            return 0;
+        }
+        if (player.level().dimension() != DungeonDimension.DUNGEON) {
+            fail(context.getSource(), "Invaders only come in dungeons. Enter one first.");
+            return 0;
+        }
+        boolean spawned = io.github.ranger3462.dungeondelving.integration.apotheosis.ApotheosisDungeons.spawnInvader(player.serverLevel(),
+                player.blockPosition().relative(player.getDirection(), 4), player);
+        if (spawned) {
+            tell(context.getSource(), "An invader arrives.");
+        } else {
+            fail(context.getSource(), "No invader could come for this dungeon's tier.");
+        }
+        return spawned ? 1 : 0;
     }
 
     /** Same as using the exit block: ends the run and keeps the loot. */
