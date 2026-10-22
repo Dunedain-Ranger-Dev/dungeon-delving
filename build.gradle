@@ -161,6 +161,11 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+// Our other mods in development, by folder next to this repository: the dependency each one's build provides.
+def siblingMods = [
+        'deep-mines': 'io.github.ranger3462.deepmines:deep-mines', // Deep Mines (and its Custom Portal API Reforged)
+]
+
 dependencies {
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
@@ -199,6 +204,12 @@ dependencies {
     // Versions are pinned to Modrinth version IDs for NeoForge 1.21.1. They're left out of runData, because
     // Apotheosis's own data generators need its optional Gateways mod.
     if (!gradle.startParameter.taskNames.any { it.toLowerCase().contains('rundata') }) {
+        // Our other mods in development (see settings.gradle), built from their own repositories next to this one.
+        siblingMods.each { name, coordinates ->
+            if (file("../${name}").isDirectory()) {
+                localRuntime coordinates
+            }
+        }
         // Apotheosis and its libraries
         localRuntime "maven.modrinth:apotheosis:veL1ccTb"            // 1.21.1-8.9.0
         localRuntime "maven.modrinth:placebo:B5zbSVlT"               // 1.21.1-9.9.4
