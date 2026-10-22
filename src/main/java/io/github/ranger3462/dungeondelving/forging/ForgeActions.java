@@ -193,7 +193,7 @@ public final class ForgeActions {
         if (held.is(Forging.HEATED_INGOT.get()) && isAnvil(state)) {
             return Action.STRIKE;
         } else if (held.is(Forging.STRUCK_INGOT.get()) && (state.is(Blocks.WATER_CAULDRON) || state.is(Blocks.CAULDRON)
-                || state.is(Forging.QUENCH_TUB.get()))) {
+                || state.is(Forging.OIL_CAULDRON.get()))) {
             return Action.QUENCH;
         } else if (isGrindable(held) && (state.is(Blocks.GRINDSTONE) || state.is(Forging.GRINDING_WHEEL.get()))) {
             return Action.GRIND;
@@ -449,11 +449,8 @@ public final class ForgeActions {
             return;
         }
         float chance;
-        if (state.is(Forging.QUENCH_TUB.get())) {
-            if (!QuenchTubBlock.useOil(level, pos, state)) {
-                tell(player, Component.translatable("message.dungeondelving.forge.tub_dry").withStyle(ChatFormatting.RED));
-                return;
-            }
+        if (state.is(Forging.OIL_CAULDRON.get())) {
+            OilCauldronBlock.useOil(level, pos, state);
             chance = 0.0f;
         } else if (state.is(Blocks.WATER_CAULDRON)) {
             LayeredCauldronBlock.lowerFillLevel(state, level, pos); // Each quench boils off a level of water.

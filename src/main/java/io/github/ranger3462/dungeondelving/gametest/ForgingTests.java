@@ -12,6 +12,7 @@ import io.github.ranger3462.dungeondelving.forging.ForgeWorkshop;
 import io.github.ranger3462.dungeondelving.forging.Forging;
 import io.github.ranger3462.dungeondelving.forging.ForgingPerks;
 import io.github.ranger3462.dungeondelving.forging.HotMetalItem;
+import io.github.ranger3462.dungeondelving.forging.OilCauldronBlock;
 import io.github.ranger3462.dungeondelving.forging.TimingBar;
 import io.github.ranger3462.dungeondelving.skill.CraftSkill;
 import io.github.ranger3462.dungeondelving.skill.CraftingSkills;
@@ -83,7 +84,7 @@ public class ForgingTests {
             set(level, hearth.offset(-3, 0, 2), Forging.DWARVEN_ANVIL.get().defaultBlockState());
             helper.assertTrue(ForgeWorkshop.scan(level, hearth).forgeLevel() == 2, "a blast furnace and Dwarven Anvil make a level 2 forge");
             set(level, hearth.offset(4, 0, 0), Forging.BELLOWS.get().defaultBlockState());
-            set(level, hearth.offset(0, 0, 4), Forging.QUENCH_TUB.get().defaultBlockState());
+            set(level, hearth.offset(0, 0, 4), Forging.OIL_CAULDRON.get().defaultBlockState());
             set(level, hearth.offset(0, 0, -4), Forging.GRINDING_WHEEL.get().defaultBlockState());
             ForgeWorkshop full = ForgeWorkshop.scan(level, hearth);
             helper.assertTrue(full.forgeLevel() == 3 && full.maxStars() == Forging.MAX_STARS, "every upgrade makes a level 3 forge (up to ★7)");
@@ -132,12 +133,11 @@ public class ForgingTests {
             player.setItemInHand(InteractionHand.MAIN_HAND, struck.copy());
             struck.setCount(0);
             BlockPos tub = hearth.offset(0, 0, 4);
-            set(level, tub, Forging.QUENCH_TUB.get().defaultBlockState().setValue(io.github.ranger3462.dungeondelving.forging.QuenchTubBlock.LEVEL, 4));
+            set(level, tub, Forging.OIL_CAULDRON.get().defaultBlockState().setValue(OilCauldronBlock.LEVEL, 2));
             ForgeActions.quench(player, level, tub, level.getBlockState(tub), player.getMainHandItem());
             ItemStack quenched = find(player, Forging.QUENCHED_INGOT.get());
-            helper.assertTrue(!quenched.isEmpty(), "quenching in the oil tub never cracks");
-            helper.assertTrue(level.getBlockState(tub).getValue(io.github.ranger3462.dungeondelving.forging.QuenchTubBlock.LEVEL) == 3,
-                    "each quench uses a level of oil");
+            helper.assertTrue(!quenched.isEmpty(), "quenching in oil never cracks");
+            helper.assertTrue(level.getBlockState(tub).getValue(OilCauldronBlock.LEVEL) == 1, "each quench uses a level of oil");
 
             player.setItemInHand(InteractionHand.MAIN_HAND, quenched.copy());
             quenched.setCount(0);

@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * @param decor how many decoration blocks ({@link Forging#FORGE_DECOR}) are in range
  */
 public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurnace, boolean bellows, boolean anvil, boolean dwarvenAnvil,
-        boolean waterCauldron, boolean quenchTub, boolean grindstone, boolean grindingWheel, int decor) {
+        boolean waterCauldron, boolean oilCauldron, boolean grindstone, boolean grindingWheel, int decor) {
     public static final int RADIUS = 7;
     public static final int HEIGHT = 4;
     /** Decoration blocks for each +0.5% of sweet-spot width, and the most that can add. */
@@ -30,7 +30,7 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
     /** Looks over everything in range of a hearth. */
     public static ForgeWorkshop scan(Level level, BlockPos hearth) {
         boolean furnace = false, blastFurnace = false, bellows = false, anvil = false, dwarvenAnvil = false, waterCauldron = false,
-                quenchTub = false, grindstone = false, grindingWheel = false;
+                oilCauldron = false, grindstone = false, grindingWheel = false;
         int decor = 0;
         for (BlockPos pos : BlockPos.betweenClosed(hearth.offset(-RADIUS, -HEIGHT, -RADIUS), hearth.offset(RADIUS, HEIGHT, RADIUS))) {
             BlockState state = level.getBlockState(pos);
@@ -48,8 +48,8 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
                 dwarvenAnvil = true;
             } else if (state.is(Blocks.WATER_CAULDRON) || state.is(Blocks.CAULDRON)) {
                 waterCauldron = true; // An empty cauldron still counts: it just needs refilling before the next quench.
-            } else if (state.is(Forging.QUENCH_TUB.get())) {
-                quenchTub = true;
+            } else if (state.is(Forging.OIL_CAULDRON.get())) {
+                oilCauldron = true;
             } else if (state.is(Blocks.GRINDSTONE)) {
                 grindstone = true;
             } else if (state.is(Forging.GRINDING_WHEEL.get())) {
@@ -59,7 +59,7 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
                 decor++;
             }
         }
-        return new ForgeWorkshop(hearth.immutable(), furnace, blastFurnace, bellows, anvil, dwarvenAnvil, waterCauldron, quenchTub, grindstone,
+        return new ForgeWorkshop(hearth.immutable(), furnace, blastFurnace, bellows, anvil, dwarvenAnvil, waterCauldron, oilCauldron, grindstone,
                 grindingWheel, decor);
     }
 
@@ -101,7 +101,7 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
         if (!anvil && !dwarvenAnvil) {
             missing.add(Component.translatable("forge.dungeondelving.station.anvil"));
         }
-        if (!waterCauldron && !quenchTub) {
+        if (!waterCauldron && !oilCauldron) {
             missing.add(Component.translatable("forge.dungeondelving.station.quench"));
         }
         if (!grindstone && !grindingWheel) {
@@ -116,7 +116,7 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
             return 0;
         }
         if (blastFurnace && dwarvenAnvil) {
-            return bellows && quenchTub && grindingWheel ? 3 : 2;
+            return bellows && oilCauldron && grindingWheel ? 3 : 2;
         }
         return 1;
     }

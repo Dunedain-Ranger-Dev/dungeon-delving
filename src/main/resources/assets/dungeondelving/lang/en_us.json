@@ -100,7 +100,6 @@
   "block.dungeondelving.bellows": "Bellows",
   "block.dungeondelving.dwarven_anvil": "Dwarven Anvil",
   "block.dungeondelving.grinding_wheel": "Grinding Wheel",
-  "block.dungeondelving.quench_tub": "Quench Tub",
   "item.dungeondelving.heated_ingot": "Heated Ingot",
   "item.dungeondelving.struck_ingot": "Struck Ingot",
   "item.dungeondelving.quenched_ingot": "Quenched Ingot",
@@ -117,12 +116,11 @@
   "tooltip.dungeondelving.heat.cold": "Cold: heat it again in a furnace",
   "forge.dungeondelving.station.furnace": "a furnace or blast furnace",
   "forge.dungeondelving.station.anvil": "an anvil",
-  "forge.dungeondelving.station.quench": "a water cauldron or Quench Tub",
+  "forge.dungeondelving.station.quench": "a cauldron (of water or oil)",
   "forge.dungeondelving.station.grindstone": "a grindstone",
   "forge.dungeondelving.upgrade.blast_furnace": "Blast Furnace",
   "forge.dungeondelving.upgrade.dwarven_anvil": "Dwarven Anvil",
   "forge.dungeondelving.upgrade.bellows": "Bellows (next to a furnace)",
-  "forge.dungeondelving.upgrade.quench_tub": "Quench Tub",
   "forge.dungeondelving.upgrade.grinding_wheel": "Grinding Wheel",
   "forge.dungeondelving.report.complete": "Forge level %s: can forge up to %s",
   "forge.dungeondelving.report.missing": "This forge still needs: %s",
@@ -132,7 +130,6 @@
   "message.dungeondelving.forge.skill_too_low": "You need Forging level %s to forge %s.",
   "message.dungeondelving.forge.cold": "It's gone cold. Heat it again in a furnace.",
   "message.dungeondelving.forge.too_cold_to_quench": "Too cold to quench. Heat it again in a furnace.",
-  "message.dungeondelving.forge.tub_dry": "The tub is dry. Pour in some Quenching Oil.",
   "message.dungeondelving.forge.off": "Off the mark! Next miss: %s%% to crack",
   "message.dungeondelving.forge.cracked": "It cracked! You salvage %s iron nuggets.",
   "message.dungeondelving.forge.struck": "Shaped! Quench it while it's hot.",
@@ -149,5 +146,7 @@
   "message.dungeondelving.forge.grind_miss_unstable": "A rough pass... it's going to break!",
   "message.dungeondelving.forge.unstable": "It came out unstable. Grind it once more, cleanly.",
   "message.dungeondelving.forge.basic_station": "The old station gave out under it.",
-  "message.dungeondelving.forge.cauldron_empty": "The cauldron is empty. Fill it with water first."
+  "message.dungeondelving.forge.cauldron_empty": "The cauldron is empty. Fill it with water first.",
+  "block.dungeondelving.oil_cauldron": "Oil Cauldron",
+  "forge.dungeondelving.upgrade.oil_cauldron": "Oil Cauldron"
 }

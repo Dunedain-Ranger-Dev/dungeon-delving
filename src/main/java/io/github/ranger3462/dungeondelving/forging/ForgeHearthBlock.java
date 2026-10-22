@@ -97,7 +97,7 @@ public class ForgeHearthBlock extends HorizontalDirectionalBlock {
         lines.add(station("blast_furnace", workshop.blastFurnace()));
         lines.add(station("dwarven_anvil", workshop.dwarvenAnvil()));
         lines.add(station("bellows", workshop.bellows()));
-        lines.add(station("quench_tub", workshop.quenchTub()));
+        lines.add(station("oil_cauldron", workshop.oilCauldron()));
         lines.add(station("grinding_wheel", workshop.grindingWheel()));
         lines.add(Component.translatable("forge.dungeondelving.report.decor", workshop.decor(), Math.round(workshop.decorBonus() * 100))
                 .withStyle(ChatFormatting.GRAY));

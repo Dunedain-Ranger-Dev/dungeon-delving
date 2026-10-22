@@ -166,29 +166,36 @@ def blocks():
         f"facing={facing}": {"model": f"{MOD}:block/grinding_wheel", "y": y} for facing, y in HORIZONTAL.items()}})
     item_model("grinding_wheel", f"{MOD}:block/grinding_wheel")
 
-    # Quench Tub: a wooden tub, empty or full of oil.
-    for full in (False, True):
-        elements = [
-            box([1, 0, 1], [15, 1, 15], "wood"),
-            box([1, 1, 1], [15, 10, 2], "wood"),
-            box([1, 1, 14], [15, 10, 15], "wood"),
-            box([1, 1, 2], [2, 10, 14], "wood"),
-            box([14, 1, 2], [15, 10, 14], "wood"),
-        ]
-        if full:
-            elements.append({"from": [2, 1, 2], "to": [14, 8, 14], "faces": {"up": {"texture": "#oil"}}})
-        write(ASSETS / f"models/block/quench_tub{'_full' if full else ''}.json", {
-            "parent": "minecraft:block/block",
-            "textures": {"wood": "minecraft:block/stripped_spruce_log", "oil": "minecraft:block/honey_block_top",
-                         "particle": "minecraft:block/stripped_spruce_log"},
-            "elements": elements,
+    # Oil Cauldron: a vanilla cauldron filled with oil, at three levels like water.
+    for level, template in ((1, "template_cauldron_level1"), (2, "template_cauldron_level2"), (3, "template_cauldron_full")):
+        write(ASSETS / f"models/block/oil_cauldron_level{level}.json", {
+            "parent": f"minecraft:block/{template}",
+            "textures": {"bottom": "minecraft:block/cauldron_bottom", "content": f"{MOD}:block/quenching_oil",
+                         "inside": "minecraft:block/cauldron_inner", "particle": "minecraft:block/cauldron_side",
+                         "side": "minecraft:block/cauldron_side", "top": "minecraft:block/cauldron_top"},
         })
-    write(ASSETS / "blockstates/quench_tub.json", {"variants": {
-        f"level={level}": {"model": f"{MOD}:block/quench_tub{'_full' if level > 0 else ''}"} for level in range(9)}})
-    item_model("quench_tub", f"{MOD}:block/quench_tub")
+    write(ASSETS / "blockstates/oil_cauldron.json", {"variants": {
+        f"level={level}": {"model": f"{MOD}:block/oil_cauldron_level{level}"} for level in (1, 2, 3)}})
+    png(ASSETS / "textures/block/quenching_oil.png", oil_surface())
+    # Breaking an oil cauldron gives back the cauldron, like a water cauldron.
+    write(DATA / "loot_table/blocks/oil_cauldron.json", {
+        "type": "minecraft:block",
+        "pools": [{"rolls": 1, "entries": [{"type": "minecraft:item", "name": "minecraft:cauldron"}],
+                   "conditions": [{"condition": "minecraft:survives_explosion"}]}],
+    })
 
-    for name in ("forge_hearth", "bellows", "dwarven_anvil", "grinding_wheel", "quench_tub"):
+    for name in ("forge_hearth", "bellows", "dwarven_anvil", "grinding_wheel"):
         block_loot(name)
+
+
+def oil_surface():
+    """Dark amber oil with a few lighter swirls. Original placeholder art."""
+    image = {}
+    for y in range(16):
+        for x in range(16):
+            swirl = (x * 3 + y * 5) % 11 == 0 or (x * 7 + y * 2) % 13 == 0
+            image[(x, y)] = shade((120, 78, 22), 30 if swirl else ((x + y) % 3) * 4)
+    return image
 
 
 def box(start, end, texture):
@@ -228,7 +235,6 @@ def recipes():
            {"W": f"{MOD}:wardsilver_ingot", "A": "minecraft:anvil", "D": "minecraft:polished_deepslate"})
     shaped("grinding_wheel", ["SES", "EGE", "LEL"],
            {"S": "minecraft:smooth_stone", "E": f"{MOD}:emberstone_ingot", "G": "minecraft:grindstone", "L": "minecraft:stripped_dark_oak_log"})
-    shaped("quench_tub", ["P P", "PIP", "PPP"], {"P": "minecraft:stripped_spruce_log", "I": "minecraft:iron_ingot"})
     shapeless("quenching_oil", ["minecraft:glass_bottle", "#c:seeds", "#c:seeds", "#c:seeds", "#c:seeds"])
     heating("iron", "minecraft:iron_ingot", f"{MOD}:heated_ingot")
     heating("tempered", f"{MOD}:tempered_iron_ingot", f"{MOD}:heated_ingot")
@@ -262,7 +268,7 @@ def tags():
     write(pickaxe, tag)
     axe = RES / "data/minecraft/tags/block/mineable/axe.json"
     tag = json.loads(axe.read_text(encoding="utf-8")) if axe.exists() else {"replace": False, "values": []}
-    for name in ("bellows", "quench_tub"):
+    for name in ("bellows",):
         if f"{MOD}:{name}" not in tag["values"]:
             tag["values"].append(f"{MOD}:{name}")
     write(axe, tag)

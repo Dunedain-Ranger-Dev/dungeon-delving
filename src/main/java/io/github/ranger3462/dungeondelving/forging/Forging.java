@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -62,9 +63,9 @@ public final class Forging {
     public static final DeferredBlock<GrindingWheelBlock> GRINDING_WHEEL = ModRegistries.BLOCKS.registerBlock("grinding_wheel", GrindingWheelBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(2.0f, 6.0f).requiresCorrectToolForDrops().sound(SoundType.STONE).noOcclusion());
     public static final DeferredItem<BlockItem> GRINDING_WHEEL_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(GRINDING_WHEEL);
-    public static final DeferredBlock<QuenchTubBlock> QUENCH_TUB = ModRegistries.BLOCKS.registerBlock("quench_tub", QuenchTubBlock::new,
-            BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.0f).sound(SoundType.WOOD).noOcclusion());
-    public static final DeferredItem<BlockItem> QUENCH_TUB_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(QUENCH_TUB);
+    /** A cauldron of Quenching Oil. It has no item of its own: pour oil into a cauldron to make one. */
+    public static final DeferredBlock<OilCauldronBlock> OIL_CAULDRON = ModRegistries.BLOCKS.registerBlock("oil_cauldron", OilCauldronBlock::new,
+            BlockBehaviour.Properties.ofLegacyCopy(net.minecraft.world.level.block.Blocks.CAULDRON));
 
     // --- Items ---
 
@@ -83,7 +84,7 @@ public final class Forging {
     /** The finished metal: the ★ says how many times it's been through the forge. */
     public static final DeferredItem<StarredItem> TEMPERED_IRON_INGOT = ModRegistries.ITEMS.registerItem("tempered_iron_ingot", StarredItem::new,
             new Item.Properties());
-    /** Fills the Quench Tub. */
+    /** Poured into a cauldron, makes an Oil Cauldron. */
     public static final DeferredItem<Item> QUENCHING_OIL = ModRegistries.ITEMS.registerSimpleItem("quenching_oil", new Item.Properties().stacksTo(16));
 
     // --- Recipes ---
@@ -101,6 +102,7 @@ public final class Forging {
     public static void register(IEventBus modEventBus) {
         SERIALIZERS.register(modEventBus);
         modEventBus.addListener(Forging::onRegisterPayloads);
+        modEventBus.addListener((FMLCommonSetupEvent event) -> event.enqueueWork(OilCauldronBlock::registerInteractions));
     }
 
     private static void onRegisterPayloads(RegisterPayloadHandlersEvent event) {

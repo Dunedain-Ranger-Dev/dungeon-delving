@@ -18,7 +18,7 @@ setblock -16 -60 3 dungeondelving:bellows[facing=south]
 setblock -12 -60 3 minecraft:anvil[facing=east]
 setblock -12 -60 5 dungeondelving:dwarven_anvil[facing=east]
 setblock -18 -60 7 minecraft:water_cauldron[level=3]
-setblock -17 -60 7 dungeondelving:quench_tub[level=8]
+setblock -17 -60 7 dungeondelving:oil_cauldron[level=3]
 setblock -12 -60 7 minecraft:grindstone[face=floor,facing=north]
 setblock -11 -60 7 dungeondelving:grinding_wheel[facing=north]
 
