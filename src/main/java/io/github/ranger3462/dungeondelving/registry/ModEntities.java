@@ -1,5 +1,11 @@
 package io.github.ranger3462.dungeondelving.registry;
 
+import io.github.ranger3462.dungeondelving.entity.GoblinBosses;
+import io.github.ranger3462.dungeondelving.entity.Hobgoblin;
+import io.github.ranger3462.dungeondelving.entity.HobgoblinHunter;
+import io.github.ranger3462.dungeondelving.entity.HobgoblinSoldier;
+import io.github.ranger3462.dungeondelving.entity.HobgoblinSpellbreaker;
+import io.github.ranger3462.dungeondelving.entity.HobgoblinVanguard;
 import java.util.List;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
@@ -15,6 +21,7 @@ import io.github.ranger3462.dungeondelving.entity.WitherSkeletonArcher;
 import io.github.ranger3462.dungeondelving.entity.ZombieLord;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.monster.AbstractSkeleton;
@@ -54,6 +61,39 @@ public final class ModEntities {
     /** The bow goblin archers carry: low durability, and its arrows hit softer. */
     public static final DeferredItem<GoblinBowItem> GOBLIN_BOW = ModRegistries.ITEMS.registerItem("goblin_bow", GoblinBowItem::new,
             new Item.Properties().durability(96));
+
+    /** Hobgoblins (tiers 3-4 goblin dungeons): full-sized goblins. */
+    public static final DeferredHolder<EntityType<?>, EntityType<HobgoblinSoldier>> HOBGOBLIN_SOLDIER = hobgoblin("hobgoblin_soldier", HobgoblinSoldier::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<HobgoblinHunter>> HOBGOBLIN_HUNTER = hobgoblin("hobgoblin_hunter", HobgoblinHunter::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<HobgoblinVanguard>> HOBGOBLIN_VANGUARD = hobgoblin("hobgoblin_vanguard",
+            HobgoblinVanguard::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<HobgoblinSpellbreaker>> HOBGOBLIN_SPELLBREAKER = hobgoblin("hobgoblin_spellbreaker",
+            HobgoblinSpellbreaker::new);
+    /** The goblin bosses that don't need Iron's Spells (see GoblinBosses). */
+    public static final DeferredHolder<EntityType<?>, EntityType<GoblinBosses.Gladiator>> GOBLIN_GLADIATOR = ENTITIES.register("goblin_gladiator",
+            () -> EntityType.Builder.of(GoblinBosses.Gladiator::new, MobCategory.MONSTER).sized(0.5f, 1.45f).eyeHeight(1.25f).clientTrackingRange(10)
+                    .build(DungeonDelving.id("goblin_gladiator").toString()));
+    public static final DeferredHolder<EntityType<?>, EntityType<GoblinBosses.Veteran>> HOBGOBLIN_VETERAN = hobgoblin("hobgoblin_veteran",
+            GoblinBosses.Veteran::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<GoblinBosses.General>> HOBGOBLIN_GENERAL = hobgoblin("hobgoblin_general",
+            GoblinBosses.General::new);
+
+    public static final DeferredItem<DeferredSpawnEggItem> HOBGOBLIN_SOLDIER_SPAWN_EGG = egg("hobgoblin_soldier", HOBGOBLIN_SOLDIER, 0xB8562E);
+    public static final DeferredItem<DeferredSpawnEggItem> HOBGOBLIN_HUNTER_SPAWN_EGG = egg("hobgoblin_hunter", HOBGOBLIN_HUNTER, 0x6B4A2B);
+    public static final DeferredItem<DeferredSpawnEggItem> HOBGOBLIN_VANGUARD_SPAWN_EGG = egg("hobgoblin_vanguard", HOBGOBLIN_VANGUARD, 0x8A8F9A);
+    public static final DeferredItem<DeferredSpawnEggItem> HOBGOBLIN_SPELLBREAKER_SPAWN_EGG = egg("hobgoblin_spellbreaker", HOBGOBLIN_SPELLBREAKER, 0x4A2E6A);
+    public static final DeferredItem<DeferredSpawnEggItem> GOBLIN_GLADIATOR_SPAWN_EGG = egg("goblin_gladiator", GOBLIN_GLADIATOR, 0xC8A040);
+    public static final DeferredItem<DeferredSpawnEggItem> HOBGOBLIN_VETERAN_SPAWN_EGG = egg("hobgoblin_veteran", HOBGOBLIN_VETERAN, 0xC8A040);
+    public static final DeferredItem<DeferredSpawnEggItem> HOBGOBLIN_GENERAL_SPAWN_EGG = egg("hobgoblin_general", HOBGOBLIN_GENERAL, 0xC8A040);
+
+    private static <T extends Hobgoblin> DeferredHolder<EntityType<?>, EntityType<T>> hobgoblin(String name, EntityType.EntityFactory<T> factory) {
+        return ENTITIES.register(name, () -> EntityType.Builder.of(factory, MobCategory.MONSTER).sized(0.6f, 1.95f).eyeHeight(1.74f)
+                .clientTrackingRange(8).build(DungeonDelving.id(name).toString()));
+    }
+
+    private static DeferredItem<DeferredSpawnEggItem> egg(String name, DeferredHolder<EntityType<?>, ? extends EntityType<? extends Mob>> type, int spots) {
+        return ModRegistries.ITEMS.registerItem(name + "_spawn_egg", properties -> new DeferredSpawnEggItem(type, 0xB8562E, spots, properties));
+    }
 
     /** The skeleton swordsman: sword and shield, blocks when you get close. */
     public static final DeferredHolder<EntityType<?>, EntityType<SkeletonSwordsman>> SKELETON_SWORDSMAN = ENTITIES.register("skeleton_swordsman",
@@ -124,12 +164,21 @@ public final class ModEntities {
         event.put(BOGGED_SWORDSMAN.get(), BoggedSwordsman.createAttributes().build());
         event.put(WITHER_SKELETON_ARCHER.get(), AbstractSkeleton.createAttributes().build());
         event.put(ZOMBIE_LORD.get(), ZombieLord.createAttributes().build());
+        event.put(HOBGOBLIN_SOLDIER.get(), HobgoblinSoldier.createAttributes().build());
+        event.put(HOBGOBLIN_HUNTER.get(), HobgoblinHunter.createAttributes().build());
+        event.put(HOBGOBLIN_VANGUARD.get(), HobgoblinVanguard.createAttributes().build());
+        event.put(HOBGOBLIN_SPELLBREAKER.get(), HobgoblinSpellbreaker.createAttributes().build());
+        event.put(GOBLIN_GLADIATOR.get(), GoblinBosses.Gladiator.createAttributes().build());
+        event.put(HOBGOBLIN_VETERAN.get(), GoblinBosses.Veteran.createAttributes().build());
+        event.put(HOBGOBLIN_GENERAL.get(), GoblinBosses.General.createAttributes().build());
     }
 
     @SubscribeEvent
     public static void onSpawnPlacements(RegisterSpawnPlacementsEvent event) {
         for (EntityType<? extends Monster> goblin : List.of(GOBLIN.get(), GOBLIN_ARCHER.get(), SKELETON_SWORDSMAN.get(), SKELETON_KNIGHT.get(),
-                SKELETON_LORD.get(), STRAY_SWORDSMAN.get(), BOGGED_SWORDSMAN.get(), WITHER_SKELETON_ARCHER.get(), ZOMBIE_LORD.get())) {
+                SKELETON_LORD.get(), STRAY_SWORDSMAN.get(), BOGGED_SWORDSMAN.get(), WITHER_SKELETON_ARCHER.get(), ZOMBIE_LORD.get(),
+                HOBGOBLIN_SOLDIER.get(), HOBGOBLIN_HUNTER.get(), HOBGOBLIN_VANGUARD.get(), HOBGOBLIN_SPELLBREAKER.get(), GOBLIN_GLADIATOR.get(),
+                HOBGOBLIN_VETERAN.get(), HOBGOBLIN_GENERAL.get())) {
             event.register(goblin, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules,
                     RegisterSpawnPlacementsEvent.Operation.REPLACE);
         }

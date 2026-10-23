@@ -10,6 +10,17 @@
     {
       "id": "dungeondelving:goblin_chief",
       "required": false
+    },
+    "dungeondelving:hobgoblin_soldier",
+    "dungeondelving:hobgoblin_hunter",
+    "dungeondelving:hobgoblin_vanguard",
+    "dungeondelving:hobgoblin_spellbreaker",
+    "dungeondelving:goblin_gladiator",
+    "dungeondelving:hobgoblin_veteran",
+    "dungeondelving:hobgoblin_general",
+    {
+      "id": "dungeondelving:goblin_pyro",
+      "required": false
     }
   ]
 }

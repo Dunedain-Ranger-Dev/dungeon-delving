@@ -2,7 +2,9 @@ package io.github.ranger3462.dungeondelving.integration.irons;
 
 import java.util.List;
 
+import io.github.ranger3462.dungeondelving.entity.GoblinSwarm;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
+import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
 import io.redspace.ironsspellbooks.entity.mobs.goals.WizardAttackGoal;
 import net.minecraft.sounds.SoundEvent;
@@ -23,8 +25,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 /**
- * The goblin shaman: a fragile hedge-caster that keeps its distance, flinging Firebolts and Poison Arrows and healing
- * itself. Casts real Iron's Spells spells, so it only exists when Iron's Spells is installed.
+ * The goblin shaman (tiers 2-4): a fragile hedge-caster of poison and healing. It keeps its distance, flinging Poison
+ * Arrows and Poison Splash, heals itself, and mends hurt goblins nearby. Casts real Iron's Spells spells, so it only
+ * exists when Iron's Spells is installed. The goblin pyro and the Goblin Shaman Chief build on it.
  */
 public class GoblinShaman extends AbstractSpellCastingMob implements Enemy {
     public static final double MAX_HEALTH = 12.0;
@@ -46,15 +49,33 @@ public class GoblinShaman extends AbstractSpellCastingMob implements Enemy {
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
+        if (healsAllies()) {
+            goalSelector.addGoal(1, new SupportCastGoal(this, ally -> ally != this && GoblinSwarm.isGoblin(ally), 16.0, 6.0, 40, 80,
+                    List.of(SpellRegistry.BLESSING_OF_LIFE_SPELL.get()), List.of()).setSpellQuality(0.15f, 0.3f));
+        }
         goalSelector.addGoal(2, new WizardAttackGoal(this, 1.15, 40, 70)
-                .setSpells(List.of(SpellRegistry.FIREBOLT_SPELL.get(), SpellRegistry.POISON_ARROW_SPELL.get()), List.of(), List.of(),
-                        List.of(SpellRegistry.HEAL_SPELL.get()))
+                .setSpells(attackSpells(), List.of(), List.of(), selfHeals())
                 .setSpellQuality(0.1f, 0.3f));
         goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0));
         goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0f));
         goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
         targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+    }
+
+    /** The spells it attacks with. */
+    protected List<AbstractSpell> attackSpells() {
+        return List.of(SpellRegistry.POISON_ARROW_SPELL.get(), SpellRegistry.POISON_SPLASH_SPELL.get());
+    }
+
+    /** The spells it heals itself with. */
+    protected List<AbstractSpell> selfHeals() {
+        return List.of(SpellRegistry.HEAL_SPELL.get());
+    }
+
+    /** Whether it mends hurt goblins around it. */
+    protected boolean healsAllies() {
+        return true;
     }
 
     @Override

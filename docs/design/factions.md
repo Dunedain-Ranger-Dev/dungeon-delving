@@ -16,7 +16,7 @@ Replaces the old skeleton faction. The MVP's only faction.
 | 3 | Bogged, Bogged Swordsman, Drowned | Barrow King |
 | 4 | Wither Skeleton, Wither Skeleton Archer, Wither Skeleton Mage (thematic spells) | Lich Lord (looks like a husk, moves at skeleton speed, casts spells) |
 
-## Goblins (Phase 2)
+## Goblins (Phase 2, first version built: DD-73)
 
 - **All tiers:** Goblin Warriors and Goblin Archers. Weak, no armor; their danger is numbers, with larger packs at
   higher tiers.

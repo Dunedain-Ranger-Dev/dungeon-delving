@@ -1,8 +1,6 @@
 {
   "replace": false,
   "values": [
-    "dungeondelving:goblin",
-    "dungeondelving:goblin_archer",
     "dungeondelving:skeleton_swordsman",
     "dungeondelving:skeleton_knight",
     "minecraft:skeleton",

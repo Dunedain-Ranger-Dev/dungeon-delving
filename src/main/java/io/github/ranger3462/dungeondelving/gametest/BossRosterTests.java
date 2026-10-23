@@ -69,11 +69,11 @@ public class BossRosterTests {
             String faction = DungeonFactions.pick(1, random, List.of(DungeonFactions.UNDEAD, DungeonFactions.GOBLINS));
             tierOne.add(faction);
             String boss = DungeonBosses.pick(1, faction, random);
-            helper.assertTrue(faction.equals(DungeonFactions.GOBLINS) ? boss.equals(CHIEF) : boss.equals(DungeonBosses.ZOMBIE_LORD),
+            helper.assertTrue(faction.equals(DungeonFactions.GOBLINS) ? boss.equals(DungeonBosses.GOBLIN_GLADIATOR) : boss.equals(DungeonBosses.ZOMBIE_LORD),
                     "a tier 1 " + faction + " dungeon got the wrong boss: " + boss);
         }
-        helper.assertTrue(tierOne.equals(irons() ? Set.of(DungeonFactions.GOBLINS, DungeonFactions.UNDEAD) : Set.of(DungeonFactions.UNDEAD)),
-                "with goblins turned on, tier 1 should roll goblins (with Iron's Spells, for the chief) and undead, got " + tierOne);
+        helper.assertTrue(tierOne.equals(Set.of(DungeonFactions.GOBLINS, DungeonFactions.UNDEAD)),
+                "with goblins turned on, tier 1 should roll goblins (the Gladiator's) and undead, got " + tierOne);
         helper.assertTrue(DungeonFactions.current("skeletons").equals(DungeonFactions.UNDEAD), "saved skeleton runs load as undead");
         helper.succeed();
     }
@@ -108,7 +108,7 @@ public class BossRosterTests {
             helper.succeed();
             return;
         }
-        LivingEntity chief = DungeonBosses.spawn(helper.getLevel(), helper.absolutePos(new BlockPos(0, 1, 0)).above(100), 1, -1, CHIEF);
+        LivingEntity chief = DungeonBosses.spawn(helper.getLevel(), helper.absolutePos(new BlockPos(0, 1, 0)).above(100), 2, -1, CHIEF);
         Item staff = BuiltInRegistries.ITEM.get(DungeonDelving.id("goblin_chief_staff"));
         try {
             helper.assertTrue(DungeonBosses.isBoss(chief), "the chief should be a boss");
@@ -117,12 +117,12 @@ public class BossRosterTests {
         } finally {
             chief.discard();
         }
-        LootTable table = helper.getLevel().getServer().reloadableRegistries().getLootTable(DungeonBosses.lootTable(CHIEF, 1));
+        LootTable table = helper.getLevel().getServer().reloadableRegistries().getLootTable(DungeonBosses.lootTable(CHIEF, 2));
         LootParams params = new LootParams.Builder(helper.getLevel()).withParameter(LootContextParams.ORIGIN, Vec3.ZERO).create(LootContextParamSets.CHEST);
         boolean dropped = false;
         for (int i = 0; i < 60; i++) {
             List<ItemStack> drops = table.getRandomItems(params);
-            helper.assertTrue(drops.stream().anyMatch(stack -> stack.is(RunicWorkshop.shard(1))), "the chief should always drop Runic Shard I");
+            helper.assertTrue(drops.stream().anyMatch(stack -> stack.is(RunicWorkshop.shard(2))), "the chief (tier 2) should always drop Runic Shard II");
             dropped |= drops.stream().anyMatch(stack -> stack.is(staff));
         }
         helper.assertTrue(dropped, "the chief should sometimes drop his staff");

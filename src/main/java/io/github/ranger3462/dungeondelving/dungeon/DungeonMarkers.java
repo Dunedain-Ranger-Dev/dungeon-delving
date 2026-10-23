@@ -55,6 +55,8 @@ import net.minecraft.world.level.storage.loot.LootTable;
 public final class DungeonMarkers {
     public static final TagKey<EntityType<?>> DUNGEON_MOBS = TagKey.create(Registries.ENTITY_TYPE, DungeonDelving.id("dungeon_mobs"));
     public static final TagKey<Block> DUNGEON_RESOURCES = TagKey.create(Registries.BLOCK, DungeonDelving.id("dungeon_resources"));
+    /** Mobs that come in packs: their spawners spawn one more at a time per tier above 1, and allow two more nearby. */
+    public static final TagKey<EntityType<?>> PACK_MOBS = TagKey.create(Registries.ENTITY_TYPE, DungeonDelving.id("pack_mobs"));
 
     /**
      * The dungeon's tier and region, and the chances used when rolling its markers. The region is -1 when a piece is
@@ -199,7 +201,7 @@ public final class DungeonMarkers {
      * The spawner settings for a dungeon mob in a dungeon of this tier: quicker waves than vanilla, fewer mobs at low
      * tiers (see {@link #SPAWN_COUNT}), with spawning allowed at any light level.
      */
-    static CompoundTag spawnerTag(EntityType<?> type, int tier) {
+    public static CompoundTag spawnerTag(EntityType<?> type, int tier) {
         int index = DungeonRun.clampTier(tier) - DungeonRun.MIN_TIER;
         CompoundTag entity = new CompoundTag();
         entity.putString("id", BuiltInRegistries.ENTITY_TYPE.getKey(type).toString());
@@ -221,8 +223,10 @@ public final class DungeonMarkers {
         // Vanilla only reads the spawn count with the delays, and the nearby limit with the player range.
         tag.putShort("MinSpawnDelay", (short) MIN_SPAWN_DELAY);
         tag.putShort("MaxSpawnDelay", (short) MAX_SPAWN_DELAY);
-        tag.putShort("SpawnCount", (short) SPAWN_COUNT[index]);
-        tag.putShort("MaxNearbyEntities", (short) MAX_NEARBY[index]);
+        // Pack mobs (e.g. goblins) are weak alone; their spawners put out more of them at higher tiers.
+        boolean pack = type.is(PACK_MOBS);
+        tag.putShort("SpawnCount", (short) (SPAWN_COUNT[index] + (pack ? index : 0)));
+        tag.putShort("MaxNearbyEntities", (short) (MAX_NEARBY[index] + (pack ? 2 * index : 0)));
         tag.putShort("RequiredPlayerRange", (short) 16);
         return tag;
     }

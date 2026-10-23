@@ -25,6 +25,7 @@ public class GoblinShamanRenderer extends AbstractSpellCastingMobRenderer {
     /** Registers the renderers; called from the client renderer event when Iron's Spells is installed. */
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(IronsGoblins.GOBLIN_SHAMAN.get(), context -> new GoblinShamanRenderer(context, "goblin_shaman", 0.75f));
+        event.registerEntityRenderer(IronsGoblins.GOBLIN_PYRO.get(), context -> new GoblinShamanRenderer(context, "goblin_pyro", 0.75f));
         event.registerEntityRenderer(IronsGoblins.GOBLIN_CHIEF.get(), context -> new GoblinShamanRenderer(context, "goblin_chief", 0.95f));
         // Skeleton mages borrow Iron's own necromancer look until they get their own texture.
         event.registerEntityRenderer(IronsSkeletons.SKELETON_MAGE.get(),

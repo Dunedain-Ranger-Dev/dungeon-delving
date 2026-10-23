@@ -1,4 +1,4 @@
-"""Draws placeholder art for the goblins (spear goblin, archer, shaman) and their Goblin Spear and Goblin Bow.
+"""Draws placeholder art for the goblins (warrior, archer, shaman, pyro, gladiator), the hobgoblins, and their weapons.
 
 Run from the project root: python tools/placeholder_goblin_textures.py
 The body texture uses the vanilla humanoid (zombie/player) layout, so it fits the model GoblinRenderer uses until a
@@ -210,4 +210,91 @@ def staff(head, gem, length):
 BONE_HEAD = (226, 218, 190)
 png(ITEM / "goblin_totem_staff.png", 16, 16, staff(BONE_HEAD, (120, 200, 90), 9))  # a bone fetish with a green glow
 png(ITEM / "goblin_chief_staff.png", 16, 16, staff((232, 186, 60), (240, 60, 60), 11))  # gold-capped, with a red gem
-print("Wrote the goblin, archer, shaman and chief textures, the Goblin Spear, the Goblin Bow, and the goblin staves")
+
+# --- DD-73: the pyro, the gladiator and the hobgoblins (appended, so the textures above stay the same) ---
+
+# Pyro: the shaman's robe in fire colors, with a flame on the crown of the head.
+PYRO_ROBE = (196, 92, 30)
+PYRO_ROBE_DARK = (150, 60, 20)
+FLAME = (250, 190, 60)
+pyro = {k: v for k, v in shaman.items()}
+box(pyro, 16, 16, 8, 12, 4, PYRO_ROBE)
+fill(pyro, 16, 28, 40, 30, PYRO_ROBE_DARK, 6)
+for u, v in [(0, 16), (16, 48)]:
+    box(pyro, u, v, 4, 12, 4, PYRO_ROBE)
+    fill(pyro, u, v + 4 + 10, u + 16, v + 4 + 12, PYRO_ROBE_DARK, 6)
+for x, y in [(11, 1), (12, 0), (12, 1), (13, 2), (11, 3), (12, 2), (12, 3), (13, 3)]:
+    pyro[(x, y)] = (FLAME if y < 2 else FEATHER) + (255,)
+png(ENTITY / "goblin_pyro.png", 64, 64, pyro)
+
+# Gladiator: a goblin pit-fighter, bare-chested with crossed leather straps and studded wrist guards.
+STUD = (180, 180, 186)
+gladiator = goblin_body()
+fill(gladiator, 20, 20, 28, 32, SKIN, 8)  # bare chest
+for i in range(8):
+    gladiator[(20 + i, 20 + i if 20 + i < 32 else 31)] = STRAP + (255,)
+    gladiator[(27 - i, 20 + i if 20 + i < 32 else 31)] = STRAP + (255,)
+for u, v in [(40, 16), (32, 48)]:
+    for x in range(u, u + 16, 3):
+        gladiator[(x, v + 4 + 10)] = STUD + (255,)
+png(ENTITY / "goblin_gladiator.png", 64, 64, gladiator)
+
+
+def hobgoblin_body():
+    """The goblin body with a hobgoblin's ruddy orange skin."""
+    global SKIN, SKIN_DARK
+    saved = (SKIN, SKIN_DARK)
+    SKIN, SKIN_DARK = (184, 96, 52), (142, 68, 36)
+    body = goblin_body()
+    SKIN, SKIN_DARK = saved
+    return body
+
+
+def tabard(body, color, trim):
+    fill(body, 20, 20, 28, 32, color, 6)  # front of the body
+    fill(body, 32, 20, 40, 32, color, 6)  # back
+    fill(body, 20, 30, 28, 32, trim, 4)
+
+
+TABARD_RED = (150, 38, 34)
+TABARD_GREY = (82, 84, 92)
+GOLD = (220, 176, 60)
+WARPAINT = (90, 40, 140)
+
+soldier = hobgoblin_body()
+tabard(soldier, TABARD_RED, LEATHER_DARK)
+png(ENTITY / "hobgoblin_soldier.png", 64, 64, soldier)
+
+hunter = hobgoblin_body()
+fill(hunter, 8, 0, 16, 8, LEATHER)
+fill(hunter, 0, 8, 8, 16, LEATHER)
+fill(hunter, 16, 8, 24, 16, LEATHER)
+fill(hunter, 24, 8, 32, 16, LEATHER_DARK)
+fill(hunter, 8, 8, 16, 10, LEATHER)
+png(ENTITY / "hobgoblin_hunter.png", 64, 64, hunter)
+
+vanguard = hobgoblin_body()
+tabard(vanguard, TABARD_GREY, (50, 52, 58))
+png(ENTITY / "hobgoblin_vanguard.png", 64, 64, vanguard)
+
+spellbreaker = hobgoblin_body()
+for x in range(8, 16):
+    spellbreaker[(x, 12)] = WARPAINT + (255,)  # a stripe of warpaint across the eyes
+for y in range(9, 16):
+    spellbreaker[(11, y)] = WARPAINT + (255,)
+fill(spellbreaker, 20, 20, 28, 32, (60, 44, 70), 6)
+png(ENTITY / "hobgoblin_spellbreaker.png", 64, 64, spellbreaker)
+
+veteran = {k: v for k, v in vanguard.items()}
+for x, y in [(9, 9), (10, 10), (11, 11), (13, 13), (14, 14)]:
+    veteran[(x, y)] = (220, 170, 140, 255)  # old scars across the face
+fill(veteran, 20, 30, 28, 32, GOLD, 4)
+png(ENTITY / "hobgoblin_veteran.png", 64, 64, veteran)
+
+general = {k: v for k, v in soldier.items()}
+fill(general, 32, 20, 40, 32, (170, 30, 30), 4)  # a red cape down the back
+fill(general, 8, 8, 16, 9, GOLD, 4)  # a gold band across the brow
+png(ENTITY / "hobgoblin_general.png", 64, 64, general)
+
+print("Wrote the goblin, archer, shaman, pyro, chief, gladiator and hobgoblin textures, the Goblin Spear, the Goblin Bow, "
+      "and the goblin staves")

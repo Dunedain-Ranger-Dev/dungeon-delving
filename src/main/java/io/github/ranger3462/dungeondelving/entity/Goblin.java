@@ -1,5 +1,7 @@
 package io.github.ranger3462.dungeondelving.entity;
 
+import java.util.Map;
+
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -69,11 +71,27 @@ public class Goblin extends Monster {
         return new ItemStack(ModEntities.GOBLIN_SPEAR.get());
     }
 
+    /** What this goblin holds in its off hand: nothing for plain goblins; shields and second weapons for hobgoblins. */
+    protected ItemStack offhand() {
+        return ItemStack.EMPTY;
+    }
+
+    /** The armor this goblin wears, by slot. Goblins wear none; their danger is their numbers. */
+    protected Map<EquipmentSlot, ItemStack> armor() {
+        return Map.of();
+    }
+
     @Override
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, SpawnGroupData data) {
         SpawnGroupData result = super.finalizeSpawn(level, difficulty, spawnType, data);
         setItemSlot(EquipmentSlot.MAINHAND, weapon());
         setDropChance(EquipmentSlot.MAINHAND, SPEAR_DROP_CHANCE);
+        setItemSlot(EquipmentSlot.OFFHAND, offhand());
+        setDropChance(EquipmentSlot.OFFHAND, 0.0f);
+        armor().forEach((slot, item) -> {
+            setItemSlot(slot, item);
+            setDropChance(slot, 0.0f);
+        });
         return result;
     }
 
