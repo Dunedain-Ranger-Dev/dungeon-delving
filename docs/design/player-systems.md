@@ -40,8 +40,10 @@ hand-editing 600 recipes.
 - Smithing upgrades: need a dungeon ingot of the target tier (e.g. Emberstone for diamond-class gear, Thailite for
   netherite) and a Master Anvil step, so the best class gear comes from dungeons plus forging.
 - Jewelry: gem settings use our ingots.
-- **Q:** should class gear go through the Master Anvil's forging minigame (quality and stars like our own gear), or
-  just take forged parts as ingredients in normal crafting? The first keeps forging central but is more work per item.
+- **Leaning (user, 2026-10-23):** full integration, so RPG gear can earn stars from quality too, if the cost is
+  reasonable. The likely way: one generic quality component our Master Anvil can put on *any* item, scaling that
+  item's own attribute modifiers by its stars (an item attribute event), rather than per-mod special cases. The
+  forging minigame would then accept RPG gear recipes as "forge this item" jobs. To be costed before committing.
 
 ## 3. Ability scores
 
@@ -55,8 +57,9 @@ STR, DEX, CON, INT, WIS, CHA, each a real attribute so gear, races and skills ca
   - CHA: trading prices now; faction standing and companions later.
 - Points come from levelling up, and from rare items (tomes, shrine offerings, boss drops).
 - A stats screen to spend them, plus a respec item.
-- **Q:** which level? Vanilla XP levels (simple, but enchanting and Apotheosis eat them) or a separate character
-  level earned from fighting and dungeons (recommended).
+- **Decided (user, 2026-10-23):** a separate character level, worked out from the skill levels like RuneScape's,
+  so crafting and gathering count as much as fighting and nobody is punished for crafting. Exact formula to be
+  worked out (e.g. an average of the highest skills, or total level in steps).
 
 ## 4. Races
 
@@ -93,7 +96,8 @@ Specializations unlock deeper in the skill tree, using the other mods' content:
   schools, or Spell Engine spells we write).
 
 Classes decide which Skill Tree categories a player can level, and which class gear they get full bonuses from.
-**Q:** can a player change class (at a cost), or is it permanent per character?
+**Decided (user, 2026-10-23):** players can change class at a cost (a rare item or ritual that resets class and
+its skill points).
 
 ## 6. Skill trees (mcMMO-style)
 
