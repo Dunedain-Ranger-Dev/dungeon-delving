@@ -2,7 +2,6 @@ package io.github.ranger3462.dungeondelving.entity;
 
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -10,7 +9,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 
 /** The bogged swordsman, the tier 3 undead swordsman: a mossy skeleton swordsman whose blade carries rot (Poison). */
-public class BoggedSwordsman extends SkeletonSwordsman {
+public class BoggedSwordsman extends SkeletonSwordsman implements MeleeHitEffect {
     public static final double MAX_HEALTH = 28.0;
     /** How long a bogged swordsman's hits poison, in ticks. */
     public static final int POISON_TICKS = 80;
@@ -24,11 +23,7 @@ public class BoggedSwordsman extends SkeletonSwordsman {
     }
 
     @Override
-    public boolean doHurtTarget(Entity target) {
-        boolean hit = super.doHurtTarget(target);
-        if (hit && target instanceof LivingEntity living) {
-            living.addEffect(new MobEffectInstance(MobEffects.POISON, POISON_TICKS, 0), this);
-        }
-        return hit;
+    public void onMeleeHit(LivingEntity target) {
+        target.addEffect(new MobEffectInstance(MobEffects.POISON, POISON_TICKS, 0), this);
     }
 }

@@ -138,9 +138,12 @@ public class SkeletonTests {
             bogged.moveTo(pos.getX() - 1, pos.getY(), pos.getZ());
             helper.getLevel().addFreshEntity(stray);
             helper.getLevel().addFreshEntity(bogged);
-            helper.assertTrue(stray.doHurtTarget(target) && target.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "a stray swordsman's hit should slow");
+            // Melee damage from the mob itself, however it lands (Better Mob Combat skips doHurtTarget).
+            target.hurt(helper.getLevel().damageSources().mobAttack(stray), 1.0f);
+            helper.assertTrue(target.hasEffect(MobEffects.MOVEMENT_SLOWDOWN), "a stray swordsman's hit should slow");
             target.invulnerableTime = 0;
-            helper.assertTrue(bogged.doHurtTarget(target) && target.hasEffect(MobEffects.POISON), "a bogged swordsman's hit should poison");
+            target.hurt(helper.getLevel().damageSources().mobAttack(bogged), 1.0f);
+            helper.assertTrue(target.hasEffect(MobEffects.POISON), "a bogged swordsman's hit should poison");
         } finally {
             target.discard();
             stray.discard();
