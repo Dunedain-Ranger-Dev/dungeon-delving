@@ -7,6 +7,7 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
+import io.github.ranger3462.dungeondelving.dungeon.RoomMobCap;
 import io.github.ranger3462.dungeondelving.dungeon.RoomSpec;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.ChatFormatting;
@@ -80,7 +81,10 @@ public final class DungeonChallenges {
         });
     }
 
-    /** A dungeon spawner spawning a mob: in a room still waiting on hunt targets, it may become one. */
+    /**
+     * A dungeon spawner spawning a mob: skipped if its room already holds its mob cap ({@link RoomMobCap}); otherwise, in
+     * a room still waiting on hunt targets, it may become one.
+     */
     @SubscribeEvent
     public static void onSpawnerSpawn(FinalizeSpawnEvent event) {
         if (event.getSpawnType() != MobSpawnType.SPAWNER || event.getLevel().getLevel().dimension() != DungeonDimension.DUNGEON) {
@@ -91,6 +95,10 @@ public final class DungeonChallenges {
         int region = DungeonDimension.regionAt(pos);
         long room = DungeonDimension.roomMinAt(pos).asLong();
         DungeonRegions.get().progress(region).ifPresent(progress -> {
+            if (RoomMobCap.full(event.getLevel().getLevel(), pos, progress.tier())) {
+                event.setSpawnCancelled(true);
+                return;
+            }
             if (progress.unspawnedHunters(room) > 0 && mob.getRandom().nextDouble() < HUNTER_CHANCE && progress.hunterSpawned(room)) {
                 makeHunter(mob, region, room);
                 DungeonRegions.get().progressChanged();

@@ -93,9 +93,7 @@ def riftstone():
 
 
 png(ASSETS / "block" / "riftstone.png", riftstone())
+# The ores, raw ores and ingots come from vanilla's art now: see tools/vanilla_recolor_textures.py.
 for key, color in ORES.items():
-    png(ASSETS / "block" / f"{key}_ore.png", ore(color, key))
     png(ASSETS / "block" / f"{key}_block.png", storage_block(color))
-    png(ASSETS / "item" / f"raw_{key}.png", raw_chunk(color, key))
-    png(ASSETS / "item" / f"{key}_ingot.png", ingot(color))
 print("Wrote placeholder textures for", ", ".join(ORES))

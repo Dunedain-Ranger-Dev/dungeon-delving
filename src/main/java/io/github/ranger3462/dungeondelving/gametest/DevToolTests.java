@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
+import io.github.ranger3462.dungeondelving.dungeon.RoomMobCap;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonProgress;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import io.github.ranger3462.dungeondelving.testing.BossDoorSpot;
@@ -16,8 +18,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -92,6 +97,34 @@ public class DevToolTests {
         helper.assertTrue(eastSpot.pos().equals(new BlockPos(200 + BossDoorSpot.DISTANCE, 65, 52)) && eastSpot.facing() == Direction.WEST,
                 "the spot should be just east of an east door, facing west, got " + eastSpot);
         helper.assertTrue(BossDoorSpot.find(new DungeonProgress(1, 1, List.of(), null)).isEmpty(), "no door, no spot");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void roomsCapTheirMobsByTier(GameTestHelper helper) {
+        helper.assertTrue(RoomMobCap.cap(1) == 7 && RoomMobCap.cap(4) == 15, "room caps should run from 7 at tier 1 to 15 at tier 4");
+        helper.assertTrue(RoomMobCap.cap(2) < RoomMobCap.cap(3), "caps should grow with tier");
+        ServerLevel level = helper.getLevel();
+        BlockPos center = DungeonDimension.roomCenterAt(helper.absolutePos(BlockPos.ZERO)).above(2);
+        level.getChunkAt(center);
+        List<Zombie> zombies = new ArrayList<>();
+        try {
+            for (int i = 0; i < RoomMobCap.cap(1); i++) {
+                Zombie zombie = EntityType.ZOMBIE.create(level);
+                zombie.moveTo(center.getX() + 0.5 + i % 3, center.getY(), center.getZ() + 0.5 + i / 3);
+                zombie.setNoAi(true);
+                level.addFreshEntity(zombie);
+                zombies.add(zombie);
+                if (i == RoomMobCap.cap(1) - 2) {
+                    helper.assertFalse(RoomMobCap.full(level, center, 1), "a room one short of its cap isn't full");
+                }
+            }
+            helper.assertTrue(RoomMobCap.count(level, center) >= RoomMobCap.cap(1), "the room should count its mobs");
+            helper.assertTrue(RoomMobCap.full(level, center, 1), "a tier 1 room with 7 mobs is full");
+            helper.assertFalse(RoomMobCap.full(level, center, 4), "a tier 4 room holds more");
+        } finally {
+            zombies.forEach(Zombie::discard);
+        }
         helper.succeed();
     }
 

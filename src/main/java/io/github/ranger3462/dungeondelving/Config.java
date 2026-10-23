@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
+import io.github.ranger3462.dungeondelving.dungeon.RoomMobCap;
 import io.github.ranger3462.dungeondelving.dungeon.SpawnerMobs;
 import io.github.ranger3462.dungeondelving.dungeon.layout.LayoutType;
 import net.neoforged.fml.event.config.ModConfigEvent;
@@ -38,6 +39,11 @@ public final class Config {
             .comment("How often each dungeon layout type is rolled, as \"type=weight\" entries. normal: mostly ordinary rooms;",
                     "resource: mostly quarries packed with ore; loot: lots of treasure rooms with extra chests.")
             .defineList("layoutTypes", LayoutType.DEFAULTS, () -> "normal=1", value -> value instanceof String text && LayoutType.parse(text).isPresent());
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> ROOM_MOB_CAPS = BUILDER
+            .comment("The most hostile mobs a dungeon room's spawners keep alive at once, for tiers 1, 2, 3 and 4 in order. Once a",
+                    "room holds this many, its spawners wait until some die, so rooms with several spawners can't swamp you.")
+            .defineList("roomMobCaps", RoomMobCap.DEFAULTS, () -> 10, value -> value instanceof Integer cap && cap > 0);
 
     public static final ModConfigSpec.DoubleValue MOB_MARKER_CHANCE = BUILDER
             .comment("Chance that each mob marker in a dungeon becomes a spawner. Otherwise it's left empty. Hunt markers always do.")

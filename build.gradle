@@ -242,6 +242,10 @@ dependencies {
         // Sophisticated Backpacks, for storage
         localRuntime "maven.modrinth:sophisticated-backpacks:QkVLEgt1" // 1.21.1-3.26.12.2208
         localRuntime "maven.modrinth:sophisticated-core:DAcZAWzl"    // 1.21.1-1.5.13.2404
+        // Inventory quick-moves: Mouse Tweaks (shift-drag over slots) and Inventory Essentials (move all, sorting)
+        localRuntime "maven.modrinth:mouse-tweaks:9I21YYxf"          // 1.21-2.26.1-neoforge
+        localRuntime "maven.modrinth:inventory-essentials:B2gBjJSj"  // 21.1.20+neoforge-1.21.1
+        localRuntime "maven.modrinth:balm:CquiaiDj"                  // 21.0.66+neoforge-1.21.1
         // Better Combat, Spell Engine and the RPG Series (DD-76), with their libraries
         localRuntime "maven.modrinth:better-combat:VhIOvcXP"         // 2.4.0+1.21.1-neoforge
         localRuntime "maven.modrinth:combat-roll:FT7t1n1a"           // 2.0.6+1.21.1-neoforge
