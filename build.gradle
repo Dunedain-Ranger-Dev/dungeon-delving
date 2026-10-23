@@ -242,6 +242,42 @@ dependencies {
         // Sophisticated Backpacks, for storage
         localRuntime "maven.modrinth:sophisticated-backpacks:QkVLEgt1" // 1.21.1-3.26.12.2208
         localRuntime "maven.modrinth:sophisticated-core:DAcZAWzl"    // 1.21.1-1.5.13.2404
+        // Better Combat, Spell Engine and the RPG Series (DD-76), with their libraries
+        localRuntime "maven.modrinth:better-combat:VhIOvcXP"         // 2.4.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:combat-roll:FT7t1n1a"           // 2.0.6+1.21.1-neoforge
+        localRuntime "maven.modrinth:apothic-combat:8gwHTe22"        // 1.2.1+1.21.1, Apotheosis x Better Combat
+        localRuntime "maven.modrinth:spell-engine:IYoY9AHA"          // 1.10.9+1.21.1-neoforge
+        localRuntime "maven.modrinth:spell-power:RFCD8Aio"           // 1.6.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:runes:Br4oP4M6"                 // 1.3.2+1.21.1-neoforge
+        localRuntime "maven.modrinth:bundle-api:w5F5wdko"            // 1.1.0-neoforge
+        localRuntime "maven.modrinth:ranged-weapon-api:WxNYN3Zh"     // 3.0.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:armor-model-api:QRkmKYGJ"       // 1.1.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:shield-api:fgK2cNYi"            // 2.2.0-neoforge
+        localRuntime "maven.modrinth:critical-strike:2LZ76MSH"       // 1.0.4+1.21.1-neoforge
+        localRuntime "maven.modrinth:structure-pool-api:kdWVYKdx"    // 1.2.1+1.21.1-neoforge
+        localRuntime "maven.modrinth:cloth-config:izKINKFg"          // 15.0.140+neoforge
+        localRuntime "maven.modrinth:wizards:lxbf57N2"               // 3.1.3+1.21.1-neoforge
+        localRuntime "maven.modrinth:paladins-and-priests:7oCw7txX"  // 3.1.3+1.21.1-neoforge
+        localRuntime "maven.modrinth:rogues-and-warriors:WxwS7HDW"   // 3.1.3+1.21.1-neoforge
+        localRuntime "maven.modrinth:archers:7oSRQwU0"               // 3.1.3+1.21.1-neoforge
+        localRuntime "maven.modrinth:jewelry:iLTExB6G"               // 2.5.1+1.21.1-neoforge
+        localRuntime "maven.modrinth:relics-rpg:O6zfkTwx"            // 1.4.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:arsenal-rpg-series:rYyhslig"    // 1.5.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:armory-rpg-series:51cccxUm"     // 1.5.2+1.21.1-neoforge
+        localRuntime "maven.modrinth:skill-tree:Vr94BeiF"            // 1.6.1+1.21.1-neoforge
+        localRuntime "maven.modrinth:skills:8tfcI2wU"                // Pufferfish's Skills 0.19.2
+        localRuntime "maven.modrinth:dungeon-difficulty:uwoMCnrI"    // 3.9.2+1.21.1-neoforge
+        localRuntime "maven.modrinth:gazebos:ktRCCPX3"               // 2.2.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:village-taverns:qhOcjQ6u"       // 1.3.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:sensible-survival:Fc9Sd9Wm"     // 1.1.2+1.21.1-neoforge
+        localRuntime "maven.modrinth:hunger-tweaks:1fs4FiOW"         // 1.0.1-neoforge
+        // More RPG Classes (Spell Engine partner mods)
+        localRuntime "maven.modrinth:more-rpg-library:oA6DragU"      // 2.8.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:archers-expansion:GOnpQHSG"     // 2.2.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:berserker-rpg-class:val86kc4"   // 3.2.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:elemental-wizards-rpg:yciypA9F" // 3.2.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:forcemaster-rpg-class:fyug07lZ" // 3.2.0+1.21.1-neoforge
+        localRuntime "maven.modrinth:witcher-rpg-class:FcCltY07"     // 3.2.0+1.21.1-neoforge
     }
 
     // For more info:
