@@ -22,6 +22,9 @@ import io.github.ranger3462.dungeondelving.dungeon.layout.LayoutType;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonProgress;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonTravel;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
+import io.github.ranger3462.dungeondelving.testing.BossDoorSpot;
+import io.github.ranger3462.dungeondelving.testing.DevGear;
+import io.github.ranger3462.dungeondelving.testing.TestersCharm;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -36,7 +39,9 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 /**
  * Operator-only commands for testing dungeons without the gate and exit blocks:
  * {@code /dungeondelving dungeon enter [rooms] [tier]|enter tier <tier> [normal|resource|loot]|enter faction <faction> <tier>|keys|leave|fail|regions}. Without a room count, the
- * count is rolled from the tier's {@code roomCounts} range.
+ * count is rolled from the tier's {@code roomCounts} range. For quick survival testing there's also {@code enter geared <tier> [faction]}
+ * (enter with tier-appropriate gear), {@code boss} (teleport to just outside the boss door) and {@code leave reset} (leave, then
+ * clear everything and put a fresh Tester's Charm in a ring slot).
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class DevCommands {
@@ -66,6 +71,13 @@ public final class DevCommands {
                                                             }
                                                             return enterFaction(context, tier, faction);
                                                         }))))
+                                .then(Commands.literal("geared")
+                                        .then(Commands.argument("tier", IntegerArgumentType.integer(DungeonRun.MIN_TIER, DungeonRun.MAX_TIER))
+                                                .executes(context -> enterGeared(context, IntegerArgumentType.getInteger(context, "tier"), null))
+                                                .then(Commands.argument("faction", StringArgumentType.word())
+                                                        .suggests((context, builder) -> SharedSuggestionProvider.suggest(DungeonFactions.ids(), builder))
+                                                        .executes(context -> enterGeared(context, IntegerArgumentType.getInteger(context, "tier"),
+                                                                StringArgumentType.getString(context, "faction"))))))
                                 .then(Commands.literal("tier")
                                         .then(Commands.argument("tier", IntegerArgumentType.integer(DungeonRun.MIN_TIER, DungeonRun.MAX_TIER))
                                                 .executes(context -> {
@@ -91,7 +103,9 @@ public final class DevCommands {
                                                         IntegerArgumentType.getInteger(context, "tier"))))))
                         .then(Commands.literal("keys").executes(DevCommands::keys))
                         .then(Commands.literal("invader").executes(DevCommands::invader))
-                        .then(Commands.literal("leave").executes(DevCommands::leave))
+                        .then(Commands.literal("boss").executes(DevCommands::toBossDoor))
+                        .then(Commands.literal("leave").executes(DevCommands::leave)
+                                .then(Commands.literal("reset").executes(DevCommands::leaveAndReset)))
                         .then(Commands.literal("fail").executes(DevCommands::failRun))
                         .then(Commands.literal("regions").executes(DevCommands::regions))));
     }
@@ -105,6 +119,53 @@ public final class DevCommands {
         DungeonTravel.Entry entry = DungeonTravel.enter(player, rolledRooms(context, tier), tier, LayoutType.roll(player.getRandom()), faction);
         tell(context.getSource(), "Entered tier " + tier + " " + entry.type().id() + " " + faction + " dungeon: " + entry.layout().rooms().size()
                 + " rooms, boss " + DungeonRegions.get().progress(entry.run().region()).map(p -> p.boss()).orElse("?"));
+        return 1;
+    }
+
+    /** Enters a dungeon (of this faction, or a rolled one if null) already equipped for its tier. */
+    private static int enterGeared(CommandContext<CommandSourceStack> context, int tier, String faction) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        if (faction != null && !DungeonFactions.ids().contains(faction)) {
+            fail(context.getSource(), "Unknown faction " + faction + "; try " + DungeonFactions.ids());
+            return 0;
+        }
+        int entered = faction == null ? enter(context, rolledRooms(context, tier), tier) : enterFaction(context, tier, faction);
+        if (entered > 0) {
+            DevGear.equip(player, tier);
+            tell(context.getSource(), "Equipped tier " + tier + " gear.");
+        }
+        return entered;
+    }
+
+    /** Teleports the player to just outside their dungeon's boss door, facing it. */
+    private static int toBossDoor(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        Optional<DungeonRun> run = DungeonRegions.get().run(player.getUUID());
+        Optional<BossDoorSpot.Spot> spot = run.flatMap(r -> DungeonRegions.get().progress(r.region())).flatMap(BossDoorSpot::find);
+        if (run.isEmpty()) {
+            fail(context.getSource(), "You aren't in a dungeon.");
+            return 0;
+        }
+        if (spot.isEmpty()) {
+            fail(context.getSource(), "This dungeon has no boss door.");
+            return 0;
+        }
+        BlockPos pos = spot.get().pos();
+        player.teleportTo(player.serverLevel(), pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, spot.get().facing().toYRot(), 0.0f);
+        tell(context.getSource(), "Moved to the boss door. /dungeondelving dungeon keys gives the keys it needs.");
+        return 1;
+    }
+
+    /** Leaves the dungeon, then clears everything the player has and gives them a fresh Tester's Charm, worn as a ring. */
+    private static int leaveAndReset(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        ServerPlayer player = context.getSource().getPlayerOrException();
+        if (DungeonTravel.exit(player).isEmpty()) {
+            fail(context.getSource(), "You are not in a dungeon.");
+            return 0;
+        }
+        TestersCharm.clearEverything(player);
+        boolean worn = TestersCharm.give(player);
+        tell(context.getSource(), "Left the dungeon and cleared your inventory. Tester's Charm " + (worn ? "worn in a ring slot." : "put in your inventory."));
         return 1;
     }
 

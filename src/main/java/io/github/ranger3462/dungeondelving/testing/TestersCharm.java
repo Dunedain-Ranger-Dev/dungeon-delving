@@ -5,6 +5,7 @@ import java.util.List;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.integration.ars.ArsMana;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsMana;
+import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,8 +23,8 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 /**
- * The Tester's Charm: a testing tool for playing in survival with creative's safety. While it's anywhere in a
- * player's inventory, they can't die (lethal hits leave them at half a heart), every hit they take is reported in chat
+ * The Tester's Charm: a testing tool for playing in survival with creative's safety. While it's worn in a ring slot
+ * (with Curios) or anywhere in a player's inventory, they can't die (lethal hits leave them at half a heart), every hit they take is reported in chat
  * with its damage and source, they heal very fast with full hunger and mana (Iron's Spells and Ars Nouveau), and they
  * can fly like in creative. Only in the creative tab; it has no recipe.
  */
@@ -55,7 +56,32 @@ public final class TestersCharm {
     }
 
     public static boolean has(Player player) {
-        return player.getInventory().hasAnyMatching(stack -> stack.getItem() instanceof CharmItem);
+        return player.getInventory().hasAnyMatching(stack -> stack.getItem() instanceof CharmItem)
+                || (ModList.get().isLoaded("curios") && CuriosCharm.wearing(player));
+    }
+
+    /**
+     * Gives the player a charm: worn in a ring slot if they have Curios and a free one, otherwise in their inventory.
+     * Returns whether it went in a ring slot.
+     */
+    public static boolean give(ServerPlayer player) {
+        ItemStack charm = new ItemStack(ModRegistries.TESTERS_CHARM.get());
+        if (ModList.get().isLoaded("curios") && CuriosCharm.wear(player, charm)) {
+            return true;
+        }
+        if (!player.getInventory().add(charm)) {
+            player.drop(charm, false);
+        }
+        return false;
+    }
+
+    /** Clears everything the player has: inventory, armor, off-hand and (with Curios) every Curios slot. */
+    public static void clearEverything(ServerPlayer player) {
+        player.getInventory().clearContent();
+        if (ModList.get().isLoaded("curios")) {
+            CuriosCharm.clear(player);
+        }
+        player.inventoryMenu.broadcastChanges();
     }
 
     @SubscribeEvent
