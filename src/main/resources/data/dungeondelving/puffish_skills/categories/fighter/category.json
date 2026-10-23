@@ -5,7 +5,7 @@
   "icon": {
     "type": "item",
     "data": {
-      "item": "minecraft:iron_sword"
+      "item": "rogues:berserker_armor_head"
     }
   },
   "unlocked_by_default": false,

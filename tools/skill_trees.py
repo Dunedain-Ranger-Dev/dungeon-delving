@@ -137,11 +137,11 @@ ACTIVITIES = {
     "one_handed": ("One-Handed", "minecraft:iron_sword", melee("one_handed", "One-Handed")),
     "two_handed": ("Two-Handed", "minecraft:netherite_axe", melee("two_handed", "Two-Handed")),
     "polearms": ("Polearms", "minecraft:trident", melee("polearms", "Polearm")),
-    "daggers": ("Daggers", "minecraft:stone_sword", melee("daggers", "Dagger")),
+    "daggers": ("Daggers", "rogues:iron_dagger", melee("daggers", "Dagger")),
     "unarmed": ("Unarmed", "minecraft:leather", melee("unarmed", "Unarmed")),
     "archery": ("Archery", "minecraft:bow", ranged("archery", "Archery")),
     "crossbows": ("Crossbows", "minecraft:crossbow", ranged("crossbows", "Crossbow")),
-    "dual_wielding": ("Dual Wielding", "minecraft:golden_sword",
+    "dual_wielding": ("Dual Wielding", "texture:dungeondelving:textures/gui/skill_icons/dual_wielding.png",
                       [node("ambidextrous", "Ambidextrous", "+2% attack speed.", [attribute("minecraft:generic.attack_speed", 0.02)]),
                        node("flurry", "Flurry", "+2% attack speed.", [attribute("minecraft:generic.attack_speed", 0.02)])]),
     "blocking": ("Blocking", "minecraft:shield",
@@ -173,6 +173,13 @@ ACTIVITIES = {
 }
 
 
+def icon_json(icon):
+    """A Pufferfish icon: an item id, or "texture:<path>" for one of our textures (like the crossed swords)."""
+    if icon.startswith("texture:"):
+        return {"type": "texture", "data": {"texture": icon[len("texture:"):]}}
+    return {"type": "item", "data": {"item": icon}}
+
+
 def write(path, obj):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(obj, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
@@ -184,10 +191,10 @@ TREES = {**PROFESSIONS, **{key: (title, icon, [], nodes) for key, (title, icon, 
 # its branches' nodes, layout, spells and experience (from kills), and starts locked: picking the class unlocks it.
 # Read from the Skill Tree jar in Gradle's cache, so run this after a Gradle build or run.
 CLASSES = {
-    "fighter": ("Fighter", "minecraft:iron_sword", ["warrior", "paladin"]),
-    "archer": ("Archer", "minecraft:bow", ["archer"]),
-    "rogue": ("Rogue", "minecraft:iron_sword", ["rogue"]),
-    "mage": ("Mage", "minecraft:blaze_rod", ["arcane", "fire", "frost", "priest"]),
+    "fighter": ("Fighter", "rogues:berserker_armor_head", ["warrior", "paladin"]),
+    "archer": ("Archer", "archers:small_quiver", ["archer"]),
+    "rogue": ("Rogue", "rogues:assassin_armor_head", ["rogue"]),
+    "mage": ("Mage", "elemental_wizards_rpg:elemental_head", ["arcane", "fire", "frost", "priest"]),
 }
 GRADLE_CACHE = Path.home() / ".gradle/caches/modules-2/files-2.1/maven.modrinth/skill-tree"
 
@@ -212,7 +219,7 @@ def write_classes(lang):
         lang[f"skill_category.{NS}.{key}"] = title
         # Locked until the class is picked. One class can take several of its branches (a mage can mix fire and frost),
         # and points come from the class's own levels, so there's no cap on how many are spent.
-        cat = {**category, "title": {"translate": f"skill_category.{NS}.{key}"}, "icon": {"type": "item", "data": {"item": icon}},
+        cat = {**category, "title": {"translate": f"skill_category.{NS}.{key}"}, "icon": icon_json(icon),
                "unlocked_by_default": False, "exclusive_root": False}
         cat.pop("spent_points_limit", None)
         write(folder / "category.json", cat)
@@ -230,7 +237,7 @@ for key, (title, icon, sources, nodes) in TREES.items():
     lang[f"skill_category.{NS}.{key}"] = title
     write(folder / "category.json", {
         "title": {"translate": f"skill_category.{NS}.{key}"},
-        "icon": {"type": "item", "data": {"item": icon}},
+        "icon": icon_json(icon),
         "unlocked_by_default": True,
         "exclusive_root": False,
         "background": {"texture": "minecraft:textures/block/deepslate_tiles.png", "width": 16, "height": 16, "position": "tile"},
@@ -246,7 +253,7 @@ for key, (title, icon, sources, nodes) in TREES.items():
         definitions[node_key] = {
             "title": {"translate": f"skill.{NS}.{key}.{node_key}"},
             "description": {"translate": f"skill.{NS}.{key}.{node_key}.description"},
-            "icon": {"type": "item", "data": {"item": icon}},
+            "icon": icon_json(icon),
             "frame": {"type": "advancement", "data": {"frame": "task" if i < len(nodes) - 1 or len(nodes) == 1 else "goal"}},
             "rewards": rewards,
             "cost": 1,

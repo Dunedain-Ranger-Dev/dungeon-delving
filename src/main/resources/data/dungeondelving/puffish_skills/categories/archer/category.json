@@ -5,7 +5,7 @@
   "icon": {
     "type": "item",
     "data": {
-      "item": "minecraft:bow"
+      "item": "archers:small_quiver"
     }
   },
   "unlocked_by_default": false,

@@ -3,9 +3,9 @@
     "translate": "skill_category.dungeondelving.dual_wielding"
   },
   "icon": {
-    "type": "item",
+    "type": "texture",
     "data": {
-      "item": "minecraft:golden_sword"
+      "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
     }
   },
   "unlocked_by_default": true,

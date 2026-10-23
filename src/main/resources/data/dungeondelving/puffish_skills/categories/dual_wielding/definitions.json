@@ -7,9 +7,9 @@
       "translate": "skill.dungeondelving.dual_wielding.ambidextrous.description"
     },
     "icon": {
-      "type": "item",
+      "type": "texture",
       "data": {
-        "item": "minecraft:golden_sword"
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
       }
     },
     "frame": {
@@ -38,9 +38,9 @@
       "translate": "skill.dungeondelving.dual_wielding.flurry.description"
     },
     "icon": {
-      "type": "item",
+      "type": "texture",
       "data": {
-        "item": "minecraft:golden_sword"
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
       }
     },
     "frame": {

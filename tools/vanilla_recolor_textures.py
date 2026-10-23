@@ -8,6 +8,7 @@ that ModDevGradle downloads): python tools/vanilla_recolor_textures.py
   is neutral grey and stays as it is).
 - Raw ores: vanilla's raw iron, copper or gold lump, some mirrored, so no two dungeon ores share a silhouette, then
   recolored.
+- The Dual Wielding skill's icon: two of vanilla's iron sword, crossed.
 
 These are recolors of Mojang's art, which mods commonly ship, so they aren't covered by this project's All Rights
 Reserved asset license the way original art is. Needs Pillow (pip install pillow).
@@ -112,6 +113,13 @@ def main():
         if meta in jar.namelist():  # Keep animations (the rift).
             (TEXTURES / f"{target}.png.mcmeta").write_bytes(jar.read(meta))
         print(f"{target}: from {source}")
+    # The Dual Wielding skill's icon: vanilla's iron sword crossed with a mirrored copy of itself.
+    sword = vanilla(jar, "item/iron_sword")
+    crossed = sword.transpose(Image.Transpose.FLIP_LEFT_RIGHT)
+    crossed.alpha_composite(sword)
+    (TEXTURES / "gui/skill_icons").mkdir(parents=True, exist_ok=True)
+    crossed.save(TEXTURES / "gui/skill_icons/dual_wielding.png")
+    print("gui/skill_icons/dual_wielding: crossed iron swords")
 
 
 if __name__ == "__main__":

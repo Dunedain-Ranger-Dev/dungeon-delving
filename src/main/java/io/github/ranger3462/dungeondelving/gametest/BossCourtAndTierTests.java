@@ -91,8 +91,11 @@ public class BossCourtAndTierTests {
         helper.succeed();
     }
 
-    /** With Iron's Spells, the King's mage heals him when he's hurt, even with nobody to fight. */
-    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 300)
+    /**
+     * With Iron's Spells, the King's mage heals him when he's hurt, even with nobody to fight. Mending is slow (a point
+     * every few seconds) and the mage has to walk over first, so this gets a generous time limit.
+     */
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 600)
     public static void theMagesHealTheBarrowKing(GameTestHelper helper) {
         if (!ModList.get().isLoaded("irons_spellbooks")) {
             helper.succeed();

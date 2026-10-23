@@ -100,7 +100,12 @@ public final class SkillXpOverlay {
             graphics.pose().pushPose();
             graphics.pose().translate(x, y - 4, 0);
             graphics.pose().scale(0.75f, 0.75f, 1.0f);
-            graphics.renderItem(new ItemStack(BuiltInRegistries.ITEM.get(SkillGroup.icon(row.skill))), 0, 0);
+            var texture = SkillGroup.iconTexture(row.skill);
+            if (texture.isPresent()) {
+                graphics.blit(texture.get(), 0, 0, 0, 0, 16, 16, 16, 16);
+            } else {
+                graphics.renderItem(new ItemStack(BuiltInRegistries.ITEM.get(SkillGroup.icon(row.skill))), 0, 0);
+            }
             graphics.pose().popPose();
 
             int barX = x + 15;

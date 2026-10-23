@@ -5,7 +5,7 @@
   "icon": {
     "type": "item",
     "data": {
-      "item": "minecraft:blaze_rod"
+      "item": "elemental_wizards_rpg:elemental_head"
     }
   },
   "unlocked_by_default": false,

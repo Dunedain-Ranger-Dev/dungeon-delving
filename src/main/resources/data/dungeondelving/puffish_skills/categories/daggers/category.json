@@ -5,7 +5,7 @@
   "icon": {
     "type": "item",
     "data": {
-      "item": "minecraft:stone_sword"
+      "item": "rogues:iron_dagger"
     }
   },
   "unlocked_by_default": true,
