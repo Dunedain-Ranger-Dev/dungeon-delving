@@ -25,7 +25,7 @@
             ]
           }
         },
-        "experience": "block_0 * 3"
+        "experience": "max(0, block_0 * 3)"
       }
     }
   ]

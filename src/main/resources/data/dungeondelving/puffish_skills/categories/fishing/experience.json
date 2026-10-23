@@ -10,7 +10,48 @@
     {
       "type": "puffish_skills:fish_item",
       "data": {
-        "experience": "15"
+        "variables": {
+          "fish_0": {
+            "operations": [
+              {
+                "type": "get_fished_item_stack"
+              },
+              {
+                "type": "puffish_skills:test",
+                "data": {
+                  "item": "minecraft:salmon"
+                }
+              }
+            ]
+          },
+          "fish_1": {
+            "operations": [
+              {
+                "type": "get_fished_item_stack"
+              },
+              {
+                "type": "puffish_skills:test",
+                "data": {
+                  "item": "minecraft:tropical_fish"
+                }
+              }
+            ]
+          },
+          "fish_2": {
+            "operations": [
+              {
+                "type": "get_fished_item_stack"
+              },
+              {
+                "type": "puffish_skills:test",
+                "data": {
+                  "item": "minecraft:pufferfish"
+                }
+              }
+            ]
+          }
+        },
+        "experience": "max(max(max(2, fish_0 * 5), fish_1 * 8), fish_2 * 15)"
       }
     }
   ]

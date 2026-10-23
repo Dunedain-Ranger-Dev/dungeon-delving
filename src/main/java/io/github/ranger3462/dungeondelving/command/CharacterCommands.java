@@ -1,15 +1,24 @@
 package io.github.ranger3462.dungeondelving.command;
 
+import java.util.Map;
+
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
+import io.github.ranger3462.dungeondelving.Config;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.character.AbilityScore;
 import io.github.ranger3462.dungeondelving.character.Characters;
+import io.github.ranger3462.dungeondelving.character.SkillGroup;
 import io.github.ranger3462.dungeondelving.character.SkillLevels;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -46,12 +55,56 @@ public final class CharacterCommands {
 
     private static int show(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
-        Feedback.tell(context.getSource(), "Character level " + Characters.level(player) + ", " + Characters.available(player)
-                + " ability points to spend (skill levels: " + SkillLevels.levels(player) + ")");
-        for (AbilityScore score : AbilityScore.values()) {
-            AttributeInstance attribute = player.getAttribute(score.attribute());
-            Feedback.detail(context.getSource(), score.abbreviation + " " + (attribute == null ? "?" : Math.round(attribute.getValue()))
-                    + " (+" + Characters.data(player).allocated(score) + " allocated)");
+        CommandSourceStack source = context.getSource();
+        int available = Characters.available(player);
+        Feedback.send(source, SkillReport.header("Character"));
+        Feedback.send(source, Component.literal("Level ").withStyle(ChatFormatting.GRAY)
+                .append(Component.literal(String.valueOf(Characters.level(player))).withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD))
+                .append(Component.literal("   ·   ").withStyle(ChatFormatting.DARK_GRAY))
+                .append(Component.literal(available + " ability point" + (available == 1 ? "" : "s") + " to spend")
+                        .withStyle(available > 0 ? ChatFormatting.GREEN : ChatFormatting.GRAY))
+                .append(Component.literal(available > 0 ? " (press J)" : "").withStyle(ChatFormatting.DARK_GRAY)));
+
+        Feedback.send(source, Component.literal("Ability scores").withStyle(ChatFormatting.YELLOW));
+        AbilityScore[] scores = AbilityScore.values();
+        for (int i = 0; i < scores.length; i += 3) {
+            MutableComponent line = Component.literal("  ");
+            for (int j = i; j < Math.min(scores.length, i + 3); j++) {
+                AbilityScore score = scores[j];
+                AttributeInstance attribute = player.getAttribute(score.attribute());
+                long value = attribute == null ? Math.round(AbilityScore.BASE) : Math.round(attribute.getValue());
+                int allocated = Characters.data(player).allocated(score);
+                if (j > i) {
+                    line.append(Component.literal("   ·   ").withStyle(ChatFormatting.DARK_GRAY));
+                }
+                line.append(Component.literal(score.abbreviation + " ").withStyle(ChatFormatting.WHITE)
+                        .append(Component.literal(String.valueOf(value)).withStyle(value > AbilityScore.BASE ? ChatFormatting.AQUA : ChatFormatting.GRAY))
+                        .append(Component.literal(allocated > 0 ? " (+" + allocated + ")" : "").withStyle(ChatFormatting.DARK_GREEN))
+                        .withStyle(style -> style.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                score.displayName().copy().append("\n").append(Component.translatable("attribute.dungeondelving." + score.id + ".description"))))));
+            }
+            Feedback.send(source, line);
+        }
+
+        if (SkillLevels.pufferfish()) {
+            int top = Config.CHARACTER_LEVEL_TOP_SKILLS.get();
+            var best = SkillLevels.levelsById(player).entrySet().stream().filter(entry -> entry.getValue() > 0)
+                    .sorted(Map.Entry.<ResourceLocation, Integer>comparingByValue().reversed()).limit(top).toList();
+            Feedback.send(source, Component.literal("Your best " + top + " skills set your level").withStyle(ChatFormatting.YELLOW));
+            if (best.isEmpty()) {
+                Feedback.send(source, Component.literal("  None yet: mine, fight, craft or cast to level a skill.").withStyle(ChatFormatting.GRAY));
+            } else {
+                MutableComponent line = Component.literal("  ");
+                for (int i = 0; i < best.size(); i++) {
+                    if (i > 0) {
+                        line.append(Component.literal("  ·  ").withStyle(ChatFormatting.DARK_GRAY));
+                    }
+                    line.append(SkillGroup.name(best.get(i).getKey()).copy().withStyle(ChatFormatting.WHITE))
+                            .append(Component.literal(" " + best.get(i).getValue()).withStyle(ChatFormatting.AQUA));
+                }
+                Feedback.send(source, line);
+            }
+            Feedback.send(source, Component.literal("All skills: /skills").withStyle(ChatFormatting.DARK_GRAY));
         }
         return 1;
     }

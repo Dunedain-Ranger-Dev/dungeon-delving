@@ -54,6 +54,20 @@ public final class SkillLevels {
         return ModList.get().isLoaded("puffish_skills");
     }
 
+    /** The player's level in each counting skill (from 0), by skill id. Pufferfish's Skills only; empty without it. */
+    public static java.util.Map<ResourceLocation, Integer> levelsById(ServerPlayer player) {
+        java.util.Map<ResourceLocation, Integer> levels = new java.util.LinkedHashMap<>();
+        if (pufferfish()) {
+            for (String id : Config.CHARACTER_LEVEL_SKILLS.get()) {
+                ResourceLocation category = ResourceLocation.tryParse(id);
+                if (category != null) {
+                    PufferfishSkills.level(player, category).ifPresent(level -> levels.put(category, level));
+                }
+            }
+        }
+        return levels;
+    }
+
     /** The player's level in each skill that counts, from 0. */
     public static List<Integer> levels(ServerPlayer player) {
         List<Integer> levels = new ArrayList<>();

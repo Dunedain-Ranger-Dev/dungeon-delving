@@ -24,7 +24,7 @@ final class Feedback {
         send(source, Component.literal("  " + message).withStyle(ChatFormatting.GRAY));
     }
 
-    private static void send(CommandSourceStack source, Component message) {
+    static void send(CommandSourceStack source, Component message) {
         if (source.getEntity() instanceof ServerPlayer player) {
             player.sendSystemMessage(message);
         } else {

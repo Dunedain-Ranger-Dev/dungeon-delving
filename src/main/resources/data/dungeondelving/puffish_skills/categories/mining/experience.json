@@ -51,7 +51,7 @@
             ]
           }
         },
-        "experience": "block_0 * 10 + block_1 * 1 + block_2 * 1"
+        "experience": "max(max(max(0, block_0 * 10), block_1 * 1), block_2 * 1)"
       }
     }
   ]

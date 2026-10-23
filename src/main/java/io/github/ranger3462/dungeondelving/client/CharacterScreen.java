@@ -14,6 +14,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -33,6 +34,10 @@ public class CharacterScreen extends Screen {
             "key.categories.dungeondelving");
     private static final int ROW_HEIGHT = 22;
     private static final int WIDTH = 220;
+    /** The panel's backdrop: the same deepslate tiles as our skill trees, darkened so the text reads in daylight. */
+    private static final ResourceLocation BACKGROUND = ResourceLocation.withDefaultNamespace("textures/block/deepslate_tiles.png");
+    private static final int PADDING = 12;
+    private static final int TOP_SPACE = 44;
 
     /** The latest character info from the server. */
     private static CharacterSyncPayload latest = new CharacterSyncPayload(1, 0, Map.of());
@@ -67,6 +72,19 @@ public class CharacterScreen extends Screen {
                     .bounds(left() + WIDTH - 20, y, 20, 20).build());
             y += ROW_HEIGHT;
         }
+    }
+
+    /** Draws the tiled, darkened panel behind the scores, with a thin border. */
+    @Override
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(graphics, mouseX, mouseY, partialTick);
+        int x0 = left() - PADDING;
+        int y0 = top() - TOP_SPACE;
+        int x1 = left() + WIDTH + PADDING;
+        int y1 = top() + AbilityScore.values().length * ROW_HEIGHT + PADDING;
+        graphics.fill(x0 - 1, y0 - 1, x1 + 1, y1 + 1, 0xFF0E0D0C);
+        graphics.blit(BACKGROUND, x0, y0, 0, 0.0f, 0.0f, x1 - x0, y1 - y0, 16, 16);
+        graphics.fill(x0, y0, x1, y1, 0xB0000000);
     }
 
     @Override

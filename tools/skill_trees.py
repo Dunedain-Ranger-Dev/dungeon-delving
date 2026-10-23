@@ -27,14 +27,34 @@ CRAFTING_CURVE = "20 * (2 * level + 1)"
 CRAFTING_LIMIT = 29
 
 
+def best_of(terms, floor="0"):
+    """An expression for the largest of some terms (nested two-argument max), at least floor."""
+    expression = floor
+    for term in terms:
+        expression = f"max({expression}, {term})"
+    return expression
+
+
 def mine(blocks_xp):
-    """A mine_block source giving experience for blocks in each tag: {"#tag": xp}."""
+    """A mine_block source giving experience for blocks in each tag: {"#tag": xp}. A block in several of the tags
+    gets the best one's experience, not their sum (stone is in two stone tags)."""
     variables, terms = {}, []
     for i, (tag, xp) in enumerate(blocks_xp.items()):
         name = f"block_{i}"
         variables[name] = {"operations": [{"type": "get_mined_block_state"}, {"type": "puffish_skills:test", "data": {"block": tag}}]}
         terms.append(f"{name} * {xp}")
-    return {"type": "puffish_skills:mine_block", "data": {"variables": variables, "experience": " + ".join(terms)}}
+    return {"type": "puffish_skills:mine_block", "data": {"variables": variables, "experience": best_of(terms)}}
+
+
+def fish(fish_xp, other):
+    """A fish_item source: experience by what was caught ({"item id": xp}), and `other` for anything else (cod,
+    junk, treasure)."""
+    variables, terms = {}, []
+    for i, (item, xp) in enumerate(fish_xp.items()):
+        name = f"fish_{i}"
+        variables[name] = {"operations": [{"type": "get_fished_item_stack"}, {"type": "puffish_skills:test", "data": {"item": item}}]}
+        terms.append(f"{name} * {xp}")
+    return {"type": "puffish_skills:fish_item", "data": {"variables": variables, "experience": best_of(terms, str(other))}}
 
 
 def attribute(attr, value, operation="multiply_base"):
@@ -90,7 +110,8 @@ PROFESSIONS = {
     "farming": ("Farming", "minecraft:iron_hoe", [mine({"#minecraft:crops": 3})],
                 [node("green_thumb", "Green Thumb", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")]),
                  node("hardy", "Hardy", "+2 max health.", [attribute("minecraft:generic.max_health", 2, "addition")])]),
-    "fishing": ("Fishing", "minecraft:fishing_rod", [{"type": "puffish_skills:fish_item", "data": {"experience": "15"}}],
+    "fishing": ("Fishing", "minecraft:fishing_rod",
+                [fish({"minecraft:salmon": 5, "minecraft:tropical_fish": 8, "minecraft:pufferfish": 15}, 2)],
                 [node("patient", "Patient", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")]),
                  node("angler", "Angler", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),
     "forging": ("Forging", "dungeondelving:master_anvil", None,

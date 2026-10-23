@@ -189,7 +189,7 @@ public final class ModRegistries {
                     BuiltInRegistries.ITEM.getOptional(DungeonDelving.id(optional)).ifPresent(output::accept);
                 }
                 for (var forging : java.util.List.of(Forging.FORGE_HEARTH_ITEM, Forging.BELLOWS_ITEM, Forging.MASTER_ANVIL_ITEM,
-                        Forging.GRINDING_WHEEL_ITEM, Forging.QUENCHING_OIL, Forging.HEATED_INGOT, Forging.STRUCK_INGOT,
+                        Forging.GRINDING_WHEEL_ITEM, Forging.QUENCHING_OIL, Forging.COKE_INFUSED_IRON_INGOT, Forging.HEATED_INGOT, Forging.STRUCK_INGOT,
                         Forging.QUENCHED_INGOT, Forging.UNSTABLE_INGOT, Forging.TEMPERED_IRON_INGOT, Forging.SAND_FLUX, Forging.BORAX,
                         Forging.BORAX_DEPOSIT_ITEM, Forging.BORAX_FLUX, Forging.RUNIC_FLUX, Forging.RUNEFORGED_FLUX, Forging.ARMOR_PLATE, Forging.RIVETS,
                         Forging.CHAIN_LINKS, Forging.TANNING_RACK_ITEM, Forging.LEATHER_SCRAPS, Forging.REFINED_LEATHER, Forging.BOILED_LEATHER, Forging.HARDENED_LEATHER, Forging.LEATHER_BASE,

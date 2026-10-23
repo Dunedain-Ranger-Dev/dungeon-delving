@@ -93,6 +93,12 @@ public final class Forging {
             new Item.Properties());
     /** Poured into a cauldron, makes an Oil Cauldron. */
     public static final DeferredItem<Item> QUENCHING_OIL = ModRegistries.ITEMS.registerSimpleItem("quenching_oil", new Item.Properties().stacksTo(16));
+    /**
+     * An iron ingot worked together with coal, ready to become steel in a blast furnace. A step of its own, so plain
+     * iron ingots in a blast furnace still heat for forging (the Witcher's steel recipe used to take them first).
+     */
+    public static final DeferredItem<Item> COKE_INFUSED_IRON_INGOT = ModRegistries.ITEMS.registerSimpleItem("coke_infused_iron_ingot",
+            new Item.Properties());
 
     // --- Flux ---
 

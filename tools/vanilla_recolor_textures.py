@@ -52,6 +52,7 @@ RECOLORS = [
     ("block/nether_portal", "block/rift_portal", 0x46C8E0),   # the rift, a cold cyan so it isn't mistaken for the Nether
     ("item/amethyst_shard", "item/bloodshed_stone", 0xB3202A),  # Bloodshed Stone
     ("mob_effect/regeneration", "mob_effect/mending", 0xE8A0C8),  # Mending, the casters' slow heal
+    ("item/iron_ingot", "item/coke_infused_iron_ingot", 0x5A5A62),  # Coke-Infused Iron Ingot: sooty iron, before steel
 ]
 
 

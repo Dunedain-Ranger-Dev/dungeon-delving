@@ -31,6 +31,16 @@ public final class PufferfishSkills {
         return experience(category).map(experience -> experience.getLevel(player));
     }
 
+    /** Where a player stands in a skill: their level (from 0), and experience toward the next level out of what it needs. */
+    public record Progress(int level, int current, int required) {}
+
+    public static Optional<Progress> progress(ServerPlayer player, ResourceLocation category) {
+        return experience(category).map(experience -> {
+            int level = experience.getLevel(player);
+            return new Progress(level, experience.getCurrent(player), experience.getRequired(level));
+        });
+    }
+
     /** A player's total experience in a skill. */
     public static Optional<Integer> total(ServerPlayer player, ResourceLocation category) {
         return experience(category).map(experience -> experience.getTotal(player));

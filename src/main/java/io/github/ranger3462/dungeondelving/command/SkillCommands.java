@@ -10,17 +10,23 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.character.SkillLevels;
 import io.github.ranger3462.dungeondelving.skill.CraftSkill;
 import io.github.ranger3462.dungeondelving.skill.CraftingSkills;
+import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
-/** {@code /skills}: shows your crafting skill levels. {@code /skills set <skill> <level>} sets one, for testing. */
+/**
+ * {@code /skills}: shows every skill tree's level, grouped (or just the crafting skills without Pufferfish's Skills).
+ * {@code /skills set <skill> <level>} sets a crafting skill, for testing.
+ */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class SkillCommands {
     private SkillCommands() {}
@@ -40,6 +46,12 @@ public final class SkillCommands {
 
     private static int show(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
+        if (SkillLevels.pufferfish()) {
+            Feedback.send(context.getSource(), SkillReport.header("Skills"));
+            SkillReport.sendAll(context.getSource(), player);
+            Feedback.send(context.getSource(), Component.literal("Hover a skill for its XP. Open the trees with K.").withStyle(ChatFormatting.DARK_GRAY));
+            return 1;
+        }
         Feedback.tell(context.getSource(), "Crafting skills:");
         for (CraftSkill skill : CraftSkill.values()) {
             int xp = CraftingSkills.xp(player, skill);

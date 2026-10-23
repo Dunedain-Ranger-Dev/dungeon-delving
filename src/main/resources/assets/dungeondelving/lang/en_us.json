@@ -460,5 +460,6 @@
   "skill.dungeondelving.necromancy.eldritch_lore": "Eldritch Lore",
   "skill.dungeondelving.necromancy.eldritch_lore.description": "+3% eldritch spell power for Iron's Spells.",
   "skill.dungeondelving.necromancy.blood_lore": "Blood Lore",
-  "skill.dungeondelving.necromancy.blood_lore.description": "+3% blood spell power for Iron's Spells."
+  "skill.dungeondelving.necromancy.blood_lore.description": "+3% blood spell power for Iron's Spells.",
+  "item.dungeondelving.coke_infused_iron_ingot": "Coke-Infused Iron Ingot"
 }
