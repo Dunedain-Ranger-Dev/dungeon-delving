@@ -31,12 +31,22 @@ public final class SkillLevels {
             "dungeondelving:light_armor", "dungeondelving:medium_armor", "dungeondelving:heavy_armor", "dungeondelving:mage_armor",
             "dungeondelving:fire_magic", "dungeondelving:frost_magic", "dungeondelving:lightning_magic", "dungeondelving:arcane_magic",
             "dungeondelving:holy_magic", "dungeondelving:earth_magic", "dungeondelving:water_magic", "dungeondelving:air_magic",
-            "dungeondelving:blood_magic", "dungeondelving:necromancy", "dungeondelving:beastmastery",
+            "dungeondelving:necromancy", "dungeondelving:beastmastery",
             "skill_tree_rpgs:class_skills");
     /** Earlier defaults: a config still holding one of these was never edited, so it moves to the new list. */
     public static final List<List<String>> OLD_DEFAULT_SKILLS = List.of(List.of("dungeondelving:mining", "dungeondelving:woodcutting",
             "dungeondelving:excavation", "dungeondelving:farming", "dungeondelving:fishing", "dungeondelving:forging", "dungeondelving:leatherworking",
-            "dungeondelving:weaving", "skill_tree_rpgs:class_skills", "skill_tree_rpgs:weapon_skills"));
+            "dungeondelving:weaving", "skill_tree_rpgs:class_skills", "skill_tree_rpgs:weapon_skills"),
+            // Before Blood Magic was folded into Necromancy.
+            List.of("dungeondelving:mining", "dungeondelving:woodcutting", "dungeondelving:excavation", "dungeondelving:farming",
+                    "dungeondelving:fishing", "dungeondelving:forging", "dungeondelving:leatherworking", "dungeondelving:weaving",
+                    "dungeondelving:one_handed", "dungeondelving:two_handed", "dungeondelving:polearms", "dungeondelving:daggers",
+                    "dungeondelving:unarmed", "dungeondelving:archery", "dungeondelving:crossbows", "dungeondelving:dual_wielding",
+                    "dungeondelving:blocking", "dungeondelving:light_armor", "dungeondelving:medium_armor", "dungeondelving:heavy_armor",
+                    "dungeondelving:mage_armor", "dungeondelving:fire_magic", "dungeondelving:frost_magic", "dungeondelving:lightning_magic",
+                    "dungeondelving:arcane_magic", "dungeondelving:holy_magic", "dungeondelving:earth_magic", "dungeondelving:water_magic",
+                    "dungeondelving:air_magic", "dungeondelving:blood_magic", "dungeondelving:necromancy", "dungeondelving:beastmastery",
+                    "skill_tree_rpgs:class_skills"));
 
     private SkillLevels() {}
 

@@ -11,9 +11,15 @@
     "y": 0,
     "root": false
   },
-  "necromancy_lore": {
-    "definition": "necromancy_lore",
+  "eldritch_lore": {
+    "definition": "eldritch_lore",
     "x": 80,
+    "y": 0,
+    "root": false
+  },
+  "blood_lore": {
+    "definition": "blood_lore",
+    "x": 120,
     "y": 0,
     "root": false
   }

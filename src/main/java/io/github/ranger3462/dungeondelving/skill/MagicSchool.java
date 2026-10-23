@@ -17,7 +17,7 @@ public enum MagicSchool {
     EARTH("earth_magic"),
     WATER("water_magic"),
     AIR("air_magic"),
-    BLOOD("blood_magic"),
+    /** Soul and eldritch magic, and blood magic too. */
     NECROMANCY("necromancy");
 
     /** Experience for each spell cast: a base, plus some for its level (Iron's) or for a full cast (Spell Engine). */
@@ -32,7 +32,7 @@ public enum MagicSchool {
             Map.entry("spell_power:earth", EARTH), Map.entry("spell_power:nature", EARTH), Map.entry("irons_spellbooks:nature", EARTH),
             Map.entry("spell_power:water", WATER),
             Map.entry("spell_power:air", AIR),
-            Map.entry("spell_power:blood", BLOOD), Map.entry("irons_spellbooks:blood", BLOOD),
+            Map.entry("spell_power:blood", NECROMANCY), Map.entry("irons_spellbooks:blood", NECROMANCY),
             Map.entry("spell_power:soul", NECROMANCY), Map.entry("spell_power:unholy", NECROMANCY), Map.entry("irons_spellbooks:eldritch", NECROMANCY));
 
     public final String skill;

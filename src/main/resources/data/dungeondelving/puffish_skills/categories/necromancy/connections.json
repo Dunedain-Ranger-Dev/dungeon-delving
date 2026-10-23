@@ -7,7 +7,11 @@
       ],
       [
         "necromancy_expert",
-        "necromancy_lore"
+        "eldritch_lore"
+      ],
+      [
+        "eldritch_lore",
+        "blood_lore"
       ]
     ]
   }

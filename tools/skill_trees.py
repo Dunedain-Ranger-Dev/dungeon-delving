@@ -58,17 +58,19 @@ def ranged(key, name):
                  [attribute("ranged_weapon:damage", 0.03, "multiply_total")], ["ranged_weapon_api"])]
 
 
-def school(key, name, spell_power, irons=None):
-    """A magic school tree. spell_power is its Spell Power school (None if it has none, like blood); irons is its
-    Iron's Spells school, for a node raising that school's Iron's spell power."""
+def school(key, name, spell_power, irons=()):
+    """A magic school tree. spell_power is its Spell Power school (None if it has none); irons are its Iron's Spells
+    schools, each with a node raising that school's Iron's spell power."""
     nodes = [] if spell_power is None else [
         node(f"{key}_adept", f"{name} Adept", f"+0.5 {name.lower()} spell power.",
              [attribute(f"spell_power:{spell_power}", 0.5, "addition")], ["spell_power"]),
         node(f"{key}_expert", f"{name} Expert", f"+0.5 {name.lower()} spell power.",
              [attribute(f"spell_power:{spell_power}", 0.5, "addition")], ["spell_power"])]
-    if irons:
-        nodes.append(node(f"{key}_lore", f"{name} Lore", f"+3% {name.lower()} spell power for Iron's Spells.",
-                          [attribute(f"irons_spellbooks:{irons}_spell_power", 0.03)], ["irons_spellbooks"]))
+    for irons_school in ([irons] if isinstance(irons, str) else irons):
+        lore = irons_school if len(irons) > 1 and not isinstance(irons, str) else key
+        title = irons_school.capitalize() if lore != key else name
+        nodes.append(node(f"{lore}_lore", f"{title} Lore", f"+3% {irons_school} spell power for Iron's Spells.",
+                          [attribute(f"irons_spellbooks:{irons_school}_spell_power", 0.03)], ["irons_spellbooks"]))
     return nodes
 
 
@@ -135,8 +137,7 @@ ACTIVITIES = {
     "earth_magic": ("Earth Magic", "minecraft:moss_block", school("earth", "Earth", "earth", "nature")),
     "water_magic": ("Water Magic", "minecraft:heart_of_the_sea", school("water", "Water", "water")),
     "air_magic": ("Air Magic", "minecraft:feather", school("air", "Air", "air")),
-    "blood_magic": ("Blood Magic", "minecraft:redstone", school("blood", "Blood", None, "blood")),
-    "necromancy": ("Necromancy", "minecraft:wither_skeleton_skull", school("necromancy", "Necromancy", "soul", "eldritch")),
+    "necromancy": ("Necromancy", "minecraft:wither_skeleton_skull", school("necromancy", "Necromancy", "soul", ("eldritch", "blood"))),
     "beastmastery": ("Beastmastery", "minecraft:lead",
                      [node("animal_friend", "Animal Friend", "Your first step as a beastmaster. Companions and their perks come in a later update.", [])]),
 }

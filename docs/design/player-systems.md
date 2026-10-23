@@ -133,8 +133,8 @@ radial class tree and weapon tree are retired in favour of these (switched off b
 **Magic schools** (from casting that school's spells, in Spell Engine or Iron's Spells), each levelling on its own so
 you can master frost and still be a fire apprentice:
 - **Fire** (fire), **Frost** (frost, Iron's ice), **Lightning**, **Arcane** (arcane, Iron's ender and evocation),
-  **Holy** (healing, Iron's holy), **Earth** (earth, Iron's nature), **Water**, **Air**, **Blood** (Iron's),
-  **Necromancy** (soul, Iron's eldritch).
+  **Holy** (healing, Iron's holy), **Earth** (earth, Iron's nature), **Water**, **Air**, **Necromancy** (soul, Iron's
+  eldritch and blood; blood was folded in to keep the tree count down).
 - The Witcher's signs stay with a future Witcher specialization, not the shared schools.
 
 **Beastmastery** (planned; no pets system yet): from taming and breeding animals for now, and from fighting alongside

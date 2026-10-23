@@ -67,12 +67,46 @@
       "spell_power"
     ]
   },
-  "necromancy_lore": {
+  "eldritch_lore": {
     "title": {
-      "translate": "skill.dungeondelving.necromancy.necromancy_lore"
+      "translate": "skill.dungeondelving.necromancy.eldritch_lore"
     },
     "description": {
-      "translate": "skill.dungeondelving.necromancy.necromancy_lore.description"
+      "translate": "skill.dungeondelving.necromancy.eldritch_lore.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:wither_skeleton_skull"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:eldritch_spell_power",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  },
+  "blood_lore": {
+    "title": {
+      "translate": "skill.dungeondelving.necromancy.blood_lore"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.necromancy.blood_lore.description"
     },
     "icon": {
       "type": "item",
@@ -90,7 +124,7 @@
       {
         "type": "puffish_skills:attribute",
         "data": {
-          "attribute": "irons_spellbooks:eldritch_spell_power",
+          "attribute": "irons_spellbooks:blood_spell_power",
           "operation": "multiply_base",
           "value": 0.03
         }

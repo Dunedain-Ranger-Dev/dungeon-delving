@@ -80,7 +80,8 @@ public class ActivitySkillTests {
     public static void spellSchoolsMapAcrossBothMods(GameTestHelper helper) {
         helper.assertTrue(MagicSchool.byId("spell_power:frost").equals(Optional.of(MagicSchool.FROST))
                 && MagicSchool.byId("irons_spellbooks:ice").equals(Optional.of(MagicSchool.FROST)), "Spell Engine frost and Iron's ice are one school");
-        helper.assertTrue(MagicSchool.byId("irons_spellbooks:eldritch").equals(Optional.of(MagicSchool.NECROMANCY)), "eldritch is necromancy");
+        helper.assertTrue(MagicSchool.byId("irons_spellbooks:eldritch").equals(Optional.of(MagicSchool.NECROMANCY))
+                && MagicSchool.byId("irons_spellbooks:blood").equals(Optional.of(MagicSchool.NECROMANCY)), "eldritch and blood magic are necromancy");
         helper.assertTrue(MagicSchool.byId("spell_power:physical_melee").isEmpty() && MagicSchool.byId("spell_power:igni").isEmpty(),
                 "martial skills and Witcher signs aren't magic schools");
         helper.succeed();
