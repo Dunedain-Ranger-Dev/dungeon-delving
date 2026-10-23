@@ -1,37 +1,22 @@
 package io.github.ranger3462.dungeondelving.entity;
 
-import java.util.Map;
-
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
-import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
-import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
-import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerLevelAccessor;
 
 /**
- * The spear goblin: the everyday dungeon enemy. Small, fast and fragile; it rushes straight at the player. Faster than
- * a zombie, and three hits from an iron sword kill it. Goblins are hostile, and swarm when one is hit (see
- * {@link GoblinSwarm}).
+ * The goblin warrior: the everyday goblin. Small, fast and fragile, with no armor; it rushes straight at the player, and
+ * goblins are dangerous in numbers. Faster than a zombie, and three hits from an iron sword kill it. Goblins swarm when
+ * one is hit (see {@link GoblinSwarm}).
  */
-public class Goblin extends Monster {
+public class Goblin extends ArmedHumanoid {
     public static final double MAX_HEALTH = 14.0;
     public static final double SPEED = 0.30;
     public static final double DAMAGE = 3.0;
@@ -51,48 +36,13 @@ public class Goblin extends Monster {
     }
 
     @Override
-    protected void registerGoals() {
-        goalSelector.addGoal(0, new FloatGoal(this));
-        addAttackGoal();
-        goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0));
-        goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0f));
-        goalSelector.addGoal(8, new RandomLookAroundGoal(this));
-        targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
-    }
-
-    /** How this goblin fights: spear goblins rush in and stab. */
-    protected void addAttackGoal() {
-        goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.1, true));
-    }
-
-    /** The weapon this goblin spawns holding. */
     protected ItemStack weapon() {
         return new ItemStack(ModEntities.GOBLIN_SPEAR.get());
     }
 
-    /** What this goblin holds in its off hand: nothing for plain goblins; shields and second weapons for hobgoblins. */
-    protected ItemStack offhand() {
-        return ItemStack.EMPTY;
-    }
-
-    /** The armor this goblin wears, by slot. Goblins wear none; their danger is their numbers. */
-    protected Map<EquipmentSlot, ItemStack> armor() {
-        return Map.of();
-    }
-
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, SpawnGroupData data) {
-        SpawnGroupData result = super.finalizeSpawn(level, difficulty, spawnType, data);
-        setItemSlot(EquipmentSlot.MAINHAND, weapon());
-        setDropChance(EquipmentSlot.MAINHAND, SPEAR_DROP_CHANCE);
-        setItemSlot(EquipmentSlot.OFFHAND, offhand());
-        setDropChance(EquipmentSlot.OFFHAND, 0.0f);
-        armor().forEach((slot, item) -> {
-            setItemSlot(slot, item);
-            setDropChance(slot, 0.0f);
-        });
-        return result;
+    protected float weaponDropChance() {
+        return SPEAR_DROP_CHANCE;
     }
 
     @Override

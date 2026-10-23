@@ -13,10 +13,15 @@ import io.github.ranger3462.dungeondelving.entity.Goblin;
 import io.github.ranger3462.dungeondelving.entity.GoblinArcher;
 import io.github.ranger3462.dungeondelving.entity.BoggedSwordsman;
 import io.github.ranger3462.dungeondelving.entity.GoblinBowItem;
+import io.github.ranger3462.dungeondelving.entity.Orc;
+import io.github.ranger3462.dungeondelving.entity.OrcBosses;
+import io.github.ranger3462.dungeondelving.entity.OrcRaider;
+import io.github.ranger3462.dungeondelving.entity.OrcVagabond;
 import io.github.ranger3462.dungeondelving.entity.SkeletonKnight;
 import io.github.ranger3462.dungeondelving.entity.SkeletonLord;
 import io.github.ranger3462.dungeondelving.entity.SkeletonSwordsman;
 import io.github.ranger3462.dungeondelving.entity.StraySwordsman;
+import io.github.ranger3462.dungeondelving.entity.ThrownAxe;
 import io.github.ranger3462.dungeondelving.entity.WitherSkeletonArcher;
 import io.github.ranger3462.dungeondelving.entity.ZombieLord;
 import net.minecraft.core.registries.Registries;
@@ -85,6 +90,38 @@ public final class ModEntities {
     public static final DeferredItem<DeferredSpawnEggItem> GOBLIN_GLADIATOR_SPAWN_EGG = egg("goblin_gladiator", GOBLIN_GLADIATOR, 0xC8A040);
     public static final DeferredItem<DeferredSpawnEggItem> HOBGOBLIN_VETERAN_SPAWN_EGG = egg("hobgoblin_veteran", HOBGOBLIN_VETERAN, 0xC8A040);
     public static final DeferredItem<DeferredSpawnEggItem> HOBGOBLIN_GENERAL_SPAWN_EGG = egg("hobgoblin_general", HOBGOBLIN_GENERAL, 0xC8A040);
+
+    /** Orcs (DD-74): bigger than men, in warbands; the casters come with Iron's Spells. */
+    public static final DeferredHolder<EntityType<?>, EntityType<Orc.Scrapper>> ORC_SCRAPPER = orc("orc_scrapper", Orc.Scrapper::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<OrcRaider>> ORC_RAIDER = orc("orc_raider", OrcRaider::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<Orc.Veteran>> ORC_VETERAN = orc("orc_veteran", Orc.Veteran::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<OrcVagabond>> ORC_VAGABOND = orc("orc_vagabond", OrcVagabond::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<Orc.Rampager>> ORC_RAMPAGER = orc("orc_rampager", Orc.Rampager::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<OrcBosses.Commander>> ORC_COMMANDER = orc("orc_commander", OrcBosses.Commander::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<OrcBosses.Chieftain>> ORC_CHIEFTAIN = orc("orc_chieftain", OrcBosses.Chieftain::new);
+    public static final DeferredHolder<EntityType<?>, EntityType<OrcBosses.Warchief>> ORC_WARCHIEF = orc("orc_warchief", OrcBosses.Warchief::new);
+    /** The hand axe orc raiders throw. */
+    public static final DeferredHolder<EntityType<?>, EntityType<ThrownAxe>> THROWN_AXE = ENTITIES.register("thrown_axe",
+            () -> EntityType.Builder.<ThrownAxe>of(ThrownAxe::new, MobCategory.MISC).sized(0.4f, 0.4f).clientTrackingRange(4).updateInterval(10)
+                    .build(DungeonDelving.id("thrown_axe").toString()));
+
+    public static final DeferredItem<DeferredSpawnEggItem> ORC_SCRAPPER_SPAWN_EGG = orcEgg("orc_scrapper", ORC_SCRAPPER, 0x6B4A2B);
+    public static final DeferredItem<DeferredSpawnEggItem> ORC_RAIDER_SPAWN_EGG = orcEgg("orc_raider", ORC_RAIDER, 0x9A9A9A);
+    public static final DeferredItem<DeferredSpawnEggItem> ORC_VETERAN_SPAWN_EGG = orcEgg("orc_veteran", ORC_VETERAN, 0x5A5F6A);
+    public static final DeferredItem<DeferredSpawnEggItem> ORC_VAGABOND_SPAWN_EGG = orcEgg("orc_vagabond", ORC_VAGABOND, 0x4A3A2A);
+    public static final DeferredItem<DeferredSpawnEggItem> ORC_RAMPAGER_SPAWN_EGG = orcEgg("orc_rampager", ORC_RAMPAGER, 0xA02020);
+    public static final DeferredItem<DeferredSpawnEggItem> ORC_COMMANDER_SPAWN_EGG = orcEgg("orc_commander", ORC_COMMANDER, 0xC8A040);
+    public static final DeferredItem<DeferredSpawnEggItem> ORC_CHIEFTAIN_SPAWN_EGG = orcEgg("orc_chieftain", ORC_CHIEFTAIN, 0xC8A040);
+    public static final DeferredItem<DeferredSpawnEggItem> ORC_WARCHIEF_SPAWN_EGG = orcEgg("orc_warchief", ORC_WARCHIEF, 0xC8A040);
+
+    private static <T extends Orc> DeferredHolder<EntityType<?>, EntityType<T>> orc(String name, EntityType.EntityFactory<T> factory) {
+        return ENTITIES.register(name, () -> EntityType.Builder.of(factory, MobCategory.MONSTER).sized(0.7f, 2.0f).eyeHeight(1.8f)
+                .clientTrackingRange(8).build(DungeonDelving.id(name).toString()));
+    }
+
+    private static DeferredItem<DeferredSpawnEggItem> orcEgg(String name, DeferredHolder<EntityType<?>, ? extends EntityType<? extends Mob>> type, int spots) {
+        return ModRegistries.ITEMS.registerItem(name + "_spawn_egg", properties -> new DeferredSpawnEggItem(type, 0x6E7F5A, spots, properties));
+    }
 
     private static <T extends Hobgoblin> DeferredHolder<EntityType<?>, EntityType<T>> hobgoblin(String name, EntityType.EntityFactory<T> factory) {
         return ENTITIES.register(name, () -> EntityType.Builder.of(factory, MobCategory.MONSTER).sized(0.6f, 1.95f).eyeHeight(1.74f)
@@ -171,6 +208,14 @@ public final class ModEntities {
         event.put(GOBLIN_GLADIATOR.get(), GoblinBosses.Gladiator.createAttributes().build());
         event.put(HOBGOBLIN_VETERAN.get(), GoblinBosses.Veteran.createAttributes().build());
         event.put(HOBGOBLIN_GENERAL.get(), GoblinBosses.General.createAttributes().build());
+        event.put(ORC_SCRAPPER.get(), Orc.Scrapper.createAttributes().build());
+        event.put(ORC_RAIDER.get(), OrcRaider.createAttributes().build());
+        event.put(ORC_VETERAN.get(), Orc.Veteran.createAttributes().build());
+        event.put(ORC_VAGABOND.get(), OrcVagabond.createAttributes().build());
+        event.put(ORC_RAMPAGER.get(), Orc.Rampager.createAttributes().build());
+        event.put(ORC_COMMANDER.get(), OrcBosses.Commander.createAttributes().build());
+        event.put(ORC_CHIEFTAIN.get(), OrcBosses.Chieftain.createAttributes().build());
+        event.put(ORC_WARCHIEF.get(), OrcBosses.Warchief.createAttributes().build());
     }
 
     @SubscribeEvent
@@ -178,7 +223,8 @@ public final class ModEntities {
         for (EntityType<? extends Monster> goblin : List.of(GOBLIN.get(), GOBLIN_ARCHER.get(), SKELETON_SWORDSMAN.get(), SKELETON_KNIGHT.get(),
                 SKELETON_LORD.get(), STRAY_SWORDSMAN.get(), BOGGED_SWORDSMAN.get(), WITHER_SKELETON_ARCHER.get(), ZOMBIE_LORD.get(),
                 HOBGOBLIN_SOLDIER.get(), HOBGOBLIN_HUNTER.get(), HOBGOBLIN_VANGUARD.get(), HOBGOBLIN_SPELLBREAKER.get(), GOBLIN_GLADIATOR.get(),
-                HOBGOBLIN_VETERAN.get(), HOBGOBLIN_GENERAL.get())) {
+                HOBGOBLIN_VETERAN.get(), HOBGOBLIN_GENERAL.get(), ORC_SCRAPPER.get(), ORC_RAIDER.get(), ORC_VETERAN.get(), ORC_VAGABOND.get(),
+                ORC_RAMPAGER.get(), ORC_COMMANDER.get(), ORC_CHIEFTAIN.get(), ORC_WARCHIEF.get())) {
             event.register(goblin, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules,
                     RegisterSpawnPlacementsEvent.Operation.REPLACE);
         }

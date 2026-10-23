@@ -1,0 +1,25 @@
+{
+  "replace": false,
+  "values": [
+    "dungeondelving:orc_scrapper",
+    "dungeondelving:orc_raider",
+    "dungeondelving:orc_veteran",
+    "dungeondelving:orc_vagabond",
+    "dungeondelving:orc_rampager",
+    "dungeondelving:orc_commander",
+    "dungeondelving:orc_chieftain",
+    "dungeondelving:orc_warchief",
+    {
+      "id": "dungeondelving:orc_doomsayer",
+      "required": false
+    },
+    {
+      "id": "dungeondelving:orc_shaman",
+      "required": false
+    },
+    {
+      "id": "dungeondelving:orc_lorekeeper",
+      "required": false
+    }
+  ]
+}

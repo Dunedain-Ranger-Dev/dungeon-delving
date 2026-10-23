@@ -19,7 +19,7 @@ import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.level.Level;
 
 /** The hobgoblin hunter (tiers 3-4): keeps its distance and shoots a crossbow, in a leather cap and jerkin. */
-public class HobgoblinHunter extends Hobgoblin implements CrossbowAttackMob {
+public class HobgoblinHunter extends Hobgoblin implements CrossbowAttackMob, CrossbowWielder {
     private static final EntityDataAccessor<Boolean> CHARGING = SynchedEntityData.defineId(HobgoblinHunter.class, EntityDataSerializers.BOOLEAN);
 
     public HobgoblinHunter(EntityType<? extends HobgoblinHunter> type, Level level) {
@@ -52,6 +52,7 @@ public class HobgoblinHunter extends Hobgoblin implements CrossbowAttackMob {
     }
 
     /** Whether it's winding its crossbow (shown in its arm pose). */
+    @Override
     public boolean isChargingCrossbow() {
         return entityData.get(CHARGING);
     }

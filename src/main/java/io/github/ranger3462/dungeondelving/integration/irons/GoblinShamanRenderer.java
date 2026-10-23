@@ -26,6 +26,9 @@ public class GoblinShamanRenderer extends AbstractSpellCastingMobRenderer {
     public static void register(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(IronsGoblins.GOBLIN_SHAMAN.get(), context -> new GoblinShamanRenderer(context, "goblin_shaman", 0.75f));
         event.registerEntityRenderer(IronsGoblins.GOBLIN_PYRO.get(), context -> new GoblinShamanRenderer(context, "goblin_pyro", 0.75f));
+        event.registerEntityRenderer(IronsOrcs.ORC_DOOMSAYER.get(), context -> new GoblinShamanRenderer(context, "orc_doomsayer", 1.08f));
+        event.registerEntityRenderer(IronsOrcs.ORC_SHAMAN.get(), context -> new GoblinShamanRenderer(context, "orc_shaman", 1.08f));
+        event.registerEntityRenderer(IronsOrcs.ORC_LOREKEEPER.get(), context -> new GoblinShamanRenderer(context, "orc_lorekeeper", 1.08f));
         event.registerEntityRenderer(IronsGoblins.GOBLIN_CHIEF.get(), context -> new GoblinShamanRenderer(context, "goblin_chief", 0.95f));
         // Skeleton mages borrow Iron's own necromancer look until they get their own texture.
         event.registerEntityRenderer(IronsSkeletons.SKELETON_MAGE.get(),

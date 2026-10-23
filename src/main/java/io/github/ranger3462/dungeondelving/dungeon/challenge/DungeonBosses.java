@@ -18,6 +18,7 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
+import io.github.ranger3462.dungeondelving.entity.OrcBosses;
 import io.github.ranger3462.dungeondelving.entity.SkeletonLord;
 import io.github.ranger3462.dungeondelving.entity.ZombieLord;
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
@@ -80,6 +81,9 @@ public final class DungeonBosses {
     public static final String GOBLIN_GLADIATOR = "goblin_gladiator";
     public static final String HOBGOBLIN_VETERAN = "hobgoblin_veteran";
     public static final String HOBGOBLIN_GENERAL = "hobgoblin_general";
+    public static final String ORC_COMMANDER = "orc_commander";
+    public static final String ORC_CHIEFTAIN = "orc_chieftain";
+    public static final String ORC_WARCHIEF = "orc_warchief";
     /** Registered by the Iron's Spells integration; without it, the Barrow King guards tier 4 as well. */
     public static final String LICH_LORD = "lich_lord";
     /** How close players must be to see a boss's health bar. */
@@ -120,6 +124,9 @@ public final class DungeonBosses {
         register(new BossType(GOBLIN_GLADIATOR, DungeonFactions.GOBLINS, tier -> tier == 1, GoblinBosses::gladiator));
         register(new BossType(HOBGOBLIN_VETERAN, DungeonFactions.GOBLINS, tier -> tier == 3, GoblinBosses::veteran));
         register(new BossType(HOBGOBLIN_GENERAL, DungeonFactions.GOBLINS, tier -> tier == 4, GoblinBosses::general));
+        register(new BossType(ORC_COMMANDER, DungeonFactions.ORCS, tier -> tier == 1, OrcBosses::commander));
+        register(new BossType(ORC_CHIEFTAIN, DungeonFactions.ORCS, tier -> tier == 2, OrcBosses::chieftain));
+        register(new BossType(ORC_WARCHIEF, DungeonFactions.ORCS, tier -> tier == 4, OrcBosses::warchief));
         register(new BossType(SKELETON_LORD, DungeonFactions.UNDEAD, tier -> tier == 2, SkeletonLord::create));
         register(new BossType(BARROW_KING, DungeonFactions.UNDEAD, tier -> tier == 3 || (tier == 4 && !TYPES.containsKey(LICH_LORD)),
                 DungeonBosses::createBarrowKing));

@@ -20,6 +20,7 @@ import net.minecraft.util.RandomSource;
 public final class DungeonFactions {
     public static final String GOBLINS = "goblins";
     public static final String UNDEAD = "undead";
+    public static final String ORCS = "orcs";
     /** The undead's old name, still found in saved runs. */
     private static final String OLD_SKELETONS = "skeletons";
 
@@ -36,6 +37,14 @@ public final class DungeonFactions {
             "dungeondelving:stray_swordsman=40@2", "minecraft:stray=30@2", "minecraft:husk=30@2",
             "dungeondelving:bogged_swordsman=40@3", "minecraft:bogged=30@3", "minecraft:drowned=30@3",
             "minecraft:wither_skeleton=40@4", "dungeondelving:wither_skeleton_archer=30@4", "dungeondelving:wither_skeleton_mage=20@4");
+    /**
+     * One set of orcs per tier (DD-74): scrappers and raiders at tier 1; veterans, raiders and doomsayers at 2; veterans,
+     * vagabonds and doomsayers at 3; rampagers, vagabonds and shamans at 4 (the casters need Iron's Spells).
+     */
+    public static final List<String> ORC_DEFAULTS = List.of(
+            "dungeondelving:orc_scrapper=55@1", "dungeondelving:orc_raider=45@1-2",
+            "dungeondelving:orc_veteran=45@2-3", "dungeondelving:orc_doomsayer=15@2-3",
+            "dungeondelving:orc_vagabond=35@3-4", "dungeondelving:orc_rampager=45@4", "dungeondelving:orc_shaman=15@4");
     public static final List<String> ENABLED_DEFAULTS = List.of(UNDEAD);
 
     private static final Map<String, Supplier<List<? extends String>>> MOBS = new LinkedHashMap<>();
@@ -43,6 +52,7 @@ public final class DungeonFactions {
     static {
         MOBS.put(GOBLINS, () -> Config.GOBLIN_MOBS.get()); // Lambdas, not method references: Config may still be loading here.
         MOBS.put(UNDEAD, () -> Config.UNDEAD_MOBS.get());
+        MOBS.put(ORCS, () -> Config.ORC_MOBS.get());
     }
 
     private DungeonFactions() {}

@@ -14,6 +14,7 @@ import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import io.github.ranger3462.dungeondelving.forging.Forging;
 import io.github.ranger3462.dungeondelving.gate.DungeonGates;
+import io.github.ranger3462.dungeondelving.integration.irons.IronsOrcs;
 import io.github.ranger3462.dungeondelving.skill.CraftingSkills;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsGoblins;
@@ -163,7 +164,10 @@ public final class ModRegistries {
                 output.accept(ModEntities.GOBLIN_BOW.get());
                 for (var egg : java.util.List.of(ModEntities.HOBGOBLIN_SOLDIER_SPAWN_EGG, ModEntities.HOBGOBLIN_HUNTER_SPAWN_EGG,
                         ModEntities.HOBGOBLIN_VANGUARD_SPAWN_EGG, ModEntities.HOBGOBLIN_SPELLBREAKER_SPAWN_EGG, ModEntities.GOBLIN_GLADIATOR_SPAWN_EGG,
-                        ModEntities.HOBGOBLIN_VETERAN_SPAWN_EGG, ModEntities.HOBGOBLIN_GENERAL_SPAWN_EGG)) {
+                        ModEntities.HOBGOBLIN_VETERAN_SPAWN_EGG, ModEntities.HOBGOBLIN_GENERAL_SPAWN_EGG, ModEntities.ORC_SCRAPPER_SPAWN_EGG,
+                        ModEntities.ORC_RAIDER_SPAWN_EGG, ModEntities.ORC_VETERAN_SPAWN_EGG, ModEntities.ORC_VAGABOND_SPAWN_EGG,
+                        ModEntities.ORC_RAMPAGER_SPAWN_EGG, ModEntities.ORC_COMMANDER_SPAWN_EGG, ModEntities.ORC_CHIEFTAIN_SPAWN_EGG,
+                        ModEntities.ORC_WARCHIEF_SPAWN_EGG)) {
                     output.accept(egg.get());
                 }
                 output.accept(ModEntities.SKELETON_SWORDSMAN_SPAWN_EGG.get());
@@ -173,7 +177,8 @@ public final class ModRegistries {
                 output.accept(ModEntities.BOGGED_SWORDSMAN_SPAWN_EGG.get());
                 output.accept(ModEntities.WITHER_SKELETON_ARCHER_SPAWN_EGG.get());
                 output.accept(ModEntities.ZOMBIE_LORD_SPAWN_EGG.get());
-                for (String optional : new String[] { "goblin_shaman_spawn_egg", "goblin_pyro_spawn_egg", "goblin_chief_spawn_egg", "goblin_totem_staff", "goblin_chief_staff",
+                for (String optional : new String[] { "goblin_shaman_spawn_egg", "goblin_pyro_spawn_egg", "goblin_chief_spawn_egg", "orc_doomsayer_spawn_egg",
+                        "orc_shaman_spawn_egg", "orc_lorekeeper_spawn_egg", "goblin_totem_staff", "goblin_chief_staff",
                         "skeleton_mage_spawn_egg", "wither_skeleton_mage_spawn_egg", "lich_lord_spawn_egg" }) {
                     BuiltInRegistries.ITEM.getOptional(DungeonDelving.id(optional)).ifPresent(output::accept);
                 }
@@ -219,6 +224,7 @@ public final class ModRegistries {
         if (ModList.get().isLoaded("irons_spellbooks")) {
             IronsGoblins.register(modEventBus);
             IronsSkeletons.register(modEventBus);
+            IronsOrcs.register(modEventBus);
         }
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
