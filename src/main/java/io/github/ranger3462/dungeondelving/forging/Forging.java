@@ -58,8 +58,8 @@ public final class Forging {
     // --- Blocks ---
 
     public static final DeferredBlock<ForgeHearthBlock> FORGE_HEARTH = ModRegistries.BLOCKS.registerBlock("forge_hearth", ForgeHearthBlock::new,
-            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(3.5f, 6.0f).requiresCorrectToolForDrops().sound(SoundType.STONE)
-                    .lightLevel(state -> state.getValue(ForgeHearthBlock.LIT) ? 13 : 0));
+            BlockBehaviour.Properties.of().mapColor(MapColor.QUARTZ).strength(3.5f, 6.0f).requiresCorrectToolForDrops().sound(SoundType.STONE)
+                    .noOcclusion().lightLevel(state -> state.getValue(ForgeHearthBlock.LIT) ? 13 : 0));
     public static final DeferredItem<BlockItem> FORGE_HEARTH_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(FORGE_HEARTH);
     public static final DeferredBlock<BellowsBlock> BELLOWS = ModRegistries.BLOCKS.registerBlock("bellows", BellowsBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.0f).sound(SoundType.WOOD).noOcclusion());

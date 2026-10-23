@@ -1,6 +1,8 @@
 package io.github.ranger3462.dungeondelving.forging;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import com.mojang.serialization.MapCodec;
 
@@ -17,6 +19,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -25,6 +28,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
  * The heart of a forge. It checks the stations around it every couple of seconds and lights up once the workshop is
@@ -35,6 +41,31 @@ public class ForgeHearthBlock extends HorizontalDirectionalBlock {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     /** How often the hearth checks its workshop, in ticks. */
     private static final int CHECK_INTERVAL = 40;
+    /**
+     * The hearth's outline, for each way it can face: its two-tier base, the firebox under the lintel, and the fire tray
+     * at the front. Matches HEARTH_SHAPE in tools/forging_resources.py (the model), given there facing north.
+     */
+    private static final Map<Direction, VoxelShape> SHAPES = new EnumMap<>(Direction.class);
+
+    static {
+        for (Direction facing : Direction.Plane.HORIZONTAL) {
+            SHAPES.put(facing, Shapes.or(
+                    turned(facing, 0, 0, 0, 16, 2, 16),
+                    turned(facing, 1, 2, 2, 15, 4, 15),
+                    turned(facing, 4.5, 4, 2.5, 11.5, 5, 6),
+                    turned(facing, 2, 4, 6, 14, 16, 15)));
+        }
+    }
+
+    /** A box given facing north (in pixels), turned to face another way, as the block's model is. */
+    private static VoxelShape turned(Direction facing, double x1, double y1, double z1, double x2, double y2, double z2) {
+        return switch (facing) {
+            case EAST -> Block.box(16 - z2, y1, x1, 16 - z1, y2, x2);
+            case SOUTH -> Block.box(16 - x2, y1, 16 - z2, 16 - x1, y2, 16 - z1);
+            case WEST -> Block.box(z1, y1, 16 - x2, z2, y2, 16 - x1);
+            default -> Block.box(x1, y1, z1, x2, y2, z2);
+        };
+    }
 
     public ForgeHearthBlock(Properties properties) {
         super(properties);
@@ -44,6 +75,11 @@ public class ForgeHearthBlock extends HorizontalDirectionalBlock {
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return CODEC;
+    }
+
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        return SHAPES.get(state.getValue(FACING));
     }
 
     @Override
@@ -117,7 +153,7 @@ public class ForgeHearthBlock extends HorizontalDirectionalBlock {
         double x = pos.getX() + 0.5;
         double y = pos.getY() + 1.0;
         double z = pos.getZ() + 0.5;
-        level.addParticle(ParticleTypes.FLAME, x + random.nextDouble() * 0.5 - 0.25, y, z + random.nextDouble() * 0.5 - 0.25, 0.0, 0.02, 0.0);
+        // The flames are part of the model; only a little smoke rises from the top.
         if (random.nextInt(4) == 0) {
             level.addParticle(ParticleTypes.SMOKE, x, y + 0.2, z, 0.0, 0.05, 0.0);
         }
