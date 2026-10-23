@@ -1,0 +1,958 @@
+{
+  "rogue_boost": {
+    "description": {
+      "skill_definition_id": "rogue_boost"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "rogues:iron_sickle"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_boost.title"
+    }
+  },
+  "rogue_root": {
+    "description": {
+      "skill_definition_id": "rogue_root"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "components": {
+          "spell_engine:item_model": "rogues:item/spell_book/rogue"
+        },
+        "item": "spell_engine:spell_book"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_root.title"
+    }
+  },
+  "rogue_tier_1_passive_1": {
+    "description": {
+      "skill_definition_id": "rogue_tier_1_passive_1"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "skill_tree_rpgs:textures/spell/rogue_tier_1_passive_1.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_1_passive_1"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_1_passive_1.title"
+    }
+  },
+  "rogue_tier_1_passive_2": {
+    "description": {
+      "skill_definition_id": "rogue_tier_1_passive_2"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "skill_tree_rpgs:textures/spell/rogue_tier_1_passive_2.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_1_passive_2"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_1_passive_2.title"
+    }
+  },
+  "rogue_tier_2_passive_1": {
+    "description": {
+      "skill_definition_id": "rogue_tier_2_passive_1"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "skill_tree_rpgs:textures/spell/rogue_tier_2_passive_1.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_2_passive_1"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_2_passive_1.title"
+    }
+  },
+  "rogue_tier_2_passive_2": {
+    "description": {
+      "skill_definition_id": "rogue_tier_2_passive_2"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "skill_tree_rpgs:textures/spell/rogue_tier_2_passive_2.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_2_passive_2"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_2_passive_2.title"
+    }
+  },
+  "rogue_tier_2_spell_1_modifier_1": {
+    "description": {
+      "skill_definition_id": "rogue_tier_2_spell_1_modifier_1"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/shock_powder.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_2_spell_1_modifier_1"
+              ]
+            },
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_2_spell_1_modifier_1_bonus"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_2_spell_1_modifier_1.title"
+    }
+  },
+  "rogue_tier_2_spell_1_modifier_2": {
+    "description": {
+      "skill_definition_id": "rogue_tier_2_spell_1_modifier_2"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/shock_powder.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_2_spell_1_modifier_2"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_2_spell_1_modifier_2.title"
+    }
+  },
+  "rogue_tier_2_spell_1_root": {
+    "description": {
+      "skill_definition_id": "rogue_tier_2_spell_1_root"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/shock_powder.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_2_spell_1_root"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_2_spell_1_root.title"
+    }
+  },
+  "rogue_tier_2_spell_2_modifier_1": {
+    "description": {
+      "skill_definition_id": "rogue_tier_2_spell_2_modifier_1"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/slice_and_dice.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_2_spell_2_modifier_1"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_2_spell_2_modifier_1.title"
+    }
+  },
+  "rogue_tier_2_spell_2_modifier_2": {
+    "description": {
+      "skill_definition_id": "rogue_tier_2_spell_2_modifier_2"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/slice_and_dice.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_2_spell_2_modifier_2"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_2_spell_2_modifier_2.title"
+    }
+  },
+  "rogue_tier_2_spell_2_root": {
+    "description": {
+      "skill_definition_id": "rogue_tier_2_spell_2_root"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/slice_and_dice.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_2_spell_2_root"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_2_spell_2_root.title"
+    }
+  },
+  "rogue_tier_3_passive_1": {
+    "description": {
+      "skill_definition_id": "rogue_tier_3_passive_1"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "skill_tree_rpgs:textures/spell/rogue_tier_3_passive_1.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_3_passive_1"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_3_passive_1.title"
+    }
+  },
+  "rogue_tier_3_passive_2": {
+    "description": {
+      "skill_definition_id": "rogue_tier_3_passive_2"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "skill_tree_rpgs:textures/spell/rogue_tier_3_passive_2.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_3_passive_2"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_3_passive_2.title"
+    }
+  },
+  "rogue_tier_3_spell_1_modifier_1": {
+    "description": {
+      "skill_definition_id": "rogue_tier_3_spell_1_modifier_1"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/shadow_step.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_3_spell_1_modifier_1"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_3_spell_1_modifier_1.title"
+    }
+  },
+  "rogue_tier_3_spell_1_modifier_2": {
+    "description": {
+      "skill_definition_id": "rogue_tier_3_spell_1_modifier_2"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/shadow_step.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_3_spell_1_modifier_2"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_3_spell_1_modifier_2.title"
+    }
+  },
+  "rogue_tier_3_spell_1_root": {
+    "description": {
+      "skill_definition_id": "rogue_tier_3_spell_1_root"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/shadow_step.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_3_spell_1_root"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_3_spell_1_root.title"
+    }
+  },
+  "rogue_tier_3_spell_2_modifier_1": {
+    "description": {
+      "skill_definition_id": "rogue_tier_3_spell_2_modifier_1"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/bear_trap.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_3_spell_2_modifier_1"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_3_spell_2_modifier_1.title"
+    }
+  },
+  "rogue_tier_3_spell_2_modifier_2": {
+    "description": {
+      "skill_definition_id": "rogue_tier_3_spell_2_modifier_2"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/bear_trap.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_3_spell_2_modifier_2"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_3_spell_2_modifier_2.title"
+    }
+  },
+  "rogue_tier_3_spell_2_root": {
+    "description": {
+      "skill_definition_id": "rogue_tier_3_spell_2_root"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/bear_trap.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_3_spell_2_root"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_3_spell_2_root.title"
+    }
+  },
+  "rogue_tier_4_spell_1_modifier_1": {
+    "description": {
+      "skill_definition_id": "rogue_tier_4_spell_1_modifier_1"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/vanish.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_4_spell_1_modifier_1"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_4_spell_1_modifier_1.title"
+    }
+  },
+  "rogue_tier_4_spell_1_modifier_2": {
+    "description": {
+      "skill_definition_id": "rogue_tier_4_spell_1_modifier_2"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/vanish.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_4_spell_1_modifier_2"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_4_spell_1_modifier_2.title"
+    }
+  },
+  "rogue_tier_4_spell_1_root": {
+    "description": {
+      "skill_definition_id": "rogue_tier_4_spell_1_root"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/vanish.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_4_spell_1_root"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_4_spell_1_root.title"
+    }
+  },
+  "rogue_tier_4_spell_2_modifier_1": {
+    "description": {
+      "skill_definition_id": "rogue_tier_4_spell_2_modifier_1"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/mutilate.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_4_spell_2_modifier_1"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_4_spell_2_modifier_1.title"
+    }
+  },
+  "rogue_tier_4_spell_2_modifier_2": {
+    "description": {
+      "skill_definition_id": "rogue_tier_4_spell_2_modifier_2"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/mutilate.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_4_spell_2_modifier_2"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_4_spell_2_modifier_2.title"
+    }
+  },
+  "rogue_tier_4_spell_2_root": {
+    "description": {
+      "skill_definition_id": "rogue_tier_4_spell_2_root"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "rogues:textures/spell/mutilate.png"
+      }
+    },
+    "required_mods": [
+      "rogues"
+    ],
+    "rewards": [
+      {
+        "type": "skill_tree_rpgs:spell",
+        "data": {
+          "containers": [
+            {
+              "access": "NONE",
+              "access_param": "",
+              "extra_tier_binding": 0,
+              "max_spell_count": 0,
+              "pool": "",
+              "slot": "",
+              "spell_ids": [
+                "skill_tree_rpgs:rogue_tier_4_spell_2_root"
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "title": {
+      "translate": "skill.skill_tree_rpgs.rogue_tier_4_spell_2_root.title"
+    }
+  }
+}

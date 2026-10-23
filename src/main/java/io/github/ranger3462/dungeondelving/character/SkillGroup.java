@@ -15,7 +15,8 @@ public enum SkillGroup {
     ARMOR("Armor", "light_armor", "medium_armor", "heavy_armor", "mage_armor"),
     MAGIC("Magic", "fire_magic", "frost_magic", "lightning_magic", "arcane_magic", "holy_magic", "earth_magic", "water_magic", "air_magic",
             "necromancy"),
-    OTHER("Other", "beastmastery", "skill_tree_rpgs:class_skills");
+    CLASS("Class", "fighter", "archer", "rogue", "mage"),
+    OTHER("Other", "beastmastery");
 
     /** Each skill's icon (an item id), the same as its tree's tab (tools/skill_trees.py). */
     private static final Map<String, String> ICONS = Map.ofEntries(
@@ -30,7 +31,8 @@ public enum SkillGroup {
             Map.entry("lightning_magic", "minecraft:lightning_rod"), Map.entry("arcane_magic", "minecraft:amethyst_shard"),
             Map.entry("holy_magic", "minecraft:golden_apple"), Map.entry("earth_magic", "minecraft:moss_block"), Map.entry("water_magic", "minecraft:heart_of_the_sea"),
             Map.entry("air_magic", "minecraft:feather"), Map.entry("necromancy", "minecraft:wither_skeleton_skull"), Map.entry("beastmastery", "minecraft:lead"),
-            Map.entry("class_skills", "minecraft:book"));
+            Map.entry("fighter", "minecraft:iron_sword"), Map.entry("archer", "minecraft:bow"), Map.entry("rogue", "minecraft:iron_sword"),
+            Map.entry("mage", "minecraft:blaze_rod"));
 
     public final String title;
     public final List<ResourceLocation> skills;

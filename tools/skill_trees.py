@@ -13,6 +13,7 @@ The nodes are a first pass: small attribute bonuses. Vein mining, tree felling a
 nodes our own code reacts to.
 """
 import json
+import zipfile
 from pathlib import Path
 
 RESOURCES = Path("src/main/resources")
@@ -179,7 +180,51 @@ def write(path, obj):
 
 lang = json.loads(LANG.read_text(encoding="utf-8"))
 TREES = {**PROFESSIONS, **{key: (title, icon, [], nodes) for key, (title, icon, nodes) in ACTIVITIES.items()}}
-write(DATA / "config.json", {"version": 3, "categories": list(TREES)})
+# The class trees (DD-83): the RPG Series' radial class tree (Skill Tree), split into one tree per class. Each keeps
+# its branches' nodes, layout, spells and experience (from kills), and starts locked: picking the class unlocks it.
+# Read from the Skill Tree jar in Gradle's cache, so run this after a Gradle build or run.
+CLASSES = {
+    "fighter": ("Fighter", "minecraft:iron_sword", ["warrior", "paladin"]),
+    "archer": ("Archer", "minecraft:bow", ["archer"]),
+    "rogue": ("Rogue", "minecraft:iron_sword", ["rogue"]),
+    "mage": ("Mage", "minecraft:blaze_rod", ["arcane", "fire", "frost", "priest"]),
+}
+GRADLE_CACHE = Path.home() / ".gradle/caches/modules-2/files-2.1/maven.modrinth/skill-tree"
+
+
+def skill_tree_jar():
+    jars = sorted(GRADLE_CACHE.rglob("*.jar"))
+    if not jars:
+        raise SystemExit("Skill Tree jar not found in the Gradle cache: run a Gradle build or runClient first")
+    return zipfile.ZipFile(jars[-1])
+
+
+def write_classes(lang):
+    jar = skill_tree_jar()
+    base = "data/skill_tree_rpgs/puffish_skills/categories/class_skills/"
+    load = lambda name: json.loads(jar.read(base + name).decode("utf-8"))
+    category, definitions, skills, connections, experience = (load(n) for n in
+        ("category.json", "definitions.json", "skills.json", "connections.json", "experience.json"))
+    for key, (title, icon, branches) in CLASSES.items():
+        kept = {sid: s for sid, s in skills.items() if any(s["definition"].startswith(b + "_") for b in branches)}
+        used = {s["definition"] for s in kept.values()}
+        folder = DATA / "categories" / key
+        lang[f"skill_category.{NS}.{key}"] = title
+        # Locked until the class is picked. One class can take several of its branches (a mage can mix fire and frost),
+        # and points come from the class's own levels, so there's no cap on how many are spent.
+        cat = {**category, "title": {"translate": f"skill_category.{NS}.{key}"}, "icon": {"type": "item", "data": {"item": icon}},
+               "unlocked_by_default": False, "exclusive_root": False}
+        cat.pop("spent_points_limit", None)
+        write(folder / "category.json", cat)
+        write(folder / "definitions.json", {d: v for d, v in definitions.items() if d in used})
+        write(folder / "skills.json", kept)
+        write(folder / "connections.json", {kind: {direction: [pair for pair in pairs if all(s in kept for s in pair)]
+                                                    for direction, pairs in groups.items()} for kind, groups in connections.items()})
+        write(folder / "experience.json", experience)
+
+
+write_classes(lang)
+write(DATA / "config.json", {"version": 3, "categories": list(TREES) + list(CLASSES)})
 for key, (title, icon, sources, nodes) in TREES.items():
     folder = DATA / "categories" / key
     lang[f"skill_category.{NS}.{key}"] = title
@@ -216,4 +261,4 @@ for key, (title, icon, sources, nodes) in TREES.items():
     write(folder / "skills.json", skills)
     write(folder / "connections.json", {"normal": {"bidirectional": links}})
 LANG.write_text(json.dumps(lang, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
-print("Wrote skill trees for", ", ".join(TREES))
+print("Wrote skill trees for", ", ".join(TREES), "and classes", ", ".join(CLASSES))

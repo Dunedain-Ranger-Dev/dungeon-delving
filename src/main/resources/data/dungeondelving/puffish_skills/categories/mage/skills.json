@@ -1,0 +1,674 @@
+{
+  "qr4fdarqqqm5ifoa": {
+    "definition": "arcane_root",
+    "x": -67.88225099390856,
+    "y": -67.88225099390857,
+    "root": true
+  },
+  "m1pc5vz73nx4b28c": {
+    "definition": "fire_root",
+    "x": 0,
+    "y": -96,
+    "root": true
+  },
+  "akyr8k2dv9xsy70c": {
+    "definition": "frost_root",
+    "x": 67.88225099390856,
+    "y": -67.88225099390857,
+    "root": true
+  },
+  "ov6ag9tjdhsmldil": {
+    "definition": "priest_root",
+    "x": 96,
+    "y": -5.878304635907295e-15,
+    "root": true
+  },
+  "jf9g15hlqy81pt15": {
+    "definition": "fire_tier_2_spell_1_modifier_1",
+    "x": -74.31287737714236,
+    "y": -244.97672594744546,
+    "root": false
+  },
+  "5finy8ushehch66n": {
+    "definition": "fire_boost",
+    "x": 0,
+    "y": -192,
+    "root": false
+  },
+  "zy0iv358bpnyc0vn": {
+    "definition": "fire_tier_3_spell_1_modifier_1",
+    "x": -74.98609573058476,
+    "y": -409.18588129001176,
+    "root": false
+  },
+  "q8xryjwbp1h451j9": {
+    "definition": "fire_tier_4_spell_1_modifier_1",
+    "x": -75.1830867187497,
+    "y": -571.0722401513148,
+    "root": false
+  },
+  "2ied8j8jkna9q3sb": {
+    "definition": "fire_tier_1_passive_1",
+    "x": -25.029514406436938,
+    "y": -158.03013449522206,
+    "root": false
+  },
+  "x3ouzc8temz30cin": {
+    "definition": "fire_tier_2_passive_1",
+    "x": -25.10691063291038,
+    "y": -319.0135467946009,
+    "root": false
+  },
+  "oo7bvawwd1d5db3z": {
+    "definition": "fire_tier_3_passive_1",
+    "x": -25.121258996613037,
+    "y": -479.34217668219543,
+    "root": false
+  },
+  "kkuzqse43xq7bcwf": {
+    "definition": "fire_tier_2_spell_1_modifier_2",
+    "x": -25.092387924367515,
+    "y": -254.7672900280824,
+    "root": false
+  },
+  "tf2hdvel3dd3ctut": {
+    "definition": "fire_tier_3_spell_1_modifier_2",
+    "x": -25.117454927670998,
+    "y": -415.24103055690006,
+    "root": false
+  },
+  "54ttqmoe4vdh8krj": {
+    "definition": "fire_tier_4_spell_1_modifier_2",
+    "x": -25.124767122433536,
+    "y": -575.4517756311501,
+    "root": false
+  },
+  "daxqbt8e0sp1ttmk": {
+    "definition": "fire_tier_1_passive_2",
+    "x": 25.029514406436938,
+    "y": -158.03013449522206,
+    "root": false
+  },
+  "wk3c3v606bix2jlw": {
+    "definition": "fire_tier_2_passive_2",
+    "x": 25.10691063291038,
+    "y": -319.0135467946009,
+    "root": false
+  },
+  "ael7lany9swsjhgy": {
+    "definition": "fire_tier_3_passive_2",
+    "x": 25.121258996613037,
+    "y": -479.34217668219543,
+    "root": false
+  },
+  "d2r1bwbjlejfsyx8": {
+    "definition": "arcane_boost",
+    "x": -135.7645019878171,
+    "y": -135.76450198781714,
+    "root": false
+  },
+  "q8ffmb3ab8ncodol": {
+    "definition": "arcane_tier_2_spell_1_modifier_1",
+    "x": -225.77184367317886,
+    "y": -120.67756462745544,
+    "root": false
+  },
+  "nbiclomesme3v1xf": {
+    "definition": "arcane_tier_2_spell_1_modifier_2",
+    "x": -197.89067606086067,
+    "y": -162.40468074589324,
+    "root": false
+  },
+  "qidfapujo6nvkhu3": {
+    "definition": "arcane_boost",
+    "x": -248.9015869776647,
+    "y": -248.90158697766475,
+    "root": false
+  },
+  "68foxw7lmj0rs0kp": {
+    "definition": "arcane_tier_3_spell_1_modifier_1",
+    "x": -342.36128821176106,
+    "y": -236.31493464016086,
+    "root": false
+  },
+  "p6k6oj0rwy5waw7k": {
+    "definition": "arcane_tier_3_spell_1_modifier_2",
+    "x": -311.38047123917806,
+    "y": -275.85902582817084,
+    "root": false
+  },
+  "c2dh654316pt1nlq": {
+    "definition": "arcane_tier_4_spell_1_modifier_1",
+    "x": -456.97152400775144,
+    "y": -350.6465831090231,
+    "root": false
+  },
+  "url6bcwcdip1kia3": {
+    "definition": "arcane_tier_4_spell_1_modifier_2",
+    "x": -424.6717460026314,
+    "y": -389.13995958662036,
+    "root": false
+  },
+  "x0rbz99jwtdp3l7e": {
+    "definition": "arcane_tier_1_passive_2",
+    "x": -94.04564036679571,
+    "y": -129.4427190999916,
+    "root": false
+  },
+  "pzwf17ukf1m73ag5": {
+    "definition": "arcane_tier_2_passive_2",
+    "x": -207.82337546565878,
+    "y": -243.3299089920099,
+    "root": false
+  },
+  "hfuuo18bl6n65dfh": {
+    "definition": "arcane_tier_3_passive_2",
+    "x": -321.1826910522519,
+    "y": -356.7095162291493,
+    "root": false
+  },
+  "4mz3dsmef5hjefi8": {
+    "definition": "arcane_tier_1_passive_1",
+    "x": -129.4427190999916,
+    "y": -94.04564036679571,
+    "root": false
+  },
+  "ukbeqrzvwus1htcz": {
+    "definition": "arcane_tier_2_passive_1",
+    "x": -243.3299089920099,
+    "y": -207.82337546565878,
+    "root": false
+  },
+  "fcoj22kades1hhy7": {
+    "definition": "arcane_tier_3_passive_1",
+    "x": -356.70951622914924,
+    "y": -321.1826910522519,
+    "root": false
+  },
+  "npusgtxros2kh5bc": {
+    "definition": "frost_boost",
+    "x": 135.7645019878171,
+    "y": -135.76450198781714,
+    "root": false
+  },
+  "7aj1z6m3kbq1cio3": {
+    "definition": "frost_tier_2_spell_1_modifier_1",
+    "x": 120.6775646274554,
+    "y": -225.7718436731789,
+    "root": false
+  },
+  "25ow7hxb9ugrmn6t": {
+    "definition": "frost_boost",
+    "x": 362.0386719675123,
+    "y": -362.03867196751236,
+    "root": false
+  },
+  "si05g9ldspulfx75": {
+    "definition": "frost_boost",
+    "x": 248.9015869776647,
+    "y": -248.90158697766475,
+    "root": false
+  },
+  "91pfadzf9rn3z0ol": {
+    "definition": "frost_tier_3_spell_1_modifier_1",
+    "x": 236.31493464016077,
+    "y": -342.36128821176106,
+    "root": false
+  },
+  "88pz83mi03f2gogl": {
+    "definition": "frost_tier_4_spell_1_modifier_1",
+    "x": 350.6465831090231,
+    "y": -456.97152400775144,
+    "root": false
+  },
+  "xzp1g4hpr9a1dk4k": {
+    "definition": "frost_tier_1_passive_1",
+    "x": 94.04564036679571,
+    "y": -129.4427190999916,
+    "root": false
+  },
+  "tyt9qsmt47in8zg3": {
+    "definition": "frost_tier_2_spell_1_modifier_2",
+    "x": 162.40468074589324,
+    "y": -197.89067606086067,
+    "root": false
+  },
+  "2n6klyswpmz67yry": {
+    "definition": "frost_tier_3_spell_1_modifier_2",
+    "x": 275.85902582817073,
+    "y": -311.3804712391781,
+    "root": false
+  },
+  "1w0u1k2il0ck77mz": {
+    "definition": "frost_tier_4_spell_1_modifier_2",
+    "x": 389.13995958662025,
+    "y": -424.6717460026315,
+    "root": false
+  },
+  "751j5v5cujdu1d7o": {
+    "definition": "frost_tier_1_passive_2",
+    "x": 129.4427190999916,
+    "y": -94.04564036679571,
+    "root": false
+  },
+  "2sbyohss0ym2xg8l": {
+    "definition": "frost_tier_3_passive_1",
+    "x": 321.1826910522519,
+    "y": -356.7095162291493,
+    "root": false
+  },
+  "nutmzqvgo4lajcb0": {
+    "definition": "frost_tier_2_passive_1",
+    "x": 207.82337546565878,
+    "y": -243.3299089920099,
+    "root": false
+  },
+  "dprqnknv3uwofo55": {
+    "definition": "frost_tier_2_passive_2",
+    "x": 243.3299089920099,
+    "y": -207.82337546565878,
+    "root": false
+  },
+  "wb3tz3kk85ou88l6": {
+    "definition": "frost_tier_3_passive_2",
+    "x": 356.70951622914924,
+    "y": -321.1826910522519,
+    "root": false
+  },
+  "uomzi3hqxkvxdl01": {
+    "definition": "priest_boost",
+    "x": 192,
+    "y": -1.175660927181459e-14,
+    "root": false
+  },
+  "7ne0058blktoc3qs": {
+    "definition": "priest_boost",
+    "x": 352,
+    "y": -2.1553783664993418e-14,
+    "root": false
+  },
+  "pto1rwqjasw98v21": {
+    "definition": "priest_boost",
+    "x": 512,
+    "y": -3.135095805817224e-14,
+    "root": false
+  },
+  "9nqkj7a7d5hc9b4p": {
+    "definition": "priest_tier_2_spell_1_modifier_1",
+    "x": 244.9767259474455,
+    "y": -74.31287737714236,
+    "root": false
+  },
+  "cti8naxm0u1rgoc5": {
+    "definition": "priest_tier_3_spell_1_modifier_1",
+    "x": 409.1858812900117,
+    "y": -74.98609573058484,
+    "root": false
+  },
+  "ra1as6xwgl0i8glw": {
+    "definition": "priest_tier_4_spell_1_modifier_1",
+    "x": 571.0722401513148,
+    "y": -75.18308671874979,
+    "root": false
+  },
+  "3atj3io6b3fdr75i": {
+    "definition": "priest_tier_1_passive_1",
+    "x": 158.03013449522206,
+    "y": -25.02951440643695,
+    "root": false
+  },
+  "x2iblrhrxswo5u84": {
+    "definition": "priest_tier_2_passive_1",
+    "x": 319.0135467946009,
+    "y": -25.1069106329104,
+    "root": false
+  },
+  "jj4edxd8mc717snx": {
+    "definition": "priest_tier_3_passive_1",
+    "x": 479.34217668219543,
+    "y": -25.121258996613104,
+    "root": false
+  },
+  "zoqhif4egxrk0xqd": {
+    "definition": "priest_tier_2_spell_1_modifier_2",
+    "x": 254.76729002808239,
+    "y": -25.092387924367557,
+    "root": false
+  },
+  "mpdb0g2axpa69zzl": {
+    "definition": "priest_tier_3_spell_1_modifier_2",
+    "x": 415.24103055690006,
+    "y": -25.117454927671094,
+    "root": false
+  },
+  "qvdgzu6wm3the9hu": {
+    "definition": "priest_tier_4_spell_1_modifier_2",
+    "x": 575.4517756311501,
+    "y": -25.12476712243354,
+    "root": false
+  },
+  "6xuu35d8dcqgelbh": {
+    "definition": "priest_tier_1_passive_2",
+    "x": 158.03013449522206,
+    "y": 25.02951440643693,
+    "root": false
+  },
+  "7zvk576cejewz88u": {
+    "definition": "priest_tier_2_passive_2",
+    "x": 319.0135467946009,
+    "y": 25.10691063291036,
+    "root": false
+  },
+  "0gj1bcpk55756ahe": {
+    "definition": "priest_tier_3_passive_2",
+    "x": 479.34217668219543,
+    "y": 25.121258996612937,
+    "root": false
+  },
+  "dtjgjzuz9dbozhks": {
+    "definition": "frost_tier_2_spell_1_root",
+    "x": 119.1751851394354,
+    "y": -189.66622062713566,
+    "root": false
+  },
+  "xk0zup4vlq2bpia8": {
+    "definition": "frost_tier_3_spell_1_root",
+    "x": 210.9457386119941,
+    "y": -281.79051680537486,
+    "root": false
+  },
+  "fsoh4wr8biwxyx1m": {
+    "definition": "frost_tier_4_spell_1_root",
+    "x": 324.8093614917865,
+    "y": -395.78135212172134,
+    "root": false
+  },
+  "y4f4bxrmm634xlgz": {
+    "definition": "frost_tier_2_spell_2_root",
+    "x": 189.66622062713566,
+    "y": -119.1751851394354,
+    "root": false
+  },
+  "uz6pupqhw27im61o": {
+    "definition": "frost_tier_2_spell_2_modifier_1",
+    "x": 197.89067606086067,
+    "y": -162.40468074589324,
+    "root": false
+  },
+  "k2hyynsy53w5ory1": {
+    "definition": "frost_tier_2_spell_2_modifier_2",
+    "x": 225.77184367317886,
+    "y": -120.67756462745544,
+    "root": false
+  },
+  "t7boplcuqumobewj": {
+    "definition": "frost_tier_3_spell_2_root",
+    "x": 281.17111632573096,
+    "y": -210.47771302292426,
+    "root": false
+  },
+  "y1t8dbqvi429cep3": {
+    "definition": "frost_tier_3_spell_2_modifier_1",
+    "x": 311.38047123917806,
+    "y": -275.85902582817084,
+    "root": false
+  },
+  "mf3t0splsf6vg6ld": {
+    "definition": "frost_tier_3_spell_2_modifier_2",
+    "x": 342.36128821176106,
+    "y": -236.31493464016086,
+    "root": false
+  },
+  "ur6lrbrjx4u52zdp": {
+    "definition": "frost_tier_4_spell_2_root",
+    "x": 395.78135212172134,
+    "y": -324.8093614917865,
+    "root": false
+  },
+  "vdvrw73xcm2k0lry": {
+    "definition": "frost_tier_4_spell_2_modifier_1",
+    "x": 424.6717460026314,
+    "y": -389.13995958662036,
+    "root": false
+  },
+  "6573dwuvyl7khs0w": {
+    "definition": "frost_tier_4_spell_2_modifier_2",
+    "x": 456.97152400775144,
+    "y": -350.6465831090231,
+    "root": false
+  },
+  "lwmfdsnzvemm492u": {
+    "definition": "fire_tier_2_spell_1_root",
+    "x": -49.844689206214426,
+    "y": -218.3838523287285,
+    "root": false
+  },
+  "36aeqseyzs70feif": {
+    "definition": "fire_tier_3_spell_1_root",
+    "x": -50.122057812499804,
+    "y": -348.7148267675432,
+    "root": false
+  },
+  "8a2c8jxv7k4vhlui": {
+    "definition": "fire_tier_4_spell_1_root",
+    "x": -50.18477584873503,
+    "y": -509.5345800561648,
+    "root": false
+  },
+  "qvbapaoh8ietgvcm": {
+    "definition": "fire_tier_2_spell_2_root",
+    "x": 49.844689206214426,
+    "y": -218.3838523287285,
+    "root": false
+  },
+  "ws0zvn5xtenhjfg2": {
+    "definition": "fire_tier_2_spell_2_modifier_1",
+    "x": 25.092387924367515,
+    "y": -254.7672900280824,
+    "root": false
+  },
+  "it7ddytaje5w6sng": {
+    "definition": "fire_tier_2_spell_2_modifier_2",
+    "x": 74.31287737714236,
+    "y": -244.97672594744546,
+    "root": false
+  },
+  "u1341ylh0390jabt": {
+    "definition": "fire_tier_3_spell_2_root",
+    "x": 50.122057812499804,
+    "y": -348.7148267675432,
+    "root": false
+  },
+  "r7g5dpybimhe6u1y": {
+    "definition": "fire_tier_3_spell_2_modifier_1",
+    "x": 25.117454927670998,
+    "y": -415.24103055690006,
+    "root": false
+  },
+  "svm2prnqs03uqent": {
+    "definition": "fire_tier_3_spell_2_modifier_2",
+    "x": 74.9860957305848,
+    "y": -409.18588129001176,
+    "root": false
+  },
+  "kjssmt5q3gi8r8lx": {
+    "definition": "fire_tier_4_spell_2_root",
+    "x": 50.18477584873503,
+    "y": -509.5345800561648,
+    "root": false
+  },
+  "c7q7jjwu534zqyng": {
+    "definition": "fire_tier_4_spell_2_modifier_1",
+    "x": 25.124767122433536,
+    "y": -575.4517756311501,
+    "root": false
+  },
+  "uqqt8dzye5nbpzg4": {
+    "definition": "fire_tier_4_spell_2_modifier_2",
+    "x": 75.1830867187497,
+    "y": -571.0722401513148,
+    "root": false
+  },
+  "h4kc1gscqd3pcg78": {
+    "definition": "arcane_tier_2_spell_1_root",
+    "x": -189.66622062713566,
+    "y": -119.1751851394354,
+    "root": false
+  },
+  "j0s748bxsykvp5uc": {
+    "definition": "arcane_tier_3_spell_1_root",
+    "x": -281.79051680537486,
+    "y": -210.94573861199413,
+    "root": false
+  },
+  "3e85mfvd1q8w78gv": {
+    "definition": "arcane_tier_4_spell_1_root",
+    "x": -395.78135212172134,
+    "y": -324.8093614917865,
+    "root": false
+  },
+  "uepo8apqsbk5ftuc": {
+    "definition": "arcane_tier_2_spell_2_root",
+    "x": -119.1751851394354,
+    "y": -189.66622062713566,
+    "root": false
+  },
+  "pwxw3k20k7fa7npt": {
+    "definition": "arcane_tier_2_spell_2_modifier_1",
+    "x": -162.40468074589324,
+    "y": -197.89067606086067,
+    "root": false
+  },
+  "h0xnm5h6fvtmrm43": {
+    "definition": "arcane_tier_2_spell_2_modifier_2",
+    "x": -120.6775646274554,
+    "y": -225.7718436731789,
+    "root": false
+  },
+  "bg6vzs7jj6kn1ine": {
+    "definition": "arcane_tier_3_spell_2_root",
+    "x": -210.9457386119941,
+    "y": -281.79051680537486,
+    "root": false
+  },
+  "53qir353ol1s2jcn": {
+    "definition": "arcane_tier_3_spell_2_modifier_1",
+    "x": -275.85902582817073,
+    "y": -311.3804712391781,
+    "root": false
+  },
+  "4tpryefmykr266d7": {
+    "definition": "arcane_tier_3_spell_2_modifier_2",
+    "x": -236.31493464016077,
+    "y": -342.36128821176106,
+    "root": false
+  },
+  "wpgi3mwi6k8e9b2v": {
+    "definition": "arcane_tier_4_spell_2_root",
+    "x": -324.8093614917865,
+    "y": -395.78135212172134,
+    "root": false
+  },
+  "b591cob8oxjl6m4v": {
+    "definition": "arcane_tier_4_spell_2_modifier_1",
+    "x": -389.13995958662025,
+    "y": -424.6717460026315,
+    "root": false
+  },
+  "0bygnkeq1yau0hvy": {
+    "definition": "arcane_tier_4_spell_2_modifier_2",
+    "x": -350.6465831090231,
+    "y": -456.97152400775144,
+    "root": false
+  },
+  "li4iluy7adnytclb": {
+    "definition": "priest_tier_2_spell_1_root",
+    "x": 218.3838523287285,
+    "y": -49.84468920621444,
+    "root": false
+  },
+  "c768e8r0ctc9lwd0": {
+    "definition": "priest_tier_3_spell_1_root",
+    "x": 348.4171475420883,
+    "y": -50.09482307219636,
+    "root": false
+  },
+  "635oa1722ipi71hq": {
+    "definition": "priest_tier_4_spell_1_root",
+    "x": 509.53458005616477,
+    "y": -50.184775848735114,
+    "root": false
+  },
+  "mra78xekcqttdwbx": {
+    "definition": "priest_tier_2_spell_2_root",
+    "x": 218.3838523287285,
+    "y": 49.84468920621441,
+    "root": false
+  },
+  "wnv6qx3q3o2p8o08": {
+    "definition": "priest_tier_2_spell_2_modifier_1",
+    "x": 254.7672900280824,
+    "y": 25.092387924367525,
+    "root": false
+  },
+  "nfxzl65awdpibu3x": {
+    "definition": "priest_tier_2_spell_2_modifier_2",
+    "x": 244.9767259474455,
+    "y": 74.31287737714231,
+    "root": false
+  },
+  "jrp4nqgtcbvyot3s": {
+    "definition": "priest_tier_3_spell_2_root",
+    "x": 348.41714754208834,
+    "y": 50.09482307219632,
+    "root": false
+  },
+  "w92f6zohy81zxobi": {
+    "definition": "priest_tier_3_spell_2_modifier_1",
+    "x": 415.24103055690006,
+    "y": 25.117454927670952,
+    "root": false
+  },
+  "nwmxo0f0bc17nvin": {
+    "definition": "priest_tier_3_spell_2_modifier_2",
+    "x": 409.18588129001176,
+    "y": 74.98609573058471,
+    "root": false
+  },
+  "hg4zcfzw8h0grszh": {
+    "definition": "priest_tier_4_spell_2_root",
+    "x": 509.5345800561648,
+    "y": 50.18477584873505,
+    "root": false
+  },
+  "xviy9i3hrle9h68f": {
+    "definition": "priest_tier_4_spell_2_modifier_1",
+    "x": 575.4517756311501,
+    "y": 25.12476712243347,
+    "root": false
+  },
+  "h5cevm6tcv9fveo1": {
+    "definition": "priest_tier_4_spell_2_modifier_2",
+    "x": 571.0722401513148,
+    "y": 75.18308671874972,
+    "root": false
+  },
+  "nejd72tr8e37suu6": {
+    "definition": "fire_boost",
+    "x": 0,
+    "y": -352,
+    "root": false
+  },
+  "lf94vmmafja7joor": {
+    "definition": "fire_boost",
+    "x": 0,
+    "y": -512,
+    "root": false
+  },
+  "sz49xai629avut2e": {
+    "definition": "arcane_boost",
+    "x": -362.0386719675123,
+    "y": -362.03867196751236,
+    "root": false
+  }
+}

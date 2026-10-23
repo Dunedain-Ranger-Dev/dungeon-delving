@@ -31,6 +31,10 @@
     "water_magic",
     "air_magic",
     "necromancy",
-    "beastmastery"
+    "beastmastery",
+    "fighter",
+    "archer",
+    "rogue",
+    "mage"
   ]
 }

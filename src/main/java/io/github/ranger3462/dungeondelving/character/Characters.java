@@ -47,6 +47,8 @@ public final class Characters {
     private static final ResourceLocation ALLOCATED = DungeonDelving.id("allocated");
     /** Where a race's score bonuses, size and traits are kept on their attributes. */
     private static final ResourceLocation RACE = DungeonDelving.id("race");
+    /** Where a class's passive bonus is kept on its attributes. */
+    private static final ResourceLocation CLASS = DungeonDelving.id("class");
     /** Humans' versatility: a bonus ability point every this many character levels. */
     public static final int HUMAN_BONUS_EVERY = 4;
     /** How often scores' effects are brought up to date with gear changes, in ticks. */
@@ -69,6 +71,9 @@ public final class Characters {
                 (payload, context) -> io.github.ranger3462.dungeondelving.client.RaceScreen.open());
         event.registrar("1").playToServer(RacePayloads.Choose.TYPE, RacePayloads.Choose.STREAM_CODEC, RacePayloads.Choose::handle);
         event.registrar("1").playToServer(RacePayloads.UseAbility.TYPE, RacePayloads.UseAbility.STREAM_CODEC, RacePayloads.UseAbility::handle);
+        event.registrar("1").playToClient(ClassPayloads.Open.TYPE, ClassPayloads.Open.STREAM_CODEC,
+                (payload, context) -> io.github.ranger3462.dungeondelving.client.ClassScreen.open(payload));
+        event.registrar("1").playToServer(ClassPayloads.Choose.TYPE, ClassPayloads.Choose.STREAM_CODEC, ClassPayloads.Choose::handle);
         event.registrar("1").playToClient(MobLevelPayload.TYPE, MobLevelPayload.STREAM_CODEC,
                 (payload, context) -> io.github.ranger3462.dungeondelving.client.MobNameplates.receive(payload));
         event.registrar("1").playToClient(SkillXpPayload.TYPE, SkillXpPayload.STREAM_CODEC,
@@ -89,6 +94,20 @@ public final class Characters {
         int level = level(player);
         int human = data(player).raceOf().filter(race -> race == Race.HUMAN).map(race -> level / HUMAN_BONUS_EVERY).orElse(0);
         return level - 1 + data(player).bonusPoints() + human;
+    }
+
+    /**
+     * Sets the player's class: locks the old class's tree (refunding its points, so a class change starts that tree
+     * fresh) and unlocks the new one's. Its passive bonus is applied with the rest of the character.
+     */
+    public static void setClass(ServerPlayer player, PlayerClass chosen) {
+        data(player).classOf().filter(old -> old != chosen).ifPresent(old -> SkillLevels.lockTree(player, old.tree()));
+        if (chosen != null) {
+            SkillLevels.unlockTree(player, chosen.tree());
+        }
+        player.setData(DATA, data(player).withClass(chosen == null ? "" : chosen.id));
+        apply(player);
+        sync(player);
     }
 
     /** Sets the player's race (or clears it, with null, so they pick again), and applies it. */
@@ -133,6 +152,7 @@ public final class Characters {
         CharacterData data = data(player);
         Race race = data.raceOf().orElse(null);
         applyRace(player, race);
+        applyClass(player, data.classOf().orElse(null));
         for (AbilityScore score : AbilityScore.values()) {
             AttributeInstance attribute = player.getAttribute(score.attribute());
             if (attribute == null) {
@@ -150,6 +170,23 @@ public final class Characters {
         }
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
+        }
+    }
+
+    /** The class's passive bonus; every other class's is taken off. */
+    private static void applyClass(ServerPlayer player, PlayerClass chosen) {
+        for (PlayerClass other : PlayerClass.values()) {
+            for (Race.Trait trait : other.traits) {
+                AttributeInstance target = attribute(player, trait.attribute());
+                if (target == null) {
+                    continue;
+                }
+                if (other == chosen) {
+                    setModifier(target, CLASS, trait.amount(), trait.operation());
+                } else if (chosen == null || chosen.traits.stream().noneMatch(t -> t.attribute().equals(trait.attribute()))) {
+                    setModifier(target, CLASS, 0, trait.operation());
+                }
+            }
         }
     }
 
@@ -221,6 +258,8 @@ public final class Characters {
             for (CraftSkill skill : CraftSkill.values()) {
                 SkillLevels.mirror(player, skill, CraftingSkills.xp(player, skill));
             }
+            // And the class trees with the class: only the player's own class's is unlocked.
+            data(player).classOf().ifPresent(chosen -> SkillLevels.unlockTree(player, chosen.tree()));
             apply(player);
             checkLevel(player);
             sync(player);

@@ -94,6 +94,29 @@ public class RaceTests {
         helper.succeed();
     }
 
+    @GameTest(template = ANY_TEMPLATE)
+    public static void aClassOpensItsTreeAndBonus(GameTestHelper helper) {
+        ServerPlayer player = player(helper, "classy");
+        double health = player.getMaxHealth();
+        Characters.setClass(player, io.github.ranger3462.dungeondelving.character.PlayerClass.FIGHTER);
+        helper.assertTrue(player.getMaxHealth() == health + 2, "a fighter gets +2 max health");
+        if (io.github.ranger3462.dungeondelving.character.SkillLevels.pufferfish()) {
+            helper.assertTrue(io.github.ranger3462.dungeondelving.integration.skills.PufferfishSkills.isUnlocked(player, DungeonDelving.id("fighter")),
+                    "the fighter tree opens");
+            helper.assertFalse(io.github.ranger3462.dungeondelving.integration.skills.PufferfishSkills.isUnlocked(player, DungeonDelving.id("mage")),
+                    "other class trees stay locked");
+        }
+        Characters.setClass(player, io.github.ranger3462.dungeondelving.character.PlayerClass.MAGE);
+        helper.assertTrue(player.getMaxHealth() == health, "changing class takes the fighter bonus off");
+        if (io.github.ranger3462.dungeondelving.character.SkillLevels.pufferfish()) {
+            helper.assertFalse(io.github.ranger3462.dungeondelving.integration.skills.PufferfishSkills.isUnlocked(player, DungeonDelving.id("fighter")),
+                    "the old class tree locks again");
+            helper.assertTrue(io.github.ranger3462.dungeondelving.integration.skills.PufferfishSkills.isUnlocked(player, DungeonDelving.id("mage")),
+                    "the new one opens");
+        }
+        helper.succeed();
+    }
+
     private static ServerPlayer player(GameTestHelper helper, String name) {
         ServerPlayer player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), name));
         Characters.apply(player);

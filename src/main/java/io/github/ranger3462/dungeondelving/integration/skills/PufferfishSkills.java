@@ -46,6 +46,24 @@ public final class PufferfishSkills {
         return experience(category).map(experience -> experience.getTotal(player));
     }
 
+    /** Unlocks a skill tree for a player. */
+    public static void unlock(ServerPlayer player, ResourceLocation category) {
+        SkillsAPI.getCategory(category).ifPresent(c -> c.unlock(player));
+    }
+
+    /** Takes back the points spent in a tree and locks it. */
+    public static void lock(ServerPlayer player, ResourceLocation category) {
+        SkillsAPI.getCategory(category).ifPresent(c -> {
+            c.resetSkills(player);
+            c.lock(player);
+        });
+    }
+
+    /** Whether a player has a skill tree unlocked. */
+    public static boolean isUnlocked(ServerPlayer player, ResourceLocation category) {
+        return SkillsAPI.getCategory(category).map(c -> c.isUnlocked(player)).orElse(false);
+    }
+
     /** Adds to a player's total experience in a skill, if it exists. */
     public static void addTotal(ServerPlayer player, ResourceLocation category, int amount) {
         experience(category).ifPresent(experience -> experience.addTotal(player, amount));

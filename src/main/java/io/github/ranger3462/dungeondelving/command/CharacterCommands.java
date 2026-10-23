@@ -27,7 +27,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
  * {@code /character}: shows the player's character level, ability points and scores. Operators can also
- * {@code /character points add <n>} (bonus points) and {@code /character respec} (take every point back), for testing.
+ * {@code /character points add <n>} (bonus points), {@code /character respec} (take every point back), and set a race or class,
+ * for testing.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class CharacterCommands {
@@ -68,6 +69,22 @@ public final class CharacterCommands {
                                     Feedback.tell(context.getSource(), "You are now a " + race.get().displayName().getString() + ".");
                                     return 1;
                                 })))
+                .then(Commands.literal("class").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .then(Commands.argument("class", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((context, builder) -> net.minecraft.commands.SharedSuggestionProvider.suggest(
+                                        java.util.Arrays.stream(io.github.ranger3462.dungeondelving.character.PlayerClass.values()).map(c -> c.id), builder))
+                                .executes(context -> {
+                                    ServerPlayer player = context.getSource().getPlayerOrException();
+                                    String id = com.mojang.brigadier.arguments.StringArgumentType.getString(context, "class");
+                                    var chosen = io.github.ranger3462.dungeondelving.character.PlayerClass.byId(id);
+                                    if (chosen.isEmpty()) {
+                                        Feedback.fail(context.getSource(), "Unknown class " + id);
+                                        return 0;
+                                    }
+                                    Characters.setClass(player, chosen.get());
+                                    Feedback.tell(context.getSource(), "You are now a " + chosen.get().displayName().getString() + ".");
+                                    return 1;
+                                })))
                 .then(Commands.literal("respec").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(context -> {
                     ServerPlayer player = context.getSource().getPlayerOrException();
                     Characters.respec(player);
@@ -83,6 +100,9 @@ public final class CharacterCommands {
         Feedback.send(source, SkillReport.header("Character"));
         Feedback.send(source, Component.literal("Race ").withStyle(ChatFormatting.GRAY).append(Characters.data(player).raceOf()
                 .map(race -> race.displayName().copy().withStyle(ChatFormatting.WHITE)).orElse(Component.literal("none yet").withStyle(ChatFormatting.DARK_GRAY))));
+        Feedback.send(source, Component.literal("Class ").withStyle(ChatFormatting.GRAY).append(Characters.data(player).classOf()
+                .map(c -> c.displayName().copy().withStyle(ChatFormatting.WHITE)).orElse(Component.literal("none yet (read a Tome of Calling)")
+                        .withStyle(ChatFormatting.DARK_GRAY))));
         Feedback.send(source, Component.literal("Level ").withStyle(ChatFormatting.GRAY)
                 .append(Component.literal(String.valueOf(Characters.level(player))).withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD))
                 .append(Component.literal("   ·   ").withStyle(ChatFormatting.DARK_GRAY))

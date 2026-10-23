@@ -1,0 +1,170 @@
+{
+  "418rsvnd17egwkse": {
+    "definition": "archer_root",
+    "x": -96,
+    "y": -5.878304635907295e-15,
+    "root": true
+  },
+  "sv8oqekmdxt8cl2o": {
+    "definition": "archer_tier_1_passive_1",
+    "x": -158.03013449522206,
+    "y": -25.02951440643695,
+    "root": false
+  },
+  "dpwphre1ii38z9ss": {
+    "definition": "archer_tier_1_passive_2",
+    "x": -158.03013449522206,
+    "y": 25.02951440643693,
+    "root": false
+  },
+  "3uptt2jhtdh025ei": {
+    "definition": "archer_boost",
+    "x": -192,
+    "y": -1.175660927181459e-14,
+    "root": false
+  },
+  "vyiswwrrkmdcnwwh": {
+    "definition": "archer_tier_2_spell_1_modifier_1",
+    "x": -254.7672900280824,
+    "y": 25.092387924367525,
+    "root": false
+  },
+  "iie5pnp7emq5o9o1": {
+    "definition": "archer_tier_3_spell_1_modifier_1",
+    "x": -415.24103055690006,
+    "y": 25.117454927670952,
+    "root": false
+  },
+  "pq4p3smmazybm828": {
+    "definition": "archer_tier_4_spell_1_modifier_1",
+    "x": -575.4517756311501,
+    "y": 25.12476712243347,
+    "root": false
+  },
+  "yf69accpikzlejod": {
+    "definition": "archer_tier_2_passive_1",
+    "x": -319.0135467946009,
+    "y": 25.10691063291036,
+    "root": false
+  },
+  "8h0qifjh8f5agi1k": {
+    "definition": "archer_tier_3_passive_1",
+    "x": -479.34217668219543,
+    "y": 25.121258996612937,
+    "root": false
+  },
+  "fdokq01n0tk6nmwl": {
+    "definition": "archer_tier_2_spell_1_modifier_2",
+    "x": -244.9767259474455,
+    "y": 74.31287737714231,
+    "root": false
+  },
+  "f7pflyqm67nqcatf": {
+    "definition": "archer_tier_3_spell_1_modifier_2",
+    "x": -409.18588129001176,
+    "y": 74.98609573058471,
+    "root": false
+  },
+  "1fdmwy1fwjge3sqy": {
+    "definition": "archer_tier_4_spell_1_modifier_2",
+    "x": -571.0722401513148,
+    "y": 75.18308671874972,
+    "root": false
+  },
+  "xsibupou0kia7u24": {
+    "definition": "archer_tier_2_passive_2",
+    "x": -319.0135467946009,
+    "y": -25.1069106329104,
+    "root": false
+  },
+  "1nmfn2021oke8wu8": {
+    "definition": "archer_tier_3_passive_2",
+    "x": -479.34217668219543,
+    "y": -25.121258996613104,
+    "root": false
+  },
+  "wh4hfqtt872975do": {
+    "definition": "archer_boost",
+    "x": -352,
+    "y": -2.1553783664993418e-14,
+    "root": false
+  },
+  "vhqmdzssmcftja37": {
+    "definition": "archer_boost",
+    "x": -512,
+    "y": -3.135095805817224e-14,
+    "root": false
+  },
+  "dpc7m2zi18kvsb9m": {
+    "definition": "archer_tier_2_spell_1_root",
+    "x": -218.3838523287285,
+    "y": 49.84468920621441,
+    "root": false
+  },
+  "gjr4udkeds3xxd4r": {
+    "definition": "archer_tier_3_spell_1_root",
+    "x": -348.41714754208834,
+    "y": 50.09482307219632,
+    "root": false
+  },
+  "p6s5xw9eameqccoa": {
+    "definition": "archer_tier_4_spell_1_root",
+    "x": -509.5345800561648,
+    "y": 50.18477584873505,
+    "root": false
+  },
+  "4fpejc67n60p5fam": {
+    "definition": "archer_tier_2_spell_2_root",
+    "x": -218.3838523287285,
+    "y": -49.84468920621444,
+    "root": false
+  },
+  "44brnsv86ojbiczk": {
+    "definition": "archer_tier_2_spell_2_modifier_1",
+    "x": -254.76729002808239,
+    "y": -25.092387924367557,
+    "root": false
+  },
+  "j29t0a5bhm1sk6cu": {
+    "definition": "archer_tier_2_spell_2_modifier_2",
+    "x": -244.9767259474455,
+    "y": -74.31287737714236,
+    "root": false
+  },
+  "8ljpp1mctqikkk62": {
+    "definition": "archer_tier_3_spell_2_root",
+    "x": -348.4171475420883,
+    "y": -50.09482307219636,
+    "root": false
+  },
+  "ld5rcyfe7x9szg7x": {
+    "definition": "archer_tier_3_spell_2_modifier_1",
+    "x": -415.24103055690006,
+    "y": -25.117454927671094,
+    "root": false
+  },
+  "rq93um3lkddwblys": {
+    "definition": "archer_tier_3_spell_2_modifier_2",
+    "x": -409.1858812900117,
+    "y": -74.98609573058484,
+    "root": false
+  },
+  "d42ph71z9w39yvfe": {
+    "definition": "archer_tier_4_spell_2_root",
+    "x": -509.53458005616477,
+    "y": -50.184775848735114,
+    "root": false
+  },
+  "xbx25koztd8yb4ai": {
+    "definition": "archer_tier_4_spell_2_modifier_1",
+    "x": -575.4517756311501,
+    "y": -25.12476712243354,
+    "root": false
+  },
+  "2yufzyn46sfp20tv": {
+    "definition": "archer_tier_4_spell_2_modifier_2",
+    "x": -571.0722401513148,
+    "y": -75.18308671874979,
+    "root": false
+  }
+}

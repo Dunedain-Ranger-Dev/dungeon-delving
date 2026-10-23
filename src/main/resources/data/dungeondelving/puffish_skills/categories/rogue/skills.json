@@ -1,0 +1,170 @@
+{
+  "63gwys64onqg00ry": {
+    "definition": "rogue_root",
+    "x": -67.88225099390857,
+    "y": 67.88225099390856,
+    "root": true
+  },
+  "wcsjeg2196zvoyj7": {
+    "definition": "rogue_tier_2_spell_1_modifier_1",
+    "x": -120.67756462745545,
+    "y": 225.77184367317886,
+    "root": false
+  },
+  "iaztym6bad9vpl6j": {
+    "definition": "rogue_boost",
+    "x": -135.76450198781714,
+    "y": 135.7645019878171,
+    "root": false
+  },
+  "i9xnsmwyiepawnjt": {
+    "definition": "rogue_boost",
+    "x": -248.90158697766475,
+    "y": 248.9015869776647,
+    "root": false
+  },
+  "s70w1793c786tgsr": {
+    "definition": "rogue_boost",
+    "x": -362.03867196751236,
+    "y": 362.0386719675123,
+    "root": false
+  },
+  "rl4jpp3irsrbaswh": {
+    "definition": "rogue_tier_3_spell_1_modifier_1",
+    "x": -236.31493464016083,
+    "y": 342.36128821176106,
+    "root": false
+  },
+  "kn5k0ptfo8zadcqj": {
+    "definition": "rogue_tier_4_spell_1_modifier_1",
+    "x": -389.13995958662036,
+    "y": 424.6717460026314,
+    "root": false
+  },
+  "rmltz0n7oef4h4wl": {
+    "definition": "rogue_tier_1_passive_1",
+    "x": -94.04564036679572,
+    "y": 129.44271909999156,
+    "root": false
+  },
+  "l4jeass9apeapcno": {
+    "definition": "rogue_tier_2_passive_1",
+    "x": -207.8233754656588,
+    "y": 243.3299089920099,
+    "root": false
+  },
+  "9h24ldeo70mvvbbp": {
+    "definition": "rogue_tier_3_passive_1",
+    "x": -321.182691052252,
+    "y": 356.70951622914913,
+    "root": false
+  },
+  "67eahla83d8pvybx": {
+    "definition": "rogue_tier_2_spell_1_modifier_2",
+    "x": -162.40468074589324,
+    "y": 197.89067606086067,
+    "root": false
+  },
+  "fzs64ss55cz4yt4p": {
+    "definition": "rogue_tier_3_spell_1_modifier_2",
+    "x": -275.85902582817096,
+    "y": 311.38047123917795,
+    "root": false
+  },
+  "k4rbiamjkymxtb7f": {
+    "definition": "rogue_tier_4_spell_1_modifier_2",
+    "x": -350.64658310902325,
+    "y": 456.9715240077514,
+    "root": false
+  },
+  "hhcimahonqdm527m": {
+    "definition": "rogue_tier_1_passive_2",
+    "x": -129.4427190999916,
+    "y": 94.04564036679568,
+    "root": false
+  },
+  "miwybq6zyt6e5yab": {
+    "definition": "rogue_tier_2_passive_2",
+    "x": -243.32990899200993,
+    "y": 207.82337546565873,
+    "root": false
+  },
+  "dyg5jr9us7c9lely": {
+    "definition": "rogue_tier_3_passive_2",
+    "x": -356.70951622914936,
+    "y": 321.1826910522518,
+    "root": false
+  },
+  "iyw38unpp57qjhrm": {
+    "definition": "rogue_tier_2_spell_1_root",
+    "x": -119.17518513943541,
+    "y": 189.66622062713566,
+    "root": false
+  },
+  "xgerunbqzlw91it9": {
+    "definition": "rogue_tier_3_spell_1_root",
+    "x": -210.94573861199416,
+    "y": 281.7905168053748,
+    "root": false
+  },
+  "x3n92mbljrncs8zs": {
+    "definition": "rogue_tier_4_spell_1_root",
+    "x": -324.8093614917865,
+    "y": 395.78135212172134,
+    "root": false
+  },
+  "13a6scounq6942da": {
+    "definition": "rogue_tier_2_spell_2_root",
+    "x": -189.66622062713566,
+    "y": 119.17518513943537,
+    "root": false
+  },
+  "n10s6dgxher29el6": {
+    "definition": "rogue_tier_2_spell_2_modifier_1",
+    "x": -197.8906760608607,
+    "y": 162.40468074589322,
+    "root": false
+  },
+  "w5q9flwgia4tils3": {
+    "definition": "rogue_tier_2_spell_2_modifier_2",
+    "x": -225.7718436731789,
+    "y": 120.67756462745541,
+    "root": false
+  },
+  "6boa4fda55fz2pqj": {
+    "definition": "rogue_tier_3_spell_2_root",
+    "x": -281.79051680537486,
+    "y": 210.94573861199413,
+    "root": false
+  },
+  "oj5usoz1opf31zcy": {
+    "definition": "rogue_tier_3_spell_2_modifier_1",
+    "x": -311.3804712391781,
+    "y": 275.85902582817073,
+    "root": false
+  },
+  "hch97ajsib3f1f3m": {
+    "definition": "rogue_tier_3_spell_2_modifier_2",
+    "x": -342.36128821176106,
+    "y": 236.31493464016077,
+    "root": false
+  },
+  "auggg4kns9og02ab": {
+    "definition": "rogue_tier_4_spell_2_root",
+    "x": -395.7813521217214,
+    "y": 324.80936149178643,
+    "root": false
+  },
+  "453ut4fxsmgr9or0": {
+    "definition": "rogue_tier_4_spell_2_modifier_1",
+    "x": -424.6717460026315,
+    "y": 389.1399595866203,
+    "root": false
+  },
+  "6v782r16movicn2w": {
+    "definition": "rogue_tier_4_spell_2_modifier_2",
+    "x": -456.97152400775144,
+    "y": 350.6465831090231,
+    "root": false
+  }
+}
