@@ -11,6 +11,7 @@ import io.github.ranger3462.dungeondelving.block.PuzzleLockBlock;
 import io.github.ranger3462.dungeondelving.block.RelicAltarBlock;
 import io.github.ranger3462.dungeondelving.block.WarDrumBlock;
 import io.github.ranger3462.dungeondelving.character.Characters;
+import io.github.ranger3462.dungeondelving.character.ElixirOfRebirthItem;
 import io.github.ranger3462.dungeondelving.character.TomeOfInsightItem;
 import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
@@ -116,6 +117,9 @@ public final class ModRegistries {
             new Item.Properties().rarity(Rarity.UNCOMMON));
 
     /** Testing tool: can't die, damage readout, fast regeneration and mana, and flight. Creative tab only. */
+    /** An Elixir of Rebirth: drink it to choose your race again (DD-82). */
+    public static final DeferredItem<ElixirOfRebirthItem> ELIXIR_OF_REBIRTH = ITEMS.registerItem("elixir_of_rebirth", ElixirOfRebirthItem::new,
+            new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
     /** A Tome of Insight: read it for a bonus ability point (DD-80). */
     public static final DeferredItem<TomeOfInsightItem> TOME_OF_INSIGHT = ITEMS.registerItem("tome_of_insight", TomeOfInsightItem::new,
             new Item.Properties().stacksTo(16).rarity(Rarity.EPIC));
@@ -164,6 +168,7 @@ public final class ModRegistries {
                 output.accept(RELIC_SHARD.get());
                 output.accept(TESTERS_CHARM.get());
                 output.accept(TOME_OF_INSIGHT.get());
+                output.accept(ELIXIR_OF_REBIRTH.get());
                 output.accept(ModEntities.GOBLIN_SPAWN_EGG.get());
                 output.accept(ModEntities.GOBLIN_SPEAR.get());
                 output.accept(ModEntities.GOBLIN_ARCHER_SPAWN_EGG.get());

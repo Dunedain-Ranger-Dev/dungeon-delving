@@ -43,7 +43,7 @@ public class CharacterScreen extends Screen {
     private static final int TOP_SPACE = 44;
 
     /** The latest character info from the server. */
-    private static CharacterSyncPayload latest = new CharacterSyncPayload(1, 0, Map.of());
+    private static CharacterSyncPayload latest = new CharacterSyncPayload(1, 0, Map.of(), "");
 
     public CharacterScreen() {
         super(Component.translatable("screen.dungeondelving.character"));

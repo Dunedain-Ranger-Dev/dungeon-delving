@@ -7,6 +7,8 @@ import java.util.Map;
 import com.mojang.serialization.Codec;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.character.Race;
+import io.github.ranger3462.dungeondelving.character.RaceTraits;
 import io.github.ranger3462.dungeondelving.character.SkillLevels;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -78,6 +80,9 @@ public final class CraftingSkills {
     public static void addXp(Player player, CraftSkill skill, int amount) {
         if (amount <= 0 || player.level().isClientSide()) {
             return;
+        }
+        if (RaceTraits.race(player).orElse(null) == Race.GNOME) {
+            amount = (int) Math.round(amount * RaceTraits.GNOME_CRAFTING_XP); // Gnomes have a knack for crafting.
         }
         int before = level(player, skill);
         setXp(player, skill, xp(player, skill) + amount);

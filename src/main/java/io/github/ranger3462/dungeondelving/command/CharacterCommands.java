@@ -45,6 +45,29 @@ public final class CharacterCommands {
                                     Feedback.tell(context.getSource(), "You now have " + Characters.available(player) + " ability points to spend.");
                                     return 1;
                                 }))))
+                .then(Commands.literal("race").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .then(Commands.literal("reset").executes(context -> {
+                            ServerPlayer player = context.getSource().getPlayerOrException();
+                            Characters.setRace(player, null);
+                            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, new io.github.ranger3462.dungeondelving.character.RacePayloads.Open());
+                            Feedback.tell(context.getSource(), "Race cleared: pick a new one.");
+                            return 1;
+                        }))
+                        .then(Commands.argument("race", com.mojang.brigadier.arguments.StringArgumentType.word())
+                                .suggests((context, builder) -> net.minecraft.commands.SharedSuggestionProvider.suggest(
+                                        java.util.Arrays.stream(io.github.ranger3462.dungeondelving.character.Race.values()).map(race -> race.id), builder))
+                                .executes(context -> {
+                                    ServerPlayer player = context.getSource().getPlayerOrException();
+                                    String id = com.mojang.brigadier.arguments.StringArgumentType.getString(context, "race");
+                                    var race = io.github.ranger3462.dungeondelving.character.Race.byId(id);
+                                    if (race.isEmpty()) {
+                                        Feedback.fail(context.getSource(), "Unknown race " + id);
+                                        return 0;
+                                    }
+                                    Characters.setRace(player, race.get());
+                                    Feedback.tell(context.getSource(), "You are now a " + race.get().displayName().getString() + ".");
+                                    return 1;
+                                })))
                 .then(Commands.literal("respec").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS)).executes(context -> {
                     ServerPlayer player = context.getSource().getPlayerOrException();
                     Characters.respec(player);
@@ -58,6 +81,8 @@ public final class CharacterCommands {
         CommandSourceStack source = context.getSource();
         int available = Characters.available(player);
         Feedback.send(source, SkillReport.header("Character"));
+        Feedback.send(source, Component.literal("Race ").withStyle(ChatFormatting.GRAY).append(Characters.data(player).raceOf()
+                .map(race -> race.displayName().copy().withStyle(ChatFormatting.WHITE)).orElse(Component.literal("none yet").withStyle(ChatFormatting.DARK_GRAY))));
         Feedback.send(source, Component.literal("Level ").withStyle(ChatFormatting.GRAY)
                 .append(Component.literal(String.valueOf(Characters.level(player))).withStyle(ChatFormatting.WHITE, ChatFormatting.BOLD))
                 .append(Component.literal("   ·   ").withStyle(ChatFormatting.DARK_GRAY))

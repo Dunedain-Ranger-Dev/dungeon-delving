@@ -45,6 +45,10 @@ public final class Characters {
             () -> AttachmentType.builder(() -> CharacterData.EMPTY).serialize(CharacterData.CODEC).copyOnDeath().build());
     /** Where a score's allocated points are kept on its attribute. */
     private static final ResourceLocation ALLOCATED = DungeonDelving.id("allocated");
+    /** Where a race's score bonuses, size and traits are kept on their attributes. */
+    private static final ResourceLocation RACE = DungeonDelving.id("race");
+    /** Humans' versatility: a bonus ability point every this many character levels. */
+    public static final int HUMAN_BONUS_EVERY = 4;
     /** How often scores' effects are brought up to date with gear changes, in ticks. */
     private static final int REFRESH_INTERVAL = 20;
 
@@ -61,6 +65,10 @@ public final class Characters {
         event.registrar("1").playToClient(CharacterSyncPayload.TYPE, CharacterSyncPayload.STREAM_CODEC,
                 (payload, context) -> io.github.ranger3462.dungeondelving.client.CharacterScreen.receive(payload));
         event.registrar("1").playToServer(AllocateScorePayload.TYPE, AllocateScorePayload.STREAM_CODEC, AllocateScorePayload::handle);
+        event.registrar("1").playToClient(RacePayloads.Open.TYPE, RacePayloads.Open.STREAM_CODEC,
+                (payload, context) -> io.github.ranger3462.dungeondelving.client.RaceScreen.open());
+        event.registrar("1").playToServer(RacePayloads.Choose.TYPE, RacePayloads.Choose.STREAM_CODEC, RacePayloads.Choose::handle);
+        event.registrar("1").playToServer(RacePayloads.UseAbility.TYPE, RacePayloads.UseAbility.STREAM_CODEC, RacePayloads.UseAbility::handle);
         event.registrar("1").playToClient(MobLevelPayload.TYPE, MobLevelPayload.STREAM_CODEC,
                 (payload, context) -> io.github.ranger3462.dungeondelving.client.MobNameplates.receive(payload));
         event.registrar("1").playToClient(SkillXpPayload.TYPE, SkillXpPayload.STREAM_CODEC,
@@ -76,9 +84,18 @@ public final class Characters {
         return SkillLevels.characterLevel(SkillLevels.levels(player), Config.CHARACTER_LEVEL_TOP_SKILLS.get());
     }
 
-    /** Ability points the player has earned: one per character level past 1, plus bonus points. */
+    /** Ability points the player has earned: one per character level past 1, plus bonus points (and humans' extra ones). */
     public static int earned(ServerPlayer player) {
-        return level(player) - 1 + data(player).bonusPoints();
+        int level = level(player);
+        int human = data(player).raceOf().filter(race -> race == Race.HUMAN).map(race -> level / HUMAN_BONUS_EVERY).orElse(0);
+        return level - 1 + data(player).bonusPoints() + human;
+    }
+
+    /** Sets the player's race (or clears it, with null, so they pick again), and applies it. */
+    public static void setRace(ServerPlayer player, Race race) {
+        player.setData(DATA, data(player).withRace(race == null ? "" : race.id));
+        apply(player);
+        sync(player);
     }
 
     /** Ability points the player hasn't spent yet. */
@@ -114,12 +131,15 @@ public final class Characters {
     /** Brings the player's scores up to date: their allocated points, then what each score adds to other attributes. */
     public static void apply(ServerPlayer player) {
         CharacterData data = data(player);
+        Race race = data.raceOf().orElse(null);
+        applyRace(player, race);
         for (AbilityScore score : AbilityScore.values()) {
             AttributeInstance attribute = player.getAttribute(score.attribute());
             if (attribute == null) {
                 continue;
             }
             setModifier(attribute, ALLOCATED, data.allocated(score), AttributeModifier.Operation.ADD_VALUE);
+            setModifier(attribute, RACE, race == null ? 0 : race.bonus(score), AttributeModifier.Operation.ADD_VALUE);
             double points = attribute.getValue() - AbilityScore.BASE;
             for (AbilityScore.Effect effect : score.effects) {
                 AttributeInstance target = attribute(player, effect.attribute());
@@ -130,6 +150,28 @@ public final class Characters {
         }
         if (player.getHealth() > player.getMaxHealth()) {
             player.setHealth(player.getMaxHealth());
+        }
+    }
+
+    /** The race's size and passive traits; every other race's are taken off (setting 0 removes a modifier). */
+    private static void applyRace(ServerPlayer player, Race race) {
+        AttributeInstance scale = attribute(player, "minecraft:generic.scale");
+        if (scale != null) {
+            setModifier(scale, RACE, race == null ? 0 : race.scale, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+        }
+        for (Race other : Race.values()) {
+            for (Race.Trait trait : other.traits) {
+                AttributeInstance target = attribute(player, trait.attribute());
+                if (target != null) {
+                    boolean mine = other == race;
+                    // Two races may share an attribute; only clear it if it isn't the current race's.
+                    if (mine) {
+                        setModifier(target, RACE, trait.amount(), trait.operation());
+                    } else if (race == null || race.traits.stream().noneMatch(t -> t.attribute().equals(trait.attribute()))) {
+                        setModifier(target, RACE, 0, trait.operation());
+                    }
+                }
+            }
         }
     }
 
@@ -169,7 +211,7 @@ public final class Characters {
     /** Sends the player their character level, points and allocations, for the stats screen. */
     public static void sync(ServerPlayer player) {
         Map<String, Integer> allocated = new HashMap<>(data(player).allocated());
-        PacketDistributor.sendToPlayer(player, new CharacterSyncPayload(level(player), available(player), allocated));
+        PacketDistributor.sendToPlayer(player, new CharacterSyncPayload(level(player), available(player), allocated, data(player).race()));
     }
 
     @SubscribeEvent
@@ -182,6 +224,10 @@ public final class Characters {
             apply(player);
             checkLevel(player);
             sync(player);
+            // New players (and anyone who drank an Elixir of Rebirth and logged off before choosing) pick a race first.
+            if (data(player).raceOf().isEmpty()) {
+                PacketDistributor.sendToPlayer(player, new RacePayloads.Open());
+            }
         }
     }
 
