@@ -304,7 +304,7 @@ DECOR = [
     "minecraft:chain", "minecraft:lantern", "minecraft:soul_lantern", "minecraft:iron_bars", "minecraft:barrel",
     "minecraft:smithing_table", "minecraft:campfire", "minecraft:soul_campfire", "minecraft:stonecutter",
     "minecraft:iron_block", "minecraft:coal_block", "minecraft:magma_block",
-    "dungeondelving:hallstone",
+    "dungeondelving:riftstone",
 ]
 
 

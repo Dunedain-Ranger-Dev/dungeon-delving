@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "dungeondelving:block/hallstone"
+    "all": "dungeondelving:block/riftstone"
   }
 }

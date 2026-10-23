@@ -79,9 +79,9 @@ def ingot(color):
     return pixels
 
 
-def hallstone():
+def riftstone():
     """Dark stone bricks, for the generic dungeon stone."""
-    rng = random.Random("hallstone")
+    rng = random.Random("riftstone")
     pixels = [[rgb(0x4A4A52, rng.uniform(0.85, 1.1)) for _ in range(16)] for _ in range(16)]
     for y in (0, 8):
         for x in range(16):
@@ -92,7 +92,7 @@ def hallstone():
     return pixels
 
 
-png(ASSETS / "block" / "hallstone.png", hallstone())
+png(ASSETS / "block" / "riftstone.png", riftstone())
 for key, color in ORES.items():
     png(ASSETS / "block" / f"{key}_ore.png", ore(color, key))
     png(ASSETS / "block" / f"{key}_block.png", storage_block(color))

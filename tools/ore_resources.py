@@ -73,8 +73,8 @@ for key, (name, tier, tool) in ORES.items():
 
 lang_path.write_text(json.dumps(lang, indent=2) + "\n", encoding="utf-8", newline="\n")
 vanilla_tags = RESOURCES / "data/minecraft/tags/block"
-# Hallstone, the generic dungeon stone, mines with any pickaxe.
-write(vanilla_tags / "mineable/pickaxe.json", {"replace": False, "values": mineable + [f"{NS}:hallstone"]})
+# Riftstone, the generic dungeon stone, mines with any pickaxe.
+write(vanilla_tags / "mineable/pickaxe.json", {"replace": False, "values": mineable + [f"{NS}:riftstone"]})
 for tool, values in needs.items():
     write(vanilla_tags / f"needs_{tool}_tool.json", {"replace": False, "values": values})
 for tag, values in item_tags.items():

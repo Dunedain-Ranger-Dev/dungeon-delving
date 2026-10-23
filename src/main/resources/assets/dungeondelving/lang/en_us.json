@@ -36,7 +36,7 @@
   "dungeondelving.configuration.blockNaturalSpawns": "Block natural spawns in dungeons",
   "dungeondelving.configuration.tierOreChance": "Tier ore chance",
   "dungeondelving.configuration.commonOreChance": "Common ore chance",
-  "block.dungeondelving.hallstone": "Hallstone",
+  "block.dungeondelving.riftstone": "Riftstone",
   "block.dungeondelving.hunt_marker": "Hunt Marker",
   "block.dungeondelving.boss_marker": "Boss Marker",
   "block.dungeondelving.boss_door": "Boss Door",

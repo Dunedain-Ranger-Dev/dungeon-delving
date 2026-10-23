@@ -34,11 +34,11 @@ All of these are in the Dungeon Delving creative tab.
 
 - **Loot marker:** becomes a chest each run (about 60% of the time), otherwise empty.
 - **Mob marker:** becomes a monster spawner. Spawners work in lit rooms too, so don't worry about lighting.
-- **Resource marker:** becomes an ore, or **Hallstone** if no ore rolls. You can build whole walls or pillars from resource markers and they'll always come out solid.
+- **Resource marker:** becomes an ore, or **Riftstone** if no ore rolls. You can build whole walls or pillars from resource markers and they'll always come out solid.
 - **Objective marker:** becomes a reward chest with the tier's best chest loot. Optional, e.g. for treasure rooms.
 - **Hunt marker:** becomes a spawner, and adds one hunt target to the room. Hunt targets are tougher mobs that come out of the room's spawners at random; killing all of them drops a Dungeon Key. Use 3 per hunt room.
 - **Boss marker:** where the boss appears once the boss door opens. Put one in each boss room, with open floor around it.
-- **Hallstone:** the generic dungeon stone, free to use as a building block.
+- **Riftstone:** the generic dungeon stone, free to use as a building block.
 
 Keep the center of start rooms clear; the exit goes there.
 

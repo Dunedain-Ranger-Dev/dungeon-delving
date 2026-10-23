@@ -66,9 +66,9 @@ public final class ModRegistries {
     public static final DeferredItem<BlockItem> DUNGEON_EXIT_ITEM = ITEMS.registerSimpleBlockItem(DUNGEON_EXIT);
 
     /** The generic dungeon stone: fills resource spots that don't roll an ore, and is a basic dungeon material. */
-    public static final DeferredBlock<Block> HALLSTONE = BLOCKS.registerSimpleBlock("hallstone",
+    public static final DeferredBlock<Block> RIFTSTONE = BLOCKS.registerSimpleBlock("riftstone",
             BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).strength(2.0f, 6.0f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE));
-    public static final DeferredItem<BlockItem> HALLSTONE_ITEM = ITEMS.registerSimpleBlockItem(HALLSTONE);
+    public static final DeferredItem<BlockItem> RIFTSTONE_ITEM = ITEMS.registerSimpleBlockItem(RIFTSTONE);
 
     // Markers: placed by builders inside dungeon pieces, and turned into chests, mobs or ores each run.
     public static final DeferredBlock<Block> LOOT_MARKER = marker("loot_marker", MapColor.WOOD);
@@ -178,7 +178,7 @@ public final class ModRegistries {
                     output.accept(forging.get());
                 }
                 Forging.gear().forEach(output::accept);
-                output.accept(HALLSTONE_ITEM.get());
+                output.accept(RIFTSTONE_ITEM.get());
                 for (DungeonOre ore : DungeonOre.values()) {
                     output.accept(ore.oreItem.get());
                     output.accept(ore.raw.get());

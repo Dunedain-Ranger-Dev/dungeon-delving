@@ -47,7 +47,7 @@ public final class Config {
             .defineInRange("lootMarkerChance", 0.6, 0.0, 1.0);
 
     public static final ModConfigSpec.DoubleValue RESOURCE_MARKER_CHANCE = BUILDER
-            .comment("Chance that each resource marker becomes an ore at all. Otherwise it becomes Hallstone.")
+            .comment("Chance that each resource marker becomes an ore at all. Otherwise it becomes Riftstone.")
             .defineInRange("resourceMarkerChance", 0.5, 0.0, 1.0);
 
     public static final ModConfigSpec.DoubleValue TIER_ORE_CHANCE = BUILDER

@@ -42,7 +42,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * and spawn fewer mobs at low tiers.</li>
  * <li>Resource marker: the dungeon's tier ore, the common dungeon ore, an ore from the
  * {@code dungeondelving:dungeon_resources} block tag or the tier's {@code dungeondelving:dungeon_resources/tier_<n>}
- * tag, or otherwise Hallstone, so there are never gaps.</li>
+ * tag, or otherwise Riftstone, so there are never gaps.</li>
  * <li>Objective marker: a reward chest with the tier's {@code dungeondelving:chests/tier_<n>/objective} loot.</li>
  * <li>Hunt marker: a spawner like a mob marker, and one more hunt target for the room; the room's hunt targets come
  * out of its spawners at random (see {@link DungeonChallenges}).</li>
@@ -125,7 +125,7 @@ public final class DungeonMarkers {
             placeChest(level, pos, objectiveLoot(rolls.tier()), random);
         } else if (marker == ModRegistries.RESOURCE_MARKER.get()) {
             Block block = random.nextDouble() < rolls.resourceChance() ? pickOre(level, random, rolls).orElse(null) : null;
-            level.setBlock(pos, (block != null ? block : ModRegistries.HALLSTONE.get()).defaultBlockState(), Block.UPDATE_CLIENTS);
+            level.setBlock(pos, (block != null ? block : ModRegistries.RIFTSTONE.get()).defaultBlockState(), Block.UPDATE_CLIENTS);
         } else if (marker == ModRegistries.MOB_MARKER.get()) {
             if (random.nextDouble() < rolls.mobChance()) {
                 placeSpawner(level, pos, random, rolls);

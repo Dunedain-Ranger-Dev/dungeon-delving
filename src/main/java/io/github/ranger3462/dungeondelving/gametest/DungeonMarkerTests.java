@@ -64,7 +64,7 @@ public class DungeonMarkerTests {
             resolve(level, pos, ModRegistries.RESOURCE_MARKER.get(), random, ALWAYS);
             helper.assertTrue(level.getBlockState(pos).is(DungeonMarkers.DUNGEON_RESOURCES), "a resource marker should become a dungeon ore");
             resolve(level, pos, ModRegistries.RESOURCE_MARKER.get(), random, NEVER);
-            helper.assertTrue(level.getBlockState(pos).is(ModRegistries.HALLSTONE.get()), "a resource marker that doesn't roll an ore becomes Hallstone");
+            helper.assertTrue(level.getBlockState(pos).is(ModRegistries.RIFTSTONE.get()), "a resource marker that doesn't roll an ore becomes Riftstone");
 
             resolve(level, pos, ModRegistries.MOB_MARKER.get(), random, ALWAYS);
             helper.assertTrue(level.getBlockState(pos).is(Blocks.SPAWNER), "a mob marker should become a spawner");

@@ -51,7 +51,7 @@ public class DungeonLootTests {
                 helper.assertTrue(stack.is(DungeonLoot.LOST_ON_FAILURE), stack.getItem() + " should be lost on a failed run");
             }
         }
-        helper.assertFalse(new ItemStack(ModRegistries.HALLSTONE_ITEM.get()).is(DungeonLoot.LOST_ON_FAILURE), "Hallstone isn't valuable");
+        helper.assertFalse(new ItemStack(ModRegistries.RIFTSTONE_ITEM.get()).is(DungeonLoot.LOST_ON_FAILURE), "Riftstone isn't valuable");
         helper.succeed();
     }
 
