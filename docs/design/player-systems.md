@@ -45,6 +45,42 @@ hand-editing 600 recipes.
   item's own attribute modifiers by its stars (an item attribute event), rather than per-mod special cases. The
   forging minigame would then accept RPG gear recipes as "forge this item" jobs. To be costed before committing.
 
+### Costing full integration (2026-10-23)
+
+What's there now: stars are a `STARS` component, but only our own gear classes (`ForgedGear.Armor`, `Sword`, `Axe`)
+turn stars into stats, by overriding their attribute modifiers per stack. Starred crafting recipes
+(`starred_shaped`/`starred_shapeless`) already give a result the lowest ★ of its forged inputs, capped by the flux.
+The RPG gear: about 230 shaped recipes (vanilla iron, gold, diamond, leather, chain, wool, string; Witcher's own
+metals and diagrams), about 190 smithing upgrades (mostly netherite, plus Armory upgrade items and warden crystals).
+Many of the rest only load with Better End, Better Nether or Jewelry, which the pack doesn't have.
+
+Two ways:
+- **A. Parts only (no stars on RPG gear).** A KubeJS rule table swaps vanilla inputs for ours: iron for tempered
+  ingots or armor plates, chain for chain links, leather for refined or hardened leather, wool for padded cloth.
+  RPG gear keeps its own stats. About a day. Forging is a gate, not a quality source.
+- **B. Full integration (stars on any gear).** On top of A's rule table:
+  1. Quality core (mod): an `ItemAttributeModifierEvent` hook scales a starred item's own armor, toughness, attack
+     damage, ranged damage and spell power modifiers by a ★ multiplier (speed and the like untouched); durability is
+     set from the ★ when crafted; stars show in the tooltip (we can't rename other mods' items the way we do ours).
+     Apotheosis and other mods see the scaled values like any item's. 1–2 days with tests.
+  2. Recipes: the KubeJS rules emit our `starred_shaped` type instead of vanilla's, so the ★ flows from the forged
+     parts with no new minigame step. Smithing upgrades copy the base item's components, so a ★5 iron set stays ★5
+     when upgraded; the upgrade just needs our dungeon ingot. 1–2 days, mostly reviewing the rule table's output.
+  3. Balance and an in-game pass: about a day.
+  About 4–5 days in total, against A's one.
+
+Complications for B, and what I'd do:
+- **Gear with no metal** (robes from wool, bows from string and sticks, wooden and stone weapons) has no star source.
+  Robes could take stars from a starred thread or rune part later; until then they stay unstarred. Wooden and stone
+  tiers can stay vanilla.
+- **Witcher's metals** (steel, silver, dimeritium, meteorite and their dark variants) are a second metal ladder.
+  Simplest: steel becomes our coke-infused iron route (already started), and the rarer ones map to dungeon ingots.
+- **Unstarred RPG gear** from loot or other recipes keeps its base stats, so the multiplier should put ★3 at about
+  base (×1.0), with lower stars a little under and ★7 about +25%, matching our sword's spread (6.5 to 8.6).
+- **Stacking with RPG upgrades** is fine: smithing keeps the component, so stars and the Armory tiers combine.
+
+Recommendation: B, built in that order, so step 1 can be tested on a few items before the recipe sweep.
+
 ## 3. Ability scores
 
 STR, DEX, CON, INT, WIS, CHA, each a real attribute so gear, races and skills can modify them the usual way.

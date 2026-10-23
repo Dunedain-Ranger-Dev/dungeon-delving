@@ -186,6 +186,8 @@ public final class Forging {
             StarredRecipes.ShapedSerializer::new);
     public static final DeferredHolder<RecipeSerializer<?>, StarredRecipes.ShapelessSerializer> STARRED_SHAPELESS =
             SERIALIZERS.register("starred_shapeless", StarredRecipes.ShapelessSerializer::new);
+    public static final DeferredHolder<RecipeSerializer<?>, StarredRecipes.SmithingSerializer> STARRED_SMITHING =
+            SERIALIZERS.register("starred_smithing", StarredRecipes.SmithingSerializer::new);
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<HeatingRecipe.Blasting>> HEATING_BLASTING =
             SERIALIZERS.register("heating_blasting", () -> HeatingRecipe.serializer(HeatingRecipe.Blasting::new, 50));
 

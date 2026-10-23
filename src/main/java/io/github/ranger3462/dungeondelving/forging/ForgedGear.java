@@ -97,13 +97,15 @@ public final class ForgedGear {
         return SLOT_DURABILITY.get(type) * DURABILITY[index(stars)];
     }
 
-    /** Sets a freshly crafted piece's durability for its ★. Does nothing to anything that isn't forged gear. */
+    /** Sets a freshly crafted piece's durability for its ★; other mods' starred gear goes by {@link Quality}. */
     public static void applyStats(ItemStack stack) {
         int stars = Forging.stars(stack);
         if (stack.getItem() instanceof Armor armor) {
             stack.set(DataComponents.MAX_DAMAGE, armorDurability(armor.getType(), stars));
         } else if (stack.getItem() instanceof Sword || stack.getItem() instanceof Axe) {
             stack.set(DataComponents.MAX_DAMAGE, WEAPON_DURABILITY[index(stars)]);
+        } else {
+            Quality.applyDurability(stack);
         }
     }
 
