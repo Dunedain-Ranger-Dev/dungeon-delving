@@ -46,6 +46,11 @@ public final class Config {
                     "several spawners can't swamp you. A faction without an entry uses 7,9,12,15.")
             .defineList("roomMobCaps", RoomMobCap.DEFAULTS, () -> "orcs=7,9,12,15", value -> value instanceof String text && RoomMobCap.parse(text).isPresent());
 
+    public static final ModConfigSpec.IntValue FACTION_INFIGHTING_MAX_TIER = BUILDER
+            .comment("Up to this dungeon tier, a mob hit by one of its own faction (a stray arrow) may turn on it. Above it, a",
+                    "faction holds together. Casters (#dungeondelving:faction_casters) are never turned on by their own side.")
+            .defineInRange("factionInfightingMaxTier", 2, 0, 4);
+
     public static final ModConfigSpec.DoubleValue MOB_MARKER_CHANCE = BUILDER
             .comment("Chance that each mob marker in a dungeon becomes a spawner. Otherwise it's left empty. Hunt markers always do.")
             .defineInRange("mobMarkerChance", 0.5, 0.0, 1.0);

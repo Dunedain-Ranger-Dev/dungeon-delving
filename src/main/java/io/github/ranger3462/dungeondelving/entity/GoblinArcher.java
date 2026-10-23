@@ -2,6 +2,7 @@ package io.github.ranger3462.dungeondelving.entity;
 
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -59,6 +60,15 @@ public class GoblinArcher extends Goblin implements RangedAttackMob {
         arrow.shoot(dx, dy + flat * 0.2, dz, 1.4f, inaccuracy);
         playSound(SoundEvents.SKELETON_SHOOT, 1.0f, 1.0f / (getRandom().nextFloat() * 0.4f + 0.8f));
         level().addFreshEntity(arrow);
+    }
+
+    /**
+     * Draws the Goblin Bow. Vanilla's bow goal asks to use whichever hand holds a vanilla bow, which for a Goblin Bow
+     * is the empty off-hand, so the archer would never draw (and look like it fires from a held bow).
+     */
+    @Override
+    public void startUsingItem(InteractionHand hand) {
+        super.startUsingItem(ProjectileUtil.getWeaponHoldingHand(this, item -> item instanceof BowItem));
     }
 
     @Override

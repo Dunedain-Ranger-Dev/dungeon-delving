@@ -8,8 +8,10 @@ import com.mojang.authlib.GameProfile;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
+import io.github.ranger3462.dungeondelving.dungeon.FactionInfighting;
 import io.github.ranger3462.dungeondelving.dungeon.RoomMobCap;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonProgress;
+import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import io.github.ranger3462.dungeondelving.testing.BossDoorSpot;
 import io.github.ranger3462.dungeondelving.testing.DevGear;
@@ -23,6 +25,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -130,6 +133,21 @@ public class DevToolTests {
         } finally {
             zombies.forEach(Zombie::discard);
         }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void factionsOnlyInfightAtLowTiers(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        LivingEntity scrapper = ModEntities.ORC_SCRAPPER.get().create(level);
+        LivingEntity raider = ModEntities.ORC_RAIDER.get().create(level);
+        LivingEntity goblin = ModEntities.GOBLIN.get().create(level);
+        helper.assertTrue(FactionInfighting.sameFaction(scrapper, raider), "two orcs are one faction");
+        helper.assertFalse(FactionInfighting.sameFaction(scrapper, goblin), "an orc and a goblin aren't");
+        helper.assertTrue(FactionInfighting.mayTurnOn(raider, 1), "a tier 1 orc may turn on another orc that hit it");
+        helper.assertFalse(FactionInfighting.mayTurnOn(raider, 3), "a tier 3 warband holds together");
+        net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getOptional(DungeonDelving.id("orc_shaman")).ifPresent(type ->
+                helper.assertFalse(FactionInfighting.mayTurnOn((LivingEntity) type.create(level), 1), "nobody turns on their own shaman"));
         helper.succeed();
     }
 

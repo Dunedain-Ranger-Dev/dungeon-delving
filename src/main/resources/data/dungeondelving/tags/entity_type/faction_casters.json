@@ -1,0 +1,41 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "dungeondelving:goblin_shaman",
+      "required": false
+    },
+    {
+      "id": "dungeondelving:goblin_pyro",
+      "required": false
+    },
+    {
+      "id": "dungeondelving:goblin_chief",
+      "required": false
+    },
+    {
+      "id": "dungeondelving:orc_doomsayer",
+      "required": false
+    },
+    {
+      "id": "dungeondelving:orc_shaman",
+      "required": false
+    },
+    {
+      "id": "dungeondelving:orc_lorekeeper",
+      "required": false
+    },
+    {
+      "id": "dungeondelving:skeleton_mage",
+      "required": false
+    },
+    {
+      "id": "dungeondelving:wither_skeleton_mage",
+      "required": false
+    },
+    {
+      "id": "dungeondelving:lich_lord",
+      "required": false
+    }
+  ]
+}
