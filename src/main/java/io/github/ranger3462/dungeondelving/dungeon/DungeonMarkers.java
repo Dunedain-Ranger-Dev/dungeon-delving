@@ -190,8 +190,8 @@ public final class DungeonMarkers {
     }
 
     /** Ticks between a dungeon spawner's waves: 6 to 20 seconds (vanilla spawners wait 10 to 40). */
-    public static final int MIN_SPAWN_DELAY = 120;
-    public static final int MAX_SPAWN_DELAY = 400;
+    public static final int MIN_SPAWN_DELAY = 80;
+    public static final int MAX_SPAWN_DELAY = 260;
     /** Mobs a dungeon spawner spawns at once, by tier (index 0 is tier 1). Vanilla spawners spawn 4. */
     public static final int[] SPAWN_COUNT = { 2, 3, 3, 4 };
     /** How many mobs can be near a dungeon spawner before it stops, by tier. Vanilla spawners allow 6. */

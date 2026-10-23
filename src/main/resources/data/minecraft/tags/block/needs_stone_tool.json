@@ -1,9 +1,0 @@
-{
-  "replace": false,
-  "values": [
-    "dungeondelving:barrow_iron_ore",
-    "dungeondelving:barrow_iron_block",
-    "dungeondelving:thraggite_ore",
-    "dungeondelving:thraggite_block"
-  ]
-}

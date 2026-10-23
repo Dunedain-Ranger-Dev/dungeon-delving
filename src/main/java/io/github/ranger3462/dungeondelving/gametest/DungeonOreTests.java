@@ -49,11 +49,14 @@ public class DungeonOreTests {
 
     @GameTest(template = ANY_TEMPLATE)
     public static void higherTierOresNeedBetterTools(GameTestHelper helper) {
-        helper.assertTrue(needs(DungeonOre.COMMON, Items.STONE_PICKAXE) && !needs(DungeonOre.COMMON, Items.WOODEN_PICKAXE), "common ore needs stone");
-        helper.assertTrue(needs(DungeonOre.TIER_1, Items.STONE_PICKAXE), "tier 1 ore needs stone");
-        helper.assertTrue(needs(DungeonOre.TIER_2, Items.IRON_PICKAXE) && !needs(DungeonOre.TIER_2, Items.STONE_PICKAXE), "tier 2 ore needs iron");
-        helper.assertTrue(needs(DungeonOre.TIER_3, Items.DIAMOND_PICKAXE) && !needs(DungeonOre.TIER_3, Items.IRON_PICKAXE), "tier 3 ore needs diamond");
-        helper.assertTrue(needs(DungeonOre.TIER_4, Items.DIAMOND_PICKAXE) && !needs(DungeonOre.TIER_4, Items.IRON_PICKAXE), "tier 4 ore needs diamond");
+        // Gold ranks above iron for dungeon ores: stone, iron, gold, diamond, netherite.
+        helper.assertTrue(needs(DungeonOre.COMMON, Items.STONE_PICKAXE) && !needs(DungeonOre.COMMON, Items.WOODEN_PICKAXE), "Barrow Iron needs stone");
+        helper.assertTrue(needs(DungeonOre.TIER_1, Items.IRON_PICKAXE) && needs(DungeonOre.TIER_1, Items.GOLDEN_PICKAXE)
+                && !needs(DungeonOre.TIER_1, Items.STONE_PICKAXE), "Thraggite needs iron or better");
+        helper.assertTrue(needs(DungeonOre.TIER_2, Items.GOLDEN_PICKAXE) && needs(DungeonOre.TIER_2, Items.DIAMOND_PICKAXE)
+                && !needs(DungeonOre.TIER_2, Items.IRON_PICKAXE), "Wardsilver needs gold or better");
+        helper.assertTrue(needs(DungeonOre.TIER_3, Items.DIAMOND_PICKAXE) && !needs(DungeonOre.TIER_3, Items.GOLDEN_PICKAXE), "Emberstone needs diamond");
+        helper.assertTrue(needs(DungeonOre.TIER_4, Items.NETHERITE_PICKAXE) && !needs(DungeonOre.TIER_4, Items.DIAMOND_PICKAXE), "Thailite needs netherite");
         helper.succeed();
     }
 

@@ -95,7 +95,7 @@ public final class DungeonChallenges {
         int region = DungeonDimension.regionAt(pos);
         long room = DungeonDimension.roomMinAt(pos).asLong();
         DungeonRegions.get().progress(region).ifPresent(progress -> {
-            if (RoomMobCap.full(event.getLevel().getLevel(), pos, progress.tier())) {
+            if (RoomMobCap.full(event.getLevel().getLevel(), pos, progress.faction(), progress.tier())) {
                 event.setSpawnCancelled(true);
                 return;
             }

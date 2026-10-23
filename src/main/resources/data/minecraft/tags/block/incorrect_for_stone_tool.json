@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "dungeondelving:thraggite_ore",
+    "dungeondelving:thraggite_block",
+    "dungeondelving:wardsilver_ore",
+    "dungeondelving:wardsilver_block",
+    "dungeondelving:emberstone_ore",
+    "dungeondelving:emberstone_block",
+    "dungeondelving:thailite_ore",
+    "dungeondelving:thailite_block"
+  ]
+}

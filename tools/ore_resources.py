@@ -11,13 +11,13 @@ ASSETS = RESOURCES / "assets/dungeondelving"
 DATA = RESOURCES / "data/dungeondelving"
 NS = "dungeondelving"
 
-# id key -> (display name, tier position for smelting XP, pickaxe needed)
+# id key -> (display name, tier position for smelting XP, weakest pickaxe that mines it)
 ORES = {
     "barrow_iron": ("Barrow Iron", 0, "stone"),
-    "thraggite": ("Thraggite", 1, "stone"),
-    "wardsilver": ("Wardsilver", 2, "iron"),
+    "thraggite": ("Thraggite", 1, "iron"),
+    "wardsilver": ("Wardsilver", 2, "gold"),
     "emberstone": ("Emberstone", 3, "diamond"),
-    "thailite": ("Thailite", 4, "diamond"),
+    "thailite": ("Thailite", 4, "netherite"),
 }
 
 
@@ -28,7 +28,10 @@ def write(path, obj):
 
 lang_path = ASSETS / "lang/en_us.json"
 lang = json.loads(lang_path.read_text(encoding="utf-8"))
-mineable, needs = [], {"stone": [], "iron": [], "diamond": []}
+# Pickaxes from weakest to strongest, for dungeon ores. Gold sits above iron here (unlike vanilla, where it's as weak as
+# wood), so each ore is listed as incorrect for every pickaxe below the one it needs rather than in a needs_*_tool tag.
+PICKAXES = ["wooden", "stone", "iron", "gold", "diamond", "netherite"]
+mineable, incorrect = [], {tool: [] for tool in PICKAXES}
 item_tags = {"dungeon_ores": [], "raw_dungeon_ores": [], "dungeon_ingots": [], "dungeon_storage_blocks": []}
 
 for key, (name, tier, tool) in ORES.items():
@@ -65,7 +68,8 @@ for key, (name, tier, tool) in ORES.items():
         "ingredients": [{"item": f"{NS}:{block}"}], "result": {"id": f"{NS}:{ingot}", "count": 9}})
 
     mineable += [f"{NS}:{ore}", f"{NS}:{block}"]
-    needs[tool] += [f"{NS}:{ore}", f"{NS}:{block}"]
+    for weaker in PICKAXES[:PICKAXES.index(tool)]:
+        incorrect[weaker] += [f"{NS}:{ore}", f"{NS}:{block}"]
     item_tags["dungeon_ores"].append(f"{NS}:{ore}")
     item_tags["raw_dungeon_ores"].append(f"{NS}:{raw}")
     item_tags["dungeon_ingots"].append(f"{NS}:{ingot}")
@@ -75,8 +79,9 @@ lang_path.write_text(json.dumps(lang, indent=2) + "\n", encoding="utf-8", newlin
 vanilla_tags = RESOURCES / "data/minecraft/tags/block"
 # Riftstone, the generic dungeon stone, mines with any pickaxe.
 write(vanilla_tags / "mineable/pickaxe.json", {"replace": False, "values": mineable + [f"{NS}:riftstone"]})
-for tool, values in needs.items():
-    write(vanilla_tags / f"needs_{tool}_tool.json", {"replace": False, "values": values})
+for tool, values in incorrect.items():
+    if values:
+        write(vanilla_tags / f"incorrect_for_{tool}_tool.json", {"replace": False, "values": values})
 for tag, values in item_tags.items():
     write(DATA / f"tags/item/{tag}.json", {"replace": False, "values": values})
 print("Wrote ore resources for", ", ".join(ORES))

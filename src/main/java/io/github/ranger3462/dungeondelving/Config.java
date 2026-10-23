@@ -40,10 +40,11 @@ public final class Config {
                     "resource: mostly quarries packed with ore; loot: lots of treasure rooms with extra chests.")
             .defineList("layoutTypes", LayoutType.DEFAULTS, () -> "normal=1", value -> value instanceof String text && LayoutType.parse(text).isPresent());
 
-    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> ROOM_MOB_CAPS = BUILDER
-            .comment("The most hostile mobs a dungeon room's spawners keep alive at once, for tiers 1, 2, 3 and 4 in order. Once a",
-                    "room holds this many, its spawners wait until some die, so rooms with several spawners can't swamp you.")
-            .defineList("roomMobCaps", RoomMobCap.DEFAULTS, () -> 10, value -> value instanceof Integer cap && cap > 0);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> ROOM_MOB_CAPS = BUILDER
+            .comment("The most hostile mobs a dungeon room's spawners keep alive at once, per faction, as \"faction=t1,t2,t3,t4\"",
+                    "entries (one number per tier). Once a room holds this many, its spawners wait until some die, so rooms with",
+                    "several spawners can't swamp you. A faction without an entry uses 7,9,12,15.")
+            .defineList("roomMobCaps", RoomMobCap.DEFAULTS, () -> "orcs=7,9,12,15", value -> value instanceof String text && RoomMobCap.parse(text).isPresent());
 
     public static final ModConfigSpec.DoubleValue MOB_MARKER_CHANCE = BUILDER
             .comment("Chance that each mob marker in a dungeon becomes a spawner. Otherwise it's left empty. Hunt markers always do.")

@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.mojang.authlib.GameProfile;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.RoomMobCap;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonProgress;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
@@ -102,26 +103,30 @@ public class DevToolTests {
 
     @GameTest(template = ANY_TEMPLATE)
     public static void roomsCapTheirMobsByTier(GameTestHelper helper) {
-        helper.assertTrue(RoomMobCap.cap(1) == 7 && RoomMobCap.cap(4) == 15, "room caps should run from 7 at tier 1 to 15 at tier 4");
-        helper.assertTrue(RoomMobCap.cap(2) < RoomMobCap.cap(3), "caps should grow with tier");
+        helper.assertTrue(RoomMobCap.cap(DungeonFactions.ORCS, 1) == 7 && RoomMobCap.cap(DungeonFactions.ORCS, 4) == 15,
+                "orc room caps should run from 7 at tier 1 to 15 at tier 4");
+        helper.assertTrue(RoomMobCap.cap(DungeonFactions.UNDEAD, 2) > RoomMobCap.cap(DungeonFactions.ORCS, 2)
+                && RoomMobCap.cap(DungeonFactions.GOBLINS, 4) > RoomMobCap.cap(DungeonFactions.ORCS, 4), "the undead and goblins should come in bigger numbers");
+        helper.assertTrue(RoomMobCap.cap("not_a_faction", 3) == RoomMobCap.FALLBACK.get(2), "an unknown faction should use the fallback caps");
+        helper.assertTrue(RoomMobCap.parse("orcs=1,2,3").isEmpty() && RoomMobCap.parse("orcs=1,2,x,4").isEmpty(), "bad entries shouldn't parse");
         ServerLevel level = helper.getLevel();
         BlockPos center = DungeonDimension.roomCenterAt(helper.absolutePos(BlockPos.ZERO)).above(2);
         level.getChunkAt(center);
         List<Zombie> zombies = new ArrayList<>();
         try {
-            for (int i = 0; i < RoomMobCap.cap(1); i++) {
+            for (int i = 0; i < RoomMobCap.cap(DungeonFactions.ORCS, 1); i++) {
                 Zombie zombie = EntityType.ZOMBIE.create(level);
                 zombie.moveTo(center.getX() + 0.5 + i % 3, center.getY(), center.getZ() + 0.5 + i / 3);
                 zombie.setNoAi(true);
                 level.addFreshEntity(zombie);
                 zombies.add(zombie);
-                if (i == RoomMobCap.cap(1) - 2) {
-                    helper.assertFalse(RoomMobCap.full(level, center, 1), "a room one short of its cap isn't full");
+                if (i == RoomMobCap.cap(DungeonFactions.ORCS, 1) - 2) {
+                    helper.assertFalse(RoomMobCap.full(level, center, DungeonFactions.ORCS, 1), "a room one short of its cap isn't full");
                 }
             }
-            helper.assertTrue(RoomMobCap.count(level, center) >= RoomMobCap.cap(1), "the room should count its mobs");
-            helper.assertTrue(RoomMobCap.full(level, center, 1), "a tier 1 room with 7 mobs is full");
-            helper.assertFalse(RoomMobCap.full(level, center, 4), "a tier 4 room holds more");
+            helper.assertTrue(RoomMobCap.count(level, center) >= RoomMobCap.cap(DungeonFactions.ORCS, 1), "the room should count its mobs");
+            helper.assertTrue(RoomMobCap.full(level, center, DungeonFactions.ORCS, 1), "a tier 1 room with 7 mobs is full");
+            helper.assertFalse(RoomMobCap.full(level, center, DungeonFactions.ORCS, 4), "a tier 4 room holds more");
         } finally {
             zombies.forEach(Zombie::discard);
         }
