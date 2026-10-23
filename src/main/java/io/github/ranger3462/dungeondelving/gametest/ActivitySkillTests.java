@@ -144,6 +144,71 @@ public class ActivitySkillTests {
         helper.succeed();
     }
 
+    @GameTest(template = ANY_TEMPLATE)
+    public static void mobsHaveLevelsFromTheirStats(GameTestHelper helper) {
+        var zombie = EntityType.ZOMBIE.create(helper.getLevel());
+        var golem = EntityType.IRON_GOLEM.create(helper.getLevel());
+        var pig = EntityType.PIG.create(helper.getLevel());
+        try {
+            int z = io.github.ranger3462.dungeondelving.character.MobLevels.fromStats(zombie);
+            int g = io.github.ranger3462.dungeondelving.character.MobLevels.fromStats(golem);
+            int p = io.github.ranger3462.dungeondelving.character.MobLevels.fromStats(pig);
+            helper.assertTrue(p == 1 && z >= 2 && z <= 4 && g >= 11 && g <= 15, "pig 1, zombie about 3, iron golem about 13; got " + p + ", " + z + ", " + g);
+        } finally {
+            zombie.discard();
+            golem.discard();
+            pig.discard();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void weakMobsGiveLittleExperience(GameTestHelper helper) {
+        helper.assertTrue(io.github.ranger3462.dungeondelving.character.MobLevels.xpMultiplier(0, 1) == 1.0, "a new skill gets full XP");
+        helper.assertTrue(io.github.ranger3462.dungeondelving.character.MobLevels.xpMultiplier(13, 8) == 1.0, "within 5 levels: full XP");
+        helper.assertTrue(Math.abs(io.github.ranger3462.dungeondelving.character.MobLevels.xpMultiplier(20, 10) - 0.5) < 1e-9, "10 below: half");
+        helper.assertTrue(io.github.ranger3462.dungeondelving.character.MobLevels.xpMultiplier(30, 1) == 0.05, "a level 30 skill on a level 1 mob: a trickle");
+        if (!SkillLevels.pufferfish()) {
+            helper.succeed();
+            return;
+        }
+        ServerPlayer master = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "master"));
+        PufferfishSkills.setTotal(master, DungeonDelving.id(ActivitySkills.ONE_HANDED), 200000);
+        Pig pig = EntityType.PIG.create(helper.getLevel());
+        try {
+            int before = total(master, ActivitySkills.ONE_HANDED);
+            for (int i = 0; i < 10; i++) {
+                ActivitySkills.awardAgainst(master, ActivitySkills.ONE_HANDED, 4, pig);
+            }
+            int gained = total(master, ActivitySkills.ONE_HANDED) - before;
+            helper.assertTrue(gained <= 6, "ten 4-XP hits on a pig should give a master almost nothing, gave " + gained);
+        } finally {
+            pig.discard();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void buffsOnlyPayOncePerCooldown(GameTestHelper helper) {
+        if (!SkillLevels.pufferfish()) {
+            helper.succeed();
+            return;
+        }
+        ServerPlayer player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "buffer"));
+        int before = total(player, MagicSchool.HOLY.skill);
+        MagicSchool.HOLY.awardCast(player, "test:blessing", 4);
+        MagicSchool.HOLY.awardCast(player, "test:blessing", 4);
+        MagicSchool.HOLY.awardCast(player, "test:other", 4);
+        helper.assertTrue(total(player, MagicSchool.HOLY.skill) == before + 8, "the same buff twice pays once; another spell pays too");
+        if (net.neoforged.fml.ModList.get().isLoaded("irons_spellbooks")) {
+            helper.assertTrue(io.github.ranger3462.dungeondelving.integration.irons.IronsMagic.heals(
+                    io.redspace.ironsspellbooks.api.registry.SpellRegistry.HEAL_SPELL.get(), 1, player), "Heal is a healing spell");
+            helper.assertFalse(io.github.ranger3462.dungeondelving.integration.irons.IronsMagic.heals(
+                    io.redspace.ironsspellbooks.api.registry.SpellRegistry.FIREBOLT_SPELL.get(), 1, player), "Firebolt isn't");
+        }
+        helper.succeed();
+    }
+
     private static int total(ServerPlayer player, String skill) {
         return PufferfishSkills.total(player, DungeonDelving.id(skill)).orElseThrow();
     }

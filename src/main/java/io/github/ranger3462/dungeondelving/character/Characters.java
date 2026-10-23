@@ -61,6 +61,10 @@ public final class Characters {
         event.registrar("1").playToClient(CharacterSyncPayload.TYPE, CharacterSyncPayload.STREAM_CODEC,
                 (payload, context) -> io.github.ranger3462.dungeondelving.client.CharacterScreen.receive(payload));
         event.registrar("1").playToServer(AllocateScorePayload.TYPE, AllocateScorePayload.STREAM_CODEC, AllocateScorePayload::handle);
+        event.registrar("1").playToClient(MobLevelPayload.TYPE, MobLevelPayload.STREAM_CODEC,
+                (payload, context) -> io.github.ranger3462.dungeondelving.client.MobNameplates.receive(payload));
+        event.registrar("1").playToClient(SkillXpPayload.TYPE, SkillXpPayload.STREAM_CODEC,
+                (payload, context) -> io.github.ranger3462.dungeondelving.client.SkillXpOverlay.receive(payload));
     }
 
     public static CharacterData data(Player player) {

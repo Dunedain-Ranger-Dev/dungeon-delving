@@ -49,6 +49,11 @@ public class CharacterScreen extends Screen {
         super(Component.translatable("screen.dungeondelving.character"));
     }
 
+    /** The player's character level, as last sent by the server. */
+    public static int characterLevel() {
+        return latest.level();
+    }
+
     public static void receive(CharacterSyncPayload payload) {
         latest = payload;
         if (Minecraft.getInstance().screen instanceof CharacterScreen screen) {

@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.character.MobLevels;
 import io.github.ranger3462.dungeondelving.character.SkillLevels;
 import io.github.ranger3462.dungeondelving.forging.ForgedGear;
 import io.github.ranger3462.dungeondelving.integration.bettercombat.BetterCombatWeapons;
@@ -14,8 +15,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ThrownTrident;
@@ -76,6 +79,27 @@ public final class ActivitySkills {
         if (amount > 0 && SkillLevels.pufferfish()) {
             PufferfishSkills.addTotal(player, DungeonDelving.id(skill), amount);
         }
+    }
+
+    /**
+     * Gives a player experience earned against a mob (hitting it, blocking it, being hit by it), scaled down when the
+     * mob is well below the skill's level ({@link MobLevels#xpMultiplier}). A fraction left over gives one more point
+     * by chance, so a trickle stays a trickle instead of rounding to nothing or to a whole point every time.
+     */
+    public static void awardAgainst(ServerPlayer player, String skill, int amount, Entity opponent) {
+        if (amount <= 0 || !SkillLevels.pufferfish()) {
+            return;
+        }
+        double scaled = amount;
+        if (opponent instanceof Mob mob) {
+            int skillLevel = PufferfishSkills.level(player, DungeonDelving.id(skill)).orElse(0);
+            scaled = amount * MobLevels.xpMultiplier(skillLevel, MobLevels.level(mob));
+        }
+        int whole = (int) Math.floor(scaled);
+        if (player.getRandom().nextDouble() < scaled - whole) {
+            whole++;
+        }
+        award(player, skill, whole);
     }
 
     /** Experience for one hit of this much damage (dealt, blocked or taken): 1 per point, at most {@link #MAX_PER_HIT}. */
@@ -188,27 +212,28 @@ public final class ActivitySkills {
         var source = event.getSource();
         if (source.getEntity() instanceof ServerPlayer player && player != event.getEntity()) {
             if (source.getDirectEntity() == player) {
-                styleFor(player.getMainHandItem()).ifPresent(style -> award(player, style, perHit(amount)));
+                LivingEntity target = event.getEntity();
+                styleFor(player.getMainHandItem()).ifPresent(style -> awardAgainst(player, style, perHit(amount), target));
                 if (isWeapon(player.getMainHandItem()) && isWeapon(player.getOffhandItem())) {
-                    award(player, DUAL_WIELDING, Math.max(1, perHit(amount) / 2));
+                    awardAgainst(player, DUAL_WIELDING, Math.max(1, perHit(amount) / 2), target);
                 }
             } else if (source.getDirectEntity() instanceof ThrownTrident) {
-                award(player, POLEARMS, perHit(amount));
+                awardAgainst(player, POLEARMS, perHit(amount), event.getEntity());
             } else if (source.getDirectEntity() instanceof AbstractArrow arrow) {
                 ItemStack weapon = arrow.getWeaponItem();
-                award(player, weapon != null && weapon.getItem() instanceof CrossbowItem ? CROSSBOWS : ARCHERY, perHit(amount));
+                awardAgainst(player, weapon != null && weapon.getItem() instanceof CrossbowItem ? CROSSBOWS : ARCHERY, perHit(amount), event.getEntity());
             }
         }
         // Armor only trains against real attackers, not falls, fire or cactus.
         if (event.getEntity() instanceof ServerPlayer player && source.getEntity() instanceof LivingEntity attacker && attacker != player) {
-            wornWeight(player).ifPresent(weight -> award(player, weight.skill, perHit(amount)));
+            wornWeight(player).ifPresent(weight -> awardAgainst(player, weight.skill, perHit(amount), attacker));
         }
     }
 
     @SubscribeEvent
     public static void onBlock(LivingShieldBlockEvent event) {
         if (event.getBlocked() && event.getEntity() instanceof ServerPlayer player && event.getBlockedDamage() > 0) {
-            award(player, BLOCKING, perHit(event.getBlockedDamage()));
+            awardAgainst(player, BLOCKING, perHit(event.getBlockedDamage()), event.getDamageSource().getEntity());
         }
     }
 
