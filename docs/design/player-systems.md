@@ -50,7 +50,8 @@ hand-editing 600 recipes.
 STR, DEX, CON, INT, WIS, CHA, each a real attribute so gear, races and skills can modify them the usual way.
 - Each point feeds existing attributes, so the RPG mods, Better Combat and Iron's all feel it:
   - STR: melee damage, knockback resistance.
-  - DEX: attack speed, ranged damage (Ranged Weapon API), crit chance (Critical Strike).
+  - DEX: attack speed, ranged damage (Ranged Weapon API), a little movement speed. Crit chance comes from gear,
+    not scores (user, 2026-10-23).
   - CON: max health, armor toughness.
   - INT: arcane, fire and frost spell power (Spell Power) and Iron's spell power.
   - WIS: healing and holy spell power, mana regen.
@@ -82,34 +83,64 @@ faction).
 
 ## 5. Classes
 
-Four base classes, picked after the race, each opening one RPG Series line:
-- **Fighter**: Rogues & Warriors (warrior side).
-- **Archer**: Archers.
-- **Rogue**: Rogues & Warriors (rogue side).
-- **Mage**: Wizards.
+**Decided (user, 2026-10-23):** four base classes to start: **Fighter**, **Archer**, **Rogue** and **Mage**. Each
+gets its own distinct skill tree (replacing the RPG Series' single radial class tree), locked until the class is
+picked; every other tree is open to everyone from the start. Specializations (Paladin, Necromancer, Berserker,
+Witcher and so on) come later as branches of the class trees, drawing on the RPG Series content. Players can change
+class at a cost (a rare item or ritual that resets the class and its points).
 
-Specializations unlock deeper in the skill tree, using the other mods' content:
-- Fighter: Paladin (Paladins & Priests), Berserker, Forcemaster.
-- Archer: Ranger (Archers Expansion), Witcher.
-- Rogue: Assassin, Witcher.
-- Mage: Elemental Wizard, Priest (Paladins & Priests), Necromancer (our own, drawing on Iron's blood and evocation
-  schools, or Spell Engine spells we write).
+Magic isn't locked to the Mage: anyone can learn any school (a Rogue can still cast Fireball). The Mage class
+empowers casting instead: mana regen, spell damage and the like.
 
-Classes decide which Skill Tree categories a player can level, and which class gear they get full bonuses from.
-**Decided (user, 2026-10-23):** players can change class at a cost (a rare item or ritual that resets class and
-its skill points).
+### Getting a class: the new-player flow
+
+1. Join the server and pick a **race** (section 4).
+2. Pick a **faction capital** to start in. Capitals are protected safe zones that other factions can't attack
+   outside of specific events.
+3. An NPC greets you and gives you a basic **adventuring book** that points you to the local **guild**.
+4. The guild walks you through combat, forging and our other systems (tutorial quests; FTB Quests is already in the
+   pack).
+5. At the end, you're sent to a **class tutor** to pick a class, which unlocks its tree.
+
+Steps 2 to 5 need things that don't exist yet (faction capitals and safe zones, NPCs, the guild tutorial), so they
+come after the player systems themselves; races and class picking can work from a screen until then.
 
 ## 6. Skill trees (mcMMO-style)
 
-Profession trees on Pufferfish's Skills, alongside the class trees. Doing the activity earns that tree's
-experience, a level gives a point, and points buy nodes.
-- **Mining** (mine block): mining speed, double drops, then vein mining.
-- **Woodcutting** (break log): speed, double logs, then tree felling.
-- **Excavation**, **Farming**, **Fishing**: the same pattern.
-- **Smithing**, **Leatherworking**, **Weaving** (our crafting): experience from forging and crafting, and nodes that
-  raise success rate, quality (stars) and yield. These feed straight into the forging system.
-- Vein mining, tree felling and the forging bonuses are our code, switched on by a node (a tag or a custom reward
-  type).
+**Decided (user, 2026-10-23):** every skill levels on its own, from doing that thing. Doing it earns the tree's
+experience, a level gives a point, and points buy nodes. All trees run on Pufferfish's Skills. The RPG Series' own
+radial class tree and weapon tree are retired in favour of these (switched off by the pack's data).
+
+**Professions** (DD-80, built):
+- **Mining**, **Woodcutting**, **Excavation**, **Farming**, **Fishing**: from mining, chopping, digging,
+  harvesting and fishing. Later nodes: double drops, vein mining, tree felling.
+- **Forging**, **Leatherworking**, **Weaving**: from our crafting; nodes for success rate, quality and yield.
+
+**Combat styles** (from hitting with that kind of weapon, by its Better Combat type):
+- **One-Handed**: sword, rapier, cutlass, katana, axe, mace.
+- **Two-Handed**: claymore, hammer, heavy axe, double axe.
+- **Polearms**: spear, halberd, glaive, lance, scythe, trident.
+- **Daggers**: dagger, sickle, claw, soul knife.
+- **Unarmed**: fists and knuckles (Forcemaster).
+- **Archery**: bows. **Crossbows**: crossbows.
+- **Dual Wielding**: hitting with a weapon in each hand.
+- **Blocking**: blocking hits with a shield.
+
+**Armor** (from taking hits while wearing mostly that kind of armor):
+- **Light**, **Medium**, **Heavy** and **Mage** (robes). Armor is sorted by item tags, with our forged armor's weight
+  and sensible defaults for vanilla and the RPG Series.
+
+**Magic schools** (from casting that school's spells, in Spell Engine or Iron's Spells), each levelling on its own so
+you can master frost and still be a fire apprentice:
+- **Fire** (fire), **Frost** (frost, Iron's ice), **Lightning**, **Arcane** (arcane, Iron's ender and evocation),
+  **Holy** (healing, Iron's holy), **Earth** (earth, Iron's nature), **Water**, **Air**, **Blood** (Iron's),
+  **Necromancy** (soul, Iron's eldritch).
+- The Witcher's signs stay with a future Witcher specialization, not the shared schools.
+
+**Beastmastery** (planned; no pets system yet): from taming and breeding animals for now, and from fighting alongside
+companions once those exist.
+
+**Classes**: one tree each for Fighter, Archer, Rogue and Mage (section 5), locked until picked.
 
 ## 7. Better Combat for our mobs
 
@@ -120,8 +151,10 @@ in game. If the add-on won't take our mobs, we drive Better Combat's animations 
 
 ## Suggested order
 
-1. Better Combat mob spike (quick, answers a feasibility question).
-2. Forging rework of the RPG recipes, then add the RPG Series to the pack.
-3. Ability scores (races and classes build on them).
-4. Races, then classes.
-5. Profession skill trees, starting with Mining and Smithing.
+Done: Better Combat mob swings (DD-79), the character core (DD-80: professions, character level, ability scores).
+
+1. Combat style, armor and magic school trees, plus Beastmastery's first XP (the rest of the skill breakdown).
+2. Races, with a first-join race screen.
+3. Classes: the four class trees and a class pick, retiring the RPG Series' radial tree.
+4. Forging rework of the RPG recipes, then add the RPG Series to the pack.
+5. The new-player flow (capitals, greeter NPC, guild tutorial, class tutor), once factions and capitals exist.
