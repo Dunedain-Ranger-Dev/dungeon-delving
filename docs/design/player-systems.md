@@ -81,6 +81,17 @@ Complications for B, and what I'd do:
 
 Recommendation: B, built in that order, so step 1 can be tested on a few items before the recipe sweep.
 
+**Chosen (user, 2026-10-23): B.** The quality core is in (`forging/Quality.java`). The recipe sweep is the pack's
+`tools/rpg_forging.py`, which writes overrides into `kubejs/data/<mod>/recipe/`:
+- Iron gear takes armor plates, chain links and rivets, and so its stars; leather, wool and hardened leather become
+  ours.
+- Diamond gear is an upgrade of the iron piece with Emberstone (no template), and netherite an upgrade of the diamond
+  piece with Thailite. The gold tier is off; wood, stone and flint stay.
+- Witcher: steel and silver armor forged like iron (silver trim is Thraggite), the other swords are upgrades of the
+  steel sword, diagram tiers take tier 1–4 ingots, and its metals elsewhere map to dungeon ingots.
+- Bows, staves, wands, robes and leather gear stay unstarred until DD-86 (woodworking, leather and cloth quality).
+- Jewelry is untouched for now.
+
 ## 3. Ability scores
 
 STR, DEX, CON, INT, WIS, CHA, each a real attribute so gear, races and skills can modify them the usual way.

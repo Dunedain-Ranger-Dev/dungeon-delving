@@ -84,6 +84,31 @@ public class QualityTests {
         helper.succeed();
     }
 
+    /** The pack's RPG Series recipes (tools/rpg_forging.py in the pack): forged iron, then upgrades with dungeon ingots. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void rpgGearIsForgedThenUpgraded(GameTestHelper helper) {
+        var iron = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse("rogues:iron_dagger"));
+        var recipes = helper.getLevel().getRecipeManager();
+        var registries = helper.getLevel().registryAccess();
+        if (iron.isEmpty() || recipes.byKey(ResourceLocation.parse("rogues:diamond_dagger")).isEmpty()) {
+            helper.succeed(); // The RPG Series or the pack's data isn't loaded.
+            return;
+        }
+        helper.assertTrue(recipes.byKey(ResourceLocation.parse("rogues:iron_dagger")).get().value() instanceof StarredRecipes.Shaped,
+                "the iron dagger is crafted from forged parts");
+        helper.assertTrue(recipes.byKey(ResourceLocation.parse("rogues:golden_dagger")).isEmpty(), "the gold tier is off");
+
+        ItemStack dagger = starred(iron.get(), 6);
+        SmithingRecipeInput input = new SmithingRecipeInput(ItemStack.EMPTY, dagger,
+                new ItemStack(BuiltInRegistries.ITEM.get(DungeonDelving.id("emberstone_ingot"))));
+        var match = recipes.getRecipeFor(net.minecraft.world.item.crafting.RecipeType.SMITHING, input, helper.getLevel());
+        helper.assertTrue(match.isPresent(), "an iron dagger and Emberstone make a diamond dagger, with no template");
+        ItemStack diamond = match.get().value().assemble(input, registries);
+        helper.assertTrue(diamond.is(BuiltInRegistries.ITEM.get(ResourceLocation.parse("rogues:diamond_dagger"))) && Forging.stars(diamond) == 6,
+                "the diamond dagger keeps the stars; got " + diamond + " " + Forging.stars(diamond));
+        helper.succeed();
+    }
+
     private static ItemStack starred(net.minecraft.world.item.Item item, int stars) {
         ItemStack stack = new ItemStack(item);
         stack.set(Forging.STARS.get(), stars);
