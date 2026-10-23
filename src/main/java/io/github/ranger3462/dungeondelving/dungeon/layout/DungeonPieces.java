@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
@@ -189,5 +190,22 @@ public final class DungeonPieces {
     public ResourceLocation pick(Kind kind, RandomSource random) {
         List<ResourceLocation> pool = pools.get(kind);
         return pool.get(random.nextInt(pool.size()));
+    }
+
+    /** A piece of this kind, weighted (e.g. by a run's dungeon stones); falls back to an even pick if every weight is 0. */
+    public ResourceLocation pick(Kind kind, RandomSource random, ToDoubleFunction<ResourceLocation> weight) {
+        List<ResourceLocation> pool = pools.get(kind);
+        double total = pool.stream().mapToDouble(weight).sum();
+        if (total <= 0) {
+            return pick(kind, random);
+        }
+        double roll = random.nextDouble() * total;
+        for (ResourceLocation piece : pool) {
+            roll -= weight.applyAsDouble(piece);
+            if (roll < 0) {
+                return piece;
+            }
+        }
+        return pool.getLast();
     }
 }

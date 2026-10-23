@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "axis=x,tier=1": {
+      "model": "dungeondelving:block/rift_portal_ns"
+    },
+    "axis=x,tier=2": {
+      "model": "dungeondelving:block/rift_portal_ns"
+    },
+    "axis=x,tier=3": {
+      "model": "dungeondelving:block/rift_portal_ns"
+    },
+    "axis=x,tier=4": {
+      "model": "dungeondelving:block/rift_portal_ns"
+    },
+    "axis=z,tier=1": {
+      "model": "dungeondelving:block/rift_portal_ew"
+    },
+    "axis=z,tier=2": {
+      "model": "dungeondelving:block/rift_portal_ew"
+    },
+    "axis=z,tier=3": {
+      "model": "dungeondelving:block/rift_portal_ew"
+    },
+    "axis=z,tier=4": {
+      "model": "dungeondelving:block/rift_portal_ew"
+    }
+  }
+}

@@ -14,6 +14,7 @@ import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Cell;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Connection;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Room;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces.Kind;
+import io.github.ranger3462.dungeondelving.gate.RunTuning;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -51,6 +52,12 @@ public final class DungeonBuilder {
 
     /** Every placement for a layout, with the boss room picked for the given boss. */
     public static List<Placement> plan(DungeonLayout layout, DungeonPieces pieces, BlockPos center, RandomSource random, String boss) {
+        return plan(layout, pieces, center, random, boss, RunTuning.NONE);
+    }
+
+    /** Every placement for a layout, with room pieces weighted by the run's dungeon stones. */
+    public static List<Placement> plan(DungeonLayout layout, DungeonPieces pieces, BlockPos center, RandomSource random, String boss,
+            RunTuning tuning) {
         List<Placement> placements = new ArrayList<>();
         Map<Cell, Integer> distances = layout.distancesFromStart();
         List<Room> rooms = layout.rooms().values().stream()
@@ -68,7 +75,8 @@ public final class DungeonBuilder {
                 case CHALLENGE -> Kind.CHALLENGE;
                 case BOSS -> Kind.BOSS;
             };
-            ResourceLocation piece = kind == Kind.BOSS ? pieces.pickBoss(boss, DungeonBosses.bossIds(), random) : pieces.pick(kind, random);
+            ResourceLocation piece = kind == Kind.BOSS ? pieces.pickBoss(boss, DungeonBosses.bossIds(), random)
+                    : pieces.pick(kind, random, candidate -> tuning.pieceWeight(kind, candidate));
             placements.add(new Placement(piece, roomMin(center, room.cell()), room.rotation(), room.mirror()));
         }
 

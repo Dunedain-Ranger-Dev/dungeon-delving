@@ -218,5 +218,19 @@
   "item.dungeondelving.wither_skeleton_archer_spawn_egg": "Wither Skeleton Archer Spawn Egg",
   "item.dungeondelving.wither_skeleton_mage_spawn_egg": "Wither Skeleton Mage Spawn Egg",
   "item.dungeondelving.zombie_lord_spawn_egg": "Zombie Lord Spawn Egg",
-  "item.dungeondelving.lich_lord_spawn_egg": "Lich Lord Spawn Egg"
+  "item.dungeondelving.lich_lord_spawn_egg": "Lich Lord Spawn Egg",
+  "block.dungeondelving.gate_tuner": "Gate Tuner",
+  "block.dungeondelving.rift_portal": "Rift",
+  "item.dungeondelving.bloodshed_stone": "Bloodshed Stone",
+  "item.dungeondelving.bloodshed_stone.tooltip": "Challenge rooms lean toward wave defense and hunts.",
+  "item.dungeondelving.dungeon_stone.tooltip": "Put it in a Gate Tuner near a Dungeon Gate. Used up when the next run starts.",
+  "message.dungeondelving.tuner_full": "This tuner already holds a stone. Right-click empty-handed to take it out.",
+  "message.dungeondelving.tuner_empty": "Right-click with a dungeon stone to tune the gate.",
+  "message.dungeondelving.gate_lit": "The rift opens to a tier %s dungeon. Step in to begin.",
+  "message.dungeondelving.gate_already_open": "The rift is already open.",
+  "message.dungeondelving.gate_no_frame": "The gate needs a Riftstone frame nearby: an opening %s-%s wide and %s-%s tall, with Riftstone under, over and at both sides, within %s blocks of the gate.",
+  "message.dungeondelving.gate_frame": "a %sx%s Riftstone frame",
+  "message.dungeondelving.gate_no_frame_short": "no Riftstone frame",
+  "message.dungeondelving.gate_status": "Gate: %s, %s tuner(s) nearby (uses %s), %s stone(s) tuned.",
+  "message.dungeondelving.gate_tuned": "Tuned: %s."
 }

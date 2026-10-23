@@ -14,6 +14,7 @@ import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces;
 import io.github.ranger3462.dungeondelving.dungeon.layout.LayoutType;
+import io.github.ranger3462.dungeondelving.gate.RunTuning;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -50,6 +51,11 @@ public final class DungeonTravel {
 
     /** Starts a run with a given layout type, held by a given faction. */
     public static Entry enter(ServerPlayer player, int roomCount, int tier, LayoutType type, String faction) {
+        return enter(player, roomCount, tier, type, faction, RunTuning.NONE);
+    }
+
+    /** Starts a run with a given layout type and faction, changed by the dungeon stones tuned into it. */
+    public static Entry enter(ServerPlayer player, int roomCount, int tier, LayoutType type, String faction, RunTuning tuning) {
         tier = DungeonRun.clampTier(tier);
         ServerLevel dungeon = dungeonLevel(player);
         DungeonRegions regions = DungeonRegions.get();
@@ -64,7 +70,7 @@ public final class DungeonTravel {
                 DungeonBuilder.bossRoomCenter(layout, center).orElse(null)).withFaction(faction));
 
         DungeonPieces pieces = DungeonPieces.load(player.server);
-        List<Placement> placements = DungeonBuilder.plan(layout, pieces, center, dungeon.getRandom(), boss);
+        List<Placement> placements = DungeonBuilder.plan(layout, pieces, center, dungeon.getRandom(), boss, tuning);
         DungeonMarkers.Rolls rolls = DungeonMarkers.Rolls.fromConfig(tier, region, faction);
         DungeonBuilder.place(dungeon, placements.getFirst(), rolls);
         dungeon.setBlock(center.above(), ModRegistries.DUNGEON_EXIT.get().defaultBlockState(), Block.UPDATE_ALL);

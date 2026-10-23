@@ -29,6 +29,12 @@ ORES = {
     "thailite": (0xF2B53A, "iron_ore"),
 }
 
+# Other textures recolored whole: (vanilla texture, our texture, color).
+RECOLORS = [
+    ("block/nether_portal", "block/rift_portal", 0x46C8E0),   # the rift, a cold cyan so it isn't mistaken for the Nether
+    ("item/amethyst_shard", "item/bloodshed_stone", 0xB3202A),  # Bloodshed Stone
+]
+
 
 def vanilla(jar, path):
     return Image.open(io.BytesIO(jar.read(f"assets/minecraft/textures/{path}.png"))).convert("RGBA")
@@ -75,6 +81,14 @@ def main():
         specks = [(x, y) for x in range(16) for y in range(16) if chroma(ore.getpixel((x, y))) > SPECK_CHROMA]
         recolored(ore, color, specks).save(TEXTURES / f"block/{name}_ore.png")
         print(f"{name}: ingot, ore ({pattern}, {len(specks)} speck pixels)")
+    for source, target, color in RECOLORS:
+        image = vanilla(jar, source)
+        everything = [(x, y) for x in range(image.width) for y in range(image.height) if image.getpixel((x, y))[3] > 0]
+        recolored(image, color, everything).save(TEXTURES / f"{target}.png")
+        meta = f"assets/minecraft/textures/{source}.png.mcmeta"
+        if meta in jar.namelist():  # Keep animations (the rift).
+            (TEXTURES / f"{target}.png.mcmeta").write_bytes(jar.read(meta))
+        print(f"{target}: from {source}")
 
 
 if __name__ == "__main__":

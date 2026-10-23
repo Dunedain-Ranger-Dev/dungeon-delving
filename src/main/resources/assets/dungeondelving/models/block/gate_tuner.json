@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "dungeondelving:block/riftstone",
+    "top": "minecraft:block/respawn_anchor_top_off",
+    "bottom": "dungeondelving:block/riftstone"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "irons_spellbooks"
+    }
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " R ",
+    "RBR",
+    " R "
+  ],
+  "key": {
+    "R": {
+      "item": "dungeondelving:riftstone"
+    },
+    "B": {
+      "item": "irons_spellbooks:blood_vial"
+    }
+  },
+  "result": {
+    "id": "dungeondelving:bloodshed_stone",
+    "count": 1
+  }
+}

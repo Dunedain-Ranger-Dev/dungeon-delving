@@ -13,6 +13,7 @@ import io.github.ranger3462.dungeondelving.block.WarDrumBlock;
 import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import io.github.ranger3462.dungeondelving.forging.Forging;
+import io.github.ranger3462.dungeondelving.gate.DungeonGates;
 import io.github.ranger3462.dungeondelving.skill.CraftingSkills;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsGoblins;
@@ -138,6 +139,8 @@ public final class ModRegistries {
             .icon(() -> DUNGEON_GATE_ITEM.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(DUNGEON_GATE_ITEM.get());
+                output.accept(DungeonGates.GATE_TUNER_ITEM.get());
+                output.accept(DungeonGates.BLOODSHED_STONE.get());
                 output.accept(DUNGEON_EXIT_ITEM.get());
                 output.accept(RunicWorkshop.BLOCK_ITEM.get());
                 RunicWorkshop.KEYS.forEach(key -> output.accept(key.get()));
@@ -204,6 +207,8 @@ public final class ModRegistries {
         RunicWorkshop.register(modEventBus);
         Forging.init();
         Forging.register(modEventBus);
+        DungeonGates.init();
+        DungeonGates.register(modEventBus);
         CraftingSkills.register(modEventBus);
         ModEntities.register(modEventBus);
         if (ModList.get().isLoaded("irons_spellbooks")) {

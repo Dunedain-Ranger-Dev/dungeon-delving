@@ -33,6 +33,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemContainerContents;
@@ -195,8 +196,10 @@ public class BossAndKeyTests {
         LivingEntity high = DungeonBosses.spawn(helper.getLevel(), pos, 4, -1);
         try {
             helper.assertTrue(DungeonBosses.isBoss(low) && DungeonBosses.isBoss(high), "spawned bosses should be marked as bosses");
-            helper.assertTrue(low.getMaxHealth() == 100.0f && high.getMaxHealth() == 250.0f,
-                    "boss health should grow with tier, got " + low.getMaxHealth() + " and " + high.getMaxHealth());
+            // Base health: other mods (e.g. Apotheosis augments) may add random bonuses on top.
+            double lowBase = low.getAttribute(Attributes.MAX_HEALTH).getBaseValue();
+            double highBase = high.getAttribute(Attributes.MAX_HEALTH).getBaseValue();
+            helper.assertTrue(lowBase == 100.0 && highBase == 250.0, "boss health should grow with tier, got " + lowBase + " and " + highBase);
         } finally {
             low.discard();
             high.discard();

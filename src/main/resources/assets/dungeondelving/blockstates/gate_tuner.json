@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "tuned=false": {
+      "model": "dungeondelving:block/gate_tuner"
+    },
+    "tuned=true": {
+      "model": "dungeondelving:block/gate_tuner_tuned"
+    }
+  }
+}

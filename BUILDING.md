@@ -17,7 +17,12 @@ How to set up the mod, build a dungeon piece, check it against the spec, and exp
 - **common:** ordinary rooms with loot, spawners and ores.
 - **quarry:** rooms packed with resource markers; resource-heavy dungeons use more of them.
 - **treasure:** rooms with extra chests (loot and objective markers); loot-heavy dungeons use more of them.
-- **challenge:** rooms that give a Dungeon Key when cleared. For now the only challenge is a hunt (hunt markers).
+- **challenge:** rooms that give a Dungeon Key when cleared. There are four kinds, and the file name says which, because
+  dungeon stones (tuned at the Dungeon Gate) favor some kinds over others:
+  - `challenge_hunt_*`: a hunt (hunt markers; kill every hunt target).
+  - `challenge_waves_*`: wave defense (a War Drum; the doorways seal while the waves run).
+  - `challenge_puzzle_*`: a redstone puzzle that powers a Puzzle Lock.
+  - `challenge_relics_*`: collection (a Relic Altar; monsters killed in the room drop Relic Shards).
 - **boss:** the goal of every run, behind the boss door. The door needs 2 keys per dungeon tier.
 
 ## Sizes (W x H x L)
