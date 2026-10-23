@@ -49,9 +49,31 @@
                 }
               }
             ]
+          },
+          "silk_touch": {
+            "operations": [
+              {
+                "type": "get_tool_item_stack"
+              },
+              {
+                "type": "puffish_skills:test",
+                "data": {
+                  "predicates": {
+                    "minecraft:enchantments": [
+                      {
+                        "enchantments": "minecraft:silk_touch",
+                        "levels": {
+                          "min": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
           }
         },
-        "experience": "max(max(max(0, block_0 * 10), block_1 * 1), block_2 * 1)"
+        "experience": "max(max(max(0, block_0 * 10 * (1 - silk_touch)), block_1 * 1), block_2 * 1)"
       }
     }
   ]

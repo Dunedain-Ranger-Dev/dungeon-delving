@@ -35,14 +35,22 @@ def best_of(terms, floor="0"):
     return expression
 
 
-def mine(blocks_xp):
+# Mining with Silk Touch: the tool has the enchantment.
+SILK_TOUCH = {"operations": [{"type": "get_tool_item_stack"}, {"type": "puffish_skills:test", "data": {
+    "predicates": {"minecraft:enchantments": [{"enchantments": "minecraft:silk_touch", "levels": {"min": 1}}]}}}]}
+
+
+def mine(blocks_xp, no_silk_touch=()):
     """A mine_block source giving experience for blocks in each tag: {"#tag": xp}. A block in several of the tags
-    gets the best one's experience, not their sum (stone is in two stone tags)."""
+    gets the best one's experience, not their sum (stone is in two stone tags). Tags in no_silk_touch give nothing
+    when mined with Silk Touch: the block comes back whole, so it could be placed and mined again for free XP."""
     variables, terms = {}, []
     for i, (tag, xp) in enumerate(blocks_xp.items()):
         name = f"block_{i}"
         variables[name] = {"operations": [{"type": "get_mined_block_state"}, {"type": "puffish_skills:test", "data": {"block": tag}}]}
-        terms.append(f"{name} * {xp}")
+        terms.append(f"{name} * {xp} * (1 - silk_touch)" if tag in no_silk_touch else f"{name} * {xp}")
+    if no_silk_touch:
+        variables["silk_touch"] = SILK_TOUCH
     return {"type": "puffish_skills:mine_block", "data": {"variables": variables, "experience": best_of(terms)}}
 
 
@@ -97,7 +105,7 @@ def school(key, name, spell_power, irons=()):
 # key -> (title, icon item, sources or None for crafting, [(node key, title, description, rewards)])
 PROFESSIONS = {
     "mining": ("Mining", "minecraft:iron_pickaxe",
-               [mine({"#c:ores": 10, "#minecraft:base_stone_overworld": 1, "#c:stones": 1})],
+               [mine({"#c:ores": 10, "#minecraft:base_stone_overworld": 1, "#c:stones": 1}, no_silk_touch=("#c:ores",))],
                [node("quick_pick", "Quick Pick", "+5% mining speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
                 node("quicker_pick", "Quicker Pick", "+5% mining speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
                 node("prospector", "Prospector", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),

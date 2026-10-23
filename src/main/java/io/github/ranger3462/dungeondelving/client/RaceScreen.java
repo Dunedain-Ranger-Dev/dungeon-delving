@@ -102,8 +102,12 @@ public class RaceScreen extends Screen {
                 scores.append(Component.literal("+" + bonus + " " + score.abbreviation).withStyle(ChatFormatting.AQUA));
             }
         }
-        graphics.drawString(font, scores, x, y, 0xFFFFFF);
-        y += 14;
+        // Wrapped: a human's six bonuses don't fit on one line.
+        for (FormattedCharSequence line : font.split(scores, WIDTH - LIST_WIDTH - 20)) {
+            graphics.drawString(font, line, x, y, 0xFFFFFF);
+            y += 10;
+        }
+        y += 4;
         if (selected.scale != 0) {
             String size = selected.scale < 0 ? "Smaller" : "Larger";
             graphics.drawString(font, Component.literal(size + " (" + Math.round((1 + selected.scale) * 100) + "% size)").withStyle(ChatFormatting.GRAY), x, y,
