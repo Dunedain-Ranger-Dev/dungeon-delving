@@ -78,7 +78,8 @@ public final class ActivitySkills {
         }
     }
 
-    private static int perHit(float amount) {
+    /** Experience for one hit of this much damage (dealt, blocked or taken): 1 per point, at most {@link #MAX_PER_HIT}. */
+    public static int perHit(float amount) {
         return Mth.clamp(Math.round(amount), 1, MAX_PER_HIT);
     }
 

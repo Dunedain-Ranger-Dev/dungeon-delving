@@ -129,6 +129,21 @@ public class ActivitySkillTests {
         helper.succeed();
     }
 
+    /** Damage spells train on their hits, so their casts give nothing; other spells (like heals) still train when cast. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void ironsTellsDamageSpellsApart(GameTestHelper helper) {
+        if (!net.neoforged.fml.ModList.get().isLoaded("irons_spellbooks")) {
+            helper.succeed();
+            return;
+        }
+        ServerPlayer player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "wizard"));
+        helper.assertTrue(io.github.ranger3462.dungeondelving.integration.irons.IronsMagic.dealsDamage(
+                io.redspace.ironsspellbooks.api.registry.SpellRegistry.FIREBOLT_SPELL.get(), 1, player), "Firebolt is a damage spell");
+        helper.assertFalse(io.github.ranger3462.dungeondelving.integration.irons.IronsMagic.dealsDamage(
+                io.redspace.ironsspellbooks.api.registry.SpellRegistry.HEAL_SPELL.get(), 1, player), "Heal isn't");
+        helper.succeed();
+    }
+
     private static int total(ServerPlayer player, String skill) {
         return PufferfishSkills.total(player, DungeonDelving.id(skill)).orElseThrow();
     }

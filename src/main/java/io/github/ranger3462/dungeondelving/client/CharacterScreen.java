@@ -36,6 +36,9 @@ public class CharacterScreen extends Screen {
     private static final int WIDTH = 220;
     /** The panel's backdrop: the same deepslate tiles as our skill trees, darkened so the text reads in daylight. */
     private static final ResourceLocation BACKGROUND = ResourceLocation.withDefaultNamespace("textures/block/deepslate_tiles.png");
+    /** Vanilla's window frame (a nine-slice sprite), drawn around the deepslate so it reads as a proper window. */
+    private static final ResourceLocation FRAME = ResourceLocation.withDefaultNamespace("popup/background");
+    private static final int FRAME_WIDTH = 6;
     private static final int PADDING = 12;
     private static final int TOP_SPACE = 44;
 
@@ -74,7 +77,7 @@ public class CharacterScreen extends Screen {
         }
     }
 
-    /** Draws the tiled, darkened panel behind the scores, with a thin border. */
+    /** Draws a vanilla window frame with the tiled, darkened deepslate panel inside it, behind the scores. */
     @Override
     public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(graphics, mouseX, mouseY, partialTick);
@@ -82,7 +85,7 @@ public class CharacterScreen extends Screen {
         int y0 = top() - TOP_SPACE;
         int x1 = left() + WIDTH + PADDING;
         int y1 = top() + AbilityScore.values().length * ROW_HEIGHT + PADDING;
-        graphics.fill(x0 - 1, y0 - 1, x1 + 1, y1 + 1, 0xFF0E0D0C);
+        graphics.blitSprite(FRAME, x0 - FRAME_WIDTH, y0 - FRAME_WIDTH, x1 - x0 + 2 * FRAME_WIDTH, y1 - y0 + 2 * FRAME_WIDTH);
         graphics.blit(BACKGROUND, x0, y0, 0, 0.0f, 0.0f, x1 - x0, y1 - y0, 16, 16);
         graphics.fill(x0, y0, x1, y1, 0xB0000000);
     }

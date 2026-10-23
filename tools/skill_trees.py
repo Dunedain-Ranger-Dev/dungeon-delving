@@ -111,7 +111,7 @@ PROFESSIONS = {
                 [node("green_thumb", "Green Thumb", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")]),
                  node("hardy", "Hardy", "+2 max health.", [attribute("minecraft:generic.max_health", 2, "addition")])]),
     "fishing": ("Fishing", "minecraft:fishing_rod",
-                [fish({"minecraft:salmon": 5, "minecraft:tropical_fish": 8, "minecraft:pufferfish": 15}, 2)],
+                [fish({"minecraft:salmon": 5, "minecraft:pufferfish": 8, "minecraft:tropical_fish": 15}, 2)],
                 [node("patient", "Patient", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")]),
                  node("angler", "Angler", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),
     "forging": ("Forging", "dungeondelving:master_anvil", None,
