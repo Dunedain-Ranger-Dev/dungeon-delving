@@ -7,6 +7,7 @@ import java.util.Map;
 import com.mojang.serialization.Codec;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.character.SkillLevels;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -92,6 +93,10 @@ public final class CraftingSkills {
         Map<String, Integer> all = new HashMap<>(player.getData(XP));
         all.put(skill.id, Math.max(0, xp));
         player.setData(XP, all);
+        // The skill tree (Pufferfish's Skills) follows this XP, for its levels and points.
+        if (player instanceof ServerPlayer serverPlayer) {
+            SkillLevels.mirror(serverPlayer, skill, Math.max(0, xp));
+        }
     }
 
     /** Sets a player's level in a skill, at the start of that level. For testing. */

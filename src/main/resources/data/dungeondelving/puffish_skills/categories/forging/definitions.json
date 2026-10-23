@@ -1,0 +1,24 @@
+{
+  "apprentice_smith": {
+    "title": {
+      "translate": "skill.dungeondelving.forging.apprentice_smith"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.forging.apprentice_smith.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:master_anvil"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [],
+    "cost": 1
+  }
+}

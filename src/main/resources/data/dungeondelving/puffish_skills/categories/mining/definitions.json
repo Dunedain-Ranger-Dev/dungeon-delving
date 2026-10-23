@@ -1,0 +1,95 @@
+{
+  "quick_pick": {
+    "title": {
+      "translate": "skill.dungeondelving.mining.quick_pick"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mining.quick_pick.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_pickaxe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:player.block_break_speed",
+          "operation": "multiply_base",
+          "value": 0.05
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "quicker_pick": {
+    "title": {
+      "translate": "skill.dungeondelving.mining.quicker_pick"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mining.quicker_pick.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_pickaxe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:player.block_break_speed",
+          "operation": "multiply_base",
+          "value": 0.05
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "prospector": {
+    "title": {
+      "translate": "skill.dungeondelving.mining.prospector"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mining.prospector.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_pickaxe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

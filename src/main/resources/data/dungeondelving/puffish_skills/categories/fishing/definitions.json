@@ -1,0 +1,64 @@
+{
+  "patient": {
+    "title": {
+      "translate": "skill.dungeondelving.fishing.patient"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fishing.patient.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:fishing_rod"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "angler": {
+    "title": {
+      "translate": "skill.dungeondelving.fishing.angler"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fishing.angler.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:fishing_rod"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "sure_swing": {
+    "title": {
+      "translate": "skill.dungeondelving.woodcutting.sure_swing"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.woodcutting.sure_swing.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:player.block_break_speed",
+          "operation": "multiply_base",
+          "value": 0.05
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "timber": {
+    "title": {
+      "translate": "skill.dungeondelving.woodcutting.timber"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.woodcutting.timber.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:player.block_break_speed",
+          "operation": "multiply_base",
+          "value": 0.05
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

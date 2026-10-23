@@ -1,0 +1,58 @@
+{
+  "experience_per_level": {
+    "type": "expression",
+    "data": {
+      "expression": "min(30 + level * 12 + level ^ 2, 6000)"
+    }
+  },
+  "level_limit": 50,
+  "sources": [
+    {
+      "type": "puffish_skills:mine_block",
+      "data": {
+        "variables": {
+          "block_0": {
+            "operations": [
+              {
+                "type": "get_mined_block_state"
+              },
+              {
+                "type": "puffish_skills:test",
+                "data": {
+                  "block": "#c:ores"
+                }
+              }
+            ]
+          },
+          "block_1": {
+            "operations": [
+              {
+                "type": "get_mined_block_state"
+              },
+              {
+                "type": "puffish_skills:test",
+                "data": {
+                  "block": "#minecraft:base_stone_overworld"
+                }
+              }
+            ]
+          },
+          "block_2": {
+            "operations": [
+              {
+                "type": "get_mined_block_state"
+              },
+              {
+                "type": "puffish_skills:test",
+                "data": {
+                  "block": "#c:stones"
+                }
+              }
+            ]
+          }
+        },
+        "experience": "block_0 * 10 + block_1 * 1 + block_2 * 1"
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "digger": {
+    "definition": "digger",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "treasure_sense": {
+    "definition": "treasure_sense",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

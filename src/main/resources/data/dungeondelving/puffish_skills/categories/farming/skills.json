@@ -1,0 +1,14 @@
+{
+  "green_thumb": {
+    "definition": "green_thumb",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "hardy": {
+    "definition": "hardy",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

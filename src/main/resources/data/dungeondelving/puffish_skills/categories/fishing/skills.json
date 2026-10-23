@@ -1,0 +1,14 @@
+{
+  "patient": {
+    "definition": "patient",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "angler": {
+    "definition": "angler",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

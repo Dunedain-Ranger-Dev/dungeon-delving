@@ -1,0 +1,24 @@
+{
+  "apprentice_weaver": {
+    "title": {
+      "translate": "skill.dungeondelving.weaving.apprentice_weaver"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaving.apprentice_weaver.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:string"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [],
+    "cost": 1
+  }
+}

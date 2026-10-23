@@ -1,0 +1,14 @@
+{
+  "normal": {
+    "bidirectional": [
+      [
+        "quick_pick",
+        "quicker_pick"
+      ],
+      [
+        "quicker_pick",
+        "prospector"
+      ]
+    ]
+  }
+}

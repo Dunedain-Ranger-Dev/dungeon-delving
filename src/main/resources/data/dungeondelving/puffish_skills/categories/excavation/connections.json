@@ -1,0 +1,10 @@
+{
+  "normal": {
+    "bidirectional": [
+      [
+        "digger",
+        "treasure_sense"
+      ]
+    ]
+  }
+}

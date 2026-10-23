@@ -1,0 +1,32 @@
+{
+  "experience_per_level": {
+    "type": "expression",
+    "data": {
+      "expression": "min(30 + level * 12 + level ^ 2, 6000)"
+    }
+  },
+  "level_limit": 50,
+  "sources": [
+    {
+      "type": "puffish_skills:mine_block",
+      "data": {
+        "variables": {
+          "block_0": {
+            "operations": [
+              {
+                "type": "get_mined_block_state"
+              },
+              {
+                "type": "puffish_skills:test",
+                "data": {
+                  "block": "#minecraft:mineable/shovel"
+                }
+              }
+            ]
+          }
+        },
+        "experience": "block_0 * 1"
+      }
+    }
+  ]
+}

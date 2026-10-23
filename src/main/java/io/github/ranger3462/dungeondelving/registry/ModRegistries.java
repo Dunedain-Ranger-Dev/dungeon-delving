@@ -10,6 +10,8 @@ import io.github.ranger3462.dungeondelving.block.DungeonGateBlock;
 import io.github.ranger3462.dungeondelving.block.PuzzleLockBlock;
 import io.github.ranger3462.dungeondelving.block.RelicAltarBlock;
 import io.github.ranger3462.dungeondelving.block.WarDrumBlock;
+import io.github.ranger3462.dungeondelving.character.Characters;
+import io.github.ranger3462.dungeondelving.character.TomeOfInsightItem;
 import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import io.github.ranger3462.dungeondelving.forging.Forging;
@@ -114,6 +116,9 @@ public final class ModRegistries {
             new Item.Properties().rarity(Rarity.UNCOMMON));
 
     /** Testing tool: can't die, damage readout, fast regeneration and mana, and flight. Creative tab only. */
+    /** A Tome of Insight: read it for a bonus ability point (DD-80). */
+    public static final DeferredItem<TomeOfInsightItem> TOME_OF_INSIGHT = ITEMS.registerItem("tome_of_insight", TomeOfInsightItem::new,
+            new Item.Properties().stacksTo(16).rarity(Rarity.EPIC));
     public static final DeferredItem<TestersCharm.CharmItem> TESTERS_CHARM = ITEMS.registerItem("testers_charm", TestersCharm.CharmItem::new,
             new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
 
@@ -158,6 +163,7 @@ public final class ModRegistries {
                 output.accept(DUNGEON_KEY.get());
                 output.accept(RELIC_SHARD.get());
                 output.accept(TESTERS_CHARM.get());
+                output.accept(TOME_OF_INSIGHT.get());
                 output.accept(ModEntities.GOBLIN_SPAWN_EGG.get());
                 output.accept(ModEntities.GOBLIN_SPEAR.get());
                 output.accept(ModEntities.GOBLIN_ARCHER_SPAWN_EGG.get());
@@ -220,6 +226,7 @@ public final class ModRegistries {
         DungeonGates.init();
         DungeonGates.register(modEventBus);
         CraftingSkills.register(modEventBus);
+        Characters.register(modEventBus);
         ModEntities.register(modEventBus);
         io.github.ranger3462.dungeondelving.entity.Mending.register(modEventBus);
         if (ModList.get().isLoaded("irons_spellbooks")) {

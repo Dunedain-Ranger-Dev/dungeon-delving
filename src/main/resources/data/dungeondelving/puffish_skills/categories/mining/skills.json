@@ -1,0 +1,20 @@
+{
+  "quick_pick": {
+    "definition": "quick_pick",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "quicker_pick": {
+    "definition": "quicker_pick",
+    "x": 40,
+    "y": 0,
+    "root": false
+  },
+  "prospector": {
+    "definition": "prospector",
+    "x": 80,
+    "y": 0,
+    "root": false
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "digger": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.digger"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.digger.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:player.block_break_speed",
+          "operation": "multiply_base",
+          "value": 0.05
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "treasure_sense": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.treasure_sense"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.treasure_sense.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

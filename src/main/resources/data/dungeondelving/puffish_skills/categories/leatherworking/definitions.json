@@ -1,0 +1,24 @@
+{
+  "apprentice_tanner": {
+    "title": {
+      "translate": "skill.dungeondelving.leatherworking.apprentice_tanner"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.leatherworking.apprentice_tanner.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [],
+    "cost": 1
+  }
+}
