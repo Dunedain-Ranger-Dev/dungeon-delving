@@ -165,33 +165,9 @@ for x, y in [(11, 4), (12, 3), (13, 2), (12, 4), (13, 3), (11, 3), (12, 2), (14,
 for x, y in [(12, 3), (13, 2), (14, 1)]:
     spear[(x, y)] = HEAD_LIGHT + (255,)
 png(ITEM / "goblin_spear.png", 16, 16, spear)
-# Goblin Bow: a crooked, knotty stave with a frayed string, plus three drawing frames.
+# The Goblin Bow is made from vanilla's bow by tools/goblin_bow_textures.py.
 WOOD = (110, 76, 44)
 WOOD_DARK = (78, 52, 28)
-KNOT = (60, 40, 22)
-STRING = (200, 200, 190)
-
-
-def bow(pull):
-    image = {}
-    stave = [(3, 14), (4, 13), (5, 13), (6, 12), (7, 11), (8, 10), (9, 9), (10, 8), (11, 7), (12, 6), (12, 5), (13, 4), (13, 3), (14, 2), (13, 1)]
-    # The stave curves from bottom left to top right; bend it a little more as it's drawn.
-    for i, (x, y) in enumerate(stave):
-        bend = pull if 4 <= i <= 10 else 0
-        image[(x - bend, y - bend)] = (WOOD if i % 3 else WOOD_DARK) + (255,)
-    image[(7 - pull, 11 - pull)] = KNOT + (255,)
-    image[(10 - pull, 8 - pull)] = KNOT + (255,)
-    # The string runs straight between the tips, pulled back toward the bottom left as it's drawn.
-    for t in range(12):
-        x = 3 + t * 10 // 11
-        y = 14 - t * 13 // 11
-        image.setdefault((x - pull, y + pull), STRING + (255,))
-    return image
-
-
-png(ITEM / "goblin_bow.png", 16, 16, bow(0))
-for frame in range(3):
-    png(ITEM / f"goblin_bow_pulling_{frame}.png", 16, 16, bow(frame + 1))
 
 
 def staff(head, gem, length):
@@ -296,5 +272,5 @@ fill(general, 32, 20, 40, 32, (170, 30, 30), 4)  # a red cape down the back
 fill(general, 8, 8, 16, 9, GOLD, 4)  # a gold band across the brow
 png(ENTITY / "hobgoblin_general.png", 64, 64, general)
 
-print("Wrote the goblin, archer, shaman, pyro, chief, gladiator and hobgoblin textures, the Goblin Spear, the Goblin Bow, "
-      "and the goblin staves")
+print("Wrote the goblin, archer, shaman, pyro, chief, gladiator and hobgoblin textures, the Goblin Spear and the "
+      "goblin staves")

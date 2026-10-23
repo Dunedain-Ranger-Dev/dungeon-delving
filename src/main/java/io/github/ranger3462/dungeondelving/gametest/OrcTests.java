@@ -177,6 +177,46 @@ public class OrcTests {
         helper.succeed();
     }
 
+    @GameTest(template = ANY_TEMPLATE)
+    public static void thrownAxesLodgeInBlocks(GameTestHelper helper) {
+        Orc raider = spawn(helper, ModEntities.ORC_RAIDER.get());
+        ThrownAxe axe = new ThrownAxe(helper.getLevel(), raider);
+        helper.getLevel().addFreshEntity(axe);
+        try {
+            axe.setDeltaMovement(0.5, 0.0, 0.0);
+            axe.lodge(raider.position().add(2, 0, 0));
+            helper.assertTrue(axe.isLodged() && axe.isNoGravity(), "an axe that hits a block should stick in it");
+            for (int i = 0; i < ThrownAxe.LODGED_TICKS - 1; i++) {
+                axe.tick();
+            }
+            helper.assertFalse(axe.isRemoved(), "a lodged axe should stay a while");
+            helper.assertTrue(axe.getDeltaMovement().lengthSqr() == 0, "a lodged axe shouldn't move");
+            axe.tick();
+            helper.assertTrue(axe.isRemoved(), "a lodged axe should be gone after " + ThrownAxe.LODGED_TICKS + " ticks");
+        } finally {
+            axe.discard();
+            raider.discard();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void orcBossesBringTheirWarband(GameTestHelper helper) {
+        BlockPos pos = helper.absolutePos(new BlockPos(0, 1, 0)).above(100);
+        Mob warchief = (Mob) DungeonBosses.spawn(helper.getLevel(), pos, 4, 0, DungeonBosses.ORC_WARCHIEF);
+        var near = helper.getLevel().getEntitiesOfClass(Mob.class, warchief.getBoundingBox().inflate(10), mob -> mob != warchief);
+        try {
+            helper.assertTrue(near.stream().filter(mob -> mob.getType() == ModEntities.ORC_RAMPAGER.get()).count() == 2,
+                    "the Warchief should bring 2 rampagers");
+            helper.assertTrue(near.stream().filter(mob -> mob.getType() == ModEntities.ORC_VAGABOND.get()).count() == 2,
+                    "the Warchief should bring 2 vagabonds");
+        } finally {
+            warchief.discard();
+            near.forEach(Mob::discard);
+        }
+        helper.succeed();
+    }
+
     private static <T extends Orc> T spawn(GameTestHelper helper, EntityType<T> type) {
         T orc = type.create(helper.getLevel());
         BlockPos pos = helper.absolutePos(new BlockPos(0, 1, 0)).above(100);

@@ -6,6 +6,7 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
 import io.github.ranger3462.dungeondelving.dungeon.SpawnerMobs;
 import io.github.ranger3462.dungeondelving.dungeon.layout.LayoutType;
+import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 /** Settings in {@code config/dungeondelving-common.toml}. */
@@ -85,4 +86,18 @@ public final class Config {
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private Config() {}
+
+    /**
+     * Moves mob lists still set to an old default onto the current one. A config file keeps whatever defaults it was
+     * written with, so without this a changed default never reaches anyone who has run the mod before.
+     */
+    static void onLoad(ModConfigEvent event) {
+        if (event.getConfig().getSpec() != SPEC || event instanceof ModConfigEvent.Unloading) {
+            return;
+        }
+        if (DungeonFactions.OLD_GOBLIN_DEFAULTS.contains(List.copyOf(GOBLIN_MOBS.get()))) {
+            GOBLIN_MOBS.set(DungeonFactions.GOBLIN_DEFAULTS);
+            GOBLIN_MOBS.save();
+        }
+    }
 }

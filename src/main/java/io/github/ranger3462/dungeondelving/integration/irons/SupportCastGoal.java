@@ -6,19 +6,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import io.github.ranger3462.dungeondelving.entity.Mending;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.capabilities.magic.TargetEntityCastData;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
- * A caster that looks after its allies (or itself) first: it heals whoever is hurt worst, and keeps buffs up on allies
+ * A caster that looks after its allies (or itself) first: it mends whoever is hurt worst with {@link Mending} (never an
+ * instant heal, so nothing is topped up to full mid-fight), and keeps buffs up on allies
  * who are fighting, walking over to them if they're too far. Its spells are aimed straight at the ally, not wherever
  * the caster happens to be looking, so they never land on the player by mistake. Between casts it's free to attack.
  */
@@ -26,7 +33,10 @@ public class SupportCastGoal extends Goal {
     /** A buff spell, cast on an ally in a fight who doesn't have its effect yet. */
     public record Buff(AbstractSpell spell, Holder<MobEffect> effect) {}
 
-    /** Heals an ally once it's below this share of its health. */
+    /** How it mends a hurt ally: {@link Mending} at this amplifier (0 heals at Regeneration I's pace) for this many ticks. */
+    public record Mend(int amplifier, int duration) {}
+
+    /** Mends an ally once it's below this share of its health. */
     private static final float HEAL_BELOW = 0.85f;
     /** How long after being hurt an ally still counts as fighting, in ticks. */
     private static final int FIGHT_MEMORY = 200;
@@ -39,7 +49,7 @@ public class SupportCastGoal extends Goal {
     private final double castRange;
     private final int cooldownMin;
     private final int cooldownMax;
-    private final List<AbstractSpell> heals;
+    private final Mend mend;
     private final List<Buff> buffs;
     private float minQuality = 0.2f;
     private float maxQuality = 0.4f;
@@ -53,17 +63,17 @@ public class SupportCastGoal extends Goal {
     /**
      * @param allies who it supports (include the caster itself to let it heal and buff itself)
      * @param castRange how close it gets to an ally before casting (area spells like Fortify reach 8 blocks)
-     * @param heals tried in order: if one can't be cast (e.g. no line of sight), the next is
+     * @param mend how it mends hurt allies, or null if it doesn't
      */
     public SupportCastGoal(AbstractSpellCastingMob mob, Predicate<LivingEntity> allies, double searchRange, double castRange, int cooldownMin,
-            int cooldownMax, List<AbstractSpell> heals, List<Buff> buffs) {
+            int cooldownMax, Mend mend, List<Buff> buffs) {
         this.mob = mob;
         this.allies = allies;
         this.searchRange = searchRange;
         this.castRange = castRange;
         this.cooldownMin = cooldownMin;
         this.cooldownMax = cooldownMax;
-        this.heals = heals;
+        this.mend = mend;
         this.buffs = buffs;
         setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
@@ -81,9 +91,10 @@ public class SupportCastGoal extends Goal {
         }
         List<LivingEntity> candidates = mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(searchRange),
                 entity -> entity.isAlive() && allies.test(entity));
-        Optional<LivingEntity> hurt = candidates.stream().filter(entity -> entity.getHealth() < entity.getMaxHealth() * HEAL_BELOW)
+        Optional<LivingEntity> hurt = candidates.stream()
+                .filter(entity -> entity.getHealth() < entity.getMaxHealth() * HEAL_BELOW && !entity.hasEffect(Mending.MENDING))
                 .min(Comparator.comparingDouble(entity -> entity.getHealth() / entity.getMaxHealth()));
-        if (hurt.isPresent() && !heals.isEmpty()) {
+        if (hurt.isPresent() && mend != null) {
             ally = hurt.get();
             spell = null;
             return true;
@@ -137,11 +148,7 @@ public class SupportCastGoal extends Goal {
         if (spell != null) {
             cast(spell);
         } else {
-            for (AbstractSpell heal : heals) {
-                if (cast(heal)) {
-                    break;
-                }
-            }
+            mend(ally);
         }
         nextCast = mob.tickCount + cooldownMin + mob.getRandom().nextInt(Math.max(1, cooldownMax - cooldownMin + 1));
         ally = null;
@@ -161,6 +168,16 @@ public class SupportCastGoal extends Goal {
         mob.setYHeadRot(yaw);
         mob.setYBodyRot(yaw);
         mob.setXRot(pitch);
+    }
+
+    /** Gives the ally Mending (slow healing, like Regeneration but for the undead too), with a burst of hearts so the player can see who's being mended. */
+    private void mend(LivingEntity target) {
+        target.addEffect(new MobEffectInstance(Mending.MENDING, mend.duration(), mend.amplifier()), mob);
+        mob.swing(InteractionHand.MAIN_HAND);
+        mob.playSound(SoundEvents.ILLUSIONER_CAST_SPELL, 1.0f, 1.2f);
+        if (mob.level() instanceof ServerLevel level) {
+            level.sendParticles(ParticleTypes.HEART, target.getX(), target.getY() + target.getBbHeight() + 0.3, target.getZ(), 4, 0.4, 0.2, 0.4, 0.0);
+        }
     }
 
     /** Starts casting a spell at the ally. False if the spell couldn't be cast. */

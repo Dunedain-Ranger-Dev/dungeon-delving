@@ -271,5 +271,6 @@
   "item.dungeondelving.orc_lorekeeper_spawn_egg": "Orc Lorekeeper Spawn Egg",
   "entity.dungeondelving.thrown_axe": "Thrown Axe",
   "entity.dungeondelving.hobgoblin_general": "Hobgoblin General",
-  "item.dungeondelving.hobgoblin_general_spawn_egg": "Hobgoblin General Spawn Egg"
+  "item.dungeondelving.hobgoblin_general_spawn_egg": "Hobgoblin General Spawn Egg",
+  "effect.dungeondelving.mending": "Mending"
 }

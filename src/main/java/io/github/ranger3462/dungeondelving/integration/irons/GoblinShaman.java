@@ -50,11 +50,11 @@ public class GoblinShaman extends AbstractSpellCastingMob implements Enemy {
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
         if (healsAllies()) {
-            goalSelector.addGoal(1, new SupportCastGoal(this, ally -> ally != this && GoblinSwarm.isGoblin(ally), 16.0, 6.0, 40, 80,
-                    List.of(SpellRegistry.BLESSING_OF_LIFE_SPELL.get()), List.of()).setSpellQuality(0.15f, 0.3f));
+            goalSelector.addGoal(1, new SupportCastGoal(this, ally -> ally == this || GoblinSwarm.isGoblin(ally), 16.0, 6.0, 60, 100,
+                    new SupportCastGoal.Mend(0, 120), List.of()).setSpellQuality(0.15f, 0.3f));
         }
         goalSelector.addGoal(2, new WizardAttackGoal(this, 1.15, 40, 70)
-                .setSpells(attackSpells(), List.of(), List.of(), selfHeals())
+                .setSpells(attackSpells(), List.of(), List.of(), List.of())
                 .setSpellQuality(0.1f, 0.3f));
         goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0));
         goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0f));
@@ -68,12 +68,7 @@ public class GoblinShaman extends AbstractSpellCastingMob implements Enemy {
         return List.of(SpellRegistry.POISON_ARROW_SPELL.get(), SpellRegistry.POISON_SPLASH_SPELL.get());
     }
 
-    /** The spells it heals itself with. */
-    protected List<AbstractSpell> selfHeals() {
-        return List.of(SpellRegistry.HEAL_SPELL.get());
-    }
-
-    /** Whether it mends hurt goblins around it. */
+    /** Whether it mends hurt goblins around it (and itself) with Mending. */
     protected boolean healsAllies() {
         return true;
     }

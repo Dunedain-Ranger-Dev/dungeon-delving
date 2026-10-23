@@ -221,6 +221,7 @@ public final class ModRegistries {
         DungeonGates.register(modEventBus);
         CraftingSkills.register(modEventBus);
         ModEntities.register(modEventBus);
+        io.github.ranger3462.dungeondelving.entity.Mending.register(modEventBus);
         if (ModList.get().isLoaded("irons_spellbooks")) {
             IronsGoblins.register(modEventBus);
             IronsSkeletons.register(modEventBus);

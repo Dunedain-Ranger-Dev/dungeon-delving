@@ -39,8 +39,8 @@ public class GoblinChief extends GoblinShaman {
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
-        // Heals himself whenever he's hurt, even when nobody is fighting back properly (e.g. a creative player hitting him).
-        goalSelector.addGoal(1, new SupportCastGoal(this, self -> self == this, 1.0, 0.0, 60, 100, List.of(SpellRegistry.HEAL_SPELL.get()),
+        // Mends himself (Mending) whenever he's hurt, even when nobody is fighting back properly (e.g. a creative player hitting him).
+        goalSelector.addGoal(1, new SupportCastGoal(this, self -> self == this, 1.0, 0.0, 200, 260, new SupportCastGoal.Mend(0, 160),
                 List.of()).setSpellQuality(0.3f, 0.5f));
         // Otherwise it's all damage.
         goalSelector.addGoal(2, new WizardAttackGoal(this, 1.2, 20, 40)

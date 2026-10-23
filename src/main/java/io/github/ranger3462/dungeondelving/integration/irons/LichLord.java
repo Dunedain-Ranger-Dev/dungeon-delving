@@ -58,9 +58,11 @@ public class LichLord extends AbstractSpellCastingMob implements Enemy {
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
+        // No teleports or instant heals: he mends slowly (Mending) now and then instead.
+        goalSelector.addGoal(1, new SupportCastGoal(this, self -> self == this, 1.0, 0.0, 240, 300, new SupportCastGoal.Mend(0, 160), List.of()));
         goalSelector.addGoal(2, new WizardAttackGoal(this, 1.25, 30, 60)
                 .setSpells(List.of(SpellRegistry.WITHER_SKULL_SPELL.get(), SpellRegistry.BLOOD_SLASH_SPELL.get(), SpellRegistry.RAISE_DEAD_SPELL.get()),
-                        List.of(), List.of(SpellRegistry.BLOOD_STEP_SPELL.get()), List.of(SpellRegistry.GREATER_HEAL_SPELL.get()))
+                        List.of(), List.of(), List.of())
                 .setSpellQuality(0.5f, 0.75f));
         goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 12.0f));
         goalSelector.addGoal(8, new RandomLookAroundGoal(this));

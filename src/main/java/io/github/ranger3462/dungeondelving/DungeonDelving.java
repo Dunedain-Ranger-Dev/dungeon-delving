@@ -1,5 +1,6 @@
 package io.github.ranger3462.dungeondelving;
 
+import net.neoforged.fml.event.config.ModConfigEvent;
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
@@ -27,6 +28,8 @@ public class DungeonDelving {
         modEventBus.addListener(this::commonSetup);
         ModRegistries.register(modEventBus);
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        modEventBus.addListener(ModConfigEvent.Loading.class, Config::onLoad);
+        modEventBus.addListener(ModConfigEvent.Reloading.class, Config::onLoad);
         if (ModList.get().isLoaded("curios")) {
             CuriosLoot.register();
         }

@@ -55,7 +55,7 @@ public abstract class OrcCaster extends AbstractSpellCastingMob implements Enemy
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
         addSupportGoal();
-        goalSelector.addGoal(2, new WizardAttackGoal(this, 1.1, 40, 70).setSpells(attackSpells(), List.of(), movementSpells(), selfHeals())
+        goalSelector.addGoal(2, new WizardAttackGoal(this, 1.1, 40, 70).setSpells(attackSpells(), List.of(), List.of(), List.of())
                 .setSpellQuality(spellQuality(), spellQuality() + 0.2f));
         goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 0.9));
         goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0f));
@@ -65,14 +65,6 @@ public abstract class OrcCaster extends AbstractSpellCastingMob implements Enemy
     }
 
     protected abstract List<AbstractSpell> attackSpells();
-
-    protected List<AbstractSpell> movementSpells() {
-        return List.of();
-    }
-
-    protected List<AbstractSpell> selfHeals() {
-        return List.of();
-    }
 
     protected float spellQuality() {
         return 0.2f;
@@ -110,7 +102,7 @@ public abstract class OrcCaster extends AbstractSpellCastingMob implements Enemy
         return true;
     }
 
-    /** The orc doomsayer (tiers 2-3): blood magic, and it keeps the warband Fortified. */
+    /** The orc doomsayer (tiers 2-3): blood needles and Acupuncture, and it keeps the warband Fortified. */
     public static class Doomsayer extends OrcCaster {
         public Doomsayer(EntityType<? extends Doomsayer> type, Level level) {
             super(type, level);
@@ -118,17 +110,17 @@ public abstract class OrcCaster extends AbstractSpellCastingMob implements Enemy
 
         @Override
         protected List<AbstractSpell> attackSpells() {
-            return List.of(SpellRegistry.BLOOD_NEEDLES_SPELL.get(), SpellRegistry.RAY_OF_SIPHONING_SPELL.get());
+            return List.of(SpellRegistry.BLOOD_NEEDLES_SPELL.get(), SpellRegistry.ACUPUNCTURE_SPELL.get());
         }
 
         @Override
         protected void addSupportGoal() {
-            goalSelector.addGoal(1, new SupportCastGoal(this, ally -> isOrcAlly(this, ally), 16.0, 8.0, 60, 120, List.of(),
+            goalSelector.addGoal(1, new SupportCastGoal(this, ally -> isOrcAlly(this, ally), 16.0, 8.0, 60, 120, null,
                     List.of(new SupportCastGoal.Buff(SpellRegistry.FORTIFY_SPELL.get(), MobEffectRegistry.FORTIFY))).setSpellQuality(0.2f, 0.4f));
         }
     }
 
-    /** The orc shaman (tier 4): calls down lightning and heals the warband. */
+    /** The orc shaman (tier 4): calls down lightning and mends the warband (and itself) with Mending. */
     public static class Shaman extends OrcCaster {
         public Shaman(EntityType<? extends Shaman> type, Level level) {
             super(type, level);
@@ -141,25 +133,20 @@ public abstract class OrcCaster extends AbstractSpellCastingMob implements Enemy
         }
 
         @Override
-        protected List<AbstractSpell> selfHeals() {
-            return List.of(SpellRegistry.HEAL_SPELL.get());
-        }
-
-        @Override
         protected float spellQuality() {
             return 0.3f;
         }
 
         @Override
         protected void addSupportGoal() {
-            goalSelector.addGoal(1, new SupportCastGoal(this, ally -> isOrcAlly(this, ally), 16.0, 6.0, 40, 80,
-                    List.of(SpellRegistry.BLESSING_OF_LIFE_SPELL.get()), List.of()).setSpellQuality(0.3f, 0.5f));
+            goalSelector.addGoal(1, new SupportCastGoal(this, ally -> ally == this || isOrcAlly(this, ally), 16.0, 6.0, 60, 100,
+                    new SupportCastGoal.Mend(0, 120), List.of()).setSpellQuality(0.3f, 0.5f));
         }
     }
 
     /**
      * The Orc Lorekeeper, the tier 3 orc boss: keeper of the warband's old magic. Eldritch Blasts, Wither Skulls and Blood
-     * Slashes, Blood Step out of reach, and Greater Heal when hurt.
+     * Slashes; no teleports or instant heals, he mends slowly (Mending) now and then.
      */
     public static class Lorekeeper extends OrcCaster {
         public static final double MAX_HEALTH = 180.0;
@@ -180,13 +167,8 @@ public abstract class OrcCaster extends AbstractSpellCastingMob implements Enemy
         }
 
         @Override
-        protected List<AbstractSpell> movementSpells() {
-            return List.of(SpellRegistry.BLOOD_STEP_SPELL.get());
-        }
-
-        @Override
-        protected List<AbstractSpell> selfHeals() {
-            return List.of(SpellRegistry.GREATER_HEAL_SPELL.get());
+        protected void addSupportGoal() {
+            goalSelector.addGoal(1, new SupportCastGoal(this, self -> self == this, 1.0, 0.0, 240, 300, new SupportCastGoal.Mend(0, 160), List.of()));
         }
 
         @Override

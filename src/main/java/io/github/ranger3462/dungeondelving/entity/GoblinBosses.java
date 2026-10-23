@@ -162,10 +162,14 @@ public final class GoblinBosses {
                 setChargingCrossbow(false);
                 stopUsingItem();
                 setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.DIAMOND_SWORD));
+                setItemSlot(EquipmentSlot.OFFHAND, new ItemStack(Items.IRON_AXE));
             } else if (distance > RANGED_RANGE && isSwordDrawn()) {
+                // The crossbow takes both hands.
                 setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(Items.CROSSBOW));
+                setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
             }
             setDropChance(EquipmentSlot.MAINHAND, 0.0f);
+            setDropChance(EquipmentSlot.OFFHAND, 0.0f);
         }
     }
 }

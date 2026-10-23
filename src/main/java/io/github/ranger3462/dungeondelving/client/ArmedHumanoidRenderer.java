@@ -10,7 +10,6 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
-import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -79,7 +78,7 @@ public class ArmedHumanoidRenderer<T extends ArmedHumanoid> extends HumanoidMobR
                     ModEntities.ORC_RAMPAGER, ModEntities.ORC_COMMANDER, ModEntities.ORC_CHIEFTAIN, ModEntities.ORC_WARCHIEF)) {
                 registerOrc(event, orc.get(), orc.getId().getPath());
             }
-            event.registerEntityRenderer(ModEntities.THROWN_AXE.get(), ThrownItemRenderer::new);
+            event.registerEntityRenderer(ModEntities.THROWN_AXE.get(), ThrownAxeRenderer::new);
             if (ModList.get().isLoaded("irons_spellbooks")) {
                 GoblinShamanRenderer.register(event);
             }

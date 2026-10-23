@@ -132,6 +132,12 @@ public final class DungeonBosses {
                 DungeonBosses::createBarrowKing));
         addRetinue(SKELETON_LORD, (level, pos, tier) -> ring(level, pos, ModEntities.SKELETON_KNIGHT.get(), SkeletonLord.GUARDS, 3.0, 0.0));
         addRetinue(BARROW_KING, (level, pos, tier) -> ring(level, pos, ModEntities.SKELETON_KNIGHT.get(), BARROW_KING_GUARDS, 3.0, 0.0));
+        // Every orc boss brings part of his warband.
+        addRetinue(ORC_COMMANDER, (level, pos, tier) -> ring(level, pos, ModEntities.ORC_SCRAPPER.get(), 3, 3.0, 0.0));
+        addRetinue(ORC_CHIEFTAIN, (level, pos, tier) -> ring(level, pos, ModEntities.ORC_VETERAN.get(), 2, 3.0, 0.0));
+        addRetinue(ORC_CHIEFTAIN, (level, pos, tier) -> ring(level, pos, ModEntities.ORC_RAIDER.get(), 2, 5.0, 0.25));
+        addRetinue(ORC_WARCHIEF, (level, pos, tier) -> ring(level, pos, ModEntities.ORC_RAMPAGER.get(), 2, 3.0, 0.0));
+        addRetinue(ORC_WARCHIEF, (level, pos, tier) -> ring(level, pos, ModEntities.ORC_VAGABOND.get(), 2, 6.0, 0.25));
     }
 
     /** Adds a boss type, e.g. from an optional integration. */

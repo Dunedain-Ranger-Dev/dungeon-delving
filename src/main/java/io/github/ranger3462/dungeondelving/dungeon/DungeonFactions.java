@@ -25,12 +25,20 @@ public final class DungeonFactions {
     private static final String OLD_SKELETONS = "skeletons";
 
     /**
-     * Goblin warriors and archers at every tier (in bigger packs higher up), shamans and pyros from tier 2, hobgoblin
-     * soldiers and hunters from tier 3, spellbreakers and vanguards at tier 4 (the casters need Iron's Spells).
+     * One set of goblins per tier, like the orcs: goblin warriors and archers at tier 1; the same with shamans at 2;
+     * hobgoblin soldiers and hunters with pyros at 3; hobgoblin vanguards and spellbreakers with pyros at 4 (the casters
+     * need Iron's Spells).
      */
-    public static final List<String> GOBLIN_DEFAULTS = List.of("dungeondelving:goblin=60", "dungeondelving:goblin_archer=30",
-            "dungeondelving:goblin_shaman=12@2-4", "dungeondelving:goblin_pyro=12@2-4", "dungeondelving:hobgoblin_soldier=18@3-4",
-            "dungeondelving:hobgoblin_hunter=14@3-4", "dungeondelving:hobgoblin_spellbreaker=10@4", "dungeondelving:hobgoblin_vanguard=10@4");
+    public static final List<String> GOBLIN_DEFAULTS = List.of(
+            "dungeondelving:goblin=60@1-2", "dungeondelving:goblin_archer=40@1-2", "dungeondelving:goblin_shaman=20@2",
+            "dungeondelving:hobgoblin_soldier=50@3", "dungeondelving:hobgoblin_hunter=35@3", "dungeondelving:goblin_pyro=20@3-4",
+            "dungeondelving:hobgoblin_vanguard=45@4", "dungeondelving:hobgoblin_spellbreaker=40@4");
+    /** Earlier goblin defaults: a config still holding one of these exactly was never edited, so it's moved to the new one. */
+    public static final List<List<String>> OLD_GOBLIN_DEFAULTS = List.of(
+            List.of("dungeondelving:goblin=60", "dungeondelving:goblin_archer=25", "dungeondelving:goblin_shaman=15"),
+            List.of("dungeondelving:goblin=60", "dungeondelving:goblin_archer=30", "dungeondelving:goblin_shaman=12@2-4",
+                    "dungeondelving:goblin_pyro=12@2-4", "dungeondelving:hobgoblin_soldier=18@3-4", "dungeondelving:hobgoblin_hunter=14@3-4",
+                    "dungeondelving:hobgoblin_spellbreaker=10@4", "dungeondelving:hobgoblin_vanguard=10@4"));
     /** One set of undead per tier (the wither skeleton mage needs Iron's Spells, and is skipped without it). */
     public static final List<String> UNDEAD_DEFAULTS = List.of(
             "dungeondelving:skeleton_swordsman=40@1", "minecraft:skeleton=30@1", "minecraft:zombie=30@1",

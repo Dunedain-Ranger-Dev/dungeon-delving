@@ -90,8 +90,8 @@ public class GoblinTests {
             counts.merge(SpawnerMobs.pick(helper.getLevel(), random, DungeonFactions.GOBLIN_DEFAULTS, 1).orElseThrow().value(), 1, Integer::sum);
         }
         // Tier 1 goblin dungeons are warriors and archers only.
-        expectShare(helper, counts, ModEntities.GOBLIN.get(), 60 / 90.0, rolls);
-        expectShare(helper, counts, ModEntities.GOBLIN_ARCHER.get(), 30 / 90.0, rolls);
+        expectShare(helper, counts, ModEntities.GOBLIN.get(), 60 / 100.0, rolls);
+        expectShare(helper, counts, ModEntities.GOBLIN_ARCHER.get(), 40 / 100.0, rolls);
         helper.assertTrue(counts.keySet().stream().allMatch(type -> type.is(GoblinSwarm.GOBLINS)), "goblin dungeon spawners should only spawn goblins");
 
         helper.assertTrue(SpawnerMobs.pick(helper.getLevel(), random, List.of("dungeondelving:not_a_mob=5", "minecraft:zombie=1"))
@@ -159,9 +159,9 @@ public class GoblinTests {
         helper.succeed();
     }
 
-    /** Each tier of goblin dungeon adds tougher goblins on top of the warriors and archers. */
+    /** Each tier of goblin dungeon has its own goblins, like the orcs (casters only with Iron's Spells). */
     @GameTest(template = ANY_TEMPLATE)
-    public static void goblinDungeonsGrowTougherByTier(GameTestHelper helper) {
+    public static void eachTierHasItsOwnGoblins(GameTestHelper helper) {
         RandomSource random = RandomSource.create(9);
         List<Set<EntityType<?>>> tiers = new ArrayList<>();
         for (int tier = 1; tier <= 4; tier++) {
@@ -171,19 +171,23 @@ public class GoblinTests {
             }
             tiers.add(mobs);
         }
-        Set<EntityType<?>> casters = new HashSet<>();
-        for (String id : List.of("goblin_shaman", "goblin_pyro")) {
-            BuiltInRegistries.ENTITY_TYPE.getOptional(DungeonDelving.id(id)).ifPresent(casters::add);
+        Set<EntityType<?>> shaman = new HashSet<>();
+        Set<EntityType<?>> pyro = new HashSet<>();
+        BuiltInRegistries.ENTITY_TYPE.getOptional(DungeonDelving.id("goblin_shaman")).ifPresent(shaman::add);
+        BuiltInRegistries.ENTITY_TYPE.getOptional(DungeonDelving.id("goblin_pyro")).ifPresent(pyro::add);
+        Set<EntityType<?>> one = Set.of(ModEntities.GOBLIN.get(), ModEntities.GOBLIN_ARCHER.get());
+        Set<EntityType<?>> two = new HashSet<>(one);
+        two.addAll(shaman);
+        Set<EntityType<?>> three = new HashSet<>(Set.of(ModEntities.HOBGOBLIN_SOLDIER.get(), ModEntities.HOBGOBLIN_HUNTER.get()));
+        three.addAll(pyro);
+        Set<EntityType<?>> four = new HashSet<>(Set.of(ModEntities.HOBGOBLIN_VANGUARD.get(), ModEntities.HOBGOBLIN_SPELLBREAKER.get()));
+        four.addAll(pyro);
+        List<Set<EntityType<?>>> expected = List.of(one, two, three, four);
+        for (int tier = 0; tier < 4; tier++) {
+            helper.assertTrue(tiers.get(tier).equals(expected.get(tier)), "tier " + (tier + 1) + " goblins should be " + expected.get(tier) + ", got "
+                    + tiers.get(tier));
+            helper.assertTrue(tiers.get(tier).stream().allMatch(type -> type.is(GoblinSwarm.GOBLINS)), "every goblin dungeon mob is a goblin");
         }
-        Set<EntityType<?>> expected = new HashSet<>(Set.of(ModEntities.GOBLIN.get(), ModEntities.GOBLIN_ARCHER.get()));
-        helper.assertTrue(tiers.get(0).equals(expected), "tier 1: warriors and archers, got " + tiers.get(0));
-        expected.addAll(casters);
-        helper.assertTrue(tiers.get(1).equals(expected), "tier 2: plus shamans and pyros (with Iron's Spells), got " + tiers.get(1));
-        expected.addAll(Set.of(ModEntities.HOBGOBLIN_SOLDIER.get(), ModEntities.HOBGOBLIN_HUNTER.get()));
-        helper.assertTrue(tiers.get(2).equals(expected), "tier 3: plus hobgoblin soldiers and hunters, got " + tiers.get(2));
-        expected.addAll(Set.of(ModEntities.HOBGOBLIN_SPELLBREAKER.get(), ModEntities.HOBGOBLIN_VANGUARD.get()));
-        helper.assertTrue(tiers.get(3).equals(expected), "tier 4: plus spellbreakers and vanguards, got " + tiers.get(3));
-        helper.assertTrue(expected.stream().allMatch(type -> type.is(GoblinSwarm.GOBLINS)), "every goblin dungeon mob is a goblin");
         helper.succeed();
     }
 
@@ -255,6 +259,21 @@ public class GoblinTests {
         } finally {
             helper.getLevel().getEntitiesOfClass(LivingEntity.class, gladiator.getBoundingBox().inflate(16),
                     entity -> !(entity instanceof net.minecraft.world.entity.player.Player)).forEach(net.minecraft.world.entity.Entity::discard);
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void theGeneralDualWieldsUpClose(GameTestHelper helper) {
+        GoblinBosses.General general = spawn(helper, ModEntities.HOBGOBLIN_GENERAL.get());
+        try {
+            general.switchWeapons(1.0);
+            helper.assertTrue(general.isSwordDrawn() && general.getOffhandItem().is(Items.IRON_AXE), "up close the General should fight sword and axe");
+            general.switchWeapons(30.0);
+            helper.assertTrue(general.getMainHandItem().is(Items.CROSSBOW) && general.getOffhandItem().isEmpty(),
+                    "at range the General should hold only his crossbow");
+        } finally {
+            general.discard();
         }
         helper.succeed();
     }

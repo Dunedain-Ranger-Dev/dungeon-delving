@@ -22,11 +22,6 @@ public class GoblinPyro extends GoblinShaman {
     }
 
     @Override
-    protected List<AbstractSpell> selfHeals() {
-        return List.of();
-    }
-
-    @Override
     protected boolean healsAllies() {
         return false;
     }

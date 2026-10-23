@@ -41,6 +41,9 @@ public final class IronsOrcs {
         ORC_SHAMAN_SPAWN_EGG = egg("orc_shaman", ORC_SHAMAN, 0x3A6AA0);
         ORC_LOREKEEPER_SPAWN_EGG = egg(ORC_LOREKEEPER_BOSS, ORC_LOREKEEPER, 0xC8A040);
         DungeonBosses.register(new DungeonBosses.BossType(ORC_LOREKEEPER_BOSS, DungeonFactions.ORCS, tier -> tier == 3, OrcCaster.Lorekeeper::create));
+        // Veterans guard the Lorekeeper, with a doomsayer out behind them.
+        DungeonBosses.addRetinue(ORC_LOREKEEPER_BOSS, (level, pos, tier) -> DungeonBosses.ring(level, pos, ModEntities.ORC_VETERAN.get(), 2, 3.0, 0.0));
+        DungeonBosses.addRetinue(ORC_LOREKEEPER_BOSS, (level, pos, tier) -> DungeonBosses.ring(level, pos, ORC_DOOMSAYER.get(), 1, 6.0, 0.5));
         modEventBus.addListener(IronsOrcs::onAttributes);
         modEventBus.addListener(IronsOrcs::onSpawnPlacements);
     }
