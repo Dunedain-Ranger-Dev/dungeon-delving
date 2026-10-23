@@ -1,0 +1,14 @@
+{
+  "one_handed_training": {
+    "definition": "one_handed_training",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "one_handed_mastery": {
+    "definition": "one_handed_mastery",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

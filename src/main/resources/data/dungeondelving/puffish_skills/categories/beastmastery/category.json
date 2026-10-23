@@ -1,0 +1,19 @@
+{
+  "title": {
+    "translate": "skill_category.dungeondelving.beastmastery"
+  },
+  "icon": {
+    "type": "item",
+    "data": {
+      "item": "minecraft:lead"
+    }
+  },
+  "unlocked_by_default": true,
+  "exclusive_root": false,
+  "background": {
+    "texture": "minecraft:textures/block/deepslate_tiles.png",
+    "width": 16,
+    "height": 16,
+    "position": "tile"
+  }
+}

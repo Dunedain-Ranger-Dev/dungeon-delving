@@ -1,0 +1,20 @@
+{
+  "necromancy_adept": {
+    "definition": "necromancy_adept",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "necromancy_expert": {
+    "definition": "necromancy_expert",
+    "x": 40,
+    "y": 0,
+    "root": false
+  },
+  "necromancy_lore": {
+    "definition": "necromancy_lore",
+    "x": 80,
+    "y": 0,
+    "root": false
+  }
+}

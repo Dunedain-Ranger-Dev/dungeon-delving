@@ -1,0 +1,20 @@
+{
+  "arcane_adept": {
+    "definition": "arcane_adept",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "arcane_expert": {
+    "definition": "arcane_expert",
+    "x": 40,
+    "y": 0,
+    "root": false
+  },
+  "arcane_lore": {
+    "definition": "arcane_lore",
+    "x": 80,
+    "y": 0,
+    "root": false
+  }
+}

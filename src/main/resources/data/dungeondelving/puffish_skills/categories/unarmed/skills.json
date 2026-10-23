@@ -1,0 +1,14 @@
+{
+  "unarmed_training": {
+    "definition": "unarmed_training",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "unarmed_mastery": {
+    "definition": "unarmed_mastery",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

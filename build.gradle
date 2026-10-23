@@ -195,6 +195,9 @@ dependencies {
     // Optional integration: Ars Nouveau mana, for the Tester's Charm. Only used when Ars Nouveau is installed.
     compileOnly "maven.modrinth:ars-nouveau:yWDnir1o"                // 5.13.3
     compileOnly "maven.modrinth:skills:8tfcI2wU"                     // Pufferfish's Skills 0.19.2
+    compileOnly "maven.modrinth:better-combat:VhIOvcXP"              // 2.4.0+1.21.1-neoforge
+    compileOnly "maven.modrinth:spell-engine:IYoY9AHA"               // 1.10.9+1.21.1-neoforge
+    compileOnly "maven.modrinth:spell-power:RFCD8Aio"                // 1.6.0+1.21.1-neoforge
     // Apotheosis, for forged gear's sockets and affix multipliers (integration/apotheosis); optional too.
     compileOnly "maven.modrinth:apotheosis:veL1ccTb"                 // 1.21.1-8.9.0
     compileOnly "maven.modrinth:placebo:B5zbSVlT"                    // 1.21.1-9.9.4

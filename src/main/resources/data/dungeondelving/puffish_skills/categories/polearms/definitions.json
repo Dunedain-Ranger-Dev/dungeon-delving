@@ -1,0 +1,64 @@
+{
+  "polearms_training": {
+    "title": {
+      "translate": "skill.dungeondelving.polearms.polearms_training"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.polearms.polearms_training.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:trident"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "polearms_mastery": {
+    "title": {
+      "translate": "skill.dungeondelving.polearms.polearms_mastery"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.polearms.polearms_mastery.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:trident"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

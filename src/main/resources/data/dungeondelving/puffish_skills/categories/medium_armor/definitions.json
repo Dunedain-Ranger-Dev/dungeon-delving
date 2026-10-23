@@ -1,0 +1,64 @@
+{
+  "fitted_mail": {
+    "title": {
+      "translate": "skill.dungeondelving.medium_armor.fitted_mail"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.medium_armor.fitted_mail.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:chainmail_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "balanced": {
+    "title": {
+      "translate": "skill.dungeondelving.medium_armor.balanced"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.medium_armor.balanced.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:chainmail_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.movement_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

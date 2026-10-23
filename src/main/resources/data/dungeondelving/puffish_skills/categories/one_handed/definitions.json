@@ -1,0 +1,64 @@
+{
+  "one_handed_training": {
+    "title": {
+      "translate": "skill.dungeondelving.one_handed.one_handed_training"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.one_handed.one_handed_training.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "one_handed_mastery": {
+    "title": {
+      "translate": "skill.dungeondelving.one_handed.one_handed_mastery"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.one_handed.one_handed_mastery.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

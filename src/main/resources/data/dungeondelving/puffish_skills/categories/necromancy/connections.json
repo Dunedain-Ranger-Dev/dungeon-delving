@@ -1,0 +1,14 @@
+{
+  "normal": {
+    "bidirectional": [
+      [
+        "necromancy_adept",
+        "necromancy_expert"
+      ],
+      [
+        "necromancy_expert",
+        "necromancy_lore"
+      ]
+    ]
+  }
+}

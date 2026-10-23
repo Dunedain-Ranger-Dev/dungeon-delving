@@ -114,26 +114,28 @@ public class DevToolTests {
         helper.assertTrue(RoomMobCap.parse("orcs=1,2,3").isEmpty() && RoomMobCap.parse("orcs=1,2,x,4").isEmpty(), "bad entries shouldn't parse");
         ServerLevel level = helper.getLevel();
         BlockPos center = DungeonDimension.roomCenterAt(helper.absolutePos(BlockPos.ZERO)).above(2);
-        level.getChunkAt(center);
+        // The room's center can be well away from the test, so keep its chunk loaded (and its mobs countable) for the test.
+        net.minecraft.world.level.ChunkPos chunk = new net.minecraft.world.level.ChunkPos(center);
+        level.setChunkForced(chunk.x, chunk.z, true);
+        int cap = RoomMobCap.cap(DungeonFactions.ORCS, 1);
         List<Zombie> zombies = new ArrayList<>();
-        try {
-            for (int i = 0; i < RoomMobCap.cap(DungeonFactions.ORCS, 1); i++) {
-                Zombie zombie = EntityType.ZOMBIE.create(level);
-                zombie.moveTo(center.getX() + 0.5 + i % 3, center.getY(), center.getZ() + 0.5 + i / 3);
-                zombie.setNoAi(true);
-                level.addFreshEntity(zombie);
-                zombies.add(zombie);
-                if (i == RoomMobCap.cap(DungeonFactions.ORCS, 1) - 2) {
-                    helper.assertFalse(RoomMobCap.full(level, center, DungeonFactions.ORCS, 1), "a room one short of its cap isn't full");
-                }
-            }
-            helper.assertTrue(RoomMobCap.count(level, center) >= RoomMobCap.cap(DungeonFactions.ORCS, 1), "the room should count its mobs");
-            helper.assertTrue(RoomMobCap.full(level, center, DungeonFactions.ORCS, 1), "a tier 1 room with 7 mobs is full");
-            helper.assertFalse(RoomMobCap.full(level, center, DungeonFactions.ORCS, 4), "a tier 4 room holds more");
-        } finally {
-            zombies.forEach(Zombie::discard);
+        for (int i = 0; i < cap; i++) {
+            Zombie zombie = EntityType.ZOMBIE.create(level);
+            zombie.moveTo(center.getX() + 0.5 + i % 3, center.getY(), center.getZ() + 0.5 + i / 3);
+            zombie.setNoAi(true);
+            zombie.setPersistenceRequired();
+            level.addFreshEntity(zombie);
+            zombies.add(zombie);
         }
-        helper.succeed();
+        helper.succeedWhen(() -> {
+            helper.assertTrue(RoomMobCap.count(level, center) >= cap, "the room should count its " + cap + " mobs, got " + RoomMobCap.count(level, center));
+            helper.assertTrue(RoomMobCap.full(level, center, DungeonFactions.ORCS, 1), "a tier 1 orc room with 7 mobs is full");
+            helper.assertFalse(RoomMobCap.full(level, center, DungeonFactions.ORCS, 4), "a tier 4 room holds more");
+            zombies.getFirst().discard();
+            helper.assertFalse(RoomMobCap.full(level, center, DungeonFactions.ORCS, 1), "one fewer and it has room again");
+            zombies.forEach(Zombie::discard);
+            level.setChunkForced(chunk.x, chunk.z, false);
+        });
     }
 
     @GameTest(template = ANY_TEMPLATE)

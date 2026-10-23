@@ -1,0 +1,70 @@
+{
+  "woven_wards": {
+    "title": {
+      "translate": "skill.dungeondelving.mage_armor.woven_wards"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mage_armor.woven_wards.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:purple_wool"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:generic",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "mana_weave": {
+    "title": {
+      "translate": "skill.dungeondelving.mage_armor.mana_weave"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mage_armor.mana_weave.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:purple_wool"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:max_mana",
+          "operation": "addition",
+          "value": 10
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  }
+}

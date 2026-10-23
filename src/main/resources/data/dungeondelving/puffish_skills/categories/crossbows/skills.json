@@ -1,0 +1,14 @@
+{
+  "crossbows_training": {
+    "definition": "crossbows_training",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "crossbows_mastery": {
+    "definition": "crossbows_mastery",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

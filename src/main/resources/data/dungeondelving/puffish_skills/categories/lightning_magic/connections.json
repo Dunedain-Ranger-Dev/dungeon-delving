@@ -1,0 +1,14 @@
+{
+  "normal": {
+    "bidirectional": [
+      [
+        "lightning_adept",
+        "lightning_expert"
+      ],
+      [
+        "lightning_expert",
+        "lightning_lore"
+      ]
+    ]
+  }
+}

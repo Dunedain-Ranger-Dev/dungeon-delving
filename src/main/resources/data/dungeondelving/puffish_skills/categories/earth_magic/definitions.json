@@ -1,0 +1,104 @@
+{
+  "earth_adept": {
+    "title": {
+      "translate": "skill.dungeondelving.earth_magic.earth_adept"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.earth_magic.earth_adept.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:moss_block"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:earth",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "earth_expert": {
+    "title": {
+      "translate": "skill.dungeondelving.earth_magic.earth_expert"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.earth_magic.earth_expert.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:moss_block"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:earth",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "earth_lore": {
+    "title": {
+      "translate": "skill.dungeondelving.earth_magic.earth_lore"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.earth_magic.earth_lore.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:moss_block"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:nature_spell_power",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  }
+}

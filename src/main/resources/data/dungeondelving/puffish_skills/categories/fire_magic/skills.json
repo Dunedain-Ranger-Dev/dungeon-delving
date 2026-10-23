@@ -1,0 +1,20 @@
+{
+  "fire_adept": {
+    "definition": "fire_adept",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "fire_expert": {
+    "definition": "fire_expert",
+    "x": 40,
+    "y": 0,
+    "root": false
+  },
+  "fire_lore": {
+    "definition": "fire_lore",
+    "x": 80,
+    "y": 0,
+    "root": false
+  }
+}

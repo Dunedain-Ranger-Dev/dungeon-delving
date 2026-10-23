@@ -1,0 +1,14 @@
+{
+  "water_adept": {
+    "definition": "water_adept",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "water_expert": {
+    "definition": "water_expert",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

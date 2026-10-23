@@ -1,0 +1,70 @@
+{
+  "water_adept": {
+    "title": {
+      "translate": "skill.dungeondelving.water_magic.water_adept"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.water_magic.water_adept.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:heart_of_the_sea"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:water",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "water_expert": {
+    "title": {
+      "translate": "skill.dungeondelving.water_magic.water_expert"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.water_magic.water_expert.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:heart_of_the_sea"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:water",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  }
+}

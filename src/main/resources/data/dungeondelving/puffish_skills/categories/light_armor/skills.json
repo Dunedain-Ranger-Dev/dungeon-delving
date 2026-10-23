@@ -1,0 +1,14 @@
+{
+  "light_step": {
+    "definition": "light_step",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "evasive": {
+    "definition": "evasive",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

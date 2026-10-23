@@ -1,0 +1,14 @@
+{
+  "braced": {
+    "definition": "braced",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "bulwark": {
+    "definition": "bulwark",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

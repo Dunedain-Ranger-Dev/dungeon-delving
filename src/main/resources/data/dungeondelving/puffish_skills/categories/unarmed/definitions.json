@@ -1,0 +1,64 @@
+{
+  "unarmed_training": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_training"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_training.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "unarmed_mastery": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_mastery"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_mastery.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

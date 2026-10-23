@@ -1,0 +1,14 @@
+{
+  "normal": {
+    "bidirectional": [
+      [
+        "holy_adept",
+        "holy_expert"
+      ],
+      [
+        "holy_expert",
+        "holy_lore"
+      ]
+    ]
+  }
+}

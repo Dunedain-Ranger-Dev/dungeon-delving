@@ -1,0 +1,14 @@
+{
+  "normal": {
+    "bidirectional": [
+      [
+        "earth_adept",
+        "earth_expert"
+      ],
+      [
+        "earth_expert",
+        "earth_lore"
+      ]
+    ]
+  }
+}

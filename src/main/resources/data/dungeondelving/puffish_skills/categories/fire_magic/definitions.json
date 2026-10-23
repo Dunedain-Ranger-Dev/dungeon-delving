@@ -1,0 +1,104 @@
+{
+  "fire_adept": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_adept"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_adept.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:fire",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "fire_expert": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_expert"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_expert.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:fire",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "fire_lore": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_lore"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_lore.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:fire_spell_power",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  }
+}

@@ -14,16 +14,29 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.fml.ModList;
 
 /**
- * A player's skill levels, for the character level (DD-80). With Pufferfish's Skills these are its categories (the
- * professions, and the RPG Series' class and weapon trees), counting from 0; the crafting skills are mirrored into
- * their categories. Without it, only the crafting skills count. The character level averages the best few skills,
+ * A player's skill levels, for the character level (DD-80). With Pufferfish's Skills these are its categories (our
+ * professions, combat styles, armor, magic schools and Beastmastery, and the RPG Series' class tree), counting from
+ * 0; the crafting skills are mirrored into their categories. Without it, only the crafting skills count. The character level averages the best few skills,
  * RuneScape-style, so a crafter levels as well as a fighter.
  */
 public final class SkillLevels {
-    /** Skills that count toward the character level by default. */
-    public static final List<String> DEFAULT_SKILLS = List.of("dungeondelving:mining", "dungeondelving:woodcutting", "dungeondelving:excavation",
-            "dungeondelving:farming", "dungeondelving:fishing", "dungeondelving:forging", "dungeondelving:leatherworking", "dungeondelving:weaving",
-            "skill_tree_rpgs:class_skills", "skill_tree_rpgs:weapon_skills");
+    /** Skills that count toward the character level by default: all of ours, and the RPG Series' class tree for now. */
+    public static final List<String> DEFAULT_SKILLS = List.of(
+            // Professions (DD-80)
+            "dungeondelving:mining", "dungeondelving:woodcutting", "dungeondelving:excavation", "dungeondelving:farming", "dungeondelving:fishing",
+            "dungeondelving:forging", "dungeondelving:leatherworking", "dungeondelving:weaving",
+            // Combat styles, armor, magic schools and Beastmastery (DD-81)
+            "dungeondelving:one_handed", "dungeondelving:two_handed", "dungeondelving:polearms", "dungeondelving:daggers", "dungeondelving:unarmed",
+            "dungeondelving:archery", "dungeondelving:crossbows", "dungeondelving:dual_wielding", "dungeondelving:blocking",
+            "dungeondelving:light_armor", "dungeondelving:medium_armor", "dungeondelving:heavy_armor", "dungeondelving:mage_armor",
+            "dungeondelving:fire_magic", "dungeondelving:frost_magic", "dungeondelving:lightning_magic", "dungeondelving:arcane_magic",
+            "dungeondelving:holy_magic", "dungeondelving:earth_magic", "dungeondelving:water_magic", "dungeondelving:air_magic",
+            "dungeondelving:blood_magic", "dungeondelving:necromancy", "dungeondelving:beastmastery",
+            "skill_tree_rpgs:class_skills");
+    /** Earlier defaults: a config still holding one of these was never edited, so it moves to the new list. */
+    public static final List<List<String>> OLD_DEFAULT_SKILLS = List.of(List.of("dungeondelving:mining", "dungeondelving:woodcutting",
+            "dungeondelving:excavation", "dungeondelving:farming", "dungeondelving:fishing", "dungeondelving:forging", "dungeondelving:leatherworking",
+            "dungeondelving:weaving", "skill_tree_rpgs:class_skills", "skill_tree_rpgs:weapon_skills"));
 
     private SkillLevels() {}
 

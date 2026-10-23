@@ -1,0 +1,20 @@
+{
+  "lightning_adept": {
+    "definition": "lightning_adept",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "lightning_expert": {
+    "definition": "lightning_expert",
+    "x": 40,
+    "y": 0,
+    "root": false
+  },
+  "lightning_lore": {
+    "definition": "lightning_lore",
+    "x": 80,
+    "y": 0,
+    "root": false
+  }
+}

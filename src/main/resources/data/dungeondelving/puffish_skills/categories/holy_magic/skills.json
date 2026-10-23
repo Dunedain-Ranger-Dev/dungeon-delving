@@ -1,0 +1,20 @@
+{
+  "holy_adept": {
+    "definition": "holy_adept",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "holy_expert": {
+    "definition": "holy_expert",
+    "x": 40,
+    "y": 0,
+    "root": false
+  },
+  "holy_lore": {
+    "definition": "holy_lore",
+    "x": 80,
+    "y": 0,
+    "root": false
+  }
+}

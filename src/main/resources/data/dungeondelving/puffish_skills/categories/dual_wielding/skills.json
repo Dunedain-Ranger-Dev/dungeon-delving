@@ -1,0 +1,14 @@
+{
+  "ambidextrous": {
+    "definition": "ambidextrous",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "flurry": {
+    "definition": "flurry",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

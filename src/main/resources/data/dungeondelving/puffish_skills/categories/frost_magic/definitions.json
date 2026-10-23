@@ -1,0 +1,104 @@
+{
+  "frost_adept": {
+    "title": {
+      "translate": "skill.dungeondelving.frost_magic.frost_adept"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.frost_magic.frost_adept.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blue_ice"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:frost",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "frost_expert": {
+    "title": {
+      "translate": "skill.dungeondelving.frost_magic.frost_expert"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.frost_magic.frost_expert.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blue_ice"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:frost",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "frost_lore": {
+    "title": {
+      "translate": "skill.dungeondelving.frost_magic.frost_lore"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.frost_magic.frost_lore.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blue_ice"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:ice_spell_power",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  }
+}

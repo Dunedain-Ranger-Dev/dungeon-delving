@@ -1,0 +1,64 @@
+{
+  "light_step": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.light_step"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.light_step.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.movement_speed",
+          "operation": "multiply_base",
+          "value": 0.02
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "evasive": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.evasive"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.evasive.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.movement_speed",
+          "operation": "multiply_base",
+          "value": 0.02
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

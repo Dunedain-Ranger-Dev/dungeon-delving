@@ -1,0 +1,70 @@
+{
+  "air_adept": {
+    "title": {
+      "translate": "skill.dungeondelving.air_magic.air_adept"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.air_magic.air_adept.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:feather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:air",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "air_expert": {
+    "title": {
+      "translate": "skill.dungeondelving.air_magic.air_expert"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.air_magic.air_expert.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:feather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:air",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  }
+}

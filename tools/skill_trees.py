@@ -1,5 +1,6 @@
-"""Writes the profession skill trees (DD-80) for Pufferfish's Skills: one category per profession, each with its own
-experience, levels and points, and a small first tree of nodes.
+"""Writes our skill trees for Pufferfish's Skills: one category per skill, each with its own experience, levels and
+points, and a small first tree of nodes. The professions (DD-80), and the combat style, armor, magic school and
+Beastmastery trees (DD-81), whose experience our own code awards (ActivitySkills, MagicSchool).
 
 Run from the project root: python tools/skill_trees.py
 
@@ -40,31 +41,104 @@ def attribute(attr, value, operation="multiply_base"):
     return {"type": "puffish_skills:attribute", "data": {"attribute": attr, "operation": operation, "value": value}}
 
 
+def node(key, title, description, rewards, mods=()):
+    """A tree node; mods are the mods its rewards need (Pufferfish drops the node if one is missing)."""
+    return (key, title, description, rewards, list(mods))
+
+
+def melee(key, name):
+    return [node(f"{key}_training", f"{name} Training", "+3% melee damage.", [attribute("minecraft:generic.attack_damage", 0.03)]),
+            node(f"{key}_mastery", f"{name} Mastery", "+3% melee damage.", [attribute("minecraft:generic.attack_damage", 0.03)])]
+
+
+def ranged(key, name):
+    return [node(f"{key}_training", f"{name} Training", "+3% ranged damage.",
+                 [attribute("ranged_weapon:damage", 0.03, "multiply_total")], ["ranged_weapon_api"]),
+            node(f"{key}_mastery", f"{name} Mastery", "+3% ranged damage.",
+                 [attribute("ranged_weapon:damage", 0.03, "multiply_total")], ["ranged_weapon_api"])]
+
+
+def school(key, name, spell_power, irons=None):
+    """A magic school tree. spell_power is its Spell Power school (None if it has none, like blood); irons is its
+    Iron's Spells school, for a node raising that school's Iron's spell power."""
+    nodes = [] if spell_power is None else [
+        node(f"{key}_adept", f"{name} Adept", f"+0.5 {name.lower()} spell power.",
+             [attribute(f"spell_power:{spell_power}", 0.5, "addition")], ["spell_power"]),
+        node(f"{key}_expert", f"{name} Expert", f"+0.5 {name.lower()} spell power.",
+             [attribute(f"spell_power:{spell_power}", 0.5, "addition")], ["spell_power"])]
+    if irons:
+        nodes.append(node(f"{key}_lore", f"{name} Lore", f"+3% {name.lower()} spell power for Iron's Spells.",
+                          [attribute(f"irons_spellbooks:{irons}_spell_power", 0.03)], ["irons_spellbooks"]))
+    return nodes
+
+
 # key -> (title, icon item, sources or None for crafting, [(node key, title, description, rewards)])
 PROFESSIONS = {
     "mining": ("Mining", "minecraft:iron_pickaxe",
                [mine({"#c:ores": 10, "#minecraft:base_stone_overworld": 1, "#c:stones": 1})],
-               [("quick_pick", "Quick Pick", "+5% mining speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
-                ("quicker_pick", "Quicker Pick", "+5% mining speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
-                ("prospector", "Prospector", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),
+               [node("quick_pick", "Quick Pick", "+5% mining speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
+                node("quicker_pick", "Quicker Pick", "+5% mining speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
+                node("prospector", "Prospector", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),
     "woodcutting": ("Woodcutting", "minecraft:iron_axe", [mine({"#minecraft:logs": 4})],
-                    [("sure_swing", "Sure Swing", "+5% breaking speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
-                     ("timber", "Timber", "+5% breaking speed.", [attribute("minecraft:player.block_break_speed", 0.05)])]),
+                    [node("sure_swing", "Sure Swing", "+5% breaking speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
+                     node("timber", "Timber", "+5% breaking speed.", [attribute("minecraft:player.block_break_speed", 0.05)])]),
     "excavation": ("Excavation", "minecraft:iron_shovel", [mine({"#minecraft:mineable/shovel": 1})],
-                   [("digger", "Digger", "+5% breaking speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
-                    ("treasure_sense", "Treasure Sense", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),
+                   [node("digger", "Digger", "+5% breaking speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
+                    node("treasure_sense", "Treasure Sense", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),
     "farming": ("Farming", "minecraft:iron_hoe", [mine({"#minecraft:crops": 3})],
-                [("green_thumb", "Green Thumb", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")]),
-                 ("hardy", "Hardy", "+2 max health.", [attribute("minecraft:generic.max_health", 2, "addition")])]),
+                [node("green_thumb", "Green Thumb", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")]),
+                 node("hardy", "Hardy", "+2 max health.", [attribute("minecraft:generic.max_health", 2, "addition")])]),
     "fishing": ("Fishing", "minecraft:fishing_rod", [{"type": "puffish_skills:fish_item", "data": {"experience": "15"}}],
-                [("patient", "Patient", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")]),
-                 ("angler", "Angler", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),
+                [node("patient", "Patient", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")]),
+                 node("angler", "Angler", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),
     "forging": ("Forging", "dungeondelving:master_anvil", None,
-                [("apprentice_smith", "Apprentice Smith", "Your first step as a smith. Forging perks move into this tree in a later update.", [])]),
+                [node("apprentice_smith", "Apprentice Smith", "Your first step as a smith. Forging perks move into this tree in a later update.", [])]),
     "leatherworking": ("Leatherworking", "minecraft:leather", None,
-                       [("apprentice_tanner", "Apprentice Tanner", "Your first step as a tanner. Leatherworking perks move into this tree in a later update.", [])]),
+                       [node("apprentice_tanner", "Apprentice Tanner", "Your first step as a tanner. Leatherworking perks move into this tree in a later update.", [])]),
     "weaving": ("Weaving", "minecraft:string", None,
-                [("apprentice_weaver", "Apprentice Weaver", "Your first step as a weaver. Weaving perks move into this tree in a later update.", [])]),
+                [node("apprentice_weaver", "Apprentice Weaver", "Your first step as a weaver. Weaving perks move into this tree in a later update.", [])]),
+}
+
+
+# The activity skills (DD-81): our code awards their experience (ActivitySkills, MagicSchool), so they have no sources here.
+ACTIVITIES = {
+    "one_handed": ("One-Handed", "minecraft:iron_sword", melee("one_handed", "One-Handed")),
+    "two_handed": ("Two-Handed", "minecraft:netherite_axe", melee("two_handed", "Two-Handed")),
+    "polearms": ("Polearms", "minecraft:trident", melee("polearms", "Polearm")),
+    "daggers": ("Daggers", "minecraft:stone_sword", melee("daggers", "Dagger")),
+    "unarmed": ("Unarmed", "minecraft:leather", melee("unarmed", "Unarmed")),
+    "archery": ("Archery", "minecraft:bow", ranged("archery", "Archery")),
+    "crossbows": ("Crossbows", "minecraft:crossbow", ranged("crossbows", "Crossbow")),
+    "dual_wielding": ("Dual Wielding", "minecraft:golden_sword",
+                      [node("ambidextrous", "Ambidextrous", "+2% attack speed.", [attribute("minecraft:generic.attack_speed", 0.02)]),
+                       node("flurry", "Flurry", "+2% attack speed.", [attribute("minecraft:generic.attack_speed", 0.02)])]),
+    "blocking": ("Blocking", "minecraft:shield",
+                 [node("braced", "Braced", "+5% knockback resistance.", [attribute("minecraft:generic.knockback_resistance", 0.05, "addition")]),
+                  node("bulwark", "Bulwark", "+1 armor.", [attribute("minecraft:generic.armor", 1, "addition")])]),
+    "light_armor": ("Light Armor", "minecraft:leather_chestplate",
+                    [node("light_step", "Light Step", "+2% movement speed.", [attribute("minecraft:generic.movement_speed", 0.02)]),
+                     node("evasive", "Evasive", "+2% movement speed.", [attribute("minecraft:generic.movement_speed", 0.02)])]),
+    "medium_armor": ("Medium Armor", "minecraft:chainmail_chestplate",
+                     [node("fitted_mail", "Fitted Mail", "+1 armor.", [attribute("minecraft:generic.armor", 1, "addition")]),
+                      node("balanced", "Balanced", "+1% movement speed.", [attribute("minecraft:generic.movement_speed", 0.01)])]),
+    "heavy_armor": ("Heavy Armor", "minecraft:iron_chestplate",
+                    [node("iron_skin", "Iron Skin", "+1 armor toughness.", [attribute("minecraft:generic.armor_toughness", 1, "addition")]),
+                     node("immovable", "Immovable", "+5% knockback resistance.", [attribute("minecraft:generic.knockback_resistance", 0.05, "addition")])]),
+    "mage_armor": ("Mage Armor", "minecraft:purple_wool",
+                   [node("woven_wards", "Woven Wards", "+0.5 spell power.", [attribute("spell_power:generic", 0.5, "addition")], ["spell_power"]),
+                    node("mana_weave", "Mana Weave", "+10 max mana for Iron's Spells.", [attribute("irons_spellbooks:max_mana", 10, "addition")], ["irons_spellbooks"])]),
+    "fire_magic": ("Fire Magic", "minecraft:blaze_powder", school("fire", "Fire", "fire", "fire")),
+    "frost_magic": ("Frost Magic", "minecraft:blue_ice", school("frost", "Frost", "frost", "ice")),
+    "lightning_magic": ("Lightning Magic", "minecraft:lightning_rod", school("lightning", "Lightning", "lightning", "lightning")),
+    "arcane_magic": ("Arcane Magic", "minecraft:amethyst_shard", school("arcane", "Arcane", "arcane", "ender")),
+    "holy_magic": ("Holy Magic", "minecraft:golden_apple", school("holy", "Holy", "healing", "holy")),
+    "earth_magic": ("Earth Magic", "minecraft:moss_block", school("earth", "Earth", "earth", "nature")),
+    "water_magic": ("Water Magic", "minecraft:heart_of_the_sea", school("water", "Water", "water")),
+    "air_magic": ("Air Magic", "minecraft:feather", school("air", "Air", "air")),
+    "blood_magic": ("Blood Magic", "minecraft:redstone", school("blood", "Blood", None, "blood")),
+    "necromancy": ("Necromancy", "minecraft:wither_skeleton_skull", school("necromancy", "Necromancy", "soul", "eldritch")),
+    "beastmastery": ("Beastmastery", "minecraft:lead",
+                     [node("animal_friend", "Animal Friend", "Your first step as a beastmaster. Companions and their perks come in a later update.", [])]),
 }
 
 
@@ -74,8 +148,9 @@ def write(path, obj):
 
 
 lang = json.loads(LANG.read_text(encoding="utf-8"))
-write(DATA / "config.json", {"version": 3, "categories": list(PROFESSIONS)})
-for key, (title, icon, sources, nodes) in PROFESSIONS.items():
+TREES = {**PROFESSIONS, **{key: (title, icon, [], nodes) for key, (title, icon, nodes) in ACTIVITIES.items()}}
+write(DATA / "config.json", {"version": 3, "categories": list(TREES)})
+for key, (title, icon, sources, nodes) in TREES.items():
     folder = DATA / "categories" / key
     lang[f"skill_category.{NS}.{key}"] = title
     write(folder / "category.json", {
@@ -92,22 +167,23 @@ for key, (title, icon, sources, nodes) in PROFESSIONS.items():
         "sources": [] if crafting else sources,
     })
     definitions, skills, links = {}, {}, []
-    for i, (node, node_title, description, rewards) in enumerate(nodes):
-        definitions[node] = {
-            "title": {"translate": f"skill.{NS}.{key}.{node}"},
-            "description": {"translate": f"skill.{NS}.{key}.{node}.description"},
+    for i, (node_key, node_title, description, rewards, mods) in enumerate(nodes):
+        definitions[node_key] = {
+            "title": {"translate": f"skill.{NS}.{key}.{node_key}"},
+            "description": {"translate": f"skill.{NS}.{key}.{node_key}.description"},
             "icon": {"type": "item", "data": {"item": icon}},
             "frame": {"type": "advancement", "data": {"frame": "task" if i < len(nodes) - 1 or len(nodes) == 1 else "goal"}},
             "rewards": rewards,
             "cost": 1,
+            **({"required_mods": mods} if mods else {}),
         }
-        lang[f"skill.{NS}.{key}.{node}"] = node_title
-        lang[f"skill.{NS}.{key}.{node}.description"] = description
-        skills[node] = {"definition": node, "x": i * 40, "y": 0, "root": i == 0}
+        lang[f"skill.{NS}.{key}.{node_key}"] = node_title
+        lang[f"skill.{NS}.{key}.{node_key}.description"] = description
+        skills[node_key] = {"definition": node_key, "x": i * 40, "y": 0, "root": i == 0}
         if i > 0:
-            links.append([nodes[i - 1][0], node])
+            links.append([nodes[i - 1][0], node_key])
     write(folder / "definitions.json", definitions)
     write(folder / "skills.json", skills)
     write(folder / "connections.json", {"normal": {"bidirectional": links}})
 LANG.write_text(json.dumps(lang, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n")
-print("Wrote skill trees for", ", ".join(PROFESSIONS))
+print("Wrote skill trees for", ", ".join(TREES))

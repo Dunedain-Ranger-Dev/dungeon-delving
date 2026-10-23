@@ -1,0 +1,20 @@
+{
+  "earth_adept": {
+    "definition": "earth_adept",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "earth_expert": {
+    "definition": "earth_expert",
+    "x": 40,
+    "y": 0,
+    "root": false
+  },
+  "earth_lore": {
+    "definition": "earth_lore",
+    "x": 80,
+    "y": 0,
+    "root": false
+  }
+}

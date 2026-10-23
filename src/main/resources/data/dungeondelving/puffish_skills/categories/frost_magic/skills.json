@@ -1,0 +1,20 @@
+{
+  "frost_adept": {
+    "definition": "frost_adept",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "frost_expert": {
+    "definition": "frost_expert",
+    "x": 40,
+    "y": 0,
+    "root": false
+  },
+  "frost_lore": {
+    "definition": "frost_lore",
+    "x": 80,
+    "y": 0,
+    "root": false
+  }
+}

@@ -89,6 +89,14 @@ public final class IronsGoblins {
         modEventBus.addListener(IronsGoblins::onAttributes);
         // Spellbreakers go after whoever has been casting.
         NeoForge.EVENT_BUS.addListener((SpellOnCastEvent event) -> Spellcasters.markCast(event.getEntity()));
+        // Casting trains the spell's magic school tree (DD-81): a base, plus a little for higher-level spells.
+        NeoForge.EVENT_BUS.addListener((SpellOnCastEvent event) -> {
+            if (event.getEntity() instanceof net.minecraft.server.level.ServerPlayer player) {
+                io.github.ranger3462.dungeondelving.skill.MagicSchool.byId(event.getSchoolType().getId().toString()).ifPresent(school ->
+                        io.github.ranger3462.dungeondelving.skill.ActivitySkills.award(player, school.skill,
+                                io.github.ranger3462.dungeondelving.skill.MagicSchool.CAST_XP + event.getSpellLevel() / 2));
+            }
+        });
         modEventBus.addListener(IronsGoblins::onSpawnPlacements);
     }
 

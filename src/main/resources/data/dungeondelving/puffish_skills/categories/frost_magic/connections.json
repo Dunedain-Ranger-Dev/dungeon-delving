@@ -1,0 +1,14 @@
+{
+  "normal": {
+    "bidirectional": [
+      [
+        "frost_adept",
+        "frost_expert"
+      ],
+      [
+        "frost_expert",
+        "frost_lore"
+      ]
+    ]
+  }
+}

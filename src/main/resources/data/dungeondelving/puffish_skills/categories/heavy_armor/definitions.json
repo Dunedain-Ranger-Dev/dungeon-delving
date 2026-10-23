@@ -1,0 +1,64 @@
+{
+  "iron_skin": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.iron_skin"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.iron_skin.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor_toughness",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "immovable": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.immovable"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.immovable.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.knockback_resistance",
+          "operation": "addition",
+          "value": 0.05
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

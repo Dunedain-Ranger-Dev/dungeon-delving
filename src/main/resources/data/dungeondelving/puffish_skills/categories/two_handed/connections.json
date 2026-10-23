@@ -1,0 +1,10 @@
+{
+  "normal": {
+    "bidirectional": [
+      [
+        "two_handed_training",
+        "two_handed_mastery"
+      ]
+    ]
+  }
+}

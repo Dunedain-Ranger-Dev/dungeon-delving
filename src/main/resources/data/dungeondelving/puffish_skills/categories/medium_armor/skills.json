@@ -1,0 +1,14 @@
+{
+  "fitted_mail": {
+    "definition": "fitted_mail",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "balanced": {
+    "definition": "balanced",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

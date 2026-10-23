@@ -1,0 +1,64 @@
+{
+  "braced": {
+    "title": {
+      "translate": "skill.dungeondelving.blocking.braced"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.blocking.braced.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:shield"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.knockback_resistance",
+          "operation": "addition",
+          "value": 0.05
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "bulwark": {
+    "title": {
+      "translate": "skill.dungeondelving.blocking.bulwark"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.blocking.bulwark.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:shield"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

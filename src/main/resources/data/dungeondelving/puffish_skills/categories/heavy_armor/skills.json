@@ -1,0 +1,14 @@
+{
+  "iron_skin": {
+    "definition": "iron_skin",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "immovable": {
+    "definition": "immovable",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

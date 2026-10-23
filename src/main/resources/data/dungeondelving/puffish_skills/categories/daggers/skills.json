@@ -1,0 +1,14 @@
+{
+  "daggers_training": {
+    "definition": "daggers_training",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "daggers_mastery": {
+    "definition": "daggers_mastery",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

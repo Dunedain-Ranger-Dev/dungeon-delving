@@ -1,0 +1,14 @@
+{
+  "normal": {
+    "bidirectional": [
+      [
+        "arcane_adept",
+        "arcane_expert"
+      ],
+      [
+        "arcane_expert",
+        "arcane_lore"
+      ]
+    ]
+  }
+}

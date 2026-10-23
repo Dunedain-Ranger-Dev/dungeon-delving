@@ -1,0 +1,70 @@
+{
+  "crossbows_training": {
+    "title": {
+      "translate": "skill.dungeondelving.crossbows.crossbows_training"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.crossbows.crossbows_training.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:crossbow"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "ranged_weapon:damage",
+          "operation": "multiply_total",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "ranged_weapon_api"
+    ]
+  },
+  "crossbows_mastery": {
+    "title": {
+      "translate": "skill.dungeondelving.crossbows.crossbows_mastery"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.crossbows.crossbows_mastery.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:crossbow"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "ranged_weapon:damage",
+          "operation": "multiply_total",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "ranged_weapon_api"
+    ]
+  }
+}

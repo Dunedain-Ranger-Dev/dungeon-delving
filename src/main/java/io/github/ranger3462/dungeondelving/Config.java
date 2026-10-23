@@ -124,5 +124,9 @@ public final class Config {
             GOBLIN_MOBS.set(DungeonFactions.GOBLIN_DEFAULTS);
             GOBLIN_MOBS.save();
         }
+        if (SkillLevels.OLD_DEFAULT_SKILLS.contains(List.copyOf(CHARACTER_LEVEL_SKILLS.get()))) {
+            CHARACTER_LEVEL_SKILLS.set(SkillLevels.DEFAULT_SKILLS);
+            CHARACTER_LEVEL_SKILLS.save();
+        }
     }
 }

@@ -1,0 +1,14 @@
+{
+  "woven_wards": {
+    "definition": "woven_wards",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "mana_weave": {
+    "definition": "mana_weave",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

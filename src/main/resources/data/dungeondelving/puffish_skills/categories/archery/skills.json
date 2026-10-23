@@ -1,0 +1,14 @@
+{
+  "archery_training": {
+    "definition": "archery_training",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "archery_mastery": {
+    "definition": "archery_mastery",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}

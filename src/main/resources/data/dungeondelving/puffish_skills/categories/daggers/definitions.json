@@ -1,0 +1,64 @@
+{
+  "daggers_training": {
+    "title": {
+      "translate": "skill.dungeondelving.daggers.daggers_training"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.daggers.daggers_training.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:stone_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "daggers_mastery": {
+    "title": {
+      "translate": "skill.dungeondelving.daggers.daggers_mastery"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.daggers.daggers_mastery.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:stone_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

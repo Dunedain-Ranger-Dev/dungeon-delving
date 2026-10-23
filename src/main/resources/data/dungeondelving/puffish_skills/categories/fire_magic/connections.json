@@ -1,0 +1,14 @@
+{
+  "normal": {
+    "bidirectional": [
+      [
+        "fire_adept",
+        "fire_expert"
+      ],
+      [
+        "fire_expert",
+        "fire_lore"
+      ]
+    ]
+  }
+}

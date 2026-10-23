@@ -36,6 +36,11 @@ public final class PufferfishSkills {
         return experience(category).map(experience -> experience.getTotal(player));
     }
 
+    /** Adds to a player's total experience in a skill, if it exists. */
+    public static void addTotal(ServerPlayer player, ResourceLocation category, int amount) {
+        experience(category).ifPresent(experience -> experience.addTotal(player, amount));
+    }
+
     /** Sets a player's total experience in a skill, if it exists. */
     public static void setTotal(ServerPlayer player, ResourceLocation category, int total) {
         experience(category).ifPresent(experience -> experience.setTotal(player, total));

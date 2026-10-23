@@ -1,0 +1,70 @@
+{
+  "archery_training": {
+    "title": {
+      "translate": "skill.dungeondelving.archery.archery_training"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.archery.archery_training.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:bow"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "ranged_weapon:damage",
+          "operation": "multiply_total",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "ranged_weapon_api"
+    ]
+  },
+  "archery_mastery": {
+    "title": {
+      "translate": "skill.dungeondelving.archery.archery_mastery"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.archery.archery_mastery.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:bow"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "ranged_weapon:damage",
+          "operation": "multiply_total",
+          "value": 0.03
+        }
+      }
+    ],
+    "cost": 1,
+    "required_mods": [
+      "ranged_weapon_api"
+    ]
+  }
+}

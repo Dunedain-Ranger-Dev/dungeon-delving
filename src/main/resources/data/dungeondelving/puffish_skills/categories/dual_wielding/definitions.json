@@ -1,0 +1,64 @@
+{
+  "ambidextrous": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.ambidextrous"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.ambidextrous.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:golden_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.02
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "flurry": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.flurry"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.flurry.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:golden_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.02
+        }
+      }
+    ],
+    "cost": 1
+  }
+}

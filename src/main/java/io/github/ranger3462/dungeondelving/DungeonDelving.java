@@ -1,6 +1,7 @@
 package io.github.ranger3462.dungeondelving;
 
 import io.github.ranger3462.dungeondelving.integration.skills.PufferfishSkills;
+import io.github.ranger3462.dungeondelving.integration.spellengine.SpellEngineMagic;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import org.slf4j.Logger;
 
@@ -33,6 +34,9 @@ public class DungeonDelving {
         modEventBus.addListener(ModConfigEvent.Reloading.class, Config::onLoad);
         if (ModList.get().isLoaded("puffish_skills")) {
             PufferfishSkills.register();
+        }
+        if (ModList.get().isLoaded("spell_engine")) {
+            SpellEngineMagic.register();
         }
         if (ModList.get().isLoaded("curios")) {
             CuriosLoot.register();

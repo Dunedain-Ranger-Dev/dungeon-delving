@@ -1,0 +1,14 @@
+{
+  "polearms_training": {
+    "definition": "polearms_training",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "polearms_mastery": {
+    "definition": "polearms_mastery",
+    "x": 40,
+    "y": 0,
+    "root": false
+  }
+}
