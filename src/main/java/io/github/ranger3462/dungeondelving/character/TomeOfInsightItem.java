@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
-/** A Tome of Insight: read it (use it) for a bonus ability point. Used up when read. A rare find, not crafted. */
+/** A Tome of Insight: read it (use it) for a bonus ability point. Used up when read. A rare find, not crafted ({@link CharacterItems}). */
 public class TomeOfInsightItem extends Item {
     public TomeOfInsightItem(Properties properties) {
         super(properties);

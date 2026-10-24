@@ -35,7 +35,10 @@ public final class RacePayloads {
 
         static void handle(Choose payload, IPayloadContext context) {
             if (context.player() instanceof ServerPlayer player && Characters.data(player).raceOf().isEmpty()) {
-                Race.byId(payload.race()).ifPresent(race -> Characters.setRace(player, race));
+                Race.byId(payload.race()).ifPresent(race -> {
+                    Characters.setRace(player, race);
+                    CharacterItems.giveStarterTome(player);
+                });
             }
         }
     }

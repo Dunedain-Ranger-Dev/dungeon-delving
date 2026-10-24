@@ -329,6 +329,7 @@
   "message.dungeondelving.character_level_up": "Character level %s! You have %s ability points to spend (press J).",
   "message.dungeondelving.tome_read": "You learn something new. You have %s ability points to spend.",
   "item.dungeondelving.tome_of_insight": "Tome of Insight",
+  "message.dungeondelving.starter_tome": "You were given a Tome of Calling. Read it to choose your class.",
   "item.dungeondelving.tome_of_insight.tooltip": "Read it for a bonus ability point.",
   "skill_category.dungeondelving.one_handed": "One-Handed",
   "skill.dungeondelving.one_handed.one_handed_training": "One-Handed Training",

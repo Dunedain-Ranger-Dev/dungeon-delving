@@ -117,6 +117,29 @@ public class RaceTests {
         helper.succeed();
     }
 
+    @GameTest(template = ANY_TEMPLATE)
+    public static void characterItemsHaveSurvivalSources(GameTestHelper helper) {
+        ServerPlayer player = player(helper, "newcomer");
+        var tome = new net.minecraft.world.item.ItemStack(ModRegistries.TOME_OF_CALLING.get());
+        io.github.ranger3462.dungeondelving.character.CharacterItems.giveStarterTome(player);
+        helper.assertTrue(player.getInventory().countItem(tome.getItem()) == 1, "a new character gets a Tome of Calling");
+        io.github.ranger3462.dungeondelving.character.CharacterItems.giveStarterTome(player);
+        helper.assertTrue(player.getInventory().countItem(tome.getItem()) == 1, "but only one");
+
+        var recipes = helper.getLevel().getRecipeManager();
+        helper.assertTrue(recipes.byKey(DungeonDelving.id("tome_of_calling")).isPresent(), "more tomes are crafted");
+        helper.assertTrue(recipes.byKey(DungeonDelving.id("elixir_of_rebirth")).isPresent(), "the elixir is crafted");
+
+        helper.assertTrue(io.github.ranger3462.dungeondelving.character.CharacterItems.insightChance("bosses/barrow_king/tier_4") == 0.15f
+                && io.github.ranger3462.dungeondelving.character.CharacterItems.insightChance("chests/tier_1/objective") == 0.025f
+                && io.github.ranger3462.dungeondelving.character.CharacterItems.insightChance("chests/tier_1/room") == 0,
+                "Tomes of Insight come from bosses and objective chests, more at higher tiers");
+        var key = net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE, DungeonDelving.id("bosses/barrow_king/tier_1"));
+        var table = helper.getLevel().getServer().reloadableRegistries().getLootTable(key);
+        helper.assertTrue(table.getPool(DungeonDelving.MODID + ":tome_of_insight") != null, "the boss table has the tome pool");
+        helper.succeed();
+    }
+
     private static ServerPlayer player(GameTestHelper helper, String name) {
         ServerPlayer player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), name));
         Characters.apply(player);
