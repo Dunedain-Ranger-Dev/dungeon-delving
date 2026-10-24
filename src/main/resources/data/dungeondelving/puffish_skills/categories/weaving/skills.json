@@ -4,5 +4,35 @@
     "x": 0,
     "y": 0,
     "root": true
+  },
+  "steady_needle_1": {
+    "definition": "steady_needle_1",
+    "x": -25,
+    "y": 50,
+    "root": false
+  },
+  "steady_needle_2": {
+    "definition": "steady_needle_2",
+    "x": -25,
+    "y": 90,
+    "root": false
+  },
+  "steady_needle_3": {
+    "definition": "steady_needle_3",
+    "x": -25,
+    "y": 130,
+    "root": false
+  },
+  "careful_weaver_1": {
+    "definition": "careful_weaver_1",
+    "x": 25,
+    "y": 50,
+    "root": false
+  },
+  "careful_weaver_2": {
+    "definition": "careful_weaver_2",
+    "x": 25,
+    "y": 90,
+    "root": false
   }
 }

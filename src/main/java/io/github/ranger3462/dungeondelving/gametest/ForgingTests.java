@@ -209,7 +209,7 @@ public class ForgingTests {
                     now += 3;
                     ForgeActions.strike(player, level, session, player.getMainHandItem(), now, session.missMarker());
                 }
-                cracked = find(player, Forging.STRUCK_INGOT.get()).isEmpty() && find(player, Items.IRON_NUGGET).getCount() == ForgingPerks.scrapNuggets(1);
+                cracked = find(player, Forging.STRUCK_INGOT.get()).isEmpty() && find(player, Items.IRON_NUGGET).getCount() == ForgingPerks.scrapNuggets(player);
                 player.getInventory().clearContent();
             }
             helper.assertTrue(cracked, "badly-timed strikes should crack an ingot sooner or later");
@@ -221,7 +221,10 @@ public class ForgingTests {
                     && ForgeActions.periodFor(TimingBar.Kind.STRIKE, 28, 0.1f) < ForgeActions.periodFor(TimingBar.Kind.STRIKE, 28, 0.5f),
                     "the cooler the metal, the faster the sweep");
             helper.assertTrue(ForgeActions.periodFor(TimingBar.Kind.GRIND, 24, 0.1f) == 24, "grinding works cold metal, so its sweep doesn't speed up");
-            helper.assertTrue(ForgingPerks.scrapNuggets(1) == 5 && ForgingPerks.scrapNuggets(30) == 8, "cracks return 5 nuggets, up to 8 with skill");
+            helper.assertTrue(ForgingPerks.scrapNuggets(player) == 5, "cracks return 5 nuggets");
+            player.addTag(io.github.ranger3462.dungeondelving.skill.Perk.THRIFTY.tag(2));
+            helper.assertTrue(ForgingPerks.scrapNuggets(player) == 8, "or 8 with Thrifty II");
+            player.removeTag(io.github.ranger3462.dungeondelving.skill.Perk.THRIFTY.tag(2));
         } finally {
             clear(level, hearth);
         }
@@ -431,7 +434,10 @@ public class ForgingTests {
         for (int level = 1; level <= CraftingSkills.MAX_LEVEL; level++) {
             helper.assertTrue(CraftingSkills.levelFor(CraftingSkills.xpFor(level)) == level, "the XP for level " + level + " should reach it exactly");
         }
-        helper.assertTrue(ForgingPerks.coolTicks(20) > ForgingPerks.coolTicks(1), "skilled smiths' metal cools slower");
+        int plain = ForgingPerks.coolTicks(player);
+        player.addTag(io.github.ranger3462.dungeondelving.skill.Perk.SLOW_COOLING.tag(1));
+        helper.assertTrue(ForgingPerks.coolTicks(player) > plain, "Slow Cooling keeps metal hot longer");
+        player.removeTag(io.github.ranger3462.dungeondelving.skill.Perk.SLOW_COOLING.tag(1));
         helper.succeed();
     }
 

@@ -247,8 +247,11 @@ public class ForgedGearTests {
             ForgeActions.salvage(player, level, grindstone, chest);
             int ingots = player.getInventory().items.stream().filter(stack -> stack.is(Forging.TEMPERED_IRON_INGOT.get()) && Forging.stars(stack) == 3)
                     .mapToInt(ItemStack::getCount).sum();
-            helper.assertTrue(ingots == 3, "a new ★3 plate cuirass (8 ingots) salvages to 3 ★3 ingots at level 1, got " + ingots);
-            helper.assertTrue(ForgingPerks.salvageShare(30) > ForgingPerks.salvageShare(1), "skilled smiths salvage more");
+            helper.assertTrue(ingots == 3, "a new ★3 plate cuirass (8 ingots) salvages to 3 ★3 ingots without Thrifty, got " + ingots);
+            float plain = ForgingPerks.salvageShare(player);
+            player.addTag(io.github.ranger3462.dungeondelving.skill.Perk.THRIFTY.tag(2));
+            helper.assertTrue(ForgingPerks.salvageShare(player) > plain, "Thrifty smiths salvage more");
+            player.removeTag(io.github.ranger3462.dungeondelving.skill.Perk.THRIFTY.tag(2));
         } finally {
             for (BlockPos pos : BlockPos.betweenClosed(hearth.offset(-3, 0, -3), hearth.offset(3, 0, 3))) {
                 level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);

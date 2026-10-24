@@ -20,5 +20,150 @@
     },
     "rewards": [],
     "cost": 1
+  },
+  "steady_needle_1": {
+    "title": {
+      "translate": "skill.dungeondelving.weaving.steady_needle_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaving.steady_needle_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:string"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_needle_1"
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "steady_needle_2": {
+    "title": {
+      "translate": "skill.dungeondelving.weaving.steady_needle_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaving.steady_needle_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:string"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_needle_2"
+        }
+      }
+    ],
+    "cost": 2
+  },
+  "steady_needle_3": {
+    "title": {
+      "translate": "skill.dungeondelving.weaving.steady_needle_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaving.steady_needle_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:string"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_needle_3"
+        }
+      }
+    ],
+    "cost": 3
+  },
+  "careful_weaver_1": {
+    "title": {
+      "translate": "skill.dungeondelving.weaving.careful_weaver_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaving.careful_weaver_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:string"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.careful_weaver_1"
+        }
+      }
+    ],
+    "cost": 2
+  },
+  "careful_weaver_2": {
+    "title": {
+      "translate": "skill.dungeondelving.weaving.careful_weaver_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaving.careful_weaver_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:string"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.careful_weaver_2"
+        }
+      }
+    ],
+    "cost": 3
   }
 }

@@ -20,5 +20,266 @@
     },
     "rewards": [],
     "cost": 1
+  },
+  "steady_hand_1": {
+    "title": {
+      "translate": "skill.dungeondelving.forging.steady_hand_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.forging.steady_hand_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:master_anvil"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_hand_1"
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "steady_hand_2": {
+    "title": {
+      "translate": "skill.dungeondelving.forging.steady_hand_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.forging.steady_hand_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:master_anvil"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_hand_2"
+        }
+      }
+    ],
+    "cost": 2
+  },
+  "steady_hand_3": {
+    "title": {
+      "translate": "skill.dungeondelving.forging.steady_hand_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.forging.steady_hand_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:master_anvil"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_hand_3"
+        }
+      }
+    ],
+    "cost": 3
+  },
+  "slow_cooling_1": {
+    "title": {
+      "translate": "skill.dungeondelving.forging.slow_cooling_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.forging.slow_cooling_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:master_anvil"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.slow_cooling_1"
+        }
+      }
+    ],
+    "cost": 2
+  },
+  "slow_cooling_2": {
+    "title": {
+      "translate": "skill.dungeondelving.forging.slow_cooling_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.forging.slow_cooling_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:master_anvil"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.slow_cooling_2"
+        }
+      }
+    ],
+    "cost": 3
+  },
+  "thrifty_1": {
+    "title": {
+      "translate": "skill.dungeondelving.forging.thrifty_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.forging.thrifty_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:master_anvil"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.thrifty_1"
+        }
+      }
+    ],
+    "cost": 2
+  },
+  "thrifty_2": {
+    "title": {
+      "translate": "skill.dungeondelving.forging.thrifty_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.forging.thrifty_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:master_anvil"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.thrifty_2"
+        }
+      }
+    ],
+    "cost": 3
+  },
+  "sure_strikes_1": {
+    "title": {
+      "translate": "skill.dungeondelving.forging.sure_strikes_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.forging.sure_strikes_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:master_anvil"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.sure_strikes_1"
+        }
+      }
+    ],
+    "cost": 2
+  },
+  "sure_strikes_2": {
+    "title": {
+      "translate": "skill.dungeondelving.forging.sure_strikes_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.forging.sure_strikes_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:master_anvil"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.sure_strikes_2"
+        }
+      }
+    ],
+    "cost": 3
   }
 }

@@ -30,6 +30,93 @@
     ],
     "cost": 1
   },
+  "bountiful_1": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.bountiful_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.bountiful_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.bountiful_1"
+        }
+      }
+    ],
+    "cost": 2
+  },
+  "bountiful_2": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.bountiful_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.bountiful_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.bountiful_2"
+        }
+      }
+    ],
+    "cost": 3
+  },
+  "replanter": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.replanter"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.replanter.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.replanter"
+        }
+      }
+    ],
+    "cost": 3
+  },
   "hardy": {
     "title": {
       "translate": "skill.dungeondelving.farming.hardy"

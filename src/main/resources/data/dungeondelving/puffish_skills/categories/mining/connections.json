@@ -7,6 +7,18 @@
       ],
       [
         "quicker_pick",
+        "vein_miner_1"
+      ],
+      [
+        "vein_miner_1",
+        "vein_miner_2"
+      ],
+      [
+        "vein_miner_2",
+        "vein_miner_3"
+      ],
+      [
+        "quicker_pick",
         "prospector"
       ]
     ]

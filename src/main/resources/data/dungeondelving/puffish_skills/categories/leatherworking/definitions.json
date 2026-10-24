@@ -20,5 +20,208 @@
     },
     "rewards": [],
     "cost": 1
+  },
+  "steady_scraper_1": {
+    "title": {
+      "translate": "skill.dungeondelving.leatherworking.steady_scraper_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.leatherworking.steady_scraper_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_scraper_1"
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "steady_scraper_2": {
+    "title": {
+      "translate": "skill.dungeondelving.leatherworking.steady_scraper_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.leatherworking.steady_scraper_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_scraper_2"
+        }
+      }
+    ],
+    "cost": 2
+  },
+  "steady_scraper_3": {
+    "title": {
+      "translate": "skill.dungeondelving.leatherworking.steady_scraper_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.leatherworking.steady_scraper_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_scraper_3"
+        }
+      }
+    ],
+    "cost": 3
+  },
+  "careful_tanner_1": {
+    "title": {
+      "translate": "skill.dungeondelving.leatherworking.careful_tanner_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.leatherworking.careful_tanner_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.careful_tanner_1"
+        }
+      }
+    ],
+    "cost": 2
+  },
+  "careful_tanner_2": {
+    "title": {
+      "translate": "skill.dungeondelving.leatherworking.careful_tanner_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.leatherworking.careful_tanner_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.careful_tanner_2"
+        }
+      }
+    ],
+    "cost": 3
+  },
+  "water_saver_1": {
+    "title": {
+      "translate": "skill.dungeondelving.leatherworking.water_saver_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.leatherworking.water_saver_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.water_saver_1"
+        }
+      }
+    ],
+    "cost": 1
+  },
+  "water_saver_2": {
+    "title": {
+      "translate": "skill.dungeondelving.leatherworking.water_saver_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.leatherworking.water_saver_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.water_saver_2"
+        }
+      }
+    ],
+    "cost": 2
   }
 }

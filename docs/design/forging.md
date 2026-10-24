@@ -159,12 +159,12 @@ affixes add; other affix effects are untouched.
 **Repair:** in the vanilla anvil, with a tempered ingot of the same ★ or higher.
 
 **Salvage:** sneak and right-click a grindstone (at a forge) with forged gear. You get back tempered ingots of its ★:
-40% of the metal it took, plus 1% per Forging level, less for worn gear, with the leftover as iron nuggets.
+40% of the metal it took (55% and 70% with Thrifty), less for worn gear, with the leftover as iron nuggets.
 
 ## Skills
 
-Forging, Leatherworking and Weaving each have levels 1 to 30, from XP. There are no talents yet (DD-70); perks unlock
-at set levels instead.
+Forging, Leatherworking and Weaving each have levels 1 to 30, from XP. Each level gives a point to spend in that skill's
+tree (Pufferfish's Skills, DD-70). The Forging level still sets the highest ★ you can forge; the rest is perks you pick.
 
 **Forging XP:**
 
@@ -177,14 +177,11 @@ at set levels instead.
 | Tempered ingot | 10 × ★ |
 | Gear piece crafted | 15 × ★ (hauberks give it to Leatherworking, brigandine to Weaving) |
 
-**Forging perks:**
-- Every level: +0.25% sweet-spot width.
-- L5: ingots cool 25% slower.
-- L10: cracks return 6 nuggets.
-- L15: strikes are 25% less likely to crack.
-- L20: cracks return 7 nuggets, and ingots cool 50% slower.
-- L25: cracks return 8 nuggets.
-- L30: strikes are 50% less likely to crack.
+**Forging perks** (points per rank in brackets; about 22 of a level 30 smith's 29 points buy everything):
+- Steady Hand I–III (1, 2, 3): +2% sweet-spot width each.
+- Slow Cooling I–II (2, 3): hot metal stays workable 25%, then 50%, longer.
+- Thrifty I–II (2, 3): cracks return 6, then 8, nuggets (5 without); salvage returns 55%, then 70%.
+- Sure Strikes I–II (2, 3): strikes are 25%, then 50%, less likely to crack.
 
 **Forging level needed for each ★:**
 
@@ -192,8 +189,11 @@ at set levels instead.
 |---|---|---|---|---|---|---|
 | 1 | 3 | 6 | 10 | 15 | 20 | 25 |
 
-**Leatherworking** gives XP for boiling and hardening leather and for crafting bases, with perks for extra yield.
-**Weaving** gives XP for weaving, with perks for a wider loom sweet spot and extra yield.
+**Leatherworking** gives XP for boiling and hardening leather and for crafting bases. Perks: Steady Scraper I–III
+(+2% patch width each), Careful Tanner I–II (25% and 50% less tearing), Water Saver I–II (boiling skips the water 25%
+and 50% of the time).
+**Weaving** gives XP for weaving. Perks: Steady Needle I–III (+2% room each), Careful Weaver I–II (25% and 50% less
+snapping).
 
 `/dungeondelving skills` shows your levels. `/dungeondelving skills set <skill> <level>` is for testing.
 

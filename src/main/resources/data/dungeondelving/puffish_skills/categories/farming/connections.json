@@ -3,6 +3,18 @@
     "bidirectional": [
       [
         "green_thumb",
+        "bountiful_1"
+      ],
+      [
+        "bountiful_1",
+        "bountiful_2"
+      ],
+      [
+        "green_thumb",
+        "replanter"
+      ],
+      [
+        "green_thumb",
         "hardy"
       ]
     ]

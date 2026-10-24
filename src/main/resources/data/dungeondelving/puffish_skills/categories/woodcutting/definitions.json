@@ -46,7 +46,7 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
       }
     },
     "rewards": [
@@ -60,5 +60,92 @@
       }
     ],
     "cost": 1
+  },
+  "tree_feller_1": {
+    "title": {
+      "translate": "skill.dungeondelving.woodcutting.tree_feller_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.woodcutting.tree_feller_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.tree_feller_1"
+        }
+      }
+    ],
+    "cost": 2
+  },
+  "tree_feller_2": {
+    "title": {
+      "translate": "skill.dungeondelving.woodcutting.tree_feller_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.woodcutting.tree_feller_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.tree_feller_2"
+        }
+      }
+    ],
+    "cost": 4
+  },
+  "forester": {
+    "title": {
+      "translate": "skill.dungeondelving.woodcutting.forester"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.woodcutting.forester.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.forester"
+        }
+      }
+    ],
+    "cost": 2
   }
 }

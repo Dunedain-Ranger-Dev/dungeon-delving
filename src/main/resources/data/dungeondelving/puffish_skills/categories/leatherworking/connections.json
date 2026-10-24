@@ -1,5 +1,34 @@
 {
   "normal": {
-    "bidirectional": []
+    "bidirectional": [
+      [
+        "apprentice_tanner",
+        "steady_scraper_1"
+      ],
+      [
+        "steady_scraper_1",
+        "steady_scraper_2"
+      ],
+      [
+        "steady_scraper_2",
+        "steady_scraper_3"
+      ],
+      [
+        "apprentice_tanner",
+        "careful_tanner_1"
+      ],
+      [
+        "careful_tanner_1",
+        "careful_tanner_2"
+      ],
+      [
+        "apprentice_tanner",
+        "water_saver_1"
+      ],
+      [
+        "water_saver_1",
+        "water_saver_2"
+      ]
+    ]
   }
 }

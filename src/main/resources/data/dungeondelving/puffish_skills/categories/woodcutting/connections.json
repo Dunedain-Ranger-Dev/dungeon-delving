@@ -4,6 +4,18 @@
       [
         "sure_swing",
         "timber"
+      ],
+      [
+        "timber",
+        "tree_feller_1"
+      ],
+      [
+        "tree_feller_1",
+        "tree_feller_2"
+      ],
+      [
+        "timber",
+        "forester"
       ]
     ]
   }

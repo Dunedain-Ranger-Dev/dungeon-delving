@@ -61,6 +61,93 @@
     ],
     "cost": 1
   },
+  "vein_miner_1": {
+    "title": {
+      "translate": "skill.dungeondelving.mining.vein_miner_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mining.vein_miner_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_pickaxe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.vein_miner_1"
+        }
+      }
+    ],
+    "cost": 2
+  },
+  "vein_miner_2": {
+    "title": {
+      "translate": "skill.dungeondelving.mining.vein_miner_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mining.vein_miner_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_pickaxe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.vein_miner_2"
+        }
+      }
+    ],
+    "cost": 3
+  },
+  "vein_miner_3": {
+    "title": {
+      "translate": "skill.dungeondelving.mining.vein_miner_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mining.vein_miner_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_pickaxe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.vein_miner_3"
+        }
+      }
+    ],
+    "cost": 4
+  },
   "prospector": {
     "title": {
       "translate": "skill.dungeondelving.mining.prospector"
@@ -82,14 +169,12 @@
     },
     "rewards": [
       {
-        "type": "puffish_skills:attribute",
+        "type": "puffish_skills:tag",
         "data": {
-          "attribute": "minecraft:generic.luck",
-          "operation": "addition",
-          "value": 0.5
+          "tag": "dungeondelving.perk.prospector"
         }
       }
     ],
-    "cost": 1
+    "cost": 3
   }
 }

@@ -9,8 +9,10 @@ sources. The crafting professions (Forging, Leatherworking, Weaving) have no sou
 their experience (CraftingSkills, mirrored into these categories), so their curve and level cap must match
 CraftingSkills: 20 * (L - 1)^2 total XP for level L, levels 1 to 30 (Pufferfish counts from 0, so 0 to 29).
 
-The nodes are a first pass: small attribute bonuses. Vein mining, tree felling and the forging perks come later as
-nodes our own code reacts to.
+Most nodes are small attribute bonuses. Perks (DD-70, DD-56) are nodes whose reward is a player tag our own code
+checks for (skill/Perk.java, with the same tag names): the crafting skills' perks (ForgingPerks, CraftPerks) and the
+gathering ones (GatheringPerks). A tree is a chain of nodes, or a root chain with branches hanging off its last node,
+one per perk, each rank costing more than the last.
 """
 import json
 import zipfile
@@ -70,9 +72,29 @@ def attribute(attr, value, operation="multiply_base"):
     return {"type": "puffish_skills:attribute", "data": {"attribute": attr, "operation": operation, "value": value}}
 
 
-def node(key, title, description, rewards, mods=()):
+def node(key, title, description, rewards, mods=(), cost=1):
     """A tree node; mods are the mods its rewards need (Pufferfish drops the node if one is missing)."""
-    return (key, title, description, rewards, list(mods))
+    return (key, title, description, rewards, list(mods), cost)
+
+
+ROMAN = ["I", "II", "III", "IV"]
+
+
+def perk(key, title, descriptions, costs):
+    """A perk's ranks, one node each: a branch. Each rank's reward is its player tag (Perk.tag in our code)."""
+    ranks = len(descriptions)
+    nodes = []
+    for rank, (description, cost) in enumerate(zip(descriptions, costs), start=1):
+        tag = f"{NS}.perk.{key}" + (f"_{rank}" if ranks > 1 else "")
+        name = f"{title} {ROMAN[rank - 1]}" if ranks > 1 else title
+        nodes.append(node(f"{key}_{rank}" if ranks > 1 else key, name, description,
+                          [{"type": "puffish_skills:tag", "data": {"tag": tag}}], cost=cost))
+    return nodes
+
+
+def branched(root, *branches):
+    """A tree with a root chain and branches (each a list of nodes) hanging off its last node."""
+    return {"root": root, "branches": list(branches)}
 
 
 def melee(key, name):
@@ -107,28 +129,43 @@ def school(key, name, spell_power, irons=()):
 PROFESSIONS = {
     "mining": ("Mining", "minecraft:iron_pickaxe",
                [mine({"#c:ores": 10, "#minecraft:base_stone_overworld": 1, "#c:stones": 1}, no_silk_touch=("#c:ores",))],
-               [node("quick_pick", "Quick Pick", "+5% mining speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
-                node("quicker_pick", "Quicker Pick", "+5% mining speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
-                node("prospector", "Prospector", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),
+               branched([node("quick_pick", "Quick Pick", "+5% mining speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
+                         node("quicker_pick", "Quicker Pick", "+5% mining speed.", [attribute("minecraft:player.block_break_speed", 0.05)])],
+                        perk("vein_miner", "Vein Miner", [f"Sneak while mining ore to mine up to {n} more blocks of the vein." for n in (8, 16, 32)], [2, 3, 4]),
+                        perk("prospector", "Prospector", ["A 10% chance of a second drop from ore (not with Silk Touch)."], [3]))),
     "woodcutting": ("Woodcutting", "minecraft:iron_axe", [mine({"#minecraft:logs": 4})],
-                    [node("sure_swing", "Sure Swing", "+5% breaking speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
-                     node("timber", "Timber", "+5% breaking speed.", [attribute("minecraft:player.block_break_speed", 0.05)])]),
+                    branched([node("sure_swing", "Sure Swing", "+5% breaking speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
+                              node("timber", "Timber", "+5% breaking speed.", [attribute("minecraft:player.block_break_speed", 0.05)])],
+                             perk("tree_feller", "Tree Feller", [f"Sneak while chopping a log to fell the tree, up to {n} more logs. Only trees with their leaves, not builds." for n in (32, 64)], [2, 4]),
+                             perk("forester", "Forester", ["Chopping a tree's bottom log plants its sapling half the time."], [2]))),
     "excavation": ("Excavation", "minecraft:iron_shovel", [mine({"#minecraft:mineable/shovel": 1})],
                    [node("digger", "Digger", "+5% breaking speed.", [attribute("minecraft:player.block_break_speed", 0.05)]),
                     node("treasure_sense", "Treasure Sense", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),
     "farming": ("Farming", "minecraft:iron_hoe", [mine({"#minecraft:crops": 3})],
-                [node("green_thumb", "Green Thumb", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")]),
-                 node("hardy", "Hardy", "+2 max health.", [attribute("minecraft:generic.max_health", 2, "addition")])]),
+                branched([node("green_thumb", "Green Thumb", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])],
+                         perk("bountiful", "Bountiful", [f"A {n}% chance of an extra crop from a ripe harvest." for n in (15, 30)], [2, 3]),
+                         perk("replanter", "Replanter", ["Ripe crops you harvest plant themselves again, using one of their seeds."], [3]),
+                         [node("hardy", "Hardy", "+2 max health.", [attribute("minecraft:generic.max_health", 2, "addition")])])),
     "fishing": ("Fishing", "minecraft:fishing_rod",
                 [fish({"minecraft:salmon": 5, "minecraft:pufferfish": 8, "minecraft:tropical_fish": 15}, 2)],
                 [node("patient", "Patient", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")]),
                  node("angler", "Angler", "+0.5 luck.", [attribute("minecraft:generic.luck", 0.5, "addition")])]),
     "forging": ("Forging", "dungeondelving:master_anvil", None,
-                [node("apprentice_smith", "Apprentice Smith", "Your first step as a smith. Forging perks move into this tree in a later update.", [])]),
+                branched([node("apprentice_smith", "Apprentice Smith", "Your first step as a smith. Your level sets the best ★ you can forge; perks are bought here.", [])],
+                         perk("steady_hand", "Steady Hand", ["+2% sweet spot on the anvil and grindstone."] * 3, [1, 2, 3]),
+                         perk("slow_cooling", "Slow Cooling", ["Hot metal stays workable 25% longer.", "Hot metal stays workable 50% longer."], [2, 3]),
+                         perk("thrifty", "Thrifty", ["Cracks give back 6 nuggets instead of 5, and salvage returns 55% of the metal instead of 40%.",
+                                                     "Cracks give back 8 nuggets, and salvage returns 70% of the metal."], [2, 3]),
+                         perk("sure_strikes", "Sure Strikes", ["25% less chance a strike cracks the piece.", "50% less chance a strike cracks the piece."], [2, 3]))),
     "leatherworking": ("Leatherworking", "minecraft:leather", None,
-                       [node("apprentice_tanner", "Apprentice Tanner", "Your first step as a tanner. Leatherworking perks move into this tree in a later update.", [])]),
+                       branched([node("apprentice_tanner", "Apprentice Tanner", "Your first step as a tanner. Perks are bought here.", [])],
+                                perk("steady_scraper", "Steady Scraper", ["+2% room on each patch at the tanning rack."] * 3, [1, 2, 3]),
+                                perk("careful_tanner", "Careful Tanner", ["25% less chance a miss tears the hide.", "50% less chance a miss tears the hide."], [2, 3]),
+                                perk("water_saver", "Water Saver", ["Boiling leather has a 25% chance not to use water.", "Boiling leather has a 50% chance not to use water."], [1, 2]))),
     "weaving": ("Weaving", "minecraft:string", None,
-                [node("apprentice_weaver", "Apprentice Weaver", "Your first step as a weaver. Weaving perks move into this tree in a later update.", [])]),
+                branched([node("apprentice_weaver", "Apprentice Weaver", "Your first step as a weaver. Perks are bought here.", [])],
+                         perk("steady_needle", "Steady Needle", ["+2% room for each stitch at the loom."] * 3, [1, 2, 3]),
+                         perk("careful_weaver", "Careful Weaver", ["25% less chance a miss snaps the thread.", "50% less chance a miss snaps the thread."], [2, 3]))),
 }
 
 
@@ -249,21 +286,30 @@ for key, (title, icon, sources, nodes) in TREES.items():
         "sources": [] if crafting else sources,
     })
     definitions, skills, links = {}, {}, []
-    for i, (node_key, node_title, description, rewards, mods) in enumerate(nodes):
+    tree = nodes if isinstance(nodes, dict) else {"root": nodes, "branches": []}
+    root, branches = tree["root"], tree["branches"]
+    # The root chain runs left to right, then each branch runs down from its last node, side by side.
+    placed = [(n, i * 40, 0, i > 0 and root[i - 1][0]) for i, n in enumerate(root)]
+    end_x = (len(root) - 1) * 40
+    for b, branch in enumerate(branches):
+        x = end_x + int((b - (len(branches) - 1) / 2) * 50)
+        placed += [(n, x, 50 + k * 40, root[-1][0] if k == 0 else branch[k - 1][0]) for k, n in enumerate(branch)]
+    last_of_branch = {branch[-1][0] for branch in branches} | ({root[-1][0]} if not branches else set())
+    for i, ((node_key, node_title, description, rewards, mods, cost), x, y, parent) in enumerate(placed):
         definitions[node_key] = {
             "title": {"translate": f"skill.{NS}.{key}.{node_key}"},
             "description": {"translate": f"skill.{NS}.{key}.{node_key}.description"},
             "icon": icon_json(icon),
-            "frame": {"type": "advancement", "data": {"frame": "task" if i < len(nodes) - 1 or len(nodes) == 1 else "goal"}},
+            "frame": {"type": "advancement", "data": {"frame": "goal" if node_key in last_of_branch and len(placed) > 1 else "task"}},
             "rewards": rewards,
-            "cost": 1,
+            "cost": cost,
             **({"required_mods": mods} if mods else {}),
         }
         lang[f"skill.{NS}.{key}.{node_key}"] = node_title
         lang[f"skill.{NS}.{key}.{node_key}.description"] = description
-        skills[node_key] = {"definition": node_key, "x": i * 40, "y": 0, "root": i == 0}
-        if i > 0:
-            links.append([nodes[i - 1][0], node_key])
+        skills[node_key] = {"definition": node_key, "x": x, "y": y, "root": i == 0}
+        if parent:
+            links.append([parent, node_key])
     write(folder / "definitions.json", definitions)
     write(folder / "skills.json", skills)
     write(folder / "connections.json", {"normal": {"bidirectional": links}})

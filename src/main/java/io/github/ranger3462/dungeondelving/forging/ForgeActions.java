@@ -322,7 +322,7 @@ public final class ForgeActions {
             needed = passesFor(stars);
             period = Math.max(16, 24 - (stars - 1));
         }
-        width += ForgingPerks.sweetSpotBonus(skill) + workshop.get().decorBonus();
+        width += ForgingPerks.sweetSpotBonus(player) + workshop.get().decorBonus();
         Session session = new Session(kind, pos.immutable(), now, period, basic, held.is(Forging.UNSTABLE_INGOT.get()), stars, needed, width);
         nextSpot(session, heat, level, now);
         return started(player, level, session, kind == TimingBar.Kind.STRIKE ? SoundEvents.ANVIL_PLACE : SoundEvents.GRINDSTONE_USE);
@@ -334,7 +334,7 @@ public final class ForgeActions {
             tell(player, Component.translatable("message.dungeondelving.weave.not_enough", WEAVE_STRING).withStyle(ChatFormatting.RED));
             return Optional.empty();
         }
-        float gap = WEAVE_GAP + CraftPerks.sweetSpotBonus(CraftingSkills.level(player, CraftSkill.WEAVING));
+        float gap = WEAVE_GAP + CraftPerks.sweetSpotBonus(player, CraftSkill.WEAVING);
         Session session = new Session(TimingBar.Kind.WEAVE, pos.immutable(), now, EYE_PERIOD, false, false, 1, WEAVE_STITCHES, gap);
         nextStitch(session, level, now);
         return started(player, level, session, SoundEvents.UI_LOOM_SELECT_PATTERN);
@@ -342,7 +342,7 @@ public final class ForgeActions {
 
     /** Scraping a hide needs a Tanning Rack. The patches are laid out along the scraper's one pass. */
     private static Optional<Session> beginScraping(ServerPlayer player, ServerLevel level, BlockPos pos, long now) {
-        float width = SCRAPE_WIDTH + CraftPerks.sweetSpotBonus(CraftingSkills.level(player, CraftSkill.LEATHERWORKING));
+        float width = SCRAPE_WIDTH + CraftPerks.sweetSpotBonus(player, CraftSkill.LEATHERWORKING);
         Session session = new Session(TimingBar.Kind.SCRAPE, pos.immutable(), now, SCRAPE_PASS, false, false, 1, SCRAPE_PATCHES, width);
         session.bar++;
         session.values = new float[SCRAPE_PATCHES * 2];
@@ -404,9 +404,9 @@ public final class ForgeActions {
         return Math.max(MIN_PERIOD, Math.round(basePeriod * (1.0f - COLD_SPEEDUP * (1.0f - heat))));
     }
 
-    /** A hot ingot's heat for this player (their Forging level slows cooling); 1 for anything that isn't hot metal. */
+    /** A hot ingot's heat for this player (Slow Cooling slows it); 1 for anything that isn't hot metal. */
     private static float heatOf(Player player, ItemStack stack, long now) {
-        return stack.getItem() instanceof HotMetalItem ? HotMetalItem.temperature(stack, now, ForgingPerks.coolTicks(ForgingPerks.level(player))) : 1.0f;
+        return stack.getItem() instanceof HotMetalItem ? HotMetalItem.temperature(stack, now, ForgingPerks.coolTicks(player)) : 1.0f;
     }
 
     // --- Strikes ---
@@ -532,11 +532,10 @@ public final class ForgeActions {
         };
     }
 
-    /** Scales the chance a miss ruins the piece, by the player's level in that minigame's skill. */
+    /** Scales the chance a miss ruins the piece, by the player's perks in that minigame's skill. */
     private static float failMultiplier(Player player, TimingBar.Kind kind) {
         CraftSkill skill = skillFor(kind);
-        return skill == CraftSkill.FORGING ? ForgingPerks.crackMultiplier(ForgingPerks.level(player))
-                : CraftPerks.failMultiplier(CraftingSkills.level(player, skill));
+        return skill == CraftSkill.FORGING ? ForgingPerks.crackMultiplier(player) : CraftPerks.failMultiplier(player, skill);
     }
 
     /** The chance the {@code misses}th miss in a minigame ruins the piece, before skill: it climbs with every miss. */
@@ -647,7 +646,7 @@ public final class ForgeActions {
             return;
         }
         float condition = held.isDamageableItem() ? 1.0f - (float) held.getDamageValue() / held.getMaxDamage() : 1.0f;
-        float metal = ForgedGear.ingotCost(held) * ForgingPerks.salvageShare(ForgingPerks.level(player)) * condition;
+        float metal = ForgedGear.ingotCost(held) * ForgingPerks.salvageShare(player) * condition;
         int ingots = (int) metal;
         int nuggets = Math.round((metal - ingots) * 9);
         int stars = Forging.stars(held);
@@ -680,7 +679,7 @@ public final class ForgeActions {
             tell(player, Component.translatable("message.dungeondelving.boil.no_heat").withStyle(ChatFormatting.RED));
             return;
         }
-        if (level.getRandom().nextFloat() >= CraftPerks.boilSavesWater(CraftingSkills.level(player, CraftSkill.LEATHERWORKING))) {
+        if (level.getRandom().nextFloat() >= CraftPerks.boilSavesWater(player)) {
             LayeredCauldronBlock.lowerFillLevel(state, level, pos);
         }
         held.shrink(1);
@@ -730,7 +729,7 @@ public final class ForgeActions {
 
     /** The piece in hand cracks: it's replaced by iron nuggets. */
     private static void crack(ServerPlayer player, ServerLevel level, BlockPos pos, ItemStack held) {
-        int nuggets = ForgingPerks.scrapNuggets(ForgingPerks.level(player));
+        int nuggets = ForgingPerks.scrapNuggets(player);
         held.shrink(1);
         give(player, new ItemStack(Items.IRON_NUGGET, nuggets));
         level.playSound(null, pos, SoundEvents.ANVIL_DESTROY, SoundSource.BLOCKS, 0.6f, 1.2f);

@@ -11,10 +11,28 @@
     "y": 0,
     "root": false
   },
+  "vein_miner_1": {
+    "definition": "vein_miner_1",
+    "x": 15,
+    "y": 50,
+    "root": false
+  },
+  "vein_miner_2": {
+    "definition": "vein_miner_2",
+    "x": 15,
+    "y": 90,
+    "root": false
+  },
+  "vein_miner_3": {
+    "definition": "vein_miner_3",
+    "x": 15,
+    "y": 130,
+    "root": false
+  },
   "prospector": {
     "definition": "prospector",
-    "x": 80,
-    "y": 0,
+    "x": 65,
+    "y": 50,
     "root": false
   }
 }

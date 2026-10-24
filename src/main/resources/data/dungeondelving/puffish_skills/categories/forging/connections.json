@@ -1,5 +1,42 @@
 {
   "normal": {
-    "bidirectional": []
+    "bidirectional": [
+      [
+        "apprentice_smith",
+        "steady_hand_1"
+      ],
+      [
+        "steady_hand_1",
+        "steady_hand_2"
+      ],
+      [
+        "steady_hand_2",
+        "steady_hand_3"
+      ],
+      [
+        "apprentice_smith",
+        "slow_cooling_1"
+      ],
+      [
+        "slow_cooling_1",
+        "slow_cooling_2"
+      ],
+      [
+        "apprentice_smith",
+        "thrifty_1"
+      ],
+      [
+        "thrifty_1",
+        "thrifty_2"
+      ],
+      [
+        "apprentice_smith",
+        "sure_strikes_1"
+      ],
+      [
+        "sure_strikes_1",
+        "sure_strikes_2"
+      ]
+    ]
   }
 }

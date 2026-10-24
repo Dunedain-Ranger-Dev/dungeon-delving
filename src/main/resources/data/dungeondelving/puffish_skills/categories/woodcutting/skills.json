@@ -10,5 +10,23 @@
     "x": 40,
     "y": 0,
     "root": false
+  },
+  "tree_feller_1": {
+    "definition": "tree_feller_1",
+    "x": 15,
+    "y": 50,
+    "root": false
+  },
+  "tree_feller_2": {
+    "definition": "tree_feller_2",
+    "x": 15,
+    "y": 90,
+    "root": false
+  },
+  "forester": {
+    "definition": "forester",
+    "x": 65,
+    "y": 50,
+    "root": false
   }
 }

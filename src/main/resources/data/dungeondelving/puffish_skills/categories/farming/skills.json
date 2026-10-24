@@ -5,10 +5,28 @@
     "y": 0,
     "root": true
   },
+  "bountiful_1": {
+    "definition": "bountiful_1",
+    "x": -50,
+    "y": 50,
+    "root": false
+  },
+  "bountiful_2": {
+    "definition": "bountiful_2",
+    "x": -50,
+    "y": 90,
+    "root": false
+  },
+  "replanter": {
+    "definition": "replanter",
+    "x": 0,
+    "y": 50,
+    "root": false
+  },
   "hardy": {
     "definition": "hardy",
-    "x": 40,
-    "y": 0,
+    "x": 50,
+    "y": 50,
     "root": false
   }
 }

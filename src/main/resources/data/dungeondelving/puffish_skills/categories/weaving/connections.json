@@ -1,5 +1,26 @@
 {
   "normal": {
-    "bidirectional": []
+    "bidirectional": [
+      [
+        "apprentice_weaver",
+        "steady_needle_1"
+      ],
+      [
+        "steady_needle_1",
+        "steady_needle_2"
+      ],
+      [
+        "steady_needle_2",
+        "steady_needle_3"
+      ],
+      [
+        "apprentice_weaver",
+        "careful_weaver_1"
+      ],
+      [
+        "careful_weaver_1",
+        "careful_weaver_2"
+      ]
+    ]
   }
 }

@@ -4,5 +4,59 @@
     "x": 0,
     "y": 0,
     "root": true
+  },
+  "steady_hand_1": {
+    "definition": "steady_hand_1",
+    "x": -75,
+    "y": 50,
+    "root": false
+  },
+  "steady_hand_2": {
+    "definition": "steady_hand_2",
+    "x": -75,
+    "y": 90,
+    "root": false
+  },
+  "steady_hand_3": {
+    "definition": "steady_hand_3",
+    "x": -75,
+    "y": 130,
+    "root": false
+  },
+  "slow_cooling_1": {
+    "definition": "slow_cooling_1",
+    "x": -25,
+    "y": 50,
+    "root": false
+  },
+  "slow_cooling_2": {
+    "definition": "slow_cooling_2",
+    "x": -25,
+    "y": 90,
+    "root": false
+  },
+  "thrifty_1": {
+    "definition": "thrifty_1",
+    "x": 25,
+    "y": 50,
+    "root": false
+  },
+  "thrifty_2": {
+    "definition": "thrifty_2",
+    "x": 25,
+    "y": 90,
+    "root": false
+  },
+  "sure_strikes_1": {
+    "definition": "sure_strikes_1",
+    "x": 75,
+    "y": 50,
+    "root": false
+  },
+  "sure_strikes_2": {
+    "definition": "sure_strikes_2",
+    "x": 75,
+    "y": 90,
+    "root": false
   }
 }
