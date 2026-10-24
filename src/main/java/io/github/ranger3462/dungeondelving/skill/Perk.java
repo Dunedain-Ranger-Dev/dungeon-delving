@@ -24,7 +24,7 @@ public enum Perk {
     VEIN_MINER("vein_miner", 3),
     PROSPECTOR("prospector", 1),
     // Woodcutting
-    TREE_FELLER("tree_feller", 2),
+    TREE_FELLER("tree_feller", 3),
     FORESTER("forester", 1),
     // Farming
     BOUNTIFUL("bountiful", 2),

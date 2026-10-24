@@ -23,6 +23,12 @@
     "y": 90,
     "root": false
   },
+  "tree_feller_3": {
+    "definition": "tree_feller_3",
+    "x": 15,
+    "y": 130,
+    "root": false
+  },
   "forester": {
     "definition": "forester",
     "x": 65,

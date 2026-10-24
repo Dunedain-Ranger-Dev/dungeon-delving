@@ -106,7 +106,7 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
       }
     },
     "rewards": [
@@ -118,6 +118,35 @@
       }
     ],
     "cost": 4
+  },
+  "tree_feller_3": {
+    "title": {
+      "translate": "skill.dungeondelving.woodcutting.tree_feller_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.woodcutting.tree_feller_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.tree_feller_3"
+        }
+      }
+    ],
+    "cost": 5
   },
   "forester": {
     "title": {

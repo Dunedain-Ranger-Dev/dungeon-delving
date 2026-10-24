@@ -517,7 +517,7 @@
   "skill.dungeondelving.woodcutting.tree_feller_2": "Tree Feller II",
   "skill.dungeondelving.woodcutting.tree_feller_2.description": "Sneak while chopping a log to fell the tree, up to 64 more logs. Only trees with their leaves, not builds.",
   "skill.dungeondelving.woodcutting.forester": "Forester",
-  "skill.dungeondelving.woodcutting.forester.description": "Chopping a tree's bottom log plants its sapling half the time.",
+  "skill.dungeondelving.woodcutting.forester.description": "Chopping a tree's bottom log plants its sapling half the time: four, for a 2x2 trunk cleared by Tree Feller.",
   "skill.dungeondelving.farming.bountiful_1": "Bountiful I",
   "skill.dungeondelving.farming.bountiful_1.description": "A 15% chance of an extra crop from a ripe harvest.",
   "skill.dungeondelving.farming.bountiful_2": "Bountiful II",
@@ -565,5 +565,7 @@
   "skill.dungeondelving.weaving.careful_weaver_1": "Careful Weaver I",
   "skill.dungeondelving.weaving.careful_weaver_1.description": "25% less chance a miss snaps the thread.",
   "skill.dungeondelving.weaving.careful_weaver_2": "Careful Weaver II",
-  "skill.dungeondelving.weaving.careful_weaver_2.description": "50% less chance a miss snaps the thread."
+  "skill.dungeondelving.weaving.careful_weaver_2.description": "50% less chance a miss snaps the thread.",
+  "skill.dungeondelving.woodcutting.tree_feller_3": "Tree Feller III",
+  "skill.dungeondelving.woodcutting.tree_feller_3.description": "Sneak while chopping a log to fell the tree, up to 160 more logs. Only trees with their leaves, not builds."
 }

@@ -2,9 +2,11 @@ package io.github.ranger3462.dungeondelving.skill;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -33,10 +35,11 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * The gathering skills' perks (DD-56), from their trees ({@link Perk}).
  * <ul>
  *   <li>Vein Miner (Mining): sneak and mine an ore to mine the rest of the vein, up to 8, 16 or 32 more blocks.</li>
- *   <li>Tree Feller (Woodcutting): sneak and chop a log to fell the tree, up to 32 or 64 more logs. Only trees: the logs
+ *   <li>Tree Feller (Woodcutting): sneak and chop a log to fell the tree, up to 32, 64 or 160 more logs. Only trees: the logs
  *   must touch natural leaves, so log builds are safe.</li>
  *   <li>Prospector (Mining): a chance of a second drop from ore (not with Silk Touch).</li>
- *   <li>Forester (Woodcutting): chopping a tree's bottom log sometimes plants its sapling. Only trees, like Tree Feller.</li>
+ *   <li>Forester (Woodcutting): chopping a tree's bottom log sometimes plants its sapling, or four for a 2×2 trunk (giant
+ *   spruce, dark oak, giant jungle) wherever the trunk's been cleared. Only trees, like Tree Feller.</li>
  *   <li>Bountiful (Farming): a chance of an extra crop from a ripe harvest.</li>
  *   <li>Replanter (Farming): a ripe crop you harvest plants itself again, using one of its seeds.</li>
  * </ul>
@@ -46,7 +49,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class GatheringPerks {
     static final int[] VEIN_LIMIT = { 8, 16, 32 };
-    static final int[] TREE_LIMIT = { 32, 64 };
+    static final int[] TREE_LIMIT = { 32, 64, 160 };
     public static final float PROSPECTOR_CHANCE = 0.10f;
     public static final float FORESTER_CHANCE = 0.5f;
     /** Bountiful's chance of an extra crop, a rank. */
@@ -60,7 +63,7 @@ public final class GatheringPerks {
      * Logs just broken by a Forester that are part of a tree, checked when the log breaks: by the time its drops are
      * made, Tree Feller has already taken the rest of the tree, and its leaves with it as far as the check can see.
      */
-    private static final Set<BlockPos> FORESTER_TREES = new HashSet<>();
+    private static final Map<BlockPos, List<BlockPos>> FORESTER_TREES = new HashMap<>();
     /** True while we're breaking a chain's extra blocks, so they don't start chains of their own. */
     private static boolean chaining;
 
@@ -73,7 +76,7 @@ public final class GatheringPerks {
         }
         BlockState state = event.getState();
         if (Perk.FORESTER.has(player) && isTreeBase(level, event.getPos(), state)) {
-            FORESTER_TREES.add(event.getPos().immutable());
+            FORESTER_TREES.put(event.getPos().immutable(), trunkBase(level, event.getPos(), state));
         }
         if (!player.isShiftKeyDown()) {
             return;
@@ -112,6 +115,22 @@ public final class GatheringPerks {
     public static boolean isTreeBase(ServerLevel level, BlockPos pos, BlockState state) {
         return state.is(BlockTags.LOGS) && level.getBlockState(pos.below()).is(BlockTags.DIRT)
                 && touchesNaturalLeaves(level, connected(level, pos, state.getBlock(), TREE_LIMIT[TREE_LIMIT.length - 1]), pos);
+    }
+
+    /**
+     * Where a tree's saplings go: the bottom log's spot, or all four of a 2×2 trunk's bottom logs if it's one of those
+     * (the same log, side by side, each on dirt), since those trees only grow back from four saplings in a square.
+     */
+    public static List<BlockPos> trunkBase(ServerLevel level, BlockPos pos, BlockState state) {
+        for (int dx = -1; dx <= 0; dx++) {
+            for (int dz = -1; dz <= 0; dz++) {
+                List<BlockPos> square = List.of(pos.offset(dx, 0, dz), pos.offset(dx + 1, 0, dz), pos.offset(dx, 0, dz + 1), pos.offset(dx + 1, 0, dz + 1));
+                if (square.stream().allMatch(spot -> level.getBlockState(spot).is(state.getBlock()) && level.getBlockState(spot.below()).is(BlockTags.DIRT))) {
+                    return square.stream().map(BlockPos::immutable).toList();
+                }
+            }
+        }
+        return List.of(pos.immutable());
     }
 
     /** The blocks of this kind connected to start (corners count), nearest first, up to limit beyond the start. */
@@ -174,8 +193,10 @@ public final class GatheringPerks {
                 PLANTINGS.add(new Planting(level, pos.immutable(), crop.getStateForAge(0)));
             }
         }
-        if (state.is(BlockTags.LOGS) && FORESTER_TREES.remove(pos) && level.getRandom().nextFloat() < FORESTER_CHANCE) {
-            saplingFor(state.getBlock()).ifPresent(sapling -> PLANTINGS.add(new Planting(level, pos.immutable(), sapling.defaultBlockState())));
+        List<BlockPos> base = state.is(BlockTags.LOGS) ? FORESTER_TREES.remove(pos) : null;
+        if (base != null && level.getRandom().nextFloat() < FORESTER_CHANCE) {
+            // Any of a 2x2 trunk's spots still holding a log (it wasn't felled) get skipped when planting.
+            saplingFor(state.getBlock()).ifPresent(sapling -> base.forEach(spot -> PLANTINGS.add(new Planting(level, spot, sapling.defaultBlockState()))));
         }
     }
 

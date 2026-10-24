@@ -122,6 +122,15 @@ public class PerkTests {
             helper.assertTrue(GatheringPerks.isTreeBase(level, tree, level.getBlockState(tree)), "a tree's bottom log is a tree base");
             helper.assertFalse(GatheringPerks.isTreeBase(level, pillar, level.getBlockState(pillar)), "a pillar of logs isn't");
             helper.assertFalse(GatheringPerks.isTreeBase(level, tree.above(), level.getBlockState(tree.above())), "nor is a log higher up the tree");
+            helper.assertTrue(GatheringPerks.trunkBase(level, tree, level.getBlockState(tree)).size() == 1, "a thin tree gets one sapling");
+            // A 2x2 trunk: its sapling spots are all four of its bottom logs.
+            BlockPos giant = tree.east(3);
+            for (BlockPos spot : BlockPos.betweenClosed(giant, giant.offset(1, 0, 1))) {
+                level.setBlockAndUpdate(spot.below(), Blocks.DIRT.defaultBlockState());
+                level.setBlockAndUpdate(spot, Blocks.SPRUCE_LOG.defaultBlockState());
+            }
+            var base = GatheringPerks.trunkBase(level, giant.offset(1, 0, 1), level.getBlockState(giant));
+            helper.assertTrue(base.size() == 4 && base.contains(giant), "a 2x2 trunk gets four saplings, got " + base);
         } finally {
             clear(level, tree);
         }
