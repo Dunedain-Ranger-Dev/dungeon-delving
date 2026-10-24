@@ -1,20 +1,56 @@
 {
-  "fire_adept": {
-    "definition": "fire_adept",
+  "fire_initiate": {
+    "definition": "fire_initiate",
     "x": 0,
     "y": 0,
     "root": true
   },
-  "fire_expert": {
-    "definition": "fire_expert",
-    "x": 40,
-    "y": 0,
+  "fire_quick_casting": {
+    "definition": "fire_quick_casting",
+    "x": -34,
+    "y": 34,
     "root": false
   },
   "fire_lore": {
     "definition": "fire_lore",
-    "x": 80,
-    "y": 0,
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "fire_adept_1": {
+    "definition": "fire_adept_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "fire_adept_2": {
+    "definition": "fire_adept_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "fire_adept_3": {
+    "definition": "fire_adept_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "fire_effect": {
+    "definition": "fire_effect",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "fire_reserves": {
+    "definition": "fire_reserves",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "fire_capstone": {
+    "definition": "fire_capstone",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

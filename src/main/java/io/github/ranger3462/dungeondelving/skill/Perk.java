@@ -27,7 +27,7 @@ public enum Perk {
     TREE_FELLER("tree_feller", 3),
     FORESTER("forester", 1),
     // Farming
-    BOUNTIFUL("bountiful", 2),
+    BOUNTIFUL("bountiful", 1),
     REPLANTER("replanter", 1);
 
     public final String key;

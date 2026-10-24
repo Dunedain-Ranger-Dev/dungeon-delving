@@ -1,20 +1,56 @@
 {
-  "frost_adept": {
-    "definition": "frost_adept",
+  "frost_initiate": {
+    "definition": "frost_initiate",
     "x": 0,
     "y": 0,
     "root": true
   },
-  "frost_expert": {
-    "definition": "frost_expert",
-    "x": 40,
-    "y": 0,
+  "frost_quick_casting": {
+    "definition": "frost_quick_casting",
+    "x": -34,
+    "y": 34,
     "root": false
   },
   "frost_lore": {
     "definition": "frost_lore",
-    "x": 80,
-    "y": 0,
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "frost_adept_1": {
+    "definition": "frost_adept_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "frost_adept_2": {
+    "definition": "frost_adept_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "frost_adept_3": {
+    "definition": "frost_adept_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "frost_effect": {
+    "definition": "frost_effect",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "frost_reserves": {
+    "definition": "frost_reserves",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "frost_capstone": {
+    "definition": "frost_capstone",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

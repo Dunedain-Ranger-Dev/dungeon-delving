@@ -30,12 +30,72 @@
     ],
     "cost": 1
   },
-  "polearms_mastery": {
+  "reach": {
     "title": {
-      "translate": "skill.dungeondelving.polearms.polearms_mastery"
+      "translate": "skill.dungeondelving.polearms.reach"
     },
     "description": {
-      "translate": "skill.dungeondelving.polearms.polearms_mastery.description"
+      "translate": "skill.dungeondelving.polearms.reach.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:trident"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.reach"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "brace": {
+    "title": {
+      "translate": "skill.dungeondelving.polearms.brace"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.polearms.brace.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:trident"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.brace"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "impale_1": {
+    "title": {
+      "translate": "skill.dungeondelving.polearms.impale_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.polearms.impale_1.description"
     },
     "icon": {
       "type": "item",
@@ -51,14 +111,164 @@
     },
     "rewards": [
       {
-        "type": "puffish_skills:attribute",
+        "type": "puffish_skills:tag",
         "data": {
-          "attribute": "minecraft:generic.attack_damage",
-          "operation": "multiply_base",
-          "value": 0.03
+          "tag": "dungeondelving.perk.impale_1"
         }
       }
     ],
-    "cost": 1
+    "cost": 1,
+    "required_points": 9
+  },
+  "impale_2": {
+    "title": {
+      "translate": "skill.dungeondelving.polearms.impale_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.polearms.impale_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:trident"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.impale_2"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 19
+  },
+  "impale_3": {
+    "title": {
+      "translate": "skill.dungeondelving.polearms.impale_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.polearms.impale_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:trident"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.impale_3"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 34
+  },
+  "sweep": {
+    "title": {
+      "translate": "skill.dungeondelving.polearms.sweep"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.polearms.sweep.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:trident"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.sweep"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "keep_away": {
+    "title": {
+      "translate": "skill.dungeondelving.polearms.keep_away"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.polearms.keep_away.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:trident"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.keep_away"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "phalanx": {
+    "title": {
+      "translate": "skill.dungeondelving.polearms.phalanx"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.polearms.phalanx.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:trident"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.phalanx"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

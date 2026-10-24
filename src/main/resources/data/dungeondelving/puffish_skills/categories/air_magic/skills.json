@@ -1,14 +1,56 @@
 {
-  "air_adept": {
-    "definition": "air_adept",
+  "air_initiate": {
+    "definition": "air_initiate",
     "x": 0,
     "y": 0,
     "root": true
   },
-  "air_expert": {
-    "definition": "air_expert",
-    "x": 40,
-    "y": 0,
+  "air_quick_casting": {
+    "definition": "air_quick_casting",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "air_efficiency": {
+    "definition": "air_efficiency",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "air_adept_1": {
+    "definition": "air_adept_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "air_adept_2": {
+    "definition": "air_adept_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "air_adept_3": {
+    "definition": "air_adept_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "air_effect": {
+    "definition": "air_effect",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "air_reserves": {
+    "definition": "air_reserves",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "air_capstone": {
+    "definition": "air_capstone",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

@@ -1,10 +1,10 @@
 {
-  "holy_adept": {
+  "holy_initiate": {
     "title": {
-      "translate": "skill.dungeondelving.holy_magic.holy_adept"
+      "translate": "skill.dungeondelving.holy_magic.holy_initiate"
     },
     "description": {
-      "translate": "skill.dungeondelving.holy_magic.holy_adept.description"
+      "translate": "skill.dungeondelving.holy_magic.holy_initiate.description"
     },
     "icon": {
       "type": "item",
@@ -33,12 +33,12 @@
       "spell_power"
     ]
   },
-  "holy_expert": {
+  "holy_quick_casting": {
     "title": {
-      "translate": "skill.dungeondelving.holy_magic.holy_expert"
+      "translate": "skill.dungeondelving.holy_magic.holy_quick_casting"
     },
     "description": {
-      "translate": "skill.dungeondelving.holy_magic.holy_expert.description"
+      "translate": "skill.dungeondelving.holy_magic.holy_quick_casting.description"
     },
     "icon": {
       "type": "item",
@@ -54,18 +54,14 @@
     },
     "rewards": [
       {
-        "type": "puffish_skills:attribute",
+        "type": "puffish_skills:tag",
         "data": {
-          "attribute": "spell_power:healing",
-          "operation": "addition",
-          "value": 0.5
+          "tag": "dungeondelving.perk.holy_quick_casting"
         }
       }
     ],
     "cost": 1,
-    "required_mods": [
-      "spell_power"
-    ]
+    "required_points": 4
   },
   "holy_lore": {
     "title": {
@@ -83,7 +79,7 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
       }
     },
     "rewards": [
@@ -97,8 +93,210 @@
       }
     ],
     "cost": 1,
+    "required_points": 4,
     "required_mods": [
       "irons_spellbooks"
     ]
+  },
+  "holy_adept_1": {
+    "title": {
+      "translate": "skill.dungeondelving.holy_magic.holy_adept_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.holy_magic.holy_adept_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:golden_apple"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:healing",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 9,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "holy_adept_2": {
+    "title": {
+      "translate": "skill.dungeondelving.holy_magic.holy_adept_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.holy_magic.holy_adept_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:golden_apple"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:healing",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 19,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "holy_adept_3": {
+    "title": {
+      "translate": "skill.dungeondelving.holy_magic.holy_adept_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.holy_magic.holy_adept_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:golden_apple"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:healing",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 34,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "holy_effect": {
+    "title": {
+      "translate": "skill.dungeondelving.holy_magic.holy_effect"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.holy_magic.holy_effect.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:golden_apple"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.holy_effect"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "holy_reserves": {
+    "title": {
+      "translate": "skill.dungeondelving.holy_magic.holy_reserves"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.holy_magic.holy_reserves.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:golden_apple"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:max_mana",
+          "operation": "addition",
+          "value": 10
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  },
+  "holy_capstone": {
+    "title": {
+      "translate": "skill.dungeondelving.holy_magic.holy_capstone"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.holy_magic.holy_capstone.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:golden_apple"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.holy_capstone"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

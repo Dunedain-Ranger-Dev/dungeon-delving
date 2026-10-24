@@ -3,6 +3,14 @@
     "bidirectional": [
       [
         "apprentice_smith",
+        "thrifty_1"
+      ],
+      [
+        "apprentice_smith",
+        "slow_cooling_1"
+      ],
+      [
+        "apprentice_smith",
         "steady_hand_1"
       ],
       [
@@ -14,28 +22,24 @@
         "steady_hand_3"
       ],
       [
-        "apprentice_smith",
-        "slow_cooling_1"
-      ],
-      [
-        "slow_cooling_1",
-        "slow_cooling_2"
-      ],
-      [
-        "apprentice_smith",
-        "thrifty_1"
-      ],
-      [
-        "thrifty_1",
+        "steady_hand_2",
         "thrifty_2"
       ],
       [
-        "apprentice_smith",
+        "steady_hand_2",
+        "slow_cooling_2"
+      ],
+      [
+        "steady_hand_3",
         "sure_strikes_1"
       ],
       [
         "sure_strikes_1",
         "sure_strikes_2"
+      ],
+      [
+        "sure_strikes_2",
+        "masterwork"
       ]
     ]
   }

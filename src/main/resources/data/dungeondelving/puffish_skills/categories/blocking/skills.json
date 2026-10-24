@@ -1,14 +1,56 @@
 {
-  "braced": {
-    "definition": "braced",
+  "blocking_training": {
+    "definition": "blocking_training",
     "x": 0,
     "y": 0,
     "root": true
   },
   "bulwark": {
     "definition": "bulwark",
-    "x": 40,
-    "y": 0,
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "quick_guard": {
+    "definition": "quick_guard",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "shield_wall_1": {
+    "definition": "shield_wall_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "shield_wall_2": {
+    "definition": "shield_wall_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "shield_wall_3": {
+    "definition": "shield_wall_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "shield_bash": {
+    "definition": "shield_bash",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "reflect": {
+    "definition": "reflect",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "unbreakable": {
+    "definition": "unbreakable",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

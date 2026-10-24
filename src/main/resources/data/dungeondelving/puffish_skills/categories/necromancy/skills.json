@@ -1,26 +1,56 @@
 {
-  "necromancy_adept": {
-    "definition": "necromancy_adept",
+  "necromancy_initiate": {
+    "definition": "necromancy_initiate",
     "x": 0,
     "y": 0,
     "root": true
   },
-  "necromancy_expert": {
-    "definition": "necromancy_expert",
-    "x": 40,
-    "y": 0,
+  "necromancy_quick_casting": {
+    "definition": "necromancy_quick_casting",
+    "x": -34,
+    "y": 34,
     "root": false
   },
-  "eldritch_lore": {
-    "definition": "eldritch_lore",
-    "x": 80,
-    "y": 0,
+  "necromancy_lore": {
+    "definition": "necromancy_lore",
+    "x": 34,
+    "y": 34,
     "root": false
   },
-  "blood_lore": {
-    "definition": "blood_lore",
-    "x": 120,
-    "y": 0,
+  "necromancy_adept_1": {
+    "definition": "necromancy_adept_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "necromancy_adept_2": {
+    "definition": "necromancy_adept_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "necromancy_adept_3": {
+    "definition": "necromancy_adept_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "necromancy_effect": {
+    "definition": "necromancy_effect",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "necromancy_reserves": {
+    "definition": "necromancy_reserves",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "necromancy_capstone": {
+    "definition": "necromancy_capstone",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

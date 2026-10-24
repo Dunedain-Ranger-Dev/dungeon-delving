@@ -5,10 +5,52 @@
     "y": 0,
     "root": true
   },
-  "crossbows_mastery": {
-    "definition": "crossbows_mastery",
-    "x": 40,
-    "y": 0,
+  "quick_reload": {
+    "definition": "quick_reload",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "bolt_pierce": {
+    "definition": "bolt_pierce",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "rapid_fire_1": {
+    "definition": "rapid_fire_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "rapid_fire_2": {
+    "definition": "rapid_fire_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "rapid_fire_3": {
+    "definition": "rapid_fire_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "explosive_bolts": {
+    "definition": "explosive_bolts",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "pin": {
+    "definition": "pin",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "siegebreaker": {
+    "definition": "siegebreaker",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

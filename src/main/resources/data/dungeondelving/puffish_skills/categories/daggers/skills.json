@@ -5,10 +5,52 @@
     "y": 0,
     "root": true
   },
-  "daggers_mastery": {
-    "definition": "daggers_mastery",
-    "x": 40,
-    "y": 0,
+  "backstab": {
+    "definition": "backstab",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "quick_hands": {
+    "definition": "quick_hands",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "shadow_flurry_1": {
+    "definition": "shadow_flurry_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "shadow_flurry_2": {
+    "definition": "shadow_flurry_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "shadow_flurry_3": {
+    "definition": "shadow_flurry_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "poison_edge": {
+    "definition": "poison_edge",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "vanish": {
+    "definition": "vanish",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "assassinate": {
+    "definition": "assassinate",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

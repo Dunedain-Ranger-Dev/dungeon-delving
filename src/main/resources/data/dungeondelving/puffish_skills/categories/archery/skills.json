@@ -5,10 +5,52 @@
     "y": 0,
     "root": true
   },
-  "archery_mastery": {
-    "definition": "archery_mastery",
-    "x": 40,
-    "y": 0,
+  "steady_aim": {
+    "definition": "steady_aim",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "retrieval": {
+    "definition": "retrieval",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "volley_1": {
+    "definition": "volley_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "volley_2": {
+    "definition": "volley_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "volley_3": {
+    "definition": "volley_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "daze": {
+    "definition": "daze",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "piercing": {
+    "definition": "piercing",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "deadeye": {
+    "definition": "deadeye",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

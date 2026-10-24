@@ -7,8 +7,50 @@
   },
   "immovable": {
     "definition": "immovable",
-    "x": 40,
-    "y": 0,
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "plated": {
+    "definition": "plated",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "juggernaut_1": {
+    "definition": "juggernaut_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "juggernaut_2": {
+    "definition": "juggernaut_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "juggernaut_3": {
+    "definition": "juggernaut_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "unshaken": {
+    "definition": "unshaken",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "heavy_bulwark": {
+    "definition": "heavy_bulwark",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "fortress": {
+    "definition": "fortress",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

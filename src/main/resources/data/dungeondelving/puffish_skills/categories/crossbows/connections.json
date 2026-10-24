@@ -3,7 +3,35 @@
     "bidirectional": [
       [
         "crossbows_training",
-        "crossbows_mastery"
+        "quick_reload"
+      ],
+      [
+        "crossbows_training",
+        "bolt_pierce"
+      ],
+      [
+        "crossbows_training",
+        "rapid_fire_1"
+      ],
+      [
+        "rapid_fire_1",
+        "rapid_fire_2"
+      ],
+      [
+        "rapid_fire_2",
+        "rapid_fire_3"
+      ],
+      [
+        "rapid_fire_2",
+        "explosive_bolts"
+      ],
+      [
+        "rapid_fire_2",
+        "pin"
+      ],
+      [
+        "rapid_fire_3",
+        "siegebreaker"
       ]
     ]
   }

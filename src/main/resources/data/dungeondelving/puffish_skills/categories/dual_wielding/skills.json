@@ -1,14 +1,56 @@
 {
-  "ambidextrous": {
-    "definition": "ambidextrous",
+  "dual_wielding_training": {
+    "definition": "dual_wielding_training",
     "x": 0,
     "y": 0,
     "root": true
   },
   "flurry": {
     "definition": "flurry",
-    "x": 40,
-    "y": 0,
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "off_hand_guard": {
+    "definition": "off_hand_guard",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "twin_fury_1": {
+    "definition": "twin_fury_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "twin_fury_2": {
+    "definition": "twin_fury_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "twin_fury_3": {
+    "definition": "twin_fury_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "dual_bleed": {
+    "definition": "dual_bleed",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "parry": {
+    "definition": "parry",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "whirlwind": {
+    "definition": "whirlwind",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

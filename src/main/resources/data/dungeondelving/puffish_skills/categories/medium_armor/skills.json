@@ -7,8 +7,50 @@
   },
   "balanced": {
     "definition": "balanced",
-    "x": 40,
-    "y": 0,
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "steady_footing": {
+    "definition": "steady_footing",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "adaptable_1": {
+    "definition": "adaptable_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "adaptable_2": {
+    "definition": "adaptable_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "adaptable_3": {
+    "definition": "adaptable_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "rally": {
+    "definition": "rally",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "brace_mail": {
+    "definition": "brace_mail",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "vanguard": {
+    "definition": "vanguard",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

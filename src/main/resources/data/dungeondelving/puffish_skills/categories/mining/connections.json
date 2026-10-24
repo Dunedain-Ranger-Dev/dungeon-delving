@@ -3,10 +3,14 @@
     "bidirectional": [
       [
         "quick_pick",
-        "quicker_pick"
+        "prospector"
       ],
       [
-        "quicker_pick",
+        "quick_pick",
+        "stonemason"
+      ],
+      [
+        "quick_pick",
         "vein_miner_1"
       ],
       [
@@ -18,8 +22,16 @@
         "vein_miner_3"
       ],
       [
-        "quicker_pick",
-        "prospector"
+        "vein_miner_2",
+        "sturdy_pick"
+      ],
+      [
+        "vein_miner_2",
+        "deep_sight"
+      ],
+      [
+        "vein_miner_3",
+        "motherlode"
       ]
     ]
   }

@@ -49,7 +49,7 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
       }
     },
     "rewards": [
@@ -63,8 +63,240 @@
       }
     ],
     "cost": 1,
+    "required_points": 4,
     "required_mods": [
       "irons_spellbooks"
     ]
+  },
+  "focus": {
+    "title": {
+      "translate": "skill.dungeondelving.mage_armor.focus"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mage_armor.focus.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:purple_wool"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.focus"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "arcane_weave_1": {
+    "title": {
+      "translate": "skill.dungeondelving.mage_armor.arcane_weave_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mage_armor.arcane_weave_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:purple_wool"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:generic",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 9,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "arcane_weave_2": {
+    "title": {
+      "translate": "skill.dungeondelving.mage_armor.arcane_weave_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mage_armor.arcane_weave_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:purple_wool"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:generic",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 19,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "arcane_weave_3": {
+    "title": {
+      "translate": "skill.dungeondelving.mage_armor.arcane_weave_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mage_armor.arcane_weave_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:purple_wool"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:generic",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 34,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "mana_shield": {
+    "title": {
+      "translate": "skill.dungeondelving.mage_armor.mana_shield"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mage_armor.mana_shield.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:purple_wool"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.mana_shield"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "deep_reserves": {
+    "title": {
+      "translate": "skill.dungeondelving.mage_armor.deep_reserves"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mage_armor.deep_reserves.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:purple_wool"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:mana_regen",
+          "operation": "multiply_base",
+          "value": 0.05
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  },
+  "archmages_robe": {
+    "title": {
+      "translate": "skill.dungeondelving.mage_armor.archmages_robe"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mage_armor.archmages_robe.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:purple_wool"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.archmages_robe"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

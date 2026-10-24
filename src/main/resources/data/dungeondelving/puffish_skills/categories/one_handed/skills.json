@@ -5,10 +5,52 @@
     "y": 0,
     "root": true
   },
-  "one_handed_mastery": {
-    "definition": "one_handed_mastery",
-    "x": 40,
-    "y": 0,
+  "riposte": {
+    "definition": "riposte",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "footwork": {
+    "definition": "footwork",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "bladestorm_1": {
+    "definition": "bladestorm_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "bladestorm_2": {
+    "definition": "bladestorm_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "bladestorm_3": {
+    "definition": "bladestorm_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "bleed": {
+    "definition": "bleed",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "disarm": {
+    "definition": "disarm",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "duelist": {
+    "definition": "duelist",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

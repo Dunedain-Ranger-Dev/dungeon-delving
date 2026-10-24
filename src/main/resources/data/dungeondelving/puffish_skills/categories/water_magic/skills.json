@@ -1,14 +1,56 @@
 {
-  "water_adept": {
-    "definition": "water_adept",
+  "water_initiate": {
+    "definition": "water_initiate",
     "x": 0,
     "y": 0,
     "root": true
   },
-  "water_expert": {
-    "definition": "water_expert",
-    "x": 40,
-    "y": 0,
+  "water_quick_casting": {
+    "definition": "water_quick_casting",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "water_efficiency": {
+    "definition": "water_efficiency",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "water_adept_1": {
+    "definition": "water_adept_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "water_adept_2": {
+    "definition": "water_adept_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "water_adept_3": {
+    "definition": "water_adept_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "water_effect": {
+    "definition": "water_effect",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "water_reserves": {
+    "definition": "water_reserves",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "water_capstone": {
+    "definition": "water_capstone",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

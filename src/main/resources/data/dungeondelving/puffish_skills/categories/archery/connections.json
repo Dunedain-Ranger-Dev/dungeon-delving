@@ -3,7 +3,35 @@
     "bidirectional": [
       [
         "archery_training",
-        "archery_mastery"
+        "steady_aim"
+      ],
+      [
+        "archery_training",
+        "retrieval"
+      ],
+      [
+        "archery_training",
+        "volley_1"
+      ],
+      [
+        "volley_1",
+        "volley_2"
+      ],
+      [
+        "volley_2",
+        "volley_3"
+      ],
+      [
+        "volley_2",
+        "daze"
+      ],
+      [
+        "volley_2",
+        "piercing"
+      ],
+      [
+        "volley_3",
+        "deadeye"
       ]
     ]
   }

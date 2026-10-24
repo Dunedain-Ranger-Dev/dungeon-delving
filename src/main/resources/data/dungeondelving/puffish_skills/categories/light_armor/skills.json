@@ -7,8 +7,50 @@
   },
   "evasive": {
     "definition": "evasive",
-    "x": 40,
-    "y": 0,
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "silent_step": {
+    "definition": "silent_step",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "agility_1": {
+    "definition": "agility_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "agility_2": {
+    "definition": "agility_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "agility_3": {
+    "definition": "agility_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "light_footed": {
+    "definition": "light_footed",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "second_wind": {
+    "definition": "second_wind",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "phantom": {
+    "definition": "phantom",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

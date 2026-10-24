@@ -2,12 +2,36 @@
   "normal": {
     "bidirectional": [
       [
-        "frost_adept",
-        "frost_expert"
+        "frost_initiate",
+        "frost_quick_casting"
       ],
       [
-        "frost_expert",
+        "frost_initiate",
         "frost_lore"
+      ],
+      [
+        "frost_initiate",
+        "frost_adept_1"
+      ],
+      [
+        "frost_adept_1",
+        "frost_adept_2"
+      ],
+      [
+        "frost_adept_2",
+        "frost_adept_3"
+      ],
+      [
+        "frost_adept_2",
+        "frost_effect"
+      ],
+      [
+        "frost_adept_2",
+        "frost_reserves"
+      ],
+      [
+        "frost_adept_3",
+        "frost_capstone"
       ]
     ]
   }

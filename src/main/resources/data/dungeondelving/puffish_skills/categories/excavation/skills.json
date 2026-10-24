@@ -7,8 +7,50 @@
   },
   "treasure_sense": {
     "definition": "treasure_sense",
-    "x": 40,
-    "y": 0,
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "swift_shovel": {
+    "definition": "swift_shovel",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "earthmover_1": {
+    "definition": "earthmover_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "earthmover_2": {
+    "definition": "earthmover_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "earthmover_3": {
+    "definition": "earthmover_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "sturdy_shovel": {
+    "definition": "sturdy_shovel",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "sifter": {
+    "definition": "sifter",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "buried_riches": {
+    "definition": "buried_riches",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

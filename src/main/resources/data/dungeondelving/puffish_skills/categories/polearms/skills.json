@@ -5,10 +5,52 @@
     "y": 0,
     "root": true
   },
-  "polearms_mastery": {
-    "definition": "polearms_mastery",
-    "x": 40,
-    "y": 0,
+  "reach": {
+    "definition": "reach",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "brace": {
+    "definition": "brace",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "impale_1": {
+    "definition": "impale_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "impale_2": {
+    "definition": "impale_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "impale_3": {
+    "definition": "impale_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "sweep": {
+    "definition": "sweep",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "keep_away": {
+    "definition": "keep_away",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "phalanx": {
+    "definition": "phalanx",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

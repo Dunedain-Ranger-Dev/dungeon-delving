@@ -30,12 +30,72 @@
     ],
     "cost": 1
   },
-  "two_handed_mastery": {
+  "cleave": {
     "title": {
-      "translate": "skill.dungeondelving.two_handed.two_handed_mastery"
+      "translate": "skill.dungeondelving.two_handed.cleave"
     },
     "description": {
-      "translate": "skill.dungeondelving.two_handed.two_handed_mastery.description"
+      "translate": "skill.dungeondelving.two_handed.cleave.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.cleave"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "crushing_blow": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.crushing_blow"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.crushing_blow.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.crushing_blow"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "skull_splitter_1": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.skull_splitter_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.skull_splitter_1.description"
     },
     "icon": {
       "type": "item",
@@ -51,14 +111,164 @@
     },
     "rewards": [
       {
-        "type": "puffish_skills:attribute",
+        "type": "puffish_skills:tag",
         "data": {
-          "attribute": "minecraft:generic.attack_damage",
-          "operation": "multiply_base",
-          "value": 0.03
+          "tag": "dungeondelving.perk.skull_splitter_1"
         }
       }
     ],
-    "cost": 1
+    "cost": 1,
+    "required_points": 9
+  },
+  "skull_splitter_2": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.skull_splitter_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.skull_splitter_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.skull_splitter_2"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 19
+  },
+  "skull_splitter_3": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.skull_splitter_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.skull_splitter_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.skull_splitter_3"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 34
+  },
+  "stagger": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.stagger"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.stagger.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.stagger"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "momentum": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.momentum"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.momentum.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.momentum"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "executioner": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.executioner"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.executioner.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.executioner"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

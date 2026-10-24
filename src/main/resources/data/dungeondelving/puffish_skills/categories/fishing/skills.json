@@ -5,10 +5,52 @@
     "y": 0,
     "root": true
   },
+  "quick_bite": {
+    "definition": "quick_bite",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
   "angler": {
     "definition": "angler",
-    "x": 40,
-    "y": 0,
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "treasure_hunter_1": {
+    "definition": "treasure_hunter_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "treasure_hunter_2": {
+    "definition": "treasure_hunter_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "treasure_hunter_3": {
+    "definition": "treasure_hunter_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "double_catch": {
+    "definition": "double_catch",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "shake": {
+    "definition": "shake",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "master_angler": {
+    "definition": "master_angler",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

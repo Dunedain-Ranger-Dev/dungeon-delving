@@ -3,7 +3,35 @@
     "bidirectional": [
       [
         "unarmed_training",
-        "unarmed_mastery"
+        "iron_fist"
+      ],
+      [
+        "unarmed_training",
+        "deflect"
+      ],
+      [
+        "unarmed_training",
+        "berserk_1"
+      ],
+      [
+        "berserk_1",
+        "berserk_2"
+      ],
+      [
+        "berserk_2",
+        "berserk_3"
+      ],
+      [
+        "berserk_2",
+        "disarm_unarmed"
+      ],
+      [
+        "berserk_2",
+        "iron_grip"
+      ],
+      [
+        "berserk_3",
+        "martial_master"
       ]
     ]
   }

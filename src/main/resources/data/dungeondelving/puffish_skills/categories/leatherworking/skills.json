@@ -5,46 +5,52 @@
     "y": 0,
     "root": true
   },
-  "steady_scraper_1": {
-    "definition": "steady_scraper_1",
-    "x": -50,
-    "y": 50,
-    "root": false
-  },
-  "steady_scraper_2": {
-    "definition": "steady_scraper_2",
-    "x": -50,
-    "y": 90,
-    "root": false
-  },
-  "steady_scraper_3": {
-    "definition": "steady_scraper_3",
-    "x": -50,
-    "y": 130,
+  "water_saver_1": {
+    "definition": "water_saver_1",
+    "x": -34,
+    "y": 34,
     "root": false
   },
   "careful_tanner_1": {
     "definition": "careful_tanner_1",
-    "x": 0,
-    "y": 50,
+    "x": 34,
+    "y": 34,
     "root": false
   },
-  "careful_tanner_2": {
-    "definition": "careful_tanner_2",
+  "steady_scraper_1": {
+    "definition": "steady_scraper_1",
     "x": 0,
-    "y": 90,
+    "y": 68,
     "root": false
   },
-  "water_saver_1": {
-    "definition": "water_saver_1",
-    "x": 50,
-    "y": 50,
+  "steady_scraper_2": {
+    "definition": "steady_scraper_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "steady_scraper_3": {
+    "definition": "steady_scraper_3",
+    "x": 0,
+    "y": 170,
     "root": false
   },
   "water_saver_2": {
     "definition": "water_saver_2",
-    "x": 50,
-    "y": 90,
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "careful_tanner_2": {
+    "definition": "careful_tanner_2",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "supple_hides": {
+    "definition": "supple_hides",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

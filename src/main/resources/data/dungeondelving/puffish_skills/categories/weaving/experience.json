@@ -5,6 +5,5 @@
       "expression": "20 * (2 * level + 1)"
     }
   },
-  "level_limit": 29,
   "sources": []
 }

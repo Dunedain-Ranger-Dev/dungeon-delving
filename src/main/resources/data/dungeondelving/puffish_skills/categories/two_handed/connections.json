@@ -3,7 +3,35 @@
     "bidirectional": [
       [
         "two_handed_training",
-        "two_handed_mastery"
+        "cleave"
+      ],
+      [
+        "two_handed_training",
+        "crushing_blow"
+      ],
+      [
+        "two_handed_training",
+        "skull_splitter_1"
+      ],
+      [
+        "skull_splitter_1",
+        "skull_splitter_2"
+      ],
+      [
+        "skull_splitter_2",
+        "skull_splitter_3"
+      ],
+      [
+        "skull_splitter_2",
+        "stagger"
+      ],
+      [
+        "skull_splitter_2",
+        "momentum"
+      ],
+      [
+        "skull_splitter_3",
+        "executioner"
       ]
     ]
   }

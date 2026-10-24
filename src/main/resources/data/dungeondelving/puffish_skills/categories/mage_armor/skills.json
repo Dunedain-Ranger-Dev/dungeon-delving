@@ -7,8 +7,50 @@
   },
   "mana_weave": {
     "definition": "mana_weave",
-    "x": 40,
-    "y": 0,
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "focus": {
+    "definition": "focus",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "arcane_weave_1": {
+    "definition": "arcane_weave_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "arcane_weave_2": {
+    "definition": "arcane_weave_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "arcane_weave_3": {
+    "definition": "arcane_weave_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "mana_shield": {
+    "definition": "mana_shield",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "deep_reserves": {
+    "definition": "deep_reserves",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "archmages_robe": {
+    "definition": "archmages_robe",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

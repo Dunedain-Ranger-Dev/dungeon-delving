@@ -46,7 +46,7 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
       }
     },
     "rewards": [
@@ -59,6 +59,248 @@
         }
       }
     ],
-    "cost": 1
+    "cost": 1,
+    "required_points": 4
+  },
+  "steady_footing": {
+    "title": {
+      "translate": "skill.dungeondelving.medium_armor.steady_footing"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.medium_armor.steady_footing.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:chainmail_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_footing"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "adaptable_1": {
+    "title": {
+      "translate": "skill.dungeondelving.medium_armor.adaptable_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.medium_armor.adaptable_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:chainmail_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor",
+          "operation": "addition",
+          "value": 1
+        }
+      },
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.movement_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 9
+  },
+  "adaptable_2": {
+    "title": {
+      "translate": "skill.dungeondelving.medium_armor.adaptable_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.medium_armor.adaptable_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:chainmail_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor",
+          "operation": "addition",
+          "value": 1
+        }
+      },
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.movement_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 19
+  },
+  "adaptable_3": {
+    "title": {
+      "translate": "skill.dungeondelving.medium_armor.adaptable_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.medium_armor.adaptable_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:chainmail_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor",
+          "operation": "addition",
+          "value": 1
+        }
+      },
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.movement_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 34
+  },
+  "rally": {
+    "title": {
+      "translate": "skill.dungeondelving.medium_armor.rally"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.medium_armor.rally.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:chainmail_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.rally"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "brace_mail": {
+    "title": {
+      "translate": "skill.dungeondelving.medium_armor.brace_mail"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.medium_armor.brace_mail.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:chainmail_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.brace_mail"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "vanguard": {
+    "title": {
+      "translate": "skill.dungeondelving.medium_armor.vanguard"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.medium_armor.vanguard.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:chainmail_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.vanguard"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

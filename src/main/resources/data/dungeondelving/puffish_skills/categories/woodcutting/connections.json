@@ -3,10 +3,14 @@
     "bidirectional": [
       [
         "sure_swing",
+        "forester"
+      ],
+      [
+        "sure_swing",
         "timber"
       ],
       [
-        "timber",
+        "sure_swing",
         "tree_feller_1"
       ],
       [
@@ -18,8 +22,16 @@
         "tree_feller_3"
       ],
       [
-        "timber",
-        "forester"
+        "tree_feller_2",
+        "sturdy_axe"
+      ],
+      [
+        "tree_feller_2",
+        "bark_collector"
+      ],
+      [
+        "tree_feller_3",
+        "heartwood"
       ]
     ]
   }

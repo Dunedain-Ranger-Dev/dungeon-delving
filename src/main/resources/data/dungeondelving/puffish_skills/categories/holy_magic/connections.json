@@ -2,12 +2,36 @@
   "normal": {
     "bidirectional": [
       [
-        "holy_adept",
-        "holy_expert"
+        "holy_initiate",
+        "holy_quick_casting"
       ],
       [
-        "holy_expert",
+        "holy_initiate",
         "holy_lore"
+      ],
+      [
+        "holy_initiate",
+        "holy_adept_1"
+      ],
+      [
+        "holy_adept_1",
+        "holy_adept_2"
+      ],
+      [
+        "holy_adept_2",
+        "holy_adept_3"
+      ],
+      [
+        "holy_adept_2",
+        "holy_effect"
+      ],
+      [
+        "holy_adept_2",
+        "holy_reserves"
+      ],
+      [
+        "holy_adept_3",
+        "holy_capstone"
       ]
     ]
   }

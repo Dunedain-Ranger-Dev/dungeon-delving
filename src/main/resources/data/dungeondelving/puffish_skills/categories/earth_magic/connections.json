@@ -2,12 +2,36 @@
   "normal": {
     "bidirectional": [
       [
-        "earth_adept",
-        "earth_expert"
+        "earth_initiate",
+        "earth_quick_casting"
       ],
       [
-        "earth_expert",
+        "earth_initiate",
         "earth_lore"
+      ],
+      [
+        "earth_initiate",
+        "earth_adept_1"
+      ],
+      [
+        "earth_adept_1",
+        "earth_adept_2"
+      ],
+      [
+        "earth_adept_2",
+        "earth_adept_3"
+      ],
+      [
+        "earth_adept_2",
+        "earth_effect"
+      ],
+      [
+        "earth_adept_2",
+        "earth_reserves"
+      ],
+      [
+        "earth_adept_3",
+        "earth_capstone"
       ]
     ]
   }

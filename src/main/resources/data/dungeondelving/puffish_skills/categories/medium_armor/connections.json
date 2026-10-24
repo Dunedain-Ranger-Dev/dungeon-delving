@@ -4,6 +4,34 @@
       [
         "fitted_mail",
         "balanced"
+      ],
+      [
+        "fitted_mail",
+        "steady_footing"
+      ],
+      [
+        "fitted_mail",
+        "adaptable_1"
+      ],
+      [
+        "adaptable_1",
+        "adaptable_2"
+      ],
+      [
+        "adaptable_2",
+        "adaptable_3"
+      ],
+      [
+        "adaptable_2",
+        "rally"
+      ],
+      [
+        "adaptable_2",
+        "brace_mail"
+      ],
+      [
+        "adaptable_3",
+        "vanguard"
       ]
     ]
   }

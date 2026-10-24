@@ -3,7 +3,35 @@
     "bidirectional": [
       [
         "polearms_training",
-        "polearms_mastery"
+        "reach"
+      ],
+      [
+        "polearms_training",
+        "brace"
+      ],
+      [
+        "polearms_training",
+        "impale_1"
+      ],
+      [
+        "impale_1",
+        "impale_2"
+      ],
+      [
+        "impale_2",
+        "impale_3"
+      ],
+      [
+        "impale_2",
+        "sweep"
+      ],
+      [
+        "impale_2",
+        "keep_away"
+      ],
+      [
+        "impale_3",
+        "phalanx"
       ]
     ]
   }

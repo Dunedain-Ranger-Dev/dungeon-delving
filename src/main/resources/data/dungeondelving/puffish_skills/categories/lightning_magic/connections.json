@@ -2,12 +2,36 @@
   "normal": {
     "bidirectional": [
       [
-        "lightning_adept",
-        "lightning_expert"
+        "lightning_initiate",
+        "lightning_quick_casting"
       ],
       [
-        "lightning_expert",
+        "lightning_initiate",
         "lightning_lore"
+      ],
+      [
+        "lightning_initiate",
+        "lightning_adept_1"
+      ],
+      [
+        "lightning_adept_1",
+        "lightning_adept_2"
+      ],
+      [
+        "lightning_adept_2",
+        "lightning_adept_3"
+      ],
+      [
+        "lightning_adept_2",
+        "lightning_effect"
+      ],
+      [
+        "lightning_adept_2",
+        "lightning_reserves"
+      ],
+      [
+        "lightning_adept_3",
+        "lightning_capstone"
       ]
     ]
   }

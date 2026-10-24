@@ -30,12 +30,12 @@
     ],
     "cost": 1
   },
-  "quicker_pick": {
+  "prospector": {
     "title": {
-      "translate": "skill.dungeondelving.mining.quicker_pick"
+      "translate": "skill.dungeondelving.mining.prospector"
     },
     "description": {
-      "translate": "skill.dungeondelving.mining.quicker_pick.description"
+      "translate": "skill.dungeondelving.mining.prospector.description"
     },
     "icon": {
       "type": "item",
@@ -51,15 +51,44 @@
     },
     "rewards": [
       {
-        "type": "puffish_skills:attribute",
+        "type": "puffish_skills:tag",
         "data": {
-          "attribute": "minecraft:player.block_break_speed",
-          "operation": "multiply_base",
-          "value": 0.05
+          "tag": "dungeondelving.perk.prospector"
         }
       }
     ],
-    "cost": 1
+    "cost": 1,
+    "required_points": 4
+  },
+  "stonemason": {
+    "title": {
+      "translate": "skill.dungeondelving.mining.stonemason"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mining.stonemason.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_pickaxe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.stonemason"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
   },
   "vein_miner_1": {
     "title": {
@@ -77,7 +106,7 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "task"
+        "frame": "goal"
       }
     },
     "rewards": [
@@ -88,7 +117,8 @@
         }
       }
     ],
-    "cost": 2
+    "cost": 1,
+    "required_points": 9
   },
   "vein_miner_2": {
     "title": {
@@ -106,7 +136,7 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "task"
+        "frame": "goal"
       }
     },
     "rewards": [
@@ -117,7 +147,8 @@
         }
       }
     ],
-    "cost": 3
+    "cost": 1,
+    "required_points": 19
   },
   "vein_miner_3": {
     "title": {
@@ -146,14 +177,15 @@
         }
       }
     ],
-    "cost": 4
+    "cost": 1,
+    "required_points": 34
   },
-  "prospector": {
+  "sturdy_pick": {
     "title": {
-      "translate": "skill.dungeondelving.mining.prospector"
+      "translate": "skill.dungeondelving.mining.sturdy_pick"
     },
     "description": {
-      "translate": "skill.dungeondelving.mining.prospector.description"
+      "translate": "skill.dungeondelving.mining.sturdy_pick.description"
     },
     "icon": {
       "type": "item",
@@ -164,17 +196,79 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
       }
     },
     "rewards": [
       {
         "type": "puffish_skills:tag",
         "data": {
-          "tag": "dungeondelving.perk.prospector"
+          "tag": "dungeondelving.perk.sturdy_pick"
         }
       }
     ],
-    "cost": 3
+    "cost": 1,
+    "required_points": 24
+  },
+  "deep_sight": {
+    "title": {
+      "translate": "skill.dungeondelving.mining.deep_sight"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mining.deep_sight.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_pickaxe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.deep_sight"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "motherlode": {
+    "title": {
+      "translate": "skill.dungeondelving.mining.motherlode"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.mining.motherlode.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_pickaxe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.motherlode"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

@@ -3,7 +3,35 @@
     "bidirectional": [
       [
         "one_handed_training",
-        "one_handed_mastery"
+        "riposte"
+      ],
+      [
+        "one_handed_training",
+        "footwork"
+      ],
+      [
+        "one_handed_training",
+        "bladestorm_1"
+      ],
+      [
+        "bladestorm_1",
+        "bladestorm_2"
+      ],
+      [
+        "bladestorm_2",
+        "bladestorm_3"
+      ],
+      [
+        "bladestorm_2",
+        "bleed"
+      ],
+      [
+        "bladestorm_2",
+        "disarm"
+      ],
+      [
+        "bladestorm_3",
+        "duelist"
       ]
     ]
   }

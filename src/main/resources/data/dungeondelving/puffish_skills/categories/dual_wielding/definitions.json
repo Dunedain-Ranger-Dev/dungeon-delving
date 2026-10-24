@@ -1,10 +1,10 @@
 {
-  "ambidextrous": {
+  "dual_wielding_training": {
     "title": {
-      "translate": "skill.dungeondelving.dual_wielding.ambidextrous"
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_training"
     },
     "description": {
-      "translate": "skill.dungeondelving.dual_wielding.ambidextrous.description"
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_training.description"
     },
     "icon": {
       "type": "texture",
@@ -46,19 +46,229 @@
     "frame": {
       "type": "advancement",
       "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.flurry"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "off_hand_guard": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.off_hand_guard"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.off_hand_guard.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.off_hand_guard"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "twin_fury_1": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.twin_fury_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.twin_fury_1.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
         "frame": "goal"
       }
     },
     "rewards": [
       {
-        "type": "puffish_skills:attribute",
+        "type": "puffish_skills:tag",
         "data": {
-          "attribute": "minecraft:generic.attack_speed",
-          "operation": "multiply_base",
-          "value": 0.02
+          "tag": "dungeondelving.perk.twin_fury_1"
         }
       }
     ],
-    "cost": 1
+    "cost": 1,
+    "required_points": 9
+  },
+  "twin_fury_2": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.twin_fury_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.twin_fury_2.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.twin_fury_2"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 19
+  },
+  "twin_fury_3": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.twin_fury_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.twin_fury_3.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.twin_fury_3"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 34
+  },
+  "dual_bleed": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_bleed"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_bleed.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.dual_bleed"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "parry": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.parry"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.parry.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.parry"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "whirlwind": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.whirlwind"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.whirlwind.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.whirlwind"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

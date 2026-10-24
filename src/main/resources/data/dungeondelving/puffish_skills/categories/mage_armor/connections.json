@@ -4,6 +4,34 @@
       [
         "woven_wards",
         "mana_weave"
+      ],
+      [
+        "woven_wards",
+        "focus"
+      ],
+      [
+        "woven_wards",
+        "arcane_weave_1"
+      ],
+      [
+        "arcane_weave_1",
+        "arcane_weave_2"
+      ],
+      [
+        "arcane_weave_2",
+        "arcane_weave_3"
+      ],
+      [
+        "arcane_weave_2",
+        "mana_shield"
+      ],
+      [
+        "arcane_weave_2",
+        "deep_reserves"
+      ],
+      [
+        "arcane_weave_3",
+        "archmages_robe"
       ]
     ]
   }

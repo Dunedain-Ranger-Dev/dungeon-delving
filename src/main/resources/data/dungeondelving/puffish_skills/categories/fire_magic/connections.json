@@ -2,12 +2,36 @@
   "normal": {
     "bidirectional": [
       [
-        "fire_adept",
-        "fire_expert"
+        "fire_initiate",
+        "fire_quick_casting"
       ],
       [
-        "fire_expert",
+        "fire_initiate",
         "fire_lore"
+      ],
+      [
+        "fire_initiate",
+        "fire_adept_1"
+      ],
+      [
+        "fire_adept_1",
+        "fire_adept_2"
+      ],
+      [
+        "fire_adept_2",
+        "fire_adept_3"
+      ],
+      [
+        "fire_adept_2",
+        "fire_effect"
+      ],
+      [
+        "fire_adept_2",
+        "fire_reserves"
+      ],
+      [
+        "fire_adept_3",
+        "fire_capstone"
       ]
     ]
   }

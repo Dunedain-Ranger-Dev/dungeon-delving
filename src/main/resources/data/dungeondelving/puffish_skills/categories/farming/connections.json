@@ -3,19 +3,35 @@
     "bidirectional": [
       [
         "green_thumb",
-        "bountiful_1"
-      ],
-      [
-        "bountiful_1",
-        "bountiful_2"
-      ],
-      [
-        "green_thumb",
         "replanter"
       ],
       [
         "green_thumb",
+        "bountiful"
+      ],
+      [
+        "green_thumb",
+        "harvest_moon_1"
+      ],
+      [
+        "harvest_moon_1",
+        "harvest_moon_2"
+      ],
+      [
+        "harvest_moon_2",
+        "harvest_moon_3"
+      ],
+      [
+        "harvest_moon_2",
+        "fertile_ground"
+      ],
+      [
+        "harvest_moon_2",
         "hardy"
+      ],
+      [
+        "harvest_moon_3",
+        "golden_harvest"
       ]
     ]
   }

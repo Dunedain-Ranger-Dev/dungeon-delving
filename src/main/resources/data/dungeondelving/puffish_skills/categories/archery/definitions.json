@@ -33,12 +33,72 @@
       "ranged_weapon_api"
     ]
   },
-  "archery_mastery": {
+  "steady_aim": {
     "title": {
-      "translate": "skill.dungeondelving.archery.archery_mastery"
+      "translate": "skill.dungeondelving.archery.steady_aim"
     },
     "description": {
-      "translate": "skill.dungeondelving.archery.archery_mastery.description"
+      "translate": "skill.dungeondelving.archery.steady_aim.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:bow"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_aim"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "retrieval": {
+    "title": {
+      "translate": "skill.dungeondelving.archery.retrieval"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.archery.retrieval.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:bow"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.retrieval"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "volley_1": {
+    "title": {
+      "translate": "skill.dungeondelving.archery.volley_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.archery.volley_1.description"
     },
     "icon": {
       "type": "item",
@@ -54,17 +114,164 @@
     },
     "rewards": [
       {
-        "type": "puffish_skills:attribute",
+        "type": "puffish_skills:tag",
         "data": {
-          "attribute": "ranged_weapon:damage",
-          "operation": "multiply_total",
-          "value": 0.03
+          "tag": "dungeondelving.perk.volley_1"
         }
       }
     ],
     "cost": 1,
-    "required_mods": [
-      "ranged_weapon_api"
-    ]
+    "required_points": 9
+  },
+  "volley_2": {
+    "title": {
+      "translate": "skill.dungeondelving.archery.volley_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.archery.volley_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:bow"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.volley_2"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 19
+  },
+  "volley_3": {
+    "title": {
+      "translate": "skill.dungeondelving.archery.volley_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.archery.volley_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:bow"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "goal"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.volley_3"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 34
+  },
+  "daze": {
+    "title": {
+      "translate": "skill.dungeondelving.archery.daze"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.archery.daze.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:bow"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.daze"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "piercing": {
+    "title": {
+      "translate": "skill.dungeondelving.archery.piercing"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.archery.piercing.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:bow"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.piercing"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "deadeye": {
+    "title": {
+      "translate": "skill.dungeondelving.archery.deadeye"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.archery.deadeye.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:bow"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.deadeye"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

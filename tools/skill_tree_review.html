@@ -1,0 +1,250 @@
+<title>Dungeon Delving Skill Trees</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: a skill-tree atlas. Header and legend, group tabs, then each tree drawn small-multiple style on a slate
+   board, with the picked node's details in a side panel (below the trees on phones). */
+:root {
+  --bg: #eef0ee;
+  --board: #ffffff;
+  --ink: #1f2423;
+  --muted: #5d6764;
+  --line: #d3d9d6;
+  --wire: #9aa5a1;
+  --accent: #2f7d6d;
+  --accent-soft: #dcefe9;
+  --gold: #b07a12;
+  --gold-soft: #f5e9cf;
+  --todo: #8a6fb5;
+  --display: "Pixelify Sans", "Courier New", monospace;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161a19; --board: #1f2524; --ink: #e8ecea; --muted: #9ba6a2; --line: #323b39; --wire: #5c6966;
+    --accent: #5cc4ad; --accent-soft: #1d3a34; --gold: #e3b14d; --gold-soft: #3b3020; --todo: #b59ae0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161a19; --board: #1f2524; --ink: #e8ecea; --muted: #9ba6a2; --line: #323b39; --wire: #5c6966;
+  --accent: #5cc4ad; --accent-soft: #1d3a34; --gold: #e3b14d; --gold-soft: #3b3020; --todo: #b59ae0;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1 { font: 700 clamp(1.8rem, 4vw, 2.6rem)/1.05 var(--display); letter-spacing: .01em; margin: 0 0 8px; text-wrap: balance; }
+.intro { color: var(--muted); max-width: 70ch; margin: 0; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px 20px; margin: 18px 0 0; padding: 0; list-style: none; font-size: .88rem; color: var(--muted); }
+.legend li { display: flex; align-items: center; gap: 8px; }
+.legend svg { flex: none; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 24px 0 18px; }
+.tab { font: 600 .92rem var(--body); color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px;
+  padding: 6px 14px; cursor: pointer; }
+.tab[aria-selected="true"] { color: var(--board); background: var(--ink); border-color: var(--ink); }
+.tab:focus-visible, .node:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+.trees { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+.tree { background: var(--board); border: 1px solid var(--line); border-radius: 10px; padding: 12px 10px 10px; min-width: 0; }
+.tree h2 { font: 700 1.05rem var(--display); margin: 0 0 2px; text-align: center; }
+.tree .mastery { font-size: .78rem; color: var(--muted); text-align: center; margin: 0 0 6px; }
+.tree svg { display: block; margin: 0 auto; max-width: 100%; height: auto; overflow: visible; }
+.wire { stroke: var(--wire); stroke-width: 2; fill: none; }
+.lvl { font: 500 9px var(--mono); fill: var(--muted); }
+.rank { font: 700 10px var(--display); fill: var(--ink); pointer-events: none; }
+.node { cursor: pointer; }
+.node .shape { fill: var(--board); stroke: var(--ink); stroke-width: 1.6; }
+.node.attribute .shape { fill: var(--accent-soft); stroke: var(--accent); }
+.node.perk .shape { fill: var(--accent-soft); stroke: var(--accent); }
+.node.todo .shape { fill: var(--board); stroke: var(--todo); stroke-dasharray: 3 2; }
+.node.active .shape { stroke-width: 2.4; }
+.node.capstone .shape { fill: var(--gold-soft); stroke: var(--gold); }
+.node.capstone.todo .shape { stroke-dasharray: 3 2; }
+.node.picked .shape { stroke: var(--ink); stroke-width: 3; }
+.node:hover .shape { filter: brightness(1.08); }
+.panel { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); background: var(--board); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
+@media (max-width: 900px) { .panel { position: static; } }
+.panel .tree-name { font: 600 .76rem var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.panel h3 { font: 700 1.35rem/1.15 var(--display); margin: 4px 0 8px; text-wrap: balance; }
+.panel p { margin: 0 0 12px; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; font-size: .9rem; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-variant-numeric: tabular-nums; }
+.chip { display: inline-block; font: 600 .74rem var(--body); padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.chip.todo { background: transparent; color: var(--todo); border: 1px dashed var(--todo); }
+.chip.gold { background: var(--gold-soft); color: var(--gold); }
+.notes { margin-top: 28px; color: var(--muted); font-size: .9rem; max-width: 75ch; }
+.notes h2 { font: 700 1.1rem var(--display); color: var(--ink); margin: 0 0 6px; }
+.notes ul { margin: 0; padding-left: 1.2em; }
+@media (prefers-reduced-motion: no-preference) { .node .shape { transition: filter .12s, stroke-width .12s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Skill Trees</h1>
+    <p class="intro">Every Dungeon Delving tree as it's laid out in game: top to bottom is the order you'd unlock them. The number beside a node is the skill level it needs. Pick a node to read it.</p>
+    <ul class="legend" aria-label="Legend">
+      <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><circle r="7" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/></svg>Root</li>
+      <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><rect x="-7" y="-7" width="14" height="14" rx="2" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/></svg>Perk or bonus that works now</li>
+      <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><rect x="-7" y="-7" width="14" height="14" rx="2" fill="var(--board)" stroke="var(--todo)" stroke-width="1.6" stroke-dasharray="3 2"/></svg>Perk still to build</li>
+      <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><path d="M0 -8 L8 0 L0 8 L-8 0 Z" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2.2"/></svg>Timed ability</li>
+      <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><path id="cap-legend" d="" fill="var(--gold-soft)" stroke="var(--gold)" stroke-width="1.6"/></svg>Capstone</li>
+    </ul>
+  </header>
+
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <div class="layout">
+    <div class="trees" id="trees"></div>
+    <aside class="panel" id="panel" aria-live="polite"></aside>
+  </div>
+
+  <section class="notes">
+    <h2>How the trees work</h2>
+    <ul id="rules"></ul>
+  </section>
+</div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>
+const DATA = JSON.parse(document.getElementById("data").textContent);
+const DX = 46, DY = 46, R = 13, PAD = 30;
+const GROUP_IDS = { Gathering: "gathering", Crafting: "crafting", Combat: "combat", Armor: "armor", Magic: "magic", Other: "other" };
+const SVGNS = "http://www.w3.org/2000/svg";
+const tabs = document.getElementById("tabs"), treesEl = document.getElementById("trees"), panel = document.getElementById("panel");
+let picked = null;
+
+function star(r, points, inner) {
+  let d = "";
+  for (let i = 0; i < points * 2; i++) {
+    const a = Math.PI * i / points - Math.PI / 2, rr = i % 2 ? r * inner : r;
+    d += (i ? "L" : "M") + (rr * Math.cos(a)).toFixed(2) + " " + (rr * Math.sin(a)).toFixed(2);
+  }
+  return d + "Z";
+}
+document.getElementById("cap-legend").setAttribute("d", star(8, 8, 0.72));
+
+function el(tag, attrs = {}, text) {
+  const node = document.createElementNS(SVGNS, tag);
+  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+  if (text != null) node.textContent = text;
+  return node;
+}
+
+function kindOf(node) {
+  const classes = ["node"];
+  if (node.spent) classes.push("capstone");
+  if (node.active) classes.push("active");
+  classes.push(node.kind === "none" ? "attribute" : node.built ? node.kind : "todo");
+  return classes;
+}
+
+function shapeFor(node) {
+  if (!node.parent) return el("circle", { class: "shape", r: R });
+  if (node.spent) return el("path", { class: "shape", d: star(R + 2, 8, 0.72) });
+  if (node.active) return el("path", { class: "shape", d: `M0 ${-R - 2} L${R + 2} 0 L0 ${R + 2} L${-R - 2} 0 Z` });
+  return el("rect", { class: "shape", x: -R + 1, y: -R + 1, width: 2 * R - 2, height: 2 * R - 2, rx: 3 });
+}
+
+function rankOf(node) {
+  const m = node.title.match(/ (I{1,3})$/);
+  return m ? m[1] : null;
+}
+
+function drawTree(tree) {
+  const cols = tree.nodes.map(n => n.column), rows = tree.nodes.map(n => n.row);
+  const minC = Math.min(...cols, -1), maxC = Math.max(...cols, 1), maxR = Math.max(...rows);
+  const w = (maxC - minC) * DX + PAD * 2, h = maxR * DY + PAD * 2;
+  const svg = el("svg", { viewBox: `0 0 ${w} ${h}`, width: w, height: h, role: "group", "aria-label": tree.title + " tree" });
+  const at = n => [(n.column - minC) * DX + PAD, n.row * DY + PAD];
+  const byKey = Object.fromEntries(tree.nodes.map(n => [n.key, n]));
+  for (const n of tree.nodes) {
+    if (!n.parent) continue;
+    const [x1, y1] = at(byKey[n.parent]), [x2, y2] = at(n);
+    const path = x1 === x2 ? `M${x1} ${y1} L${x2} ${y2}` : `M${x1} ${y1} L${x1} ${(y1 + y2) / 2} L${x2} ${(y1 + y2) / 2} L${x2} ${y2}`;
+    svg.append(el("path", { class: "wire", d: path }));
+  }
+  for (const n of tree.nodes) {
+    const [x, y] = at(n);
+    const g = el("g", { class: kindOf(n).join(" "), transform: `translate(${x} ${y})`, tabindex: 0, role: "button", "aria-label": n.title });
+    g.append(shapeFor(n));
+    const rank = rankOf(n);
+    if (rank) g.append(el("text", { class: "rank", "text-anchor": "middle", "dominant-baseline": "central" }, rank));
+    if (n.level) g.append(el("text", { class: "lvl", x: n.column > 0 ? R + 4 : -R - 4, y: 3, "text-anchor": n.column > 0 ? "start" : "end" }, n.level));
+    const choose = () => pick(tree, n, g);
+    g.addEventListener("click", choose);
+    g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(); } });
+    svg.append(g);
+  }
+  return svg;
+}
+
+function pick(tree, node, g) {
+  document.querySelectorAll(".node.picked").forEach(x => x.classList.remove("picked"));
+  if (g) g.classList.add("picked");
+  picked = { tree, node };
+  const status = node.kind === "none" ? ["The tree's starting node", ""] :
+    node.kind === "attribute" ? ["Works now (stat bonus)", ""] :
+    node.built ? ["Works now", ""] : ["Still to build", "todo"];
+  panel.replaceChildren();
+  const add = (tag, cls, text) => { const x = document.createElement(tag); if (cls) x.className = cls; x.textContent = text; panel.append(x); return x; };
+  add("p", "tree-name", tree.title);
+  add("h3", "", node.title);
+  add("p", "", node.description);
+  const dl = document.createElement("dl"); dl.className = "facts";
+  const fact = (k, v) => { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); if (v instanceof Node) dd.append(v); else dd.textContent = v; dl.append(dt, dd); };
+  fact("Needs", node.level ? `Level ${node.level}` : "Nothing: it's the start");
+  if (node.parent) fact("After", tree.nodes.find(n => n.key === node.parent).title);
+  if (node.spent) fact("Also needs", `${node.spent} points spent in this tree`);
+  fact("Cost", "1 point");
+  if (node.active) fact("Type", "Timed ability: sneak and act to start it, then it cools down");
+  if (node.mods.length) fact("Needs mod", node.mods.join(", "));
+  const chip = document.createElement("span"); chip.className = "chip " + (node.spent ? "gold" : status[1]); chip.textContent = status[0];
+  fact("Status", chip);
+  panel.append(dl);
+  const m = document.createElement("p"); m.style.marginTop = "14px"; m.style.color = "var(--muted)"; m.style.fontSize = ".88rem";
+  m.textContent = "Mastery (after the tree is full): " + DATA.mastery[tree.key];
+  panel.append(m);
+}
+
+function select(group) {
+  for (const b of tabs.children) b.setAttribute("aria-selected", b.dataset.group === group);
+  treesEl.replaceChildren();
+  for (const tree of DATA.groups[group]) {
+    const card = document.createElement("article"); card.className = "tree";
+    const h = document.createElement("h2"); h.textContent = tree.title;
+    const m = document.createElement("p"); m.className = "mastery"; m.textContent = "Mastery: " + DATA.mastery[tree.key];
+    card.append(h, m, drawTree(tree));
+    treesEl.append(card);
+  }
+  const first = DATA.groups[group][0];
+  const sig = first.nodes.find(n => n.active) || first.nodes.find(n => n.level === 10) || first.nodes[0];
+  const g = treesEl.querySelector(".tree svg").querySelectorAll(".node")[first.nodes.indexOf(sig)];
+  pick(first, sig, g);
+  try { localStorage.setItem("group", group); } catch {}
+}
+
+for (const group of Object.keys(DATA.groups)) {
+  const b = document.createElement("button");
+  b.className = "tab"; b.type = "button"; b.role = "tab"; b.dataset.group = group;
+  b.textContent = group + " (" + DATA.groups[group].length + ")";
+  b.addEventListener("click", () => select(group));
+  tabs.append(b);
+}
+
+const rules = [
+  "Each node costs 1 point. You get a point with every level, and levels never stop.",
+  "A node needs the one above it and the skill level shown beside it. The capstone also needs " + DATA.capstone_spent + " points spent in its tree.",
+  "Ranked perks (I, II, III) are stacked down the middle; each rank needs a higher level.",
+  "Timed abilities start when you sneak and act (mine ore, chop a log, strike), run for 10 to 20 seconds by rank, then cool down for 4 to 2 minutes.",
+  "Once a tree is full, leftover points go into that skill's Mastery: a small bonus per point with no limit, shrinking as it grows.",
+];
+document.getElementById("rules").replaceChildren(...rules.map(t => { const li = document.createElement("li"); li.textContent = t; return li; }));
+
+const fromHash = Object.entries(GROUP_IDS).find(([, id]) => id === location.hash.slice(1));
+let remembered = null; try { remembered = localStorage.getItem("group"); } catch {}
+select(fromHash ? fromHash[0] : DATA.groups[remembered] ? remembered : Object.keys(DATA.groups)[0]);
+</script>

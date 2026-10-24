@@ -5,28 +5,52 @@
     "y": 0,
     "root": true
   },
-  "bountiful_1": {
-    "definition": "bountiful_1",
-    "x": -50,
-    "y": 50,
-    "root": false
-  },
-  "bountiful_2": {
-    "definition": "bountiful_2",
-    "x": -50,
-    "y": 90,
-    "root": false
-  },
   "replanter": {
     "definition": "replanter",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "bountiful": {
+    "definition": "bountiful",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "harvest_moon_1": {
+    "definition": "harvest_moon_1",
     "x": 0,
-    "y": 50,
+    "y": 68,
+    "root": false
+  },
+  "harvest_moon_2": {
+    "definition": "harvest_moon_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "harvest_moon_3": {
+    "definition": "harvest_moon_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "fertile_ground": {
+    "definition": "fertile_ground",
+    "x": -34,
+    "y": 136,
     "root": false
   },
   "hardy": {
     "definition": "hardy",
-    "x": 50,
-    "y": 50,
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "golden_harvest": {
+    "definition": "golden_harvest",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

@@ -4,6 +4,34 @@
       [
         "light_step",
         "evasive"
+      ],
+      [
+        "light_step",
+        "silent_step"
+      ],
+      [
+        "light_step",
+        "agility_1"
+      ],
+      [
+        "agility_1",
+        "agility_2"
+      ],
+      [
+        "agility_2",
+        "agility_3"
+      ],
+      [
+        "agility_2",
+        "light_footed"
+      ],
+      [
+        "agility_2",
+        "second_wind"
+      ],
+      [
+        "agility_3",
+        "phantom"
       ]
     ]
   }

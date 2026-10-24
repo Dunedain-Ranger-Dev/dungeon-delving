@@ -5,10 +5,52 @@
     "y": 0,
     "root": true
   },
-  "two_handed_mastery": {
-    "definition": "two_handed_mastery",
-    "x": 40,
-    "y": 0,
+  "cleave": {
+    "definition": "cleave",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "crushing_blow": {
+    "definition": "crushing_blow",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "skull_splitter_1": {
+    "definition": "skull_splitter_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "skull_splitter_2": {
+    "definition": "skull_splitter_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "skull_splitter_3": {
+    "definition": "skull_splitter_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "stagger": {
+    "definition": "stagger",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "momentum": {
+    "definition": "momentum",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "executioner": {
+    "definition": "executioner",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

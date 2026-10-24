@@ -21,6 +21,66 @@
     "rewards": [],
     "cost": 1
   },
+  "careful_weaver_1": {
+    "title": {
+      "translate": "skill.dungeondelving.weaving.careful_weaver_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaving.careful_weaver_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:string"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.careful_weaver_1"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "quick_fingers": {
+    "title": {
+      "translate": "skill.dungeondelving.weaving.quick_fingers"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaving.quick_fingers.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:string"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.quick_fingers"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
   "steady_needle_1": {
     "title": {
       "translate": "skill.dungeondelving.weaving.steady_needle_1"
@@ -48,7 +108,8 @@
         }
       }
     ],
-    "cost": 1
+    "cost": 1,
+    "required_points": 9
   },
   "steady_needle_2": {
     "title": {
@@ -77,7 +138,8 @@
         }
       }
     ],
-    "cost": 2
+    "cost": 1,
+    "required_points": 19
   },
   "steady_needle_3": {
     "title": {
@@ -95,7 +157,7 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
       }
     },
     "rewards": [
@@ -106,36 +168,8 @@
         }
       }
     ],
-    "cost": 3
-  },
-  "careful_weaver_1": {
-    "title": {
-      "translate": "skill.dungeondelving.weaving.careful_weaver_1"
-    },
-    "description": {
-      "translate": "skill.dungeondelving.weaving.careful_weaver_1.description"
-    },
-    "icon": {
-      "type": "item",
-      "data": {
-        "item": "minecraft:string"
-      }
-    },
-    "frame": {
-      "type": "advancement",
-      "data": {
-        "frame": "task"
-      }
-    },
-    "rewards": [
-      {
-        "type": "puffish_skills:tag",
-        "data": {
-          "tag": "dungeondelving.perk.careful_weaver_1"
-        }
-      }
-    ],
-    "cost": 2
+    "cost": 1,
+    "required_points": 34
   },
   "careful_weaver_2": {
     "title": {
@@ -153,7 +187,7 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
       }
     },
     "rewards": [
@@ -164,6 +198,68 @@
         }
       }
     ],
-    "cost": 3
+    "cost": 1,
+    "required_points": 24
+  },
+  "padding": {
+    "title": {
+      "translate": "skill.dungeondelving.weaving.padding"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaving.padding.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:string"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.padding"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "fine_weave": {
+    "title": {
+      "translate": "skill.dungeondelving.weaving.fine_weave"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaving.fine_weave.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:string"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.fine_weave"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

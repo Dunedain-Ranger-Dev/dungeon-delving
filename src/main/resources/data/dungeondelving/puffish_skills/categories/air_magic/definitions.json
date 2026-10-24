@@ -1,10 +1,10 @@
 {
-  "air_adept": {
+  "air_initiate": {
     "title": {
-      "translate": "skill.dungeondelving.air_magic.air_adept"
+      "translate": "skill.dungeondelving.air_magic.air_initiate"
     },
     "description": {
-      "translate": "skill.dungeondelving.air_magic.air_adept.description"
+      "translate": "skill.dungeondelving.air_magic.air_initiate.description"
     },
     "icon": {
       "type": "item",
@@ -33,12 +33,12 @@
       "spell_power"
     ]
   },
-  "air_expert": {
+  "air_quick_casting": {
     "title": {
-      "translate": "skill.dungeondelving.air_magic.air_expert"
+      "translate": "skill.dungeondelving.air_magic.air_quick_casting"
     },
     "description": {
-      "translate": "skill.dungeondelving.air_magic.air_expert.description"
+      "translate": "skill.dungeondelving.air_magic.air_quick_casting.description"
     },
     "icon": {
       "type": "item",
@@ -49,7 +49,67 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.air_quick_casting"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "air_efficiency": {
+    "title": {
+      "translate": "skill.dungeondelving.air_magic.air_efficiency"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.air_magic.air_efficiency.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:feather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.air_efficiency"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
+  "air_adept_1": {
+    "title": {
+      "translate": "skill.dungeondelving.air_magic.air_adept_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.air_magic.air_adept_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:feather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
       }
     },
     "rewards": [
@@ -63,8 +123,175 @@
       }
     ],
     "cost": 1,
+    "required_points": 9,
     "required_mods": [
       "spell_power"
     ]
+  },
+  "air_adept_2": {
+    "title": {
+      "translate": "skill.dungeondelving.air_magic.air_adept_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.air_magic.air_adept_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:feather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:air",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 19,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "air_adept_3": {
+    "title": {
+      "translate": "skill.dungeondelving.air_magic.air_adept_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.air_magic.air_adept_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:feather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:air",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 34,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "air_effect": {
+    "title": {
+      "translate": "skill.dungeondelving.air_magic.air_effect"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.air_magic.air_effect.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:feather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.air_effect"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "air_reserves": {
+    "title": {
+      "translate": "skill.dungeondelving.air_magic.air_reserves"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.air_magic.air_reserves.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:feather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:max_mana",
+          "operation": "addition",
+          "value": 10
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  },
+  "air_capstone": {
+    "title": {
+      "translate": "skill.dungeondelving.air_magic.air_capstone"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.air_magic.air_capstone.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:feather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.air_capstone"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

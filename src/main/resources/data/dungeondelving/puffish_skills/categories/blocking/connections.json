@@ -2,8 +2,36 @@
   "normal": {
     "bidirectional": [
       [
-        "braced",
+        "blocking_training",
         "bulwark"
+      ],
+      [
+        "blocking_training",
+        "quick_guard"
+      ],
+      [
+        "blocking_training",
+        "shield_wall_1"
+      ],
+      [
+        "shield_wall_1",
+        "shield_wall_2"
+      ],
+      [
+        "shield_wall_2",
+        "shield_wall_3"
+      ],
+      [
+        "shield_wall_2",
+        "shield_bash"
+      ],
+      [
+        "shield_wall_2",
+        "reflect"
+      ],
+      [
+        "shield_wall_3",
+        "unbreakable"
       ]
     ]
   }

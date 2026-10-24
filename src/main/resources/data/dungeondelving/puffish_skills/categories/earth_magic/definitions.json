@@ -1,10 +1,10 @@
 {
-  "earth_adept": {
+  "earth_initiate": {
     "title": {
-      "translate": "skill.dungeondelving.earth_magic.earth_adept"
+      "translate": "skill.dungeondelving.earth_magic.earth_initiate"
     },
     "description": {
-      "translate": "skill.dungeondelving.earth_magic.earth_adept.description"
+      "translate": "skill.dungeondelving.earth_magic.earth_initiate.description"
     },
     "icon": {
       "type": "item",
@@ -33,12 +33,12 @@
       "spell_power"
     ]
   },
-  "earth_expert": {
+  "earth_quick_casting": {
     "title": {
-      "translate": "skill.dungeondelving.earth_magic.earth_expert"
+      "translate": "skill.dungeondelving.earth_magic.earth_quick_casting"
     },
     "description": {
-      "translate": "skill.dungeondelving.earth_magic.earth_expert.description"
+      "translate": "skill.dungeondelving.earth_magic.earth_quick_casting.description"
     },
     "icon": {
       "type": "item",
@@ -54,18 +54,14 @@
     },
     "rewards": [
       {
-        "type": "puffish_skills:attribute",
+        "type": "puffish_skills:tag",
         "data": {
-          "attribute": "spell_power:earth",
-          "operation": "addition",
-          "value": 0.5
+          "tag": "dungeondelving.perk.earth_quick_casting"
         }
       }
     ],
     "cost": 1,
-    "required_mods": [
-      "spell_power"
-    ]
+    "required_points": 4
   },
   "earth_lore": {
     "title": {
@@ -83,7 +79,7 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
       }
     },
     "rewards": [
@@ -97,8 +93,210 @@
       }
     ],
     "cost": 1,
+    "required_points": 4,
     "required_mods": [
       "irons_spellbooks"
     ]
+  },
+  "earth_adept_1": {
+    "title": {
+      "translate": "skill.dungeondelving.earth_magic.earth_adept_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.earth_magic.earth_adept_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:moss_block"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:earth",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 9,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "earth_adept_2": {
+    "title": {
+      "translate": "skill.dungeondelving.earth_magic.earth_adept_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.earth_magic.earth_adept_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:moss_block"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:earth",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 19,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "earth_adept_3": {
+    "title": {
+      "translate": "skill.dungeondelving.earth_magic.earth_adept_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.earth_magic.earth_adept_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:moss_block"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:earth",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 34,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "earth_effect": {
+    "title": {
+      "translate": "skill.dungeondelving.earth_magic.earth_effect"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.earth_magic.earth_effect.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:moss_block"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.earth_effect"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "earth_reserves": {
+    "title": {
+      "translate": "skill.dungeondelving.earth_magic.earth_reserves"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.earth_magic.earth_reserves.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:moss_block"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:max_mana",
+          "operation": "addition",
+          "value": 10
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  },
+  "earth_capstone": {
+    "title": {
+      "translate": "skill.dungeondelving.earth_magic.earth_capstone"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.earth_magic.earth_capstone.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:moss_block"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.earth_capstone"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

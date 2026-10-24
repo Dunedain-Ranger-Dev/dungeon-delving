@@ -5,34 +5,52 @@
     "y": 0,
     "root": true
   },
+  "forester": {
+    "definition": "forester",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
   "timber": {
     "definition": "timber",
-    "x": 40,
-    "y": 0,
+    "x": 34,
+    "y": 34,
     "root": false
   },
   "tree_feller_1": {
     "definition": "tree_feller_1",
-    "x": 15,
-    "y": 50,
+    "x": 0,
+    "y": 68,
     "root": false
   },
   "tree_feller_2": {
     "definition": "tree_feller_2",
-    "x": 15,
-    "y": 90,
+    "x": 0,
+    "y": 102,
     "root": false
   },
   "tree_feller_3": {
     "definition": "tree_feller_3",
-    "x": 15,
-    "y": 130,
+    "x": 0,
+    "y": 170,
     "root": false
   },
-  "forester": {
-    "definition": "forester",
-    "x": 65,
-    "y": 50,
+  "sturdy_axe": {
+    "definition": "sturdy_axe",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "bark_collector": {
+    "definition": "bark_collector",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "heartwood": {
+    "definition": "heartwood",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

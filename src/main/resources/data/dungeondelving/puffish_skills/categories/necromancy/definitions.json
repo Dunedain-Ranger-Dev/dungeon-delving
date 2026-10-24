@@ -1,10 +1,10 @@
 {
-  "necromancy_adept": {
+  "necromancy_initiate": {
     "title": {
-      "translate": "skill.dungeondelving.necromancy.necromancy_adept"
+      "translate": "skill.dungeondelving.necromancy.necromancy_initiate"
     },
     "description": {
-      "translate": "skill.dungeondelving.necromancy.necromancy_adept.description"
+      "translate": "skill.dungeondelving.necromancy.necromancy_initiate.description"
     },
     "icon": {
       "type": "item",
@@ -33,12 +33,12 @@
       "spell_power"
     ]
   },
-  "necromancy_expert": {
+  "necromancy_quick_casting": {
     "title": {
-      "translate": "skill.dungeondelving.necromancy.necromancy_expert"
+      "translate": "skill.dungeondelving.necromancy.necromancy_quick_casting"
     },
     "description": {
-      "translate": "skill.dungeondelving.necromancy.necromancy_expert.description"
+      "translate": "skill.dungeondelving.necromancy.necromancy_quick_casting.description"
     },
     "icon": {
       "type": "item",
@@ -54,25 +54,21 @@
     },
     "rewards": [
       {
-        "type": "puffish_skills:attribute",
+        "type": "puffish_skills:tag",
         "data": {
-          "attribute": "spell_power:soul",
-          "operation": "addition",
-          "value": 0.5
+          "tag": "dungeondelving.perk.necromancy_quick_casting"
         }
       }
     ],
     "cost": 1,
-    "required_mods": [
-      "spell_power"
-    ]
+    "required_points": 4
   },
-  "eldritch_lore": {
+  "necromancy_lore": {
     "title": {
-      "translate": "skill.dungeondelving.necromancy.eldritch_lore"
+      "translate": "skill.dungeondelving.necromancy.necromancy_lore"
     },
     "description": {
-      "translate": "skill.dungeondelving.necromancy.eldritch_lore.description"
+      "translate": "skill.dungeondelving.necromancy.necromancy_lore.description"
     },
     "icon": {
       "type": "item",
@@ -97,16 +93,17 @@
       }
     ],
     "cost": 1,
+    "required_points": 4,
     "required_mods": [
       "irons_spellbooks"
     ]
   },
-  "blood_lore": {
+  "necromancy_adept_1": {
     "title": {
-      "translate": "skill.dungeondelving.necromancy.blood_lore"
+      "translate": "skill.dungeondelving.necromancy.necromancy_adept_1"
     },
     "description": {
-      "translate": "skill.dungeondelving.necromancy.blood_lore.description"
+      "translate": "skill.dungeondelving.necromancy.necromancy_adept_1.description"
     },
     "icon": {
       "type": "item",
@@ -117,22 +114,189 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
       }
     },
     "rewards": [
       {
         "type": "puffish_skills:attribute",
         "data": {
-          "attribute": "irons_spellbooks:blood_spell_power",
-          "operation": "multiply_base",
-          "value": 0.03
+          "attribute": "spell_power:soul",
+          "operation": "addition",
+          "value": 0.5
         }
       }
     ],
     "cost": 1,
+    "required_points": 9,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "necromancy_adept_2": {
+    "title": {
+      "translate": "skill.dungeondelving.necromancy.necromancy_adept_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.necromancy.necromancy_adept_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:wither_skeleton_skull"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:soul",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 19,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "necromancy_adept_3": {
+    "title": {
+      "translate": "skill.dungeondelving.necromancy.necromancy_adept_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.necromancy.necromancy_adept_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:wither_skeleton_skull"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:soul",
+          "operation": "addition",
+          "value": 0.5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 34,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "necromancy_effect": {
+    "title": {
+      "translate": "skill.dungeondelving.necromancy.necromancy_effect"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.necromancy.necromancy_effect.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:wither_skeleton_skull"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.necromancy_effect"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "necromancy_reserves": {
+    "title": {
+      "translate": "skill.dungeondelving.necromancy.necromancy_reserves"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.necromancy.necromancy_reserves.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:wither_skeleton_skull"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:max_mana",
+          "operation": "addition",
+          "value": 10
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24,
     "required_mods": [
       "irons_spellbooks"
     ]
+  },
+  "necromancy_capstone": {
+    "title": {
+      "translate": "skill.dungeondelving.necromancy.necromancy_capstone"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.necromancy.necromancy_capstone.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:wither_skeleton_skull"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.necromancy_capstone"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }

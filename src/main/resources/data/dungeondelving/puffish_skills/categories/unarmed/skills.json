@@ -5,10 +5,52 @@
     "y": 0,
     "root": true
   },
-  "unarmed_mastery": {
-    "definition": "unarmed_mastery",
-    "x": 40,
-    "y": 0,
+  "iron_fist": {
+    "definition": "iron_fist",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "deflect": {
+    "definition": "deflect",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "berserk_1": {
+    "definition": "berserk_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "berserk_2": {
+    "definition": "berserk_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "berserk_3": {
+    "definition": "berserk_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "disarm_unarmed": {
+    "definition": "disarm_unarmed",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "iron_grip": {
+    "definition": "iron_grip",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "martial_master": {
+    "definition": "martial_master",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

@@ -3,7 +3,35 @@
     "bidirectional": [
       [
         "daggers_training",
-        "daggers_mastery"
+        "backstab"
+      ],
+      [
+        "daggers_training",
+        "quick_hands"
+      ],
+      [
+        "daggers_training",
+        "shadow_flurry_1"
+      ],
+      [
+        "shadow_flurry_1",
+        "shadow_flurry_2"
+      ],
+      [
+        "shadow_flurry_2",
+        "shadow_flurry_3"
+      ],
+      [
+        "shadow_flurry_2",
+        "poison_edge"
+      ],
+      [
+        "shadow_flurry_2",
+        "vanish"
+      ],
+      [
+        "shadow_flurry_3",
+        "assassinate"
       ]
     ]
   }

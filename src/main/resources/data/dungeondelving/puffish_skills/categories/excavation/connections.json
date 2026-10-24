@@ -4,6 +4,34 @@
       [
         "digger",
         "treasure_sense"
+      ],
+      [
+        "digger",
+        "swift_shovel"
+      ],
+      [
+        "digger",
+        "earthmover_1"
+      ],
+      [
+        "earthmover_1",
+        "earthmover_2"
+      ],
+      [
+        "earthmover_2",
+        "earthmover_3"
+      ],
+      [
+        "earthmover_2",
+        "sturdy_shovel"
+      ],
+      [
+        "earthmover_2",
+        "sifter"
+      ],
+      [
+        "earthmover_3",
+        "buried_riches"
       ]
     ]
   }

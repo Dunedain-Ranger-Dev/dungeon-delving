@@ -3,7 +3,35 @@
     "bidirectional": [
       [
         "patient",
+        "quick_bite"
+      ],
+      [
+        "patient",
         "angler"
+      ],
+      [
+        "patient",
+        "treasure_hunter_1"
+      ],
+      [
+        "treasure_hunter_1",
+        "treasure_hunter_2"
+      ],
+      [
+        "treasure_hunter_2",
+        "treasure_hunter_3"
+      ],
+      [
+        "treasure_hunter_2",
+        "double_catch"
+      ],
+      [
+        "treasure_hunter_2",
+        "shake"
+      ],
+      [
+        "treasure_hunter_3",
+        "master_angler"
       ]
     ]
   }

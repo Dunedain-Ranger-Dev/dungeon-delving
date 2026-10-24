@@ -2,8 +2,36 @@
   "normal": {
     "bidirectional": [
       [
-        "ambidextrous",
+        "dual_wielding_training",
         "flurry"
+      ],
+      [
+        "dual_wielding_training",
+        "off_hand_guard"
+      ],
+      [
+        "dual_wielding_training",
+        "twin_fury_1"
+      ],
+      [
+        "twin_fury_1",
+        "twin_fury_2"
+      ],
+      [
+        "twin_fury_2",
+        "twin_fury_3"
+      ],
+      [
+        "twin_fury_2",
+        "dual_bleed"
+      ],
+      [
+        "twin_fury_2",
+        "parry"
+      ],
+      [
+        "twin_fury_3",
+        "whirlwind"
       ]
     ]
   }

@@ -1,20 +1,56 @@
 {
-  "arcane_adept": {
-    "definition": "arcane_adept",
+  "arcane_initiate": {
+    "definition": "arcane_initiate",
     "x": 0,
     "y": 0,
     "root": true
   },
-  "arcane_expert": {
-    "definition": "arcane_expert",
-    "x": 40,
-    "y": 0,
+  "arcane_quick_casting": {
+    "definition": "arcane_quick_casting",
+    "x": -34,
+    "y": 34,
     "root": false
   },
   "arcane_lore": {
     "definition": "arcane_lore",
-    "x": 80,
-    "y": 0,
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "arcane_adept_1": {
+    "definition": "arcane_adept_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "arcane_adept_2": {
+    "definition": "arcane_adept_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "arcane_adept_3": {
+    "definition": "arcane_adept_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "arcane_effect": {
+    "definition": "arcane_effect",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "arcane_reserves": {
+    "definition": "arcane_reserves",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "arcane_capstone": {
+    "definition": "arcane_capstone",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

@@ -5,34 +5,52 @@
     "y": 0,
     "root": true
   },
-  "quicker_pick": {
-    "definition": "quicker_pick",
-    "x": 40,
-    "y": 0,
+  "prospector": {
+    "definition": "prospector",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "stonemason": {
+    "definition": "stonemason",
+    "x": 34,
+    "y": 34,
     "root": false
   },
   "vein_miner_1": {
     "definition": "vein_miner_1",
-    "x": 15,
-    "y": 50,
+    "x": 0,
+    "y": 68,
     "root": false
   },
   "vein_miner_2": {
     "definition": "vein_miner_2",
-    "x": 15,
-    "y": 90,
+    "x": 0,
+    "y": 102,
     "root": false
   },
   "vein_miner_3": {
     "definition": "vein_miner_3",
-    "x": 15,
-    "y": 130,
+    "x": 0,
+    "y": 170,
     "root": false
   },
-  "prospector": {
-    "definition": "prospector",
-    "x": 65,
-    "y": 50,
+  "sturdy_pick": {
+    "definition": "sturdy_pick",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "deep_sight": {
+    "definition": "deep_sight",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "motherlode": {
+    "definition": "motherlode",
+    "x": 0,
+    "y": 204,
     "root": false
   }
 }

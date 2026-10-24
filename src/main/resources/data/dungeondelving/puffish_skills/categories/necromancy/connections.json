@@ -2,16 +2,36 @@
   "normal": {
     "bidirectional": [
       [
-        "necromancy_adept",
-        "necromancy_expert"
+        "necromancy_initiate",
+        "necromancy_quick_casting"
       ],
       [
-        "necromancy_expert",
-        "eldritch_lore"
+        "necromancy_initiate",
+        "necromancy_lore"
       ],
       [
-        "eldritch_lore",
-        "blood_lore"
+        "necromancy_initiate",
+        "necromancy_adept_1"
+      ],
+      [
+        "necromancy_adept_1",
+        "necromancy_adept_2"
+      ],
+      [
+        "necromancy_adept_2",
+        "necromancy_adept_3"
+      ],
+      [
+        "necromancy_adept_2",
+        "necromancy_effect"
+      ],
+      [
+        "necromancy_adept_2",
+        "necromancy_reserves"
+      ],
+      [
+        "necromancy_adept_3",
+        "necromancy_capstone"
       ]
     ]
   }

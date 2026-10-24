@@ -30,6 +30,36 @@
     ],
     "cost": 1
   },
+  "quick_bite": {
+    "title": {
+      "translate": "skill.dungeondelving.fishing.quick_bite"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fishing.quick_bite.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:fishing_rod"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.quick_bite"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 4
+  },
   "angler": {
     "title": {
       "translate": "skill.dungeondelving.fishing.angler"
@@ -46,7 +76,7 @@
     "frame": {
       "type": "advancement",
       "data": {
-        "frame": "goal"
+        "frame": "task"
       }
     },
     "rewards": [
@@ -59,6 +89,188 @@
         }
       }
     ],
-    "cost": 1
+    "cost": 1,
+    "required_points": 4
+  },
+  "treasure_hunter_1": {
+    "title": {
+      "translate": "skill.dungeondelving.fishing.treasure_hunter_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fishing.treasure_hunter_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:fishing_rod"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.treasure_hunter_1"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 9
+  },
+  "treasure_hunter_2": {
+    "title": {
+      "translate": "skill.dungeondelving.fishing.treasure_hunter_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fishing.treasure_hunter_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:fishing_rod"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.treasure_hunter_2"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 19
+  },
+  "treasure_hunter_3": {
+    "title": {
+      "translate": "skill.dungeondelving.fishing.treasure_hunter_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fishing.treasure_hunter_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:fishing_rod"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.treasure_hunter_3"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 34
+  },
+  "double_catch": {
+    "title": {
+      "translate": "skill.dungeondelving.fishing.double_catch"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fishing.double_catch.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:fishing_rod"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.double_catch"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "shake": {
+    "title": {
+      "translate": "skill.dungeondelving.fishing.shake"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fishing.shake.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:fishing_rod"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.shake"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 24
+  },
+  "master_angler": {
+    "title": {
+      "translate": "skill.dungeondelving.fishing.master_angler"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fishing.master_angler.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:fishing_rod"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.master_angler"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 49,
+    "required_spent_points": 12
   }
 }
