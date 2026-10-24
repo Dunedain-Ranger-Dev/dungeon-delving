@@ -307,6 +307,9 @@ dependencies {
         localRuntime "maven.modrinth:yungs-better-end-island:I52NZ1qK"// 1.21.1-NeoForge-3.1.2
         localRuntime "maven.modrinth:yungs-bridges:urkCzBf6"          // 1.21.1-NeoForge-5.1.1
         localRuntime "maven.modrinth:yungs-extras:N2EpMhR7"           // 1.21.1-NeoForge-5.1.1
+        // Fast leaf decay after felling trees (Tree Feller)
+        localRuntime "maven.modrinth:leaves-be-gone:kAbmpvF3"         // v21.1.1-1.21.1-NeoForge
+        localRuntime "maven.modrinth:puzzles-lib:lATqZwtV"            // 21.1.64, Leaves Be Gone's library
     }
 
     // For more info:
