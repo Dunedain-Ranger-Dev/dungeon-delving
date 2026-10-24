@@ -70,6 +70,11 @@ public final class CharacterCommands {
                                     return 1;
                                 })))
                 .then(Commands.literal("class").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                        .then(Commands.literal("reset").executes(context -> {
+                            Characters.setClass(context.getSource().getPlayerOrException(), null);
+                            Feedback.tell(context.getSource(), "You have no class now.");
+                            return 1;
+                        }))
                         .then(Commands.argument("class", com.mojang.brigadier.arguments.StringArgumentType.word())
                                 .suggests((context, builder) -> net.minecraft.commands.SharedSuggestionProvider.suggest(
                                         java.util.Arrays.stream(io.github.ranger3462.dungeondelving.character.PlayerClass.values()).map(c -> c.id), builder))
