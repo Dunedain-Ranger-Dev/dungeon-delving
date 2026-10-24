@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.skill.GatheringPerks;
 import io.github.ranger3462.dungeondelving.skill.Perk;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
@@ -104,6 +105,29 @@ public class PerkTests {
         helper.succeed();
     }
 
+    /** Forester only replants trees: a log on dirt that's part of a tree with natural leaves, not a pillar. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void foresterOnlyReplantsTrees(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos tree = spot(helper);
+        BlockPos pillar = tree.east(6);
+        try {
+            for (BlockPos base : new BlockPos[] { tree, pillar }) {
+                level.setBlockAndUpdate(base.below(), Blocks.DIRT.defaultBlockState());
+                for (int y = 0; y < 5; y++) {
+                    level.setBlockAndUpdate(base.above(y), Blocks.OAK_LOG.defaultBlockState());
+                }
+            }
+            level.setBlockAndUpdate(tree.above(5), Blocks.OAK_LEAVES.defaultBlockState());
+            helper.assertTrue(GatheringPerks.isTreeBase(level, tree, level.getBlockState(tree)), "a tree's bottom log is a tree base");
+            helper.assertFalse(GatheringPerks.isTreeBase(level, pillar, level.getBlockState(pillar)), "a pillar of logs isn't");
+            helper.assertFalse(GatheringPerks.isTreeBase(level, tree.above(), level.getBlockState(tree.above())), "nor is a log higher up the tree");
+        } finally {
+            clear(level, tree);
+        }
+        helper.succeed();
+    }
+
     @GameTest(template = ANY_TEMPLATE)
     public static void replanterPlantsTheCropAgain(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -133,7 +157,7 @@ public class PerkTests {
 
     /** Clears the blocks and drops around a spot. */
     private static void clear(ServerLevel level, BlockPos spot) {
-        for (BlockPos pos : BlockPos.betweenClosed(spot.offset(-1, -1, -1), spot.offset(9, 6, 1))) {
+        for (BlockPos pos : BlockPos.betweenClosed(spot.offset(-1, -2, -1), spot.offset(9, 6, 1))) {
             level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
         level.getEntitiesOfClass(ItemEntity.class, new AABB(spot).inflate(12)).forEach(ItemEntity::discard);

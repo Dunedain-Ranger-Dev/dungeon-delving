@@ -36,7 +36,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  *   <li>Tree Feller (Woodcutting): sneak and chop a log to fell the tree, up to 32 or 64 more logs. Only trees: the logs
  *   must touch natural leaves, so log builds are safe.</li>
  *   <li>Prospector (Mining): a chance of a second drop from ore (not with Silk Touch).</li>
- *   <li>Forester (Woodcutting): chopping a tree's bottom log sometimes plants its sapling.</li>
+ *   <li>Forester (Woodcutting): chopping a tree's bottom log sometimes plants its sapling. Only trees, like Tree Feller.</li>
  *   <li>Bountiful (Farming): a chance of an extra crop from a ripe harvest.</li>
  *   <li>Replanter (Farming): a ripe crop you harvest plants itself again, using one of its seeds.</li>
  * </ul>
@@ -56,6 +56,11 @@ public final class GatheringPerks {
     private record Planting(ServerLevel level, BlockPos pos, BlockState state) {}
 
     private static final List<Planting> PLANTINGS = new ArrayList<>();
+    /**
+     * Logs just broken by a Forester that are part of a tree, checked when the log breaks: by the time its drops are
+     * made, Tree Feller has already taken the rest of the tree, and its leaves with it as far as the check can see.
+     */
+    private static final Set<BlockPos> FORESTER_TREES = new HashSet<>();
     /** True while we're breaking a chain's extra blocks, so they don't start chains of their own. */
     private static boolean chaining;
 
@@ -63,10 +68,16 @@ public final class GatheringPerks {
 
     @SubscribeEvent
     public static void onBreak(BlockEvent.BreakEvent event) {
-        if (chaining || !(event.getPlayer() instanceof ServerPlayer player) || !player.isShiftKeyDown() || !(event.getLevel() instanceof ServerLevel level)) {
+        if (chaining || !(event.getPlayer() instanceof ServerPlayer player) || !(event.getLevel() instanceof ServerLevel level)) {
             return;
         }
         BlockState state = event.getState();
+        if (Perk.FORESTER.has(player) && isTreeBase(level, event.getPos(), state)) {
+            FORESTER_TREES.add(event.getPos().immutable());
+        }
+        if (!player.isShiftKeyDown()) {
+            return;
+        }
         int limit = 0;
         boolean tree = false;
         if (state.is(Tags.Blocks.ORES) && Perk.VEIN_MINER.has(player) && player.hasCorrectToolForDrops(state)) {
@@ -95,6 +106,12 @@ public final class GatheringPerks {
         } finally {
             chaining = false;
         }
+    }
+
+    /** Whether this log is the bottom of a tree: on dirt, and part of logs that touch natural leaves. */
+    public static boolean isTreeBase(ServerLevel level, BlockPos pos, BlockState state) {
+        return state.is(BlockTags.LOGS) && level.getBlockState(pos.below()).is(BlockTags.DIRT)
+                && touchesNaturalLeaves(level, connected(level, pos, state.getBlock(), TREE_LIMIT[TREE_LIMIT.length - 1]), pos);
     }
 
     /** The blocks of this kind connected to start (corners count), nearest first, up to limit beyond the start. */
@@ -157,8 +174,7 @@ public final class GatheringPerks {
                 PLANTINGS.add(new Planting(level, pos.immutable(), crop.getStateForAge(0)));
             }
         }
-        if (state.is(BlockTags.LOGS) && Perk.FORESTER.has(player) && level.getBlockState(pos.below()).is(BlockTags.DIRT)
-                && level.getRandom().nextFloat() < FORESTER_CHANCE) {
+        if (state.is(BlockTags.LOGS) && FORESTER_TREES.remove(pos) && level.getRandom().nextFloat() < FORESTER_CHANCE) {
             saplingFor(state.getBlock()).ifPresent(sapling -> PLANTINGS.add(new Planting(level, pos.immutable(), sapling.defaultBlockState())));
         }
     }
@@ -199,6 +215,7 @@ public final class GatheringPerks {
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
+        FORESTER_TREES.clear(); // Any whose drops never came (a break that was cancelled).
         if (PLANTINGS.isEmpty()) {
             return;
         }
