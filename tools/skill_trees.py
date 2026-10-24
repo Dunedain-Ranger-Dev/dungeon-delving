@@ -12,9 +12,11 @@ their experience (CraftingSkills, mirrored into these categories), so their curv
 full, leftover points go into Mastery.
 
 Every tree has the same vertical shape (shape() below): a root, two choices at level 5, a signature perk with ranks
-at levels 10, 20 and 35, two refinements at 25, and a capstone at 50 that also needs points spent in the tree. A node
-needs its parent and the skill level ("required_points": a point comes with each level). Ranks are nodes stacked in
-the spine, since Pufferfish has no multi-point nodes.
+at levels 10, 20 and 35, two refinements at 25, and a capstone at 50 that also needs points spent in the tree. Two
+outer columns hold small stat bonuses, five ranks each (STATS). A node needs its parent and the skill level
+("required_points": a point comes with each level). Ranks are nodes stacked in a column, since Pufferfish has no
+multi-point nodes. Costs rise with depth, so a tree takes about 50 points, about the level its capstone needs; points
+after that go into Mastery.
 
 Rewards are attribute bonuses, or player tags our own code checks for (skill/Perk.java uses the same names:
 dungeondelving.perk.<key>, or <key>_<rank> for a ranked perk).
@@ -34,7 +36,11 @@ GATHERING_CURVE = "min(30 + level * 12 + level ^ 2, 6000)"
 CRAFTING_CURVE = "20 * (2 * level + 1)"
 # Grid spacing for the vertical layout, in Pufferfish's screen units.
 DX, DY = 34, 34
-CAPSTONE_SPENT = 12
+CAPSTONE_SPENT = 30
+# Points per node, by its place in the tree (shape()).
+ROOT_COST, CHOICE_COST, SIGNATURE_COSTS, REFINEMENT_COST, CAPSTONE_COST, STAT_COST = 1, 2, [3, 5, 8], 4, 10, 1
+# The stat columns' ranks: the level each needs.
+STAT_LEVELS = [2, 8, 15, 30, 45]
 # Perk tags our code acts on already (skill/Perk.java); the preview marks the rest as still to build.
 IMPLEMENTED = {"steady_hand", "slow_cooling", "thrifty", "sure_strikes", "steady_scraper", "careful_tanner", "water_saver",
                "steady_needle", "careful_weaver", "vein_miner", "prospector", "tree_feller", "forester", "bountiful", "replanter"}
@@ -82,7 +88,7 @@ def attribute(attr, value, operation="multiply_base"):
     return {"type": "puffish_skills:attribute", "data": {"attribute": attr, "operation": operation, "value": value}}
 
 
-ROMAN = ["I", "II", "III"]
+ROMAN = ["I", "II", "III", "IV", "V"]
 
 
 def n(key, title, description, rewards=(), mods=(), active=False):
@@ -106,28 +112,34 @@ def ranks(key, title, descriptions, active=False, rewards=None, mods=()):
             for i, d in enumerate(descriptions)]
 
 
+def stats(key, title, description, rewards=None, mods=()):
+    """A stat column: five ranks of the same small bonus (rewards, for one rank), or of a perk tag (<key>_<rank>)."""
+    return [n(f"{key}_{i + 1}", f"{title} {ROMAN[i]}", description, rewards if rewards else [tag(f"{key}_{i + 1}")], mods) for i in range(5)]
+
+
 def shape(root, choices, signature, refinements, capstone, extra=()):
     """The shared vertical tree. Rows top to bottom: root (level 0); choices (level 5, left and right); signature
     rank I (10) and II (20); refinements (25, left and right, under rank II); signature rank III (35); capstone (50,
-    with CAPSTONE_SPENT points spent). extra places more nodes: (node, column, row, level, parent key). Each placed
-    node is (node, column, row, level, parent key or None, points spent needed)."""
-    placed = [(root, 0, 0, 0, None, 0)]
+    with CAPSTONE_SPENT points spent). extra places more nodes: (node, column, row, level, parent key, cost). Each
+    placed node is (node, column, row, level, parent key or None, points spent needed, cost). add() puts the stat
+    columns either side."""
+    placed = [(root, 0, 0, 0, None, 0, ROOT_COST)]
     for node, column in zip(choices, (-1, 1)):
-        placed.append((node, column, 1, 5, root["key"], 0))
+        placed.append((node, column, 1, 5, root["key"], 0, CHOICE_COST))
     rows, levels = [2, 3, 5], [10, 20, 35]
     parent = root["key"]
     for i, node in enumerate(signature):
-        placed.append((node, 0, rows[i], levels[i], parent, 0))
+        placed.append((node, 0, rows[i], levels[i], parent, 0, SIGNATURE_COSTS[i]))
         parent = node["key"]
     above = signature[min(1, len(signature) - 1)]["key"]
     for node, column in zip(refinements, (-1, 1)):
-        placed.append((node, column, 4, 25, above, 0))
-    last_row = max(row for _, _, row, _, _, _ in placed)
-    for node, column, row, level, under in extra:
-        placed.append((node, column, row, level, under, 0))
+        placed.append((node, column, 4, 25, above, 0, REFINEMENT_COST))
+    last_row = max(row for _, _, row, _, _, _, _ in placed)
+    for node, column, row, level, under, cost in extra:
+        placed.append((node, column, row, level, under, 0, cost))
         last_row = max(last_row, row)
     placed.append((capstone, 0, last_row + 1, 50, parent if not extra else extra[-1][4] if extra[-1][1] != 0 else extra[-1][0]["key"],
-                   CAPSTONE_SPENT))
+                   CAPSTONE_SPENT, CAPSTONE_COST))
     return placed
 
 
@@ -136,15 +148,68 @@ def shape(root, choices, signature, refinements, capstone, extra=()):
 TREES = {}
 GROUPS = {}
 MASTERY = {}
+# Each tree's stat columns (left, right): small bonuses to spend points on as you level.
+SPEED = "minecraft:player.block_break_speed"
+LUCK, HEALTH, ARMOR = "minecraft:generic.luck", "minecraft:generic.max_health", "minecraft:generic.armor"
+DAMAGE, ATTACK_SPEED, MOVE = "minecraft:generic.attack_damage", "minecraft:generic.attack_speed", "minecraft:generic.movement_speed"
+RANGED_DAMAGE = "ranged_weapon:damage"
+
+
+def melee_stats(key):
+    return (stats(f"{key}_power", "Power", "+1% melee damage.", [attribute(DAMAGE, 0.01)]),
+            stats(f"{key}_quickness", "Quickness", "+1% attack speed.", [attribute(ATTACK_SPEED, 0.01)]))
+
+
+def ranged_stats(key):
+    return (stats(f"{key}_power", "Power", "+1% ranged damage.", [attribute(RANGED_DAMAGE, 0.01, "multiply_total")], ["ranged_weapon_api"]),
+            stats(f"{key}_mobility", "Mobility", "+1% movement speed.", [attribute(MOVE, 0.01)]))
+
+
+STATS = {
+    "mining": (stats("swift_pick", "Swift Pick", "+2% mining speed.", [attribute(SPEED, 0.02)]),
+               stats("miners_constitution", "Miner's Constitution", "+1 max health.", [attribute(HEALTH, 1, "addition")])),
+    "woodcutting": (stats("swift_axe", "Swift Axe", "+2% breaking speed.", [attribute(SPEED, 0.02)]),
+                    stats("woodland_luck", "Woodland Luck", "+0.1 luck.", [attribute(LUCK, 0.1, "addition")])),
+    "excavation": (stats("quick_dig", "Quick Dig", "+2% breaking speed.", [attribute(SPEED, 0.02)]),
+                   stats("keen_eye", "Keen Eye", "+0.1 luck.", [attribute(LUCK, 0.1, "addition")])),
+    "farming": (stats("green_fingers", "Green Fingers", "+0.1 luck.", [attribute(LUCK, 0.1, "addition")]),
+                stats("farmhand", "Farmhand", "+1 max health.", [attribute(HEALTH, 1, "addition")])),
+    "fishing": (stats("patience", "Patience", "+0.1 luck.", [attribute(LUCK, 0.1, "addition")]),
+                stats("deep_breath", "Deep Breath", "Stay underwater a little longer.", [attribute("minecraft:generic.oxygen_bonus", 0.2, "addition")])),
+    "forging": (stats("strong_arm", "Strong Arm", "+0.2 attack damage.", [attribute(DAMAGE, 0.2, "addition")]),
+                stats("forge_studies", "Forge Studies", "+5% Forging XP.")),
+    "leatherworking": (stats("tough_hide", "Tough Hide", "+0.2 armor.", [attribute(ARMOR, 0.2, "addition")]),
+                       stats("tanning_studies", "Tanning Studies", "+5% Leatherworking XP.")),
+    "weaving": (stats("nimble", "Nimble", "+1% movement speed.", [attribute(MOVE, 0.01)]),
+                stats("weaving_studies", "Weaving Studies", "+5% Weaving XP.")),
+    **{key: melee_stats(key) for key in ("one_handed", "two_handed", "polearms", "daggers", "unarmed")},
+    **{key: ranged_stats(key) for key in ("archery", "crossbows")},
+    "dual_wielding": tuple(reversed(melee_stats("dual_wielding"))),
+    "blocking": (stats("blocking_stance", "Stance", "+1% knockback resistance.", [attribute("minecraft:generic.knockback_resistance", 0.01, "addition")]),
+                 stats("blocking_guard", "Guard", "+0.2 armor.", [attribute(ARMOR, 0.2, "addition")])),
+    "light_armor": (stats("light_fleetness", "Fleetness", "+1% movement speed.", [attribute(MOVE, 0.01)]),
+                    stats("light_padding", "Padding", "+0.2 armor.", [attribute(ARMOR, 0.2, "addition")])),
+    "medium_armor": (stats("medium_guard", "Guard", "+0.2 armor.", [attribute(ARMOR, 0.2, "addition")]),
+                     stats("medium_fleetness", "Fleetness", "+1% movement speed.", [attribute(MOVE, 0.01)])),
+    "heavy_armor": (stats("heavy_hardening", "Hardening", "+0.2 armor toughness.", [attribute("minecraft:generic.armor_toughness", 0.2, "addition")]),
+                    stats("heavy_vigor", "Vigor", "+1 max health.", [attribute(HEALTH, 1, "addition")])),
+    "mage_armor": (stats("mage_attunement", "Attunement", "+0.1 spell power.", [attribute("spell_power:generic", 0.1, "addition")], ["spell_power"]),
+                   stats("mage_wellspring", "Wellspring", "+5 max mana for Iron's Spells.", [attribute("irons_spellbooks:max_mana", 5, "addition")], ["irons_spellbooks"])),
+}
 
 
 def add(group, key, title, icon, sources, placed, mastery):
+    """A tree, with its stat columns (STATS) added either side: rank I hangs off the root, the rest below it."""
+    for side, column in zip(STATS.get(key, ()), (-2, 2)):
+        parent = placed[0][0]["key"]
+        for i, node in enumerate(side):
+            placed.append((node, column, i + 1, STAT_LEVELS[i], parent, 0, STAT_COST))
+            parent = node["key"]
     TREES[key] = (title, icon, sources, placed)
     GROUPS[key] = group
     MASTERY[key] = mastery
 
 
-SPEED = "minecraft:player.block_break_speed"
 add("Gathering", "mining", "Mining", "minecraft:iron_pickaxe",
     [mine({"#c:ores": 10, "#minecraft:base_stone_overworld": 1, "#c:stones": 1}, no_silk_touch=("#c:ores",))],
     shape(n("quick_pick", "Quick Pick", "+5% mining speed.", [attribute(SPEED, 0.05)]),
@@ -213,8 +278,8 @@ add("Crafting", "forging", "Forging", "dungeondelving:master_anvil", None,
           [perk("thrifty_2", "Thrifty II", "Cracks give back 8 nuggets, and salvage returns 70% of the metal."),
            perk("slow_cooling_2", "Slow Cooling II", "Hot metal stays workable 50% longer.")],
           perk("masterwork", "Masterwork", "A forging with no misses has a 10% chance to come out one ★ higher, up to what the forge allows."),
-          extra=[(perk("sure_strikes_1", "Sure Strikes I", "25% less chance a strike cracks the piece."), 0, 6, 30, "steady_hand_3"),
-                 (perk("sure_strikes_2", "Sure Strikes II", "50% less chance a strike cracks the piece."), 0, 7, 40, "sure_strikes_1")]),
+          extra=[(perk("sure_strikes_1", "Sure Strikes I", "25% less chance a strike cracks the piece."), 0, 6, 30, "steady_hand_3", 5),
+                 (perk("sure_strikes_2", "Sure Strikes II", "50% less chance a strike cracks the piece."), 0, 7, 40, "sure_strikes_1", 7)]),
     "Sweet spot, up to +5%")
 
 add("Crafting", "leatherworking", "Leatherworking", "minecraft:leather", None,
@@ -365,6 +430,10 @@ SCHOOLS = [
 for key, school, icon, spell_power, irons, effect, capstone in SCHOOLS:
     title = "Necromancy" if key == "necromancy" else f"{school} Magic"
     s = school.lower() if key != "necromancy" else "necromancy"
+    STATS[key] = (stats(f"{s}_attunement", "Attunement", f"+0.1 {school.lower() if key != 'necromancy' else 'soul'} spell power.",
+                        [attribute(f"spell_power:{spell_power}", 0.1, "addition")], ["spell_power"]),
+                  stats(f"{s}_wellspring", "Wellspring", "+5 max mana for Iron's Spells.", [attribute("irons_spellbooks:max_mana", 5, "addition")],
+                        ["irons_spellbooks"]))
     lore = (n(f"{s}_lore", f"{school} Lore" if key != "necromancy" else "Eldritch Lore", f"+3% {irons} spell power for Iron's Spells.",
               [attribute(f"irons_spellbooks:{irons}_spell_power", 0.03)], ["irons_spellbooks"]) if irons
             else perk(f"{s}_efficiency", "Efficient Casting", f"{school} spells cost 10% less mana."))
@@ -380,7 +449,7 @@ for key, school, icon, spell_power, irons, effect, capstone in SCHOOLS:
         f"{school} spell power, up to +25%")
 
 add("Other", "beastmastery", "Beastmastery", "minecraft:lead", [],
-    [(n("animal_friend", "Animal Friend", "Your first step as a beastmaster. Companions and their perks come in a later update."), 0, 0, 0, None, 0)],
+    [(n("animal_friend", "Animal Friend", "Your first step as a beastmaster. Companions and their perks come in a later update."), 0, 0, 0, None, 0, ROOT_COST)],
     "Companion strength (with companions, DD-61)")
 
 
@@ -471,7 +540,7 @@ for key, (title, icon, sources, placed) in TREES.items():
         "sources": [] if crafting else sources,
     })
     definitions, skills, links, nodes = {}, {}, [], []
-    for node, column, row, level, parent, spent in placed:
+    for node, column, row, level, parent, spent, cost in placed:
         k = node["key"]
         frame = "challenge" if spent else "goal" if node["active"] else "task"
         definitions[k] = {
@@ -480,7 +549,7 @@ for key, (title, icon, sources, placed) in TREES.items():
             "icon": icon_json(icon),
             "frame": {"type": "advancement", "data": {"frame": frame}},
             "rewards": node["rewards"],
-            "cost": 1,
+            "cost": cost,
             # A point comes with each level from level 2 (Pufferfish's level 1), so level L needs L - 1 points.
             **({"required_points": level - 1} if level > 1 else {}),
             **({"required_spent_points": spent} if spent else {}),
@@ -493,7 +562,7 @@ for key, (title, icon, sources, placed) in TREES.items():
             links.append([parent, k])
         tag_key = perk_key(node)
         nodes.append({"key": k, "title": node["title"], "description": node["description"], "column": column, "row": row, "level": level,
-                      "parent": parent, "spent": spent, "active": node["active"], "mods": node["mods"],
+                      "parent": parent, "spent": spent, "cost": cost, "active": node["active"], "mods": node["mods"],
                       "kind": "attribute" if tag_key is None and node["rewards"] else "none" if not node["rewards"] else "perk",
                       "built": tag_key is None or tag_key in IMPLEMENTED})
     write(folder / "definitions.json", definitions)

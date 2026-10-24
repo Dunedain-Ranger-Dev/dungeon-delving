@@ -48,7 +48,7 @@ h1 { font: 700 clamp(1.8rem, 4vw, 2.6rem)/1.05 var(--display); letter-spacing: .
 .tab:focus-visible, .node:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
 @media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
-.trees { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+.trees { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
 .tree { background: var(--board); border: 1px solid var(--line); border-radius: 10px; padding: 12px 10px 10px; min-width: 0; }
 .tree h2 { font: 700 1.05rem var(--display); margin: 0 0 2px; text-align: center; }
 .tree .mastery { font-size: .78rem; color: var(--muted); text-align: center; margin: 0 0 6px; }
@@ -65,6 +65,12 @@ h1 { font: 700 clamp(1.8rem, 4vw, 2.6rem)/1.05 var(--display); letter-spacing: .
 .node.capstone .shape { fill: var(--gold-soft); stroke: var(--gold); }
 .node.capstone.todo .shape { stroke-dasharray: 3 2; }
 .node.picked .shape { stroke: var(--ink); stroke-width: 3; }
+.node.mastery .shape { fill: var(--bg); stroke: var(--gold); stroke-dasharray: 2 3; stroke-width: 2; }
+.node.mastery .rank { fill: var(--gold); font-size: 13px; }
+.node.stat .shape { rx: 7; }
+.cost { font: 500 8px var(--mono); fill: var(--muted); }
+.wire.sink { stroke-dasharray: 2 4; }
+.tree .total { font: 500 .74rem var(--mono); color: var(--muted); text-align: center; margin: -2px 0 6px; }
 .node:hover .shape { filter: brightness(1.08); }
 .panel { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 12px); background: var(--board); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
 @media (max-width: 900px) { .panel { position: static; } }
@@ -86,13 +92,15 @@ h1 { font: 700 clamp(1.8rem, 4vw, 2.6rem)/1.05 var(--display); letter-spacing: .
 <div class="wrap">
   <header>
     <h1>Skill Trees</h1>
-    <p class="intro">Every Dungeon Delving tree as it's laid out in game: top to bottom is the order you'd unlock them. The number beside a node is the skill level it needs. Pick a node to read it.</p>
+    <p class="intro">Every Dungeon Delving tree as it's laid out in game: top to bottom is the order you'd unlock them. Beside each node: the skill level it needs, and under it, its cost in points. Pick a node to read it.</p>
     <ul class="legend" aria-label="Legend">
       <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><circle r="7" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/></svg>Root</li>
       <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><rect x="-7" y="-7" width="14" height="14" rx="2" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/></svg>Perk or bonus that works now</li>
       <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><rect x="-7" y="-7" width="14" height="14" rx="2" fill="var(--board)" stroke="var(--todo)" stroke-width="1.6" stroke-dasharray="3 2"/></svg>Perk still to build</li>
       <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><path d="M0 -8 L8 0 L0 8 L-8 0 Z" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2.2"/></svg>Timed ability</li>
       <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><path id="cap-legend" d="" fill="var(--gold-soft)" stroke="var(--gold)" stroke-width="1.6"/></svg>Capstone</li>
+      <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><rect x="-7" y="-7" width="14" height="14" rx="7" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/></svg>Stat bonus (outer columns, 5 ranks)</li>
+      <li><svg width="18" height="18" viewBox="-9 -9 18 18" aria-hidden="true"><circle r="7" fill="var(--bg)" stroke="var(--gold)" stroke-width="2" stroke-dasharray="2 3"/></svg>Mastery: endless points sink</li>
     </ul>
   </header>
 
@@ -136,6 +144,8 @@ function el(tag, attrs = {}, text) {
 
 function kindOf(node) {
   const classes = ["node"];
+  if (node.mastery) return ["node", "mastery"];
+  if (/_[1-5]$/.test(node.key) && Math.abs(node.column) === 2) classes.push("stat");
   if (node.spent) classes.push("capstone");
   if (node.active) classes.push("active");
   classes.push(node.kind === "none" ? "attribute" : node.built ? node.kind : "todo");
@@ -150,30 +160,42 @@ function shapeFor(node) {
 }
 
 function rankOf(node) {
-  const m = node.title.match(/ (I{1,3})$/);
+  if (node.mastery) return "\u221e";
+  const m = node.title.match(/ (I{1,3}|IV|V)$/);
   return m ? m[1] : null;
 }
 
+/** The tree's nodes plus a Mastery node under the capstone: where points go once the tree is full. */
+function withMastery(tree) {
+  if (tree.nodes.length < 2) return tree.nodes;
+  const cap = tree.nodes.find(n => n.spent) || tree.nodes[tree.nodes.length - 1];
+  return [...tree.nodes, { key: "mastery", mastery: true, title: "Mastery", column: 0, row: cap.row + 1, level: 0, parent: cap.key,
+    description: DATA.mastery[tree.key], cost: 1, mods: [] }];
+}
+
 function drawTree(tree) {
-  const cols = tree.nodes.map(n => n.column), rows = tree.nodes.map(n => n.row);
+  const nodes = withMastery(tree);
+  const cols = nodes.map(n => n.column), rows = nodes.map(n => n.row);
   const minC = Math.min(...cols, -1), maxC = Math.max(...cols, 1), maxR = Math.max(...rows);
   const w = (maxC - minC) * DX + PAD * 2, h = maxR * DY + PAD * 2;
   const svg = el("svg", { viewBox: `0 0 ${w} ${h}`, width: w, height: h, role: "group", "aria-label": tree.title + " tree" });
   const at = n => [(n.column - minC) * DX + PAD, n.row * DY + PAD];
-  const byKey = Object.fromEntries(tree.nodes.map(n => [n.key, n]));
-  for (const n of tree.nodes) {
+  const byKey = Object.fromEntries(nodes.map(n => [n.key, n]));
+  for (const n of nodes) {
     if (!n.parent) continue;
     const [x1, y1] = at(byKey[n.parent]), [x2, y2] = at(n);
-    const path = x1 === x2 ? `M${x1} ${y1} L${x2} ${y2}` : `M${x1} ${y1} L${x1} ${(y1 + y2) / 2} L${x2} ${(y1 + y2) / 2} L${x2} ${y2}`;
-    svg.append(el("path", { class: "wire", d: path }));
+    const path = x1 === x2 ? `M${x1} ${y1} L${x2} ${y2}` : y1 === y2 ? `M${x1} ${y1} L${x2} ${y2}`
+      : `M${x1} ${y1} L${x2} ${y1} L${x2} ${y2}`;
+    svg.append(el("path", { class: n.mastery ? "wire sink" : "wire", d: path }));
   }
-  for (const n of tree.nodes) {
+  for (const n of nodes) {
     const [x, y] = at(n);
     const g = el("g", { class: kindOf(n).join(" "), transform: `translate(${x} ${y})`, tabindex: 0, role: "button", "aria-label": n.title });
     g.append(shapeFor(n));
     const rank = rankOf(n);
     if (rank) g.append(el("text", { class: "rank", "text-anchor": "middle", "dominant-baseline": "central" }, rank));
-    if (n.level) g.append(el("text", { class: "lvl", x: n.column > 0 ? R + 4 : -R - 4, y: 3, "text-anchor": n.column > 0 ? "start" : "end" }, n.level));
+    if (n.level) g.append(el("text", { class: "lvl", x: n.column > 0 ? R + 4 : -R - 4, y: 0, "text-anchor": n.column > 0 ? "start" : "end" }, "L" + n.level));
+    if (!n.mastery) g.append(el("text", { class: "cost", x: n.column > 0 ? R + 4 : -R - 4, y: 9, "text-anchor": n.column > 0 ? "start" : "end" }, n.cost + "p"));
     const choose = () => pick(tree, n, g);
     g.addEventListener("click", choose);
     g.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(); } });
@@ -193,13 +215,18 @@ function pick(tree, node, g) {
   const add = (tag, cls, text) => { const x = document.createElement(tag); if (cls) x.className = cls; x.textContent = text; panel.append(x); return x; };
   add("p", "tree-name", tree.title);
   add("h3", "", node.title);
+  if (node.mastery) {
+    add("p", "", "Once the tree is full, every further point goes here: " + node.description + ". Each point adds a little, with no limit on points, and each adds a bit less than the last.");
+    add("p", "", "Spent from the character screen (J), not this tree. Still to build.");
+    return;
+  }
   add("p", "", node.description);
   const dl = document.createElement("dl"); dl.className = "facts";
   const fact = (k, v) => { const dt = document.createElement("dt"); dt.textContent = k; const dd = document.createElement("dd"); if (v instanceof Node) dd.append(v); else dd.textContent = v; dl.append(dt, dd); };
   fact("Needs", node.level ? `Level ${node.level}` : "Nothing: it's the start");
   if (node.parent) fact("After", tree.nodes.find(n => n.key === node.parent).title);
   if (node.spent) fact("Also needs", `${node.spent} points spent in this tree`);
-  fact("Cost", "1 point");
+  fact("Cost", node.cost === 1 ? "1 point" : node.cost + " points");
   if (node.active) fact("Type", "Timed ability: sneak and act to start it, then it cools down");
   if (node.mods.length) fact("Needs mod", node.mods.join(", "));
   const chip = document.createElement("span"); chip.className = "chip " + (node.spent ? "gold" : status[1]); chip.textContent = status[0];
@@ -217,7 +244,9 @@ function select(group) {
     const card = document.createElement("article"); card.className = "tree";
     const h = document.createElement("h2"); h.textContent = tree.title;
     const m = document.createElement("p"); m.className = "mastery"; m.textContent = "Mastery: " + DATA.mastery[tree.key];
-    card.append(h, m, drawTree(tree));
+    const total = document.createElement("p"); total.className = "total";
+    total.textContent = tree.nodes.reduce((sum, n) => sum + n.cost, 0) + " points to fill";
+    card.append(h, m, total, drawTree(tree));
     treesEl.append(card);
   }
   const first = DATA.groups[group][0];
@@ -236,7 +265,8 @@ for (const group of Object.keys(DATA.groups)) {
 }
 
 const rules = [
-  "Each node costs 1 point. You get a point with every level, and levels never stop.",
+  "You get a point with every level, and levels never stop. Nodes cost more the deeper they are: 1 for the root and each stat rank, 2 for the level 5 choices, 3, 5 and 8 for the signature's ranks, 4 for the refinements, 10 for the capstone. A tree takes 49 points to fill, about what a skill has at level 50.",
+  "The outer columns are small stat bonuses with five ranks each (levels 2, 8, 15, 30 and 45), for spending points early.",
   "A node needs the one above it and the skill level shown beside it. The capstone also needs " + DATA.capstone_spent + " points spent in its tree.",
   "Ranked perks (I, II, III) are stacked down the middle; each rank needs a higher level.",
   "Timed abilities start when you sneak and act (mine ore, chop a log, strike), run for 10 to 20 seconds by rank, then cool down for 4 to 2 minutes.",

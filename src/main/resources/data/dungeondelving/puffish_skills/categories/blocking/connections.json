@@ -32,6 +32,46 @@
       [
         "shield_wall_3",
         "unbreakable"
+      ],
+      [
+        "blocking_training",
+        "blocking_stance_1"
+      ],
+      [
+        "blocking_stance_1",
+        "blocking_stance_2"
+      ],
+      [
+        "blocking_stance_2",
+        "blocking_stance_3"
+      ],
+      [
+        "blocking_stance_3",
+        "blocking_stance_4"
+      ],
+      [
+        "blocking_stance_4",
+        "blocking_stance_5"
+      ],
+      [
+        "blocking_training",
+        "blocking_guard_1"
+      ],
+      [
+        "blocking_guard_1",
+        "blocking_guard_2"
+      ],
+      [
+        "blocking_guard_2",
+        "blocking_guard_3"
+      ],
+      [
+        "blocking_guard_3",
+        "blocking_guard_4"
+      ],
+      [
+        "blocking_guard_4",
+        "blocking_guard_5"
       ]
     ]
   }

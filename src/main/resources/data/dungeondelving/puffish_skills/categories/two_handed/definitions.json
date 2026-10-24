@@ -57,7 +57,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "crushing_blow": {
@@ -87,7 +87,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "skull_splitter_1": {
@@ -117,7 +117,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 3,
     "required_points": 9
   },
   "skull_splitter_2": {
@@ -147,7 +147,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 5,
     "required_points": 19
   },
   "skull_splitter_3": {
@@ -177,7 +177,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 8,
     "required_points": 34
   },
   "stagger": {
@@ -207,7 +207,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "momentum": {
@@ -237,7 +237,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "executioner": {
@@ -267,8 +267,328 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 10,
     "required_points": 49,
-    "required_spent_points": 12
+    "required_spent_points": 30
+  },
+  "two_handed_power_1": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_power_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_power_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "two_handed_power_2": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_power_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_power_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "two_handed_power_3": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_power_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_power_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "two_handed_power_4": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_power_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_power_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "two_handed_power_5": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_power_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_power_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
+  },
+  "two_handed_quickness_1": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_quickness_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_quickness_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "two_handed_quickness_2": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_quickness_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_quickness_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "two_handed_quickness_3": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_quickness_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_quickness_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "two_handed_quickness_4": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_quickness_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_quickness_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "two_handed_quickness_5": {
+    "title": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_quickness_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.two_handed.two_handed_quickness_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:netherite_axe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
   }
 }

@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "water_attunement_1": {
+    "definition": "water_attunement_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "water_attunement_2": {
+    "definition": "water_attunement_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "water_attunement_3": {
+    "definition": "water_attunement_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "water_attunement_4": {
+    "definition": "water_attunement_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "water_attunement_5": {
+    "definition": "water_attunement_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "water_wellspring_1": {
+    "definition": "water_wellspring_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "water_wellspring_2": {
+    "definition": "water_wellspring_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "water_wellspring_3": {
+    "definition": "water_wellspring_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "water_wellspring_4": {
+    "definition": "water_wellspring_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "water_wellspring_5": {
+    "definition": "water_wellspring_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

@@ -32,6 +32,46 @@
       [
         "necromancy_adept_3",
         "necromancy_capstone"
+      ],
+      [
+        "necromancy_initiate",
+        "necromancy_attunement_1"
+      ],
+      [
+        "necromancy_attunement_1",
+        "necromancy_attunement_2"
+      ],
+      [
+        "necromancy_attunement_2",
+        "necromancy_attunement_3"
+      ],
+      [
+        "necromancy_attunement_3",
+        "necromancy_attunement_4"
+      ],
+      [
+        "necromancy_attunement_4",
+        "necromancy_attunement_5"
+      ],
+      [
+        "necromancy_initiate",
+        "necromancy_wellspring_1"
+      ],
+      [
+        "necromancy_wellspring_1",
+        "necromancy_wellspring_2"
+      ],
+      [
+        "necromancy_wellspring_2",
+        "necromancy_wellspring_3"
+      ],
+      [
+        "necromancy_wellspring_3",
+        "necromancy_wellspring_4"
+      ],
+      [
+        "necromancy_wellspring_4",
+        "necromancy_wellspring_5"
       ]
     ]
   }

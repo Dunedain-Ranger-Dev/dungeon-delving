@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "patience_1": {
+    "definition": "patience_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "patience_2": {
+    "definition": "patience_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "patience_3": {
+    "definition": "patience_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "patience_4": {
+    "definition": "patience_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "patience_5": {
+    "definition": "patience_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "deep_breath_1": {
+    "definition": "deep_breath_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "deep_breath_2": {
+    "definition": "deep_breath_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "deep_breath_3": {
+    "definition": "deep_breath_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "deep_breath_4": {
+    "definition": "deep_breath_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "deep_breath_5": {
+    "definition": "deep_breath_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

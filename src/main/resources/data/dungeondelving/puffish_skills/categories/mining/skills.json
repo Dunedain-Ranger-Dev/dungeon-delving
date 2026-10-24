@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "swift_pick_1": {
+    "definition": "swift_pick_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "swift_pick_2": {
+    "definition": "swift_pick_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "swift_pick_3": {
+    "definition": "swift_pick_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "swift_pick_4": {
+    "definition": "swift_pick_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "swift_pick_5": {
+    "definition": "swift_pick_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "miners_constitution_1": {
+    "definition": "miners_constitution_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "miners_constitution_2": {
+    "definition": "miners_constitution_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "miners_constitution_3": {
+    "definition": "miners_constitution_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "miners_constitution_4": {
+    "definition": "miners_constitution_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "miners_constitution_5": {
+    "definition": "miners_constitution_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "quick_dig_1": {
+    "definition": "quick_dig_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "quick_dig_2": {
+    "definition": "quick_dig_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "quick_dig_3": {
+    "definition": "quick_dig_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "quick_dig_4": {
+    "definition": "quick_dig_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "quick_dig_5": {
+    "definition": "quick_dig_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "keen_eye_1": {
+    "definition": "keen_eye_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "keen_eye_2": {
+    "definition": "keen_eye_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "keen_eye_3": {
+    "definition": "keen_eye_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "keen_eye_4": {
+    "definition": "keen_eye_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "keen_eye_5": {
+    "definition": "keen_eye_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

@@ -57,7 +57,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "bountiful": {
@@ -87,7 +87,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "harvest_moon_1": {
@@ -117,7 +117,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 3,
     "required_points": 9
   },
   "harvest_moon_2": {
@@ -147,7 +147,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 5,
     "required_points": 19
   },
   "harvest_moon_3": {
@@ -177,7 +177,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 8,
     "required_points": 34
   },
   "fertile_ground": {
@@ -207,7 +207,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "hardy": {
@@ -239,7 +239,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "golden_harvest": {
@@ -269,8 +269,328 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 10,
     "required_points": 49,
-    "required_spent_points": 12
+    "required_spent_points": 30
+  },
+  "green_fingers_1": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.green_fingers_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.green_fingers_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "green_fingers_2": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.green_fingers_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.green_fingers_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "green_fingers_3": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.green_fingers_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.green_fingers_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "green_fingers_4": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.green_fingers_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.green_fingers_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "green_fingers_5": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.green_fingers_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.green_fingers_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
+  },
+  "farmhand_1": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.farmhand_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.farmhand_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "farmhand_2": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.farmhand_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.farmhand_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "farmhand_3": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.farmhand_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.farmhand_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "farmhand_4": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.farmhand_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.farmhand_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "farmhand_5": {
+    "title": {
+      "translate": "skill.dungeondelving.farming.farmhand_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.farming.farmhand_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_hoe"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
   }
 }

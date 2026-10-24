@@ -32,6 +32,46 @@
       [
         "twin_fury_3",
         "whirlwind"
+      ],
+      [
+        "dual_wielding_training",
+        "dual_wielding_quickness_1"
+      ],
+      [
+        "dual_wielding_quickness_1",
+        "dual_wielding_quickness_2"
+      ],
+      [
+        "dual_wielding_quickness_2",
+        "dual_wielding_quickness_3"
+      ],
+      [
+        "dual_wielding_quickness_3",
+        "dual_wielding_quickness_4"
+      ],
+      [
+        "dual_wielding_quickness_4",
+        "dual_wielding_quickness_5"
+      ],
+      [
+        "dual_wielding_training",
+        "dual_wielding_power_1"
+      ],
+      [
+        "dual_wielding_power_1",
+        "dual_wielding_power_2"
+      ],
+      [
+        "dual_wielding_power_2",
+        "dual_wielding_power_3"
+      ],
+      [
+        "dual_wielding_power_3",
+        "dual_wielding_power_4"
+      ],
+      [
+        "dual_wielding_power_4",
+        "dual_wielding_power_5"
       ]
     ]
   }

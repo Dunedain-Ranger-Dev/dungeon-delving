@@ -32,6 +32,46 @@
       [
         "adaptable_3",
         "vanguard"
+      ],
+      [
+        "fitted_mail",
+        "medium_guard_1"
+      ],
+      [
+        "medium_guard_1",
+        "medium_guard_2"
+      ],
+      [
+        "medium_guard_2",
+        "medium_guard_3"
+      ],
+      [
+        "medium_guard_3",
+        "medium_guard_4"
+      ],
+      [
+        "medium_guard_4",
+        "medium_guard_5"
+      ],
+      [
+        "fitted_mail",
+        "medium_fleetness_1"
+      ],
+      [
+        "medium_fleetness_1",
+        "medium_fleetness_2"
+      ],
+      [
+        "medium_fleetness_2",
+        "medium_fleetness_3"
+      ],
+      [
+        "medium_fleetness_3",
+        "medium_fleetness_4"
+      ],
+      [
+        "medium_fleetness_4",
+        "medium_fleetness_5"
       ]
     ]
   }

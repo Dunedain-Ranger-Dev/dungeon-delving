@@ -57,7 +57,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "off_hand_guard": {
@@ -87,7 +87,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "twin_fury_1": {
@@ -117,7 +117,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 3,
     "required_points": 9
   },
   "twin_fury_2": {
@@ -147,7 +147,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 5,
     "required_points": 19
   },
   "twin_fury_3": {
@@ -177,7 +177,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 8,
     "required_points": 34
   },
   "dual_bleed": {
@@ -207,7 +207,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "parry": {
@@ -237,7 +237,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "whirlwind": {
@@ -267,8 +267,328 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 10,
     "required_points": 49,
-    "required_spent_points": 12
+    "required_spent_points": 30
+  },
+  "dual_wielding_quickness_1": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_quickness_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_quickness_1.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "dual_wielding_quickness_2": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_quickness_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_quickness_2.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "dual_wielding_quickness_3": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_quickness_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_quickness_3.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "dual_wielding_quickness_4": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_quickness_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_quickness_4.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "dual_wielding_quickness_5": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_quickness_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_quickness_5.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
+  },
+  "dual_wielding_power_1": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_power_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_power_1.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "dual_wielding_power_2": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_power_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_power_2.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "dual_wielding_power_3": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_power_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_power_3.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "dual_wielding_power_4": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_power_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_power_4.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "dual_wielding_power_5": {
+    "title": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_power_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.dual_wielding.dual_wielding_power_5.description"
+    },
+    "icon": {
+      "type": "texture",
+      "data": {
+        "texture": "dungeondelving:textures/gui/skill_icons/dual_wielding.png"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
   }
 }

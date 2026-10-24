@@ -32,6 +32,46 @@
       [
         "volley_3",
         "deadeye"
+      ],
+      [
+        "archery_training",
+        "archery_power_1"
+      ],
+      [
+        "archery_power_1",
+        "archery_power_2"
+      ],
+      [
+        "archery_power_2",
+        "archery_power_3"
+      ],
+      [
+        "archery_power_3",
+        "archery_power_4"
+      ],
+      [
+        "archery_power_4",
+        "archery_power_5"
+      ],
+      [
+        "archery_training",
+        "archery_mobility_1"
+      ],
+      [
+        "archery_mobility_1",
+        "archery_mobility_2"
+      ],
+      [
+        "archery_mobility_2",
+        "archery_mobility_3"
+      ],
+      [
+        "archery_mobility_3",
+        "archery_mobility_4"
+      ],
+      [
+        "archery_mobility_4",
+        "archery_mobility_5"
       ]
     ]
   }

@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "green_fingers_1": {
+    "definition": "green_fingers_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "green_fingers_2": {
+    "definition": "green_fingers_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "green_fingers_3": {
+    "definition": "green_fingers_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "green_fingers_4": {
+    "definition": "green_fingers_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "green_fingers_5": {
+    "definition": "green_fingers_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "farmhand_1": {
+    "definition": "farmhand_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "farmhand_2": {
+    "definition": "farmhand_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "farmhand_3": {
+    "definition": "farmhand_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "farmhand_4": {
+    "definition": "farmhand_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "farmhand_5": {
+    "definition": "farmhand_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

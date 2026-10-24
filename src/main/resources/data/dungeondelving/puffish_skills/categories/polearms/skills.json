@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "polearms_power_1": {
+    "definition": "polearms_power_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "polearms_power_2": {
+    "definition": "polearms_power_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "polearms_power_3": {
+    "definition": "polearms_power_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "polearms_power_4": {
+    "definition": "polearms_power_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "polearms_power_5": {
+    "definition": "polearms_power_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "polearms_quickness_1": {
+    "definition": "polearms_quickness_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "polearms_quickness_2": {
+    "definition": "polearms_quickness_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "polearms_quickness_3": {
+    "definition": "polearms_quickness_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "polearms_quickness_4": {
+    "definition": "polearms_quickness_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "polearms_quickness_5": {
+    "definition": "polearms_quickness_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

@@ -60,7 +60,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "fire_lore": {
@@ -92,7 +92,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4,
     "required_mods": [
       "irons_spellbooks"
@@ -127,7 +127,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 3,
     "required_points": 9,
     "required_mods": [
       "spell_power"
@@ -162,7 +162,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 5,
     "required_points": 19,
     "required_mods": [
       "spell_power"
@@ -197,7 +197,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 8,
     "required_points": 34,
     "required_mods": [
       "spell_power"
@@ -230,7 +230,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "fire_reserves": {
@@ -262,7 +262,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24,
     "required_mods": [
       "irons_spellbooks"
@@ -295,8 +295,358 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 10,
     "required_points": 49,
-    "required_spent_points": 12
+    "required_spent_points": 30
+  },
+  "fire_attunement_1": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_attunement_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_attunement_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:fire",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "fire_attunement_2": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_attunement_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_attunement_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:fire",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "fire_attunement_3": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_attunement_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_attunement_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:fire",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "fire_attunement_4": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_attunement_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_attunement_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:fire",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "fire_attunement_5": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_attunement_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_attunement_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "spell_power:fire",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44,
+    "required_mods": [
+      "spell_power"
+    ]
+  },
+  "fire_wellspring_1": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_wellspring_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_wellspring_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:max_mana",
+          "operation": "addition",
+          "value": 5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  },
+  "fire_wellspring_2": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_wellspring_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_wellspring_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:max_mana",
+          "operation": "addition",
+          "value": 5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  },
+  "fire_wellspring_3": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_wellspring_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_wellspring_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:max_mana",
+          "operation": "addition",
+          "value": 5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  },
+  "fire_wellspring_4": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_wellspring_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_wellspring_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:max_mana",
+          "operation": "addition",
+          "value": 5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
+  },
+  "fire_wellspring_5": {
+    "title": {
+      "translate": "skill.dungeondelving.fire_magic.fire_wellspring_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.fire_magic.fire_wellspring_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:blaze_powder"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "irons_spellbooks:max_mana",
+          "operation": "addition",
+          "value": 5
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44,
+    "required_mods": [
+      "irons_spellbooks"
+    ]
   }
 }

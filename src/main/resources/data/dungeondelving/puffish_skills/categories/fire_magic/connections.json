@@ -32,6 +32,46 @@
       [
         "fire_adept_3",
         "fire_capstone"
+      ],
+      [
+        "fire_initiate",
+        "fire_attunement_1"
+      ],
+      [
+        "fire_attunement_1",
+        "fire_attunement_2"
+      ],
+      [
+        "fire_attunement_2",
+        "fire_attunement_3"
+      ],
+      [
+        "fire_attunement_3",
+        "fire_attunement_4"
+      ],
+      [
+        "fire_attunement_4",
+        "fire_attunement_5"
+      ],
+      [
+        "fire_initiate",
+        "fire_wellspring_1"
+      ],
+      [
+        "fire_wellspring_1",
+        "fire_wellspring_2"
+      ],
+      [
+        "fire_wellspring_2",
+        "fire_wellspring_3"
+      ],
+      [
+        "fire_wellspring_3",
+        "fire_wellspring_4"
+      ],
+      [
+        "fire_wellspring_4",
+        "fire_wellspring_5"
       ]
     ]
   }

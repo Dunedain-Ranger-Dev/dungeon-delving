@@ -32,6 +32,46 @@
       [
         "skull_splitter_3",
         "executioner"
+      ],
+      [
+        "two_handed_training",
+        "two_handed_power_1"
+      ],
+      [
+        "two_handed_power_1",
+        "two_handed_power_2"
+      ],
+      [
+        "two_handed_power_2",
+        "two_handed_power_3"
+      ],
+      [
+        "two_handed_power_3",
+        "two_handed_power_4"
+      ],
+      [
+        "two_handed_power_4",
+        "two_handed_power_5"
+      ],
+      [
+        "two_handed_training",
+        "two_handed_quickness_1"
+      ],
+      [
+        "two_handed_quickness_1",
+        "two_handed_quickness_2"
+      ],
+      [
+        "two_handed_quickness_2",
+        "two_handed_quickness_3"
+      ],
+      [
+        "two_handed_quickness_3",
+        "two_handed_quickness_4"
+      ],
+      [
+        "two_handed_quickness_4",
+        "two_handed_quickness_5"
       ]
     ]
   }

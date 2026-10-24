@@ -32,6 +32,46 @@
       [
         "air_adept_3",
         "air_capstone"
+      ],
+      [
+        "air_initiate",
+        "air_attunement_1"
+      ],
+      [
+        "air_attunement_1",
+        "air_attunement_2"
+      ],
+      [
+        "air_attunement_2",
+        "air_attunement_3"
+      ],
+      [
+        "air_attunement_3",
+        "air_attunement_4"
+      ],
+      [
+        "air_attunement_4",
+        "air_attunement_5"
+      ],
+      [
+        "air_initiate",
+        "air_wellspring_1"
+      ],
+      [
+        "air_wellspring_1",
+        "air_wellspring_2"
+      ],
+      [
+        "air_wellspring_2",
+        "air_wellspring_3"
+      ],
+      [
+        "air_wellspring_3",
+        "air_wellspring_4"
+      ],
+      [
+        "air_wellspring_4",
+        "air_wellspring_5"
       ]
     ]
   }

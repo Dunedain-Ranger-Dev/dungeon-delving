@@ -32,6 +32,46 @@
       [
         "bladestorm_3",
         "duelist"
+      ],
+      [
+        "one_handed_training",
+        "one_handed_power_1"
+      ],
+      [
+        "one_handed_power_1",
+        "one_handed_power_2"
+      ],
+      [
+        "one_handed_power_2",
+        "one_handed_power_3"
+      ],
+      [
+        "one_handed_power_3",
+        "one_handed_power_4"
+      ],
+      [
+        "one_handed_power_4",
+        "one_handed_power_5"
+      ],
+      [
+        "one_handed_training",
+        "one_handed_quickness_1"
+      ],
+      [
+        "one_handed_quickness_1",
+        "one_handed_quickness_2"
+      ],
+      [
+        "one_handed_quickness_2",
+        "one_handed_quickness_3"
+      ],
+      [
+        "one_handed_quickness_3",
+        "one_handed_quickness_4"
+      ],
+      [
+        "one_handed_quickness_4",
+        "one_handed_quickness_5"
       ]
     ]
   }

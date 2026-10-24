@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "arcane_attunement_1": {
+    "definition": "arcane_attunement_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "arcane_attunement_2": {
+    "definition": "arcane_attunement_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "arcane_attunement_3": {
+    "definition": "arcane_attunement_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "arcane_attunement_4": {
+    "definition": "arcane_attunement_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "arcane_attunement_5": {
+    "definition": "arcane_attunement_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "arcane_wellspring_1": {
+    "definition": "arcane_wellspring_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "arcane_wellspring_2": {
+    "definition": "arcane_wellspring_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "arcane_wellspring_3": {
+    "definition": "arcane_wellspring_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "arcane_wellspring_4": {
+    "definition": "arcane_wellspring_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "arcane_wellspring_5": {
+    "definition": "arcane_wellspring_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

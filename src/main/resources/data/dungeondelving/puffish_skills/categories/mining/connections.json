@@ -32,6 +32,46 @@
       [
         "vein_miner_3",
         "motherlode"
+      ],
+      [
+        "quick_pick",
+        "swift_pick_1"
+      ],
+      [
+        "swift_pick_1",
+        "swift_pick_2"
+      ],
+      [
+        "swift_pick_2",
+        "swift_pick_3"
+      ],
+      [
+        "swift_pick_3",
+        "swift_pick_4"
+      ],
+      [
+        "swift_pick_4",
+        "swift_pick_5"
+      ],
+      [
+        "quick_pick",
+        "miners_constitution_1"
+      ],
+      [
+        "miners_constitution_1",
+        "miners_constitution_2"
+      ],
+      [
+        "miners_constitution_2",
+        "miners_constitution_3"
+      ],
+      [
+        "miners_constitution_3",
+        "miners_constitution_4"
+      ],
+      [
+        "miners_constitution_4",
+        "miners_constitution_5"
       ]
     ]
   }

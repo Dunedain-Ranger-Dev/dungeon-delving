@@ -57,7 +57,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "swift_shovel": {
@@ -87,7 +87,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "earthmover_1": {
@@ -117,7 +117,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 3,
     "required_points": 9
   },
   "earthmover_2": {
@@ -147,7 +147,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 5,
     "required_points": 19
   },
   "earthmover_3": {
@@ -177,7 +177,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 8,
     "required_points": 34
   },
   "sturdy_shovel": {
@@ -207,7 +207,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "sifter": {
@@ -237,7 +237,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "buried_riches": {
@@ -267,8 +267,328 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 10,
     "required_points": 49,
-    "required_spent_points": 12
+    "required_spent_points": 30
+  },
+  "quick_dig_1": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.quick_dig_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.quick_dig_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:player.block_break_speed",
+          "operation": "multiply_base",
+          "value": 0.02
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "quick_dig_2": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.quick_dig_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.quick_dig_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:player.block_break_speed",
+          "operation": "multiply_base",
+          "value": 0.02
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "quick_dig_3": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.quick_dig_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.quick_dig_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:player.block_break_speed",
+          "operation": "multiply_base",
+          "value": 0.02
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "quick_dig_4": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.quick_dig_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.quick_dig_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:player.block_break_speed",
+          "operation": "multiply_base",
+          "value": 0.02
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "quick_dig_5": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.quick_dig_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.quick_dig_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:player.block_break_speed",
+          "operation": "multiply_base",
+          "value": 0.02
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
+  },
+  "keen_eye_1": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.keen_eye_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.keen_eye_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "keen_eye_2": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.keen_eye_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.keen_eye_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "keen_eye_3": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.keen_eye_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.keen_eye_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "keen_eye_4": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.keen_eye_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.keen_eye_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "keen_eye_5": {
+    "title": {
+      "translate": "skill.dungeondelving.excavation.keen_eye_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.excavation.keen_eye_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_shovel"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.luck",
+          "operation": "addition",
+          "value": 0.1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
   }
 }

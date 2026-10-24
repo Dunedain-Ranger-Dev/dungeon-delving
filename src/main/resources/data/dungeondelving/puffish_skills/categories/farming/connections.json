@@ -32,6 +32,46 @@
       [
         "harvest_moon_3",
         "golden_harvest"
+      ],
+      [
+        "green_thumb",
+        "green_fingers_1"
+      ],
+      [
+        "green_fingers_1",
+        "green_fingers_2"
+      ],
+      [
+        "green_fingers_2",
+        "green_fingers_3"
+      ],
+      [
+        "green_fingers_3",
+        "green_fingers_4"
+      ],
+      [
+        "green_fingers_4",
+        "green_fingers_5"
+      ],
+      [
+        "green_thumb",
+        "farmhand_1"
+      ],
+      [
+        "farmhand_1",
+        "farmhand_2"
+      ],
+      [
+        "farmhand_2",
+        "farmhand_3"
+      ],
+      [
+        "farmhand_3",
+        "farmhand_4"
+      ],
+      [
+        "farmhand_4",
+        "farmhand_5"
       ]
     ]
   }

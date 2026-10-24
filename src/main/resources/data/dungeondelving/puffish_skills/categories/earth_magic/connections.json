@@ -32,6 +32,46 @@
       [
         "earth_adept_3",
         "earth_capstone"
+      ],
+      [
+        "earth_initiate",
+        "earth_attunement_1"
+      ],
+      [
+        "earth_attunement_1",
+        "earth_attunement_2"
+      ],
+      [
+        "earth_attunement_2",
+        "earth_attunement_3"
+      ],
+      [
+        "earth_attunement_3",
+        "earth_attunement_4"
+      ],
+      [
+        "earth_attunement_4",
+        "earth_attunement_5"
+      ],
+      [
+        "earth_initiate",
+        "earth_wellspring_1"
+      ],
+      [
+        "earth_wellspring_1",
+        "earth_wellspring_2"
+      ],
+      [
+        "earth_wellspring_2",
+        "earth_wellspring_3"
+      ],
+      [
+        "earth_wellspring_3",
+        "earth_wellspring_4"
+      ],
+      [
+        "earth_wellspring_4",
+        "earth_wellspring_5"
       ]
     ]
   }

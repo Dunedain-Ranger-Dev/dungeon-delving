@@ -32,6 +32,46 @@
       [
         "rapid_fire_3",
         "siegebreaker"
+      ],
+      [
+        "crossbows_training",
+        "crossbows_power_1"
+      ],
+      [
+        "crossbows_power_1",
+        "crossbows_power_2"
+      ],
+      [
+        "crossbows_power_2",
+        "crossbows_power_3"
+      ],
+      [
+        "crossbows_power_3",
+        "crossbows_power_4"
+      ],
+      [
+        "crossbows_power_4",
+        "crossbows_power_5"
+      ],
+      [
+        "crossbows_training",
+        "crossbows_mobility_1"
+      ],
+      [
+        "crossbows_mobility_1",
+        "crossbows_mobility_2"
+      ],
+      [
+        "crossbows_mobility_2",
+        "crossbows_mobility_3"
+      ],
+      [
+        "crossbows_mobility_3",
+        "crossbows_mobility_4"
+      ],
+      [
+        "crossbows_mobility_4",
+        "crossbows_mobility_5"
       ]
     ]
   }

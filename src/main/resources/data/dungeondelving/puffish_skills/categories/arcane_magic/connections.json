@@ -32,6 +32,46 @@
       [
         "arcane_adept_3",
         "arcane_capstone"
+      ],
+      [
+        "arcane_initiate",
+        "arcane_attunement_1"
+      ],
+      [
+        "arcane_attunement_1",
+        "arcane_attunement_2"
+      ],
+      [
+        "arcane_attunement_2",
+        "arcane_attunement_3"
+      ],
+      [
+        "arcane_attunement_3",
+        "arcane_attunement_4"
+      ],
+      [
+        "arcane_attunement_4",
+        "arcane_attunement_5"
+      ],
+      [
+        "arcane_initiate",
+        "arcane_wellspring_1"
+      ],
+      [
+        "arcane_wellspring_1",
+        "arcane_wellspring_2"
+      ],
+      [
+        "arcane_wellspring_2",
+        "arcane_wellspring_3"
+      ],
+      [
+        "arcane_wellspring_3",
+        "arcane_wellspring_4"
+      ],
+      [
+        "arcane_wellspring_4",
+        "arcane_wellspring_5"
       ]
     ]
   }

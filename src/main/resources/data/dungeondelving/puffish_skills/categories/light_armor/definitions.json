@@ -57,7 +57,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "silent_step": {
@@ -87,7 +87,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "agility_1": {
@@ -117,7 +117,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 3,
     "required_points": 9
   },
   "agility_2": {
@@ -147,7 +147,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 5,
     "required_points": 19
   },
   "agility_3": {
@@ -177,7 +177,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 8,
     "required_points": 34
   },
   "light_footed": {
@@ -207,7 +207,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "second_wind": {
@@ -237,7 +237,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "phantom": {
@@ -267,8 +267,328 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 10,
     "required_points": 49,
-    "required_spent_points": 12
+    "required_spent_points": 30
+  },
+  "light_fleetness_1": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.light_fleetness_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.light_fleetness_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.movement_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "light_fleetness_2": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.light_fleetness_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.light_fleetness_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.movement_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "light_fleetness_3": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.light_fleetness_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.light_fleetness_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.movement_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "light_fleetness_4": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.light_fleetness_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.light_fleetness_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.movement_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "light_fleetness_5": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.light_fleetness_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.light_fleetness_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.movement_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
+  },
+  "light_padding_1": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.light_padding_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.light_padding_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "light_padding_2": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.light_padding_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.light_padding_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "light_padding_3": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.light_padding_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.light_padding_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "light_padding_4": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.light_padding_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.light_padding_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "light_padding_5": {
+    "title": {
+      "translate": "skill.dungeondelving.light_armor.light_padding_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.light_armor.light_padding_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
   }
 }

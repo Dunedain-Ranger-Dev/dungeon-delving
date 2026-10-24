@@ -32,6 +32,46 @@
       [
         "berserk_3",
         "martial_master"
+      ],
+      [
+        "unarmed_training",
+        "unarmed_power_1"
+      ],
+      [
+        "unarmed_power_1",
+        "unarmed_power_2"
+      ],
+      [
+        "unarmed_power_2",
+        "unarmed_power_3"
+      ],
+      [
+        "unarmed_power_3",
+        "unarmed_power_4"
+      ],
+      [
+        "unarmed_power_4",
+        "unarmed_power_5"
+      ],
+      [
+        "unarmed_training",
+        "unarmed_quickness_1"
+      ],
+      [
+        "unarmed_quickness_1",
+        "unarmed_quickness_2"
+      ],
+      [
+        "unarmed_quickness_2",
+        "unarmed_quickness_3"
+      ],
+      [
+        "unarmed_quickness_3",
+        "unarmed_quickness_4"
+      ],
+      [
+        "unarmed_quickness_4",
+        "unarmed_quickness_5"
       ]
     ]
   }

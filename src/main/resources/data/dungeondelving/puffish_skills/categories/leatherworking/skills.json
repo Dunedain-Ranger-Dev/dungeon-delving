@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "tough_hide_1": {
+    "definition": "tough_hide_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "tough_hide_2": {
+    "definition": "tough_hide_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "tough_hide_3": {
+    "definition": "tough_hide_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "tough_hide_4": {
+    "definition": "tough_hide_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "tough_hide_5": {
+    "definition": "tough_hide_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "tanning_studies_1": {
+    "definition": "tanning_studies_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "tanning_studies_2": {
+    "definition": "tanning_studies_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "tanning_studies_3": {
+    "definition": "tanning_studies_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "tanning_studies_4": {
+    "definition": "tanning_studies_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "tanning_studies_5": {
+    "definition": "tanning_studies_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

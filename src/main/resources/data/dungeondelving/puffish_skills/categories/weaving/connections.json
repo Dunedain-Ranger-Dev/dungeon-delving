@@ -32,6 +32,46 @@
       [
         "steady_needle_3",
         "fine_weave"
+      ],
+      [
+        "apprentice_weaver",
+        "nimble_1"
+      ],
+      [
+        "nimble_1",
+        "nimble_2"
+      ],
+      [
+        "nimble_2",
+        "nimble_3"
+      ],
+      [
+        "nimble_3",
+        "nimble_4"
+      ],
+      [
+        "nimble_4",
+        "nimble_5"
+      ],
+      [
+        "apprentice_weaver",
+        "weaving_studies_1"
+      ],
+      [
+        "weaving_studies_1",
+        "weaving_studies_2"
+      ],
+      [
+        "weaving_studies_2",
+        "weaving_studies_3"
+      ],
+      [
+        "weaving_studies_3",
+        "weaving_studies_4"
+      ],
+      [
+        "weaving_studies_4",
+        "weaving_studies_5"
       ]
     ]
   }

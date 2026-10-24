@@ -32,6 +32,46 @@
       [
         "impale_3",
         "phalanx"
+      ],
+      [
+        "polearms_training",
+        "polearms_power_1"
+      ],
+      [
+        "polearms_power_1",
+        "polearms_power_2"
+      ],
+      [
+        "polearms_power_2",
+        "polearms_power_3"
+      ],
+      [
+        "polearms_power_3",
+        "polearms_power_4"
+      ],
+      [
+        "polearms_power_4",
+        "polearms_power_5"
+      ],
+      [
+        "polearms_training",
+        "polearms_quickness_1"
+      ],
+      [
+        "polearms_quickness_1",
+        "polearms_quickness_2"
+      ],
+      [
+        "polearms_quickness_2",
+        "polearms_quickness_3"
+      ],
+      [
+        "polearms_quickness_3",
+        "polearms_quickness_4"
+      ],
+      [
+        "polearms_quickness_4",
+        "polearms_quickness_5"
       ]
     ]
   }

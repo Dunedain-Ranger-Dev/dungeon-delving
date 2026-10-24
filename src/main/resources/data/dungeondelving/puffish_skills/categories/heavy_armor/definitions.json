@@ -59,7 +59,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "plated": {
@@ -89,7 +89,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "juggernaut_1": {
@@ -119,7 +119,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 3,
     "required_points": 9
   },
   "juggernaut_2": {
@@ -149,7 +149,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 5,
     "required_points": 19
   },
   "juggernaut_3": {
@@ -179,7 +179,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 8,
     "required_points": 34
   },
   "unshaken": {
@@ -209,7 +209,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "heavy_bulwark": {
@@ -239,7 +239,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "fortress": {
@@ -269,8 +269,328 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 10,
     "required_points": 49,
-    "required_spent_points": 12
+    "required_spent_points": 30
+  },
+  "heavy_hardening_1": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_hardening_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_hardening_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor_toughness",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "heavy_hardening_2": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_hardening_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_hardening_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor_toughness",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "heavy_hardening_3": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_hardening_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_hardening_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor_toughness",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "heavy_hardening_4": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_hardening_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_hardening_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor_toughness",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "heavy_hardening_5": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_hardening_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_hardening_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.armor_toughness",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
+  },
+  "heavy_vigor_1": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_vigor_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_vigor_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "heavy_vigor_2": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_vigor_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_vigor_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "heavy_vigor_3": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_vigor_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_vigor_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "heavy_vigor_4": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_vigor_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_vigor_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "heavy_vigor_5": {
+    "title": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_vigor_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.heavy_armor.heavy_vigor_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:iron_chestplate"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.max_health",
+          "operation": "addition",
+          "value": 1
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
   }
 }

@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "medium_guard_1": {
+    "definition": "medium_guard_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "medium_guard_2": {
+    "definition": "medium_guard_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "medium_guard_3": {
+    "definition": "medium_guard_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "medium_guard_4": {
+    "definition": "medium_guard_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "medium_guard_5": {
+    "definition": "medium_guard_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "medium_fleetness_1": {
+    "definition": "medium_fleetness_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "medium_fleetness_2": {
+    "definition": "medium_fleetness_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "medium_fleetness_3": {
+    "definition": "medium_fleetness_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "medium_fleetness_4": {
+    "definition": "medium_fleetness_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "medium_fleetness_5": {
+    "definition": "medium_fleetness_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

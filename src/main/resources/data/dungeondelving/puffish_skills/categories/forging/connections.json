@@ -40,6 +40,46 @@
       [
         "sure_strikes_2",
         "masterwork"
+      ],
+      [
+        "apprentice_smith",
+        "strong_arm_1"
+      ],
+      [
+        "strong_arm_1",
+        "strong_arm_2"
+      ],
+      [
+        "strong_arm_2",
+        "strong_arm_3"
+      ],
+      [
+        "strong_arm_3",
+        "strong_arm_4"
+      ],
+      [
+        "strong_arm_4",
+        "strong_arm_5"
+      ],
+      [
+        "apprentice_smith",
+        "forge_studies_1"
+      ],
+      [
+        "forge_studies_1",
+        "forge_studies_2"
+      ],
+      [
+        "forge_studies_2",
+        "forge_studies_3"
+      ],
+      [
+        "forge_studies_3",
+        "forge_studies_4"
+      ],
+      [
+        "forge_studies_4",
+        "forge_studies_5"
       ]
     ]
   }

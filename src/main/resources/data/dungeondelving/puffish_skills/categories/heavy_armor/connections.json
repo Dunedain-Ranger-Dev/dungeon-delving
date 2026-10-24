@@ -32,6 +32,46 @@
       [
         "juggernaut_3",
         "fortress"
+      ],
+      [
+        "iron_skin",
+        "heavy_hardening_1"
+      ],
+      [
+        "heavy_hardening_1",
+        "heavy_hardening_2"
+      ],
+      [
+        "heavy_hardening_2",
+        "heavy_hardening_3"
+      ],
+      [
+        "heavy_hardening_3",
+        "heavy_hardening_4"
+      ],
+      [
+        "heavy_hardening_4",
+        "heavy_hardening_5"
+      ],
+      [
+        "iron_skin",
+        "heavy_vigor_1"
+      ],
+      [
+        "heavy_vigor_1",
+        "heavy_vigor_2"
+      ],
+      [
+        "heavy_vigor_2",
+        "heavy_vigor_3"
+      ],
+      [
+        "heavy_vigor_3",
+        "heavy_vigor_4"
+      ],
+      [
+        "heavy_vigor_4",
+        "heavy_vigor_5"
       ]
     ]
   }

@@ -57,7 +57,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "deflect": {
@@ -87,7 +87,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 2,
     "required_points": 4
   },
   "berserk_1": {
@@ -117,7 +117,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 3,
     "required_points": 9
   },
   "berserk_2": {
@@ -147,7 +147,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 5,
     "required_points": 19
   },
   "berserk_3": {
@@ -177,7 +177,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 8,
     "required_points": 34
   },
   "disarm_unarmed": {
@@ -207,7 +207,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "iron_grip": {
@@ -237,7 +237,7 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 4,
     "required_points": 24
   },
   "martial_master": {
@@ -267,8 +267,328 @@
         }
       }
     ],
-    "cost": 1,
+    "cost": 10,
     "required_points": 49,
-    "required_spent_points": 12
+    "required_spent_points": 30
+  },
+  "unarmed_power_1": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_power_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_power_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "unarmed_power_2": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_power_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_power_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "unarmed_power_3": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_power_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_power_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "unarmed_power_4": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_power_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_power_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "unarmed_power_5": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_power_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_power_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
+  },
+  "unarmed_quickness_1": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_quickness_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_quickness_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "unarmed_quickness_2": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_quickness_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_quickness_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "unarmed_quickness_3": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_quickness_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_quickness_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "unarmed_quickness_4": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_quickness_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_quickness_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "unarmed_quickness_5": {
+    "title": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_quickness_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.unarmed.unarmed_quickness_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "minecraft:leather"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_speed",
+          "operation": "multiply_base",
+          "value": 0.01
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
   }
 }

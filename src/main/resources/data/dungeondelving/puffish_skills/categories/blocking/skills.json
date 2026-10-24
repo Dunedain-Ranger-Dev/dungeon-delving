@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "blocking_stance_1": {
+    "definition": "blocking_stance_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "blocking_stance_2": {
+    "definition": "blocking_stance_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "blocking_stance_3": {
+    "definition": "blocking_stance_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "blocking_stance_4": {
+    "definition": "blocking_stance_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "blocking_stance_5": {
+    "definition": "blocking_stance_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "blocking_guard_1": {
+    "definition": "blocking_guard_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "blocking_guard_2": {
+    "definition": "blocking_guard_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "blocking_guard_3": {
+    "definition": "blocking_guard_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "blocking_guard_4": {
+    "definition": "blocking_guard_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "blocking_guard_5": {
+    "definition": "blocking_guard_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

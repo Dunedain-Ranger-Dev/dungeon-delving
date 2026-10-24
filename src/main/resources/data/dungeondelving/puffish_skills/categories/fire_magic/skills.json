@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "fire_attunement_1": {
+    "definition": "fire_attunement_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "fire_attunement_2": {
+    "definition": "fire_attunement_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "fire_attunement_3": {
+    "definition": "fire_attunement_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "fire_attunement_4": {
+    "definition": "fire_attunement_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "fire_attunement_5": {
+    "definition": "fire_attunement_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "fire_wellspring_1": {
+    "definition": "fire_wellspring_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "fire_wellspring_2": {
+    "definition": "fire_wellspring_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "fire_wellspring_3": {
+    "definition": "fire_wellspring_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "fire_wellspring_4": {
+    "definition": "fire_wellspring_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "fire_wellspring_5": {
+    "definition": "fire_wellspring_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "archery_power_1": {
+    "definition": "archery_power_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "archery_power_2": {
+    "definition": "archery_power_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "archery_power_3": {
+    "definition": "archery_power_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "archery_power_4": {
+    "definition": "archery_power_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "archery_power_5": {
+    "definition": "archery_power_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "archery_mobility_1": {
+    "definition": "archery_mobility_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "archery_mobility_2": {
+    "definition": "archery_mobility_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "archery_mobility_3": {
+    "definition": "archery_mobility_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "archery_mobility_4": {
+    "definition": "archery_mobility_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "archery_mobility_5": {
+    "definition": "archery_mobility_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

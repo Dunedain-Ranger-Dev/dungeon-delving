@@ -32,6 +32,46 @@
       [
         "tree_feller_3",
         "heartwood"
+      ],
+      [
+        "sure_swing",
+        "swift_axe_1"
+      ],
+      [
+        "swift_axe_1",
+        "swift_axe_2"
+      ],
+      [
+        "swift_axe_2",
+        "swift_axe_3"
+      ],
+      [
+        "swift_axe_3",
+        "swift_axe_4"
+      ],
+      [
+        "swift_axe_4",
+        "swift_axe_5"
+      ],
+      [
+        "sure_swing",
+        "woodland_luck_1"
+      ],
+      [
+        "woodland_luck_1",
+        "woodland_luck_2"
+      ],
+      [
+        "woodland_luck_2",
+        "woodland_luck_3"
+      ],
+      [
+        "woodland_luck_3",
+        "woodland_luck_4"
+      ],
+      [
+        "woodland_luck_4",
+        "woodland_luck_5"
       ]
     ]
   }

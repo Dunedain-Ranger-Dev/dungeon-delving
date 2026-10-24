@@ -40,7 +40,10 @@ Every tree uses the same five rows, top to bottom. Levels are the skill's own.
 | Refinements | 25 | Two side nodes that change how the signature or the skill works. |
 | Capstone | 50 | One node, also needing 12 points spent in the tree. |
 
-About 13 points fill a tree; a skill at level 50 has had 50. Everything after that goes into Mastery.
+Costs rise with depth: 1 for the root, 2 for the level 5 choices, 3, 5 and 8 for the signature ranks, 4 for the
+refinements, 10 for the capstone (which also needs 30 points spent). Two outer columns hold small stat bonuses, five
+ranks each at levels 2, 8, 15, 30 and 45, for 1 point each. A tree takes 49 points to fill, what a skill has at level
+50; everything after that goes into Mastery.
 
 ## Mastery: the points sink
 

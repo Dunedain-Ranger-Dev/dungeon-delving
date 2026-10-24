@@ -52,5 +52,65 @@
     "x": 0,
     "y": 204,
     "root": false
+  },
+  "nimble_1": {
+    "definition": "nimble_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "nimble_2": {
+    "definition": "nimble_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "nimble_3": {
+    "definition": "nimble_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "nimble_4": {
+    "definition": "nimble_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "nimble_5": {
+    "definition": "nimble_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "weaving_studies_1": {
+    "definition": "weaving_studies_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "weaving_studies_2": {
+    "definition": "weaving_studies_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "weaving_studies_3": {
+    "definition": "weaving_studies_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "weaving_studies_4": {
+    "definition": "weaving_studies_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "weaving_studies_5": {
+    "definition": "weaving_studies_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }

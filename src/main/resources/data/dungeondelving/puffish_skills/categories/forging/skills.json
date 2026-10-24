@@ -64,5 +64,65 @@
     "x": 0,
     "y": 272,
     "root": false
+  },
+  "strong_arm_1": {
+    "definition": "strong_arm_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "strong_arm_2": {
+    "definition": "strong_arm_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "strong_arm_3": {
+    "definition": "strong_arm_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "strong_arm_4": {
+    "definition": "strong_arm_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "strong_arm_5": {
+    "definition": "strong_arm_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "forge_studies_1": {
+    "definition": "forge_studies_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "forge_studies_2": {
+    "definition": "forge_studies_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "forge_studies_3": {
+    "definition": "forge_studies_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "forge_studies_4": {
+    "definition": "forge_studies_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "forge_studies_5": {
+    "definition": "forge_studies_5",
+    "x": 68,
+    "y": 170,
+    "root": false
   }
 }
