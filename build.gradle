@@ -287,6 +287,26 @@ dependencies {
         localRuntime "maven.modrinth:elemental-wizards-rpg:yciypA9F" // 3.2.0+1.21.1-neoforge
         localRuntime "maven.modrinth:forcemaster-rpg-class:fyug07lZ" // 3.2.0+1.21.1-neoforge
         localRuntime "maven.modrinth:witcher-rpg-class:FcCltY07"     // 3.2.0+1.21.1-neoforge
+        // World generation: Terralith (with Lithostitched) and YUNG's structures, caves and title cards
+        localRuntime "maven.modrinth:terralith:IY93YaEe"              // 2.6.2
+        localRuntime "maven.modrinth:lithostitched:cZu4cHY3"          // 1.8.1-neoforge-21.1
+        localRuntime "maven.modrinth:yungs-api:2prKITKh"              // 1.21.1-NeoForge-5.1.9
+        localRuntime "maven.modrinth:yungs-menu-tweaks:OB9hQTpQ"      // 1.21.1-NeoForge-2.1.2
+        localRuntime "maven.modrinth:travelers-titles:2y01mBUy"       // 1.21.1-NeoForge-5.1.3
+        localRuntime "maven.modrinth:yungs-better-caves:Feo6YOjN"     // 1.21.1-NeoForge-3.1.6
+        localRuntime "maven.modrinth:terrablender:6e8GCrLb"           // 4.1.0.8, YUNG's Cave Biomes needs it
+        localRuntime "maven.modrinth:yungs-cave-biomes:HYGqXWqQ"      // 1.21.1-NeoForge-3.1.1
+        localRuntime "maven.modrinth:yungs-better-mineshafts:Go3nbneL"// 1.21.1-NeoForge-5.1.1
+        localRuntime "maven.modrinth:yungs-better-dungeons:D6aZn0Em"  // 1.21.1-NeoForge-5.1.4
+        localRuntime "maven.modrinth:yungs-better-strongholds:8U0dIfSM"// 1.21.1-NeoForge-5.1.3
+        localRuntime "maven.modrinth:yungs-better-desert-temples:GQ9iNWkI"// 1.21.1-NeoForge-4.1.5
+        localRuntime "maven.modrinth:yungs-better-jungle-temples:P00i2hJn"// 1.21.1-NeoForge-3.1.2
+        localRuntime "maven.modrinth:yungs-better-witch-huts:AvedwcIe"// 1.21.1-NeoForge-4.1.1
+        localRuntime "maven.modrinth:yungs-better-ocean-monuments:yFjEcj2g"// 1.21.1-NeoForge-4.1.2
+        localRuntime "maven.modrinth:yungs-better-nether-fortresses:iopJiJQp"// 1.21.1-NeoForge-3.1.5
+        localRuntime "maven.modrinth:yungs-better-end-island:I52NZ1qK"// 1.21.1-NeoForge-3.1.2
+        localRuntime "maven.modrinth:yungs-bridges:urkCzBf6"          // 1.21.1-NeoForge-5.1.1
+        localRuntime "maven.modrinth:yungs-extras:N2EpMhR7"           // 1.21.1-NeoForge-5.1.1
     }
 
     // For more info:
