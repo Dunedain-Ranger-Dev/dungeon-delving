@@ -91,9 +91,13 @@ public class BossCourtAndTierTests {
         helper.succeed();
     }
 
+    /** How tall the healing tests' boxes are inside: room for the King, who is 1.4 times a wither skeleton's size. */
+    private static final int BOX_HEIGHT = 5;
+
     /**
      * With Iron's Spells, the King's mage heals him when he's hurt, even with nobody to fight. Mending is slow (a point
-     * every few seconds) and the mage has to walk over first, so this gets a generous time limit.
+     * every few seconds), so this gets a generous time limit. The court gets a box of its own, away from the other tests,
+     * whose hurt bosses and skeletons the mage would go and heal instead (and whose clean-up would discard the court).
      */
     @GameTest(template = ANY_TEMPLATE, timeoutTicks = 600)
     public static void theMagesHealTheBarrowKing(GameTestHelper helper) {
@@ -101,47 +105,31 @@ public class BossCourtAndTierTests {
             helper.succeed();
             return;
         }
-        BlockPos pos = platform(helper);
+        BlockPos pos = TestArena.box(helper, 0, BOX_HEIGHT);
         LivingEntity king = DungeonBosses.spawn(helper.getLevel(), pos, 2, -1, DungeonBosses.BARROW_KING);
         king.setHealth(king.getMaxHealth() / 2);
         float hurt = king.getHealth();
         helper.succeedWhen(() -> {
             helper.assertTrue(king.getHealth() > hurt, "the mage should have healed the King by now");
-            cleanUp(helper, pos);
+            TestArena.clearBox(helper, pos, BOX_HEIGHT);
         });
     }
 
-    /** With Iron's Spells, a hurt Goblin Shaman Chief heals himself. */
+    /** With Iron's Spells, a hurt Goblin Shaman Chief heals himself. In a box of his own, like the King above. */
     @GameTest(template = ANY_TEMPLATE, timeoutTicks = 300)
     public static void theGoblinChiefHealsHimself(GameTestHelper helper) {
         if (!ModList.get().isLoaded("irons_spellbooks")) {
             helper.succeed();
             return;
         }
-        BlockPos pos = platform(helper);
+        BlockPos pos = TestArena.box(helper, 1, BOX_HEIGHT);
         LivingEntity chief = DungeonBosses.spawn(helper.getLevel(), pos, 1, -1, "goblin_chief");
         chief.setHealth(chief.getMaxHealth() / 2);
         float hurt = chief.getHealth();
         helper.succeedWhen(() -> {
             helper.assertTrue(chief.getHealth() > hurt, "the chief should have healed himself by now");
-            cleanUp(helper, pos);
+            TestArena.clearBox(helper, pos, BOX_HEIGHT);
         });
-    }
-
-    /** A stone floor high above the test, for mobs that need to stand around for a while. Returns the spot above its middle. */
-    private static BlockPos platform(GameTestHelper helper) {
-        BlockPos pos = helper.absolutePos(new BlockPos(0, 1, 0)).above(100);
-        for (BlockPos floor : BlockPos.betweenClosed(pos.offset(-8, -1, -8), pos.offset(8, -1, 8))) {
-            helper.getLevel().setBlock(floor, Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
-        }
-        return pos;
-    }
-
-    private static void cleanUp(GameTestHelper helper, BlockPos pos) {
-        helper.getLevel().getEntitiesOfClass(Mob.class, new AABB(pos).inflate(16)).forEach(Mob::discard);
-        for (BlockPos floor : BlockPos.betweenClosed(pos.offset(-8, -1, -8), pos.offset(8, -1, 8))) {
-            helper.getLevel().setBlock(floor, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-        }
     }
 
     /** Tier 1 mobs get a little leather; tier 4 mobs get plenty of diamond, some of it enchanted. None of it drops. */
