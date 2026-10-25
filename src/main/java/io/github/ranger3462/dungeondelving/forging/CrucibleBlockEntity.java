@@ -91,17 +91,18 @@ public class CrucibleBlockEntity extends BlockEntity implements Container, MenuP
             return false;
         }
         if (progress == 0) {
-            // Starting an ingot: take a new salt if this one's spent, and check the goldsmithy can work it.
+            // Starting an ingot: take a new salt if this one's spent (only once the output has room for what it makes), and
+            // check the goldsmithy can work it.
             if (saltLeft <= 0 && !takeSalt()) {
                 return false;
             }
             Optional<CraftWorkshop> workshop = CraftWorkshop.around(level, pos, Profession.GOLDSMITHING);
-            if (workshop.isEmpty() || saltStars > workshop.get().maxStars() || !outputFits()) {
+            if (workshop.isEmpty() || saltStars > workshop.get().maxStars() || !outputFits(saltStars)) {
                 return false;
             }
             total = ticksFor(saltStars, state.getBlock() == Crafts.GREAT_CRUCIBLE.get());
         }
-        if (!outputFits()) {
+        if (!outputFits(saltStars)) {
             return false;
         }
         if (++progress >= total) {
@@ -123,7 +124,7 @@ public class CrucibleBlockEntity extends BlockEntity implements Container, MenuP
 
     private boolean takeSalt() {
         ItemStack salt = items.get(SALT);
-        if (!(salt.getItem() instanceof LiquorItem liquor) || liquor.profession != Profession.GOLDSMITHING) {
+        if (!(salt.getItem() instanceof LiquorItem liquor) || liquor.profession != Profession.GOLDSMITHING || !outputFits(liquor.stars)) {
             return false;
         }
         saltStars = liquor.stars;
@@ -133,10 +134,10 @@ public class CrucibleBlockEntity extends BlockEntity implements Container, MenuP
         return true;
     }
 
-    /** Whether a fine gold of the salt's ★ fits in the output. */
-    private boolean outputFits() {
+    /** Whether a fine gold of this ★ fits in the output. */
+    private boolean outputFits(int stars) {
         ItemStack output = items.get(OUTPUT);
-        return output.isEmpty() || output.is(Crafts.FINE_GOLD.get()) && Forging.stars(output) == saltStars && output.getCount() < output.getMaxStackSize();
+        return output.isEmpty() || output.is(Crafts.FINE_GOLD.get()) && Forging.stars(output) == stars && output.getCount() < output.getMaxStackSize();
     }
 
     /** Whether a stack belongs in a slot: gold ingots in, goldsmithing salts as fuel, nothing into the output. */

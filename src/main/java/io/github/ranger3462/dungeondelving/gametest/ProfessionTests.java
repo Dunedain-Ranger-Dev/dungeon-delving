@@ -312,6 +312,11 @@ public class ProfessionTests {
                     "and the fifth waits for more salt");
             helper.assertTrue(io.github.ranger3462.dungeondelving.forging.CrucibleBlockEntity.ticksFor(7, false)
                     == io.github.ranger3462.dungeondelving.forging.CrucibleBlockEntity.ticksFor(5, false) + 600, "each better salt takes 30s more an ingot");
+            // A better salt waits, unused, while the output still holds gold of another ★.
+            refiner.setItem(io.github.ranger3462.dungeondelving.forging.CrucibleBlockEntity.SALT, new ItemStack(Crafts.SUNSALT.get()));
+            refiner.runUntilIdle(level);
+            helper.assertTrue(refiner.getItem(io.github.ranger3462.dungeondelving.forging.CrucibleBlockEntity.SALT).getCount() == 1,
+                    "sunsalt isn't used up while ★3 gold blocks the output");
             fine.setCount(2);
 
             // Chase both at the Jeweler's Bench: two fittings each.
