@@ -1,6 +1,6 @@
 {
-  "replace": false,
   "values": [
+    "dungeondelving:testers_charm",
     "dungeondelving:gold_ring"
   ]
 }

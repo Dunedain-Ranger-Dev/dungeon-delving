@@ -404,8 +404,11 @@ def tags():
     for profession, values in DECOR.items():
         write(DATA / f"tags/block/{profession}_decor.json", {"replace": False, "values": values})
     # Jewelry in Curios' ring and necklace slots, which every player gets (Curios loads these only when it's installed).
-    write(RES / "data/curios/tags/item/ring.json", {"replace": False, "values": [f"{MOD}:gold_ring"]})
-    write(RES / "data/curios/tags/item/necklace.json", {"replace": False, "values": [f"{MOD}:gold_amulet"]})
+    # Added to, not replaced: the ring tag also holds the Tester's Charm.
+    add_to_tag(RES / "data/curios/tags/item/ring.json", [f"{MOD}:testers_charm", f"{MOD}:gold_ring"])
+    add_to_tag(RES / "data/curios/tags/item/necklace.json", [f"{MOD}:gold_amulet"])
+    # Better Combat swings: the gilded sword swings like the forged one.
+    write(DATA / "weapon_attributes/gilded_sword.json", json.loads((DATA / "weapon_attributes/forged_sword.json").read_text(encoding="utf-8")))
     write(DATA / "curios/entities/goldsmithing.json", {"entities": ["player"], "slots": ["ring", "necklace"]})
     write(DATA / "tags/item/tree_bark.json", {"replace": False, "values": [{"id": f"{FD}:tree_bark", "required": False}]})
     for kind, names in (("axe", ("shaping_rack", "tanning_barrel", "fleshing_beam", "spinning_wheel", "great_loom", "dye_works", "wood_lathe",

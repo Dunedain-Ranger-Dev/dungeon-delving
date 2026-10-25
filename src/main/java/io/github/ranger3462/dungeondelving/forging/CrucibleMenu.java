@@ -67,9 +67,9 @@ public class CrucibleMenu extends AbstractContainerMenu {
         return data.get(1) <= 0 ? 0.0f : data.get(0) / (float) data.get(1);
     }
 
-    /** What's left of the current salt, from 0 to 1. */
+    /** What's left of the current salt, from 0 to 1: it burns down smoothly over its four ingots, the ingot in progress included. */
     public float saltLeft() {
-        return data.get(2) / (float) CrucibleBlockEntity.INGOTS_PER_SALT;
+        return Math.max(0.0f, data.get(2) - progress()) / CrucibleBlockEntity.INGOTS_PER_SALT;
     }
 
     /** The current salt's ★ (0 with none). */
