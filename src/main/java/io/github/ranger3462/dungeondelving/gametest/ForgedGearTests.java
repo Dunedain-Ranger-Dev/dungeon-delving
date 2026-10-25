@@ -67,14 +67,27 @@ public class ForgedGearTests {
     }
 
     @GameTest(template = ANY_TEMPLATE)
-    public static void ourForgedGearIsRetired(GameTestHelper helper) {
-        // DD-89: forged versions of vanilla and RPG gear took its place. The items stay, for pieces already made.
-        var recipes = helper.getLevel().getRecipeManager();
-        for (String id : List.of("plate_helmet", "hauberk_chestplate", "brigandine_boots", "forged_sword", "forged_axe", "leather_base", "gambeson_base")) {
-            helper.assertTrue(recipes.byKey(DungeonDelving.id(id)).isEmpty(), id + " can't be crafted any more");
-        }
-        helper.assertTrue(CraftingXp.skillFor(new ItemStack(Forging.ARMOR.get(ForgedGear.Weight.HEAVY).get(ArmorItem.Type.HELMET).get())) == CraftSkill.FORGING,
-                "pieces already made still count as Forging's");
+    public static void craftedGearTakesItsPartsStar(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        ItemStack plate = part(Forging.ARMOR_PLATE.get(), 2);
+        ItemStack helmet = craft(level, plate, plate, plate, plate, new ItemStack(Forging.LEATHER_BASE.get()), plate);
+        helper.assertTrue(helmet.is(Forging.ARMOR.get(ForgedGear.Weight.HEAVY).get(ArmorItem.Type.HELMET).get()) && Forging.stars(helmet) == 2,
+                "plates in a helmet's shape around a leather backing make a ★2 Plate Helm");
+        ItemStack hardened = new ItemStack(Forging.HARDENED_LEATHER.get());
+        ItemStack rivet = part(Forging.RIVETS.get(), 3);
+        ItemStack brigandine = craft(level, hardened, rivet, hardened, hardened, new ItemStack(Forging.GAMBESON_BASE.get()), hardened);
+        helper.assertTrue(brigandine.is(Forging.ARMOR.get(ForgedGear.Weight.LIGHT).get(ArmorItem.Type.HELMET).get()) && Forging.stars(brigandine) == 3,
+                "hardened leather with a rivet around a gambeson backing makes a ★3 Brigandine Helm (its ★ from the rivets)");
+        helper.assertTrue(helmet.getMaxDamage() == ForgedGear.armorDurability(ArmorItem.Type.HELMET, 2), "a ★2 helm gets ★2 durability");
+        ItemStack sword = craft(level, part(Forging.ARMOR_PLATE.get(), 4), ItemStack.EMPTY, ItemStack.EMPTY, part(Forging.ARMOR_PLATE.get(), 4),
+                ItemStack.EMPTY, ItemStack.EMPTY, part(io.github.ranger3462.dungeondelving.forging.Crafts.HAFT.get(), 5));
+        helper.assertTrue(sword.is(Forging.FORGED_SWORD.get()) && Forging.stars(sword) == 4, "two ★4 plates and a ★5 haft make a ★4 sword");
+        ItemStack plain = craft(level, part(Forging.ARMOR_PLATE.get(), 4), ItemStack.EMPTY, ItemStack.EMPTY, part(Forging.ARMOR_PLATE.get(), 4),
+                ItemStack.EMPTY, ItemStack.EMPTY, new ItemStack(Items.STICK));
+        helper.assertFalse(plain.is(Forging.FORGED_SWORD.get()), "a stick won't do for a forged sword");
+        helper.assertTrue(CraftingXp.skillFor(helmet) == CraftSkill.FORGING && CraftingXp.skillFor(brigandine) == CraftSkill.WEAVING
+                && CraftingXp.skillFor(new ItemStack(Forging.ARMOR.get(ForgedGear.Weight.MEDIUM).get(ArmorItem.Type.HELMET).get())) == CraftSkill.LEATHERWORKING,
+                "plate trains Forging, hauberks Leatherworking, brigandine Weaving");
         helper.succeed();
     }
 

@@ -160,8 +160,8 @@ public class ProfessionTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void theProfessionRecipesLoad(GameTestHelper helper) {
         var recipes = helper.getLevel().getRecipeManager();
-        for (String id : List.of("seasoned_billet", "bow_from_parts", "crossbow_from_parts", "straps", "hardened_leather",
-                "bowstring", "staff_wrap", "stock", "bow_limbs", "haft", "staff_shaft", "wand_core", "shaping_rack", "spinning_wheel",
+        for (String id : List.of("seasoned_billet", "bow_from_parts", "crossbow_from_parts", "straps", "hardened_leather", "leather_base",
+                "gambeson_base", "bowstring", "staff_wrap", "stock", "bow_limbs", "haft", "staff_shaft", "wand_core", "shaping_rack", "spinning_wheel",
                 "wood_lathe")) {
             helper.assertTrue(recipes.byKey(DungeonDelving.id(id)).isPresent(), "the " + id + " recipe loads");
         }

@@ -1,0 +1,21 @@
+{
+  "type": "dungeondelving:starred_shaped",
+  "category": "equipment",
+  "pattern": [
+    "MMM",
+    "MBM",
+    "M M"
+  ],
+  "key": {
+    "M": {
+      "item": "dungeondelving:chain_links"
+    },
+    "B": {
+      "item": "dungeondelving:leather_base"
+    }
+  },
+  "result": {
+    "id": "dungeondelving:hauberk_leggings",
+    "count": 1
+  }
+}

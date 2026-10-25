@@ -52,7 +52,7 @@ CATEGORIES = {
     "forge": ("The Forge", "Building a forge, and the upgrades that let it work finer metal.", f"{MOD}:guild_ledger", 0),
     "smithing": ("Smithing", "Heating, striking, quenching and grinding iron into tempered ingots.", f"{MOD}:tempered_iron_ingot", 1),
     "parts": ("Flux and Parts", "Turning tempered ingots into plates, rivets and chain.", f"{MOD}:armor_plate", 2),
-    "gear": ("Forged Gear", "Forged iron, diamond and netherite weapons and armor, and what their stars mean.", "minecraft:iron_chestplate", 7),
+    "gear": ("Forged Gear", "The armor and weapons a smith can make, and keeping them in repair.", f"{MOD}:plate_chestplate", 7),
     "skills": ("Crafting Skills", "Forging, Leatherworking, Weaving and Woodworking, and what practice earns you.", "minecraft:experience_bottle", 8),
 }
 
@@ -152,24 +152,28 @@ ENTRIES = {
         ]),
     },
     "gear": {
-        "forged": ("Forged Gear", "minecraft:iron_sword", [
-            text("Any iron, diamond or netherite weapon or armor can be forged, and a forged piece is always stronger than a plain "
-                 "one. It keeps its usual look; its ★ shows on its name. A plain piece (crafted the usual way, or found) has no ★.",
-                 "Forged Gear"),
-            text("The ★ climbs with the material:$(li)$(bold)Iron$(): ★1 to ★3. The usual shape, in forged plates; the worst plate "
-                 "sets the ★.$(li)$(bold)Diamond$(): ★4 or ★5. A forged iron piece and a diamond at a smithing table; ★5 from a ★3 "
-                 "piece.$(li)$(bold)Netherite$(): ★6 or ★7. A forged diamond piece, the usual way; ★7 from ★5.", "The Stars"),
-            text("Each ★ into its material adds 5% to the piece's damage or armor (and the like), and 10% to its durability. A ★3 "
-                 "iron sword is 15% better than a plain one; a ★4 diamond sword 5% better than a plain diamond one, and so on.",
-                 "How Much Better"),
-            crafting("forged/iron_sword", recipe2="forged/iron_chestplate"),
+        "weights": ("Three Weights", f"{MOD}:hauberk_chestplate", [
+            text("Forged armor comes in three weights, made in the usual armor shapes:"
+                 "$(li)$(bold)Brigandine$() (light): hardened leather and rivets on a gambeson. Dyeable. The least armor, no penalty."
+                 "$(li)$(bold)Hauberk$() (medium): chain links on a leather backing."
+                 "$(li)$(bold)Plate$() (heavy): plates on a leather backing. The most armor and toughness, but a little slow.",
+                 "Three Weights"),
+            crafting("plate_helmet", recipe2="plate_chestplate"),
+            crafting("hauberk_helmet", recipe2="brigandine_helmet"),
         ]),
-        "apotheosis": ("Stars and Apotheosis", "minecraft:enchanting_table", [
+        "stars": ("Stars on Gear", f"{MOD}:plate_chestplate", [
+            text("A piece takes the worst star among its parts, and its stats come from its stars. A ★1 plate set is a little better "
+                 "than iron; ★3 is a little better than diamond; ★5 a little better than netherite.", "Stars on Gear"),
             text("With Apotheosis, stars go further: ★4 gear has a gem socket and ★5 two; ★6 and ★7 strengthen the attribute bonuses "
                  "Apotheosis puts on them; and ★7 gear comes off the table already enchanted with an Apotheosis rarity.", "Apotheosis"),
         ]),
-        "upkeep": ("Repair", "minecraft:anvil", [
-            text("Repair forged gear at an anvil, as you would a plain piece. It keeps its ★.", "Repair"),
+        "weapons": ("Weapons", f"{MOD}:forged_sword", [
+            crafting("forged_sword", "Two plates over a haft, turned on a lathe. The haft's ★ counts too.", "forged_axe"),
+        ]),
+        "upkeep": ("Repair and Salvage", "minecraft:grindstone", [
+            text("Repair forged gear at a vanilla anvil with a tempered ingot of the same star or better."
+                 "$(br2)To salvage it, sneak and right-click a forge's grindstone with it. You get back tempered ingots of its star "
+                 "(some of its metal, more as your Forging improves, less if it's worn) and nuggets for the rest.", "Repair and Salvage"),
         ]),
     },
     "skills": {

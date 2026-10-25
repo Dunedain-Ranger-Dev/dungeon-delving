@@ -48,11 +48,9 @@ public final class ApotheosisForging {
         NeoForge.EVENT_BUS.addListener(ApotheosisForging::onCrafted);
     }
 
-    /** A forged piece: our own (retired) forged gear, or a forged version of any other gear (DD-89). */
     static boolean isForgedGear(ItemStack stack) {
         Item item = stack.getItem();
-        return item instanceof ForgedGear.Armor || item instanceof ForgedGear.Sword || item instanceof ForgedGear.Axe
-                || io.github.ranger3462.dungeondelving.forging.Quality.applies(stack) && io.github.ranger3462.dungeondelving.forging.Quality.isGear(stack);
+        return item instanceof ForgedGear.Armor || item instanceof ForgedGear.Sword || item instanceof ForgedGear.Axe;
     }
 
     /** Extra sockets for a forged piece of this ★. */

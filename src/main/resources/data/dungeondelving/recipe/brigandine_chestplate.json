@@ -1,0 +1,24 @@
+{
+  "type": "dungeondelving:starred_shaped",
+  "category": "equipment",
+  "pattern": [
+    "HBH",
+    "RHR",
+    "HHH"
+  ],
+  "key": {
+    "H": {
+      "item": "dungeondelving:hardened_leather"
+    },
+    "R": {
+      "item": "dungeondelving:rivets"
+    },
+    "B": {
+      "item": "dungeondelving:gambeson_base"
+    }
+  },
+  "result": {
+    "id": "dungeondelving:brigandine_chestplate",
+    "count": 1
+  }
+}

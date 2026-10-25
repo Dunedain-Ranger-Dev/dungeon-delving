@@ -1,9 +1,14 @@
 {
-  "name": "Stars and Apotheosis",
-  "icon": "minecraft:enchanting_table",
+  "name": "Stars on Gear",
+  "icon": "dungeondelving:plate_chestplate",
   "category": "dungeondelving:gear",
   "sortnum": 1,
   "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "A piece takes the worst star among its parts, and its stats come from its stars. A ★1 plate set is a little better than iron; ★3 is a little better than diamond; ★5 a little better than netherite.",
+      "title": "Stars on Gear"
+    },
     {
       "type": "patchouli:text",
       "text": "With Apotheosis, stars go further: ★4 gear has a gem socket and ★5 two; ★6 and ★7 strengthen the attribute bonuses Apotheosis puts on them; and ★7 gear comes off the table already enchanted with an Apotheosis rarity.",

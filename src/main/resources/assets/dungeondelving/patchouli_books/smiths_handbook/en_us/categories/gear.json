@@ -1,6 +1,6 @@
 {
   "name": "Forged Gear",
-  "description": "Forged iron, diamond and netherite weapons and armor, and what their stars mean.",
-  "icon": "minecraft:iron_chestplate",
+  "description": "The armor and weapons a smith can make, and keeping them in repair.",
+  "icon": "dungeondelving:plate_chestplate",
   "sortnum": 7
 }

@@ -1,13 +1,13 @@
 {
-  "name": "Repair",
-  "icon": "minecraft:anvil",
+  "name": "Repair and Salvage",
+  "icon": "minecraft:grindstone",
   "category": "dungeondelving:gear",
-  "sortnum": 2,
+  "sortnum": 3,
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Repair forged gear at an anvil, as you would a plain piece. It keeps its ★.",
-      "title": "Repair"
+      "text": "Repair forged gear at a vanilla anvil with a tempered ingot of the same star or better.$(br2)To salvage it, sneak and right-click a forge's grindstone with it. You get back tempered ingots of its star (some of its metal, more as your Forging improves, less if it's worn) and nuggets for the rest.",
+      "title": "Repair and Salvage"
     }
   ]
 }

@@ -1,0 +1,16 @@
+{
+  "type": "dungeondelving:starred_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "dungeondelving:leather_panel"
+    },
+    {
+      "item": "dungeondelving:leather_panel"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:leather_base",
+    "count": 1
+  }
+}
