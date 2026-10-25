@@ -1,0 +1,16 @@
+{
+  "type": "dungeondelving:starred_shaped",
+  "category": "equipment",
+  "pattern": [
+    "S"
+  ],
+  "key": {
+    "S": {
+      "item": "dungeondelving:stave"
+    }
+  },
+  "result": {
+    "id": "dungeondelving:haft",
+    "count": 2
+  }
+}

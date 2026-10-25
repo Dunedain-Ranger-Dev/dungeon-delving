@@ -19,8 +19,8 @@ import net.minecraft.world.level.block.state.BlockState;
  */
 public enum Profession {
     LEATHERWORKING(CraftSkill.LEATHERWORKING, List.of("tanning_rack", "vat", "shaping_rack"), "tanning_barrel", "fleshing_beam"),
-    WEAVING(CraftSkill.WEAVING, List.of("spinning_wheel", "loom", "shaping_rack", "cauldron"), "great_loom", "dye_works"),
-    WOODWORKING(CraftSkill.WOODWORKING, List.of("smoker", "chopping_block", "carving", "lathe", "cauldron"), "treadle_lathe", "bowyers_bench");
+    WEAVING(CraftSkill.WEAVING, List.of("spinning_wheel", "vat", "loom"), "great_loom", "dye_works"),
+    WOODWORKING(CraftSkill.WOODWORKING, List.of("smoker", "vat", "lathe"), "treadle_lathe", "bowyers_bench");
 
     public final CraftSkill skill;
     /** Stations the workshop needs (each id met by one or more blocks, see {@link #stations}). */
@@ -49,7 +49,8 @@ public enum Profession {
     /** The station ids this block counts as, for this profession. An upgrade can also count as the basic station it improves. */
     public List<String> stations(BlockState state) {
         List<String> ids = new ArrayList<>();
-        boolean cauldron = state.is(Blocks.CAULDRON) || state.is(Blocks.WATER_CAULDRON) || state.is(Crafts.SOAKING_CAULDRON.get());
+        // A vat: an empty cauldron (to pour the liquid into) or one of this craft's vats.
+        boolean vat = state.is(Blocks.CAULDRON) || state.getBlock() instanceof SoakingVatBlock soaking && soaking.type.profession == this;
         switch (this) {
             case LEATHERWORKING -> {
                 if (state.is(Forging.TANNING_RACK.get())) {
@@ -58,7 +59,7 @@ public enum Profession {
                 if (state.is(Crafts.FLESHING_BEAM.get())) {
                     ids.add("fleshing_beam");
                 }
-                if (cauldron || state.is(Crafts.TANNING_VAT.get()) || state.is(Crafts.TANNING_BARREL.get())) {
+                if (vat) {
                     ids.add("vat");
                 }
                 if (state.is(Crafts.TANNING_BARREL.get())) {
@@ -78,11 +79,8 @@ public enum Profession {
                 if (state.is(Crafts.GREAT_LOOM.get())) {
                     ids.add("great_loom");
                 }
-                if (state.is(Crafts.SHAPING_RACK.get())) {
-                    ids.add("shaping_rack");
-                }
-                if (cauldron) {
-                    ids.add("cauldron");
+                if (vat) {
+                    ids.add("vat");
                 }
                 if (state.is(Crafts.DYE_WORKS.get())) {
                     ids.add("dye_works");
@@ -92,11 +90,8 @@ public enum Profession {
                 if (state.is(Blocks.SMOKER)) {
                     ids.add("smoker");
                 }
-                if (state.is(Crafts.CHOPPING_BLOCK.get())) {
-                    ids.add("chopping_block");
-                }
-                if (state.is(Blocks.FLETCHING_TABLE) || state.is(Crafts.BOWYERS_BENCH.get())) {
-                    ids.add("carving");
+                if (vat) {
+                    ids.add("vat");
                 }
                 if (state.is(Crafts.BOWYERS_BENCH.get())) {
                     ids.add("bowyers_bench");
@@ -106,9 +101,6 @@ public enum Profession {
                 }
                 if (state.is(Crafts.TREADLE_LATHE.get())) {
                     ids.add("treadle_lathe");
-                }
-                if (cauldron) {
-                    ids.add("cauldron");
                 }
             }
         }

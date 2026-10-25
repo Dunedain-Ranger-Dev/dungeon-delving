@@ -1,0 +1,17 @@
+{
+  "type": "dungeondelving:starred_shaped",
+  "category": "equipment",
+  "pattern": [
+    " S",
+    "S "
+  ],
+  "key": {
+    "S": {
+      "item": "dungeondelving:stave"
+    }
+  },
+  "result": {
+    "id": "dungeondelving:bow_limbs",
+    "count": 2
+  }
+}

@@ -139,14 +139,13 @@ public final class Forging {
     public static final DeferredItem<StarredItem> HARDENED_LEATHER = ModRegistries.ITEMS.registerItem("hardened_leather", StarredItem::new, new Item.Properties());
     /** The backing every medium and heavy piece is built on. */
     public static final DeferredItem<StarredItem> LEATHER_BASE = ModRegistries.ITEMS.registerItem("leather_base", StarredItem::new, new Item.Properties());
-    public static final DeferredItem<StarredItem> WOVEN_CLOTH = ModRegistries.ITEMS.registerItem("woven_cloth", StarredItem::new, new Item.Properties());
-    /** Fulled cloth (its id is from when it was called padded cloth): woven cloth thickened in hot water (DD-88). */
-    public static final DeferredItem<StarredItem> PADDED_CLOTH = ModRegistries.ITEMS.registerItem("padded_cloth", StarredItem::new, new Item.Properties());
     /** The quilted backing light armor is built on. */
     public static final DeferredItem<StarredItem> GAMBESON_BASE = ModRegistries.ITEMS.registerItem("gambeson_base", StarredItem::new, new Item.Properties());
 
     static {
         ModRegistries.ITEMS.addAlias(DungeonDelving.id("boiled_leather"), DungeonDelving.id("refined_leather"));
+        ModRegistries.ITEMS.addAlias(DungeonDelving.id("woven_cloth"), DungeonDelving.id("cloth_panel"));
+        ModRegistries.ITEMS.addAlias(DungeonDelving.id("padded_cloth"), DungeonDelving.id("cloth_panel"));
     }
 
     // --- Gear ---

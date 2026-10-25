@@ -9,20 +9,23 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
 /**
- * A bottle of tanning liquor, brewed in a cooking pot from tree bark (and, for the better ones, a dungeon herb). Pour it
- * into a cauldron to make a Tanning Vat. Leather tanned in it is at most {@link #maxStars} ★: the liquor is to
- * Leatherworking what flux is to Forging.
+ * A bottle of a craft's vat liquid: tanning liquor (Leatherworking), sizing (Weaving) or a finish (Woodworking), brewed
+ * in a cooking pot. Pour it into a cauldron to make that craft's vat. What soaks in it comes out at its {@link #stars}:
+ * the liquid is to these crafts what the heated ingot's tier is to Forging, and the better ones take longer.
  */
 public class LiquorItem extends Item {
-    public final int maxStars;
+    public final int stars;
+    public final Profession profession;
 
-    public LiquorItem(Properties properties, int maxStars) {
+    public LiquorItem(Properties properties, int stars, Profession profession) {
         super(properties);
-        this.maxStars = maxStars;
+        this.stars = stars;
+        this.profession = profession;
     }
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("tooltip.dungeondelving.liquor", StarredItem.starsText(maxStars)).withStyle(ChatFormatting.GRAY));
+        tooltip.add(Component.translatable("tooltip.dungeondelving.liquor." + profession.id(), StarredItem.starsText(stars),
+                SoakingVatBlock.minutes(SoakingVatBlock.soakTicks(stars))).withStyle(ChatFormatting.GRAY));
     }
 }

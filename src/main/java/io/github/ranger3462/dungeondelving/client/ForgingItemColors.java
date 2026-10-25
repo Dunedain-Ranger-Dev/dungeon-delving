@@ -29,13 +29,6 @@ public final class ForgingItemColors {
 
     private ForgingItemColors() {}
 
-    /** A Soaking Cauldron's water takes the biome's water color, like a vanilla water cauldron's. */
-    @SubscribeEvent
-    public static void onRegisterBlockColors(RegisterColorHandlersEvent.Block event) {
-        event.register((state, level, pos, tint) -> level != null && pos != null ? net.minecraft.client.renderer.BiomeColors.getAverageWaterColor(level, pos)
-                : 0x3F76E4, io.github.ranger3462.dungeondelving.forging.Crafts.SOAKING_CAULDRON.get());
-    }
-
     @SubscribeEvent
     public static void onRegisterItemColors(RegisterColorHandlersEvent.Item event) {
         event.register((stack, tintIndex) -> tintIndex == 0 ? heatColor(stack) : -1, Forging.HEATED_INGOT.get(), Forging.STRUCK_INGOT.get());

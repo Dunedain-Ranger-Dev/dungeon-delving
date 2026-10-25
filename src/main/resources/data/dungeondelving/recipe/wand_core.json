@@ -1,0 +1,16 @@
+{
+  "type": "dungeondelving:starred_shaped",
+  "category": "equipment",
+  "pattern": [
+    "H"
+  ],
+  "key": {
+    "H": {
+      "item": "dungeondelving:haft"
+    }
+  },
+  "result": {
+    "id": "dungeondelving:wand_core",
+    "count": 1
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "type": "farmersdelight:cooking",
+  "experience": 0.2,
+  "cookingtime": 400,
+  "recipe_book_tab": "misc",
+  "ingredients": [
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "minecraft:wheat"
+    },
+    {
+      "item": "dungeondelving:spider_silk"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:silk_sizing",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "farmersdelight"
+    }
+  ]
+}

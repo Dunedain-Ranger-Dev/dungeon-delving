@@ -7,8 +7,8 @@
     {
       "type": "patchouli:spotlight",
       "item": "dungeondelving:guild_ledger",
-      "title": "The Guild Ledger",
-      "text": "Every workshop starts with a $(item)Guild Ledger$(). A forge needs four stations within 7 blocks of it across, and 4 up or down, set out however you like:"
+      "text": "Every workshop starts with a $(item)Guild Ledger$(). A forge needs four stations within 7 blocks of it across, and 4 up or down, set out however you like:",
+      "title": "The Guild Ledger"
     },
     {
       "type": "patchouli:text",

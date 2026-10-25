@@ -2,19 +2,19 @@
   "type": "dungeondelving:starred_shaped",
   "category": "equipment",
   "pattern": [
-    " LS",
-    "F S",
-    " LS"
+    " L ",
+    "H S",
+    " L "
   ],
   "key": {
     "L": {
-      "item": "dungeondelving:bent_limbs"
+      "item": "dungeondelving:bow_limbs"
+    },
+    "H": {
+      "item": "dungeondelving:haft"
     },
     "S": {
       "item": "dungeondelving:bowstring"
-    },
-    "F": {
-      "tag": "dungeondelving:wood_finishes"
     }
   },
   "result": {

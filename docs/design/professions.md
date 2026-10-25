@@ -1,8 +1,8 @@
 # Crafting professions
 
 The plan for the crafting professions: a shared workshop, Forging as it is, Leatherworking and Weaving rebuilt,
-Woodworking new. Agreed direction 2026-10-24; details here are a first pass, and numbers wait for playtesting. Nothing
-is built yet.
+Woodworking new. Agreed direction 2026-10-24, reworked 2026-10-25 after the first playtest; numbers wait for more
+playtesting.
 
 **Decided:** the shared block is the **Guild Ledger**. New stations reuse vanilla models where they can, but new ones
 are fine. **Farmer's Delight** joins the pack for its bark, straw, canvas, knives and cooking pot. Dryad dungeons are
@@ -11,13 +11,15 @@ are fine. **Farmer's Delight** joins the pack for its bark, straw, canvas, knive
 ## Built so far (2026-10-25)
 
 - **Phase 1:** the Guild Ledger (replacing the Forge Hearth) and Farmer's Delight.
-- **Phases 2–4, the core:** every step below for Leatherworking, Weaving and Woodworking, with their stations,
-  workshop levels and upgrades, minigames and ★ rules; the Woodworking skill and tree; bows and crossbows from parts.
-  The pack's RPG recipe rewrite uses leather and cloth panels, so RPG leather and cloth gear takes their ★.
+- **Phases 2–4, the core:** Leatherworking, Weaving and Woodworking, with their stations, workshop levels and upgrades;
+  the Woodworking skill and tree; bows and crossbows from parts. The pack's RPG recipe rewrite uses leather and cloth
+  panels, so RPG leather and cloth gear takes their ★.
+- **Reworked after the first playtest (2026-10-25):** every craft now follows Forging's pattern (below). The scraping,
+  spinning, sewing and carving minigames, fulling, bending and the Chopping Block are gone.
 - **Not yet:** sources for the dungeon materials (Barrowmoss, Emberroot, spider silk, Arcane Dust; phase 6) and the
-  dryads' woods and finishes (phase 7); Spellsilk's brewing; dyeing at the Dye Works (it only raises the level now);
-  real art for the new blocks and items (placeholders and vanilla models for now); RPG staves, wands, bows and
-  shields from parts (phase 5); the Woodworking tree's Seasoner, Fine Split and Master Bowyer perks.
+  dryads' woods and finishes (phase 7); dyeing at the Dye Works; real art for the new blocks and items (placeholders and
+  vanilla models for now); RPG staves, wands and shields from parts (phase 5); the Woodworking tree's Seasoner, Fine
+  Split and Master Bowyer perks; re-checking how forged gear sits beside the RPG and vanilla weapons.
 
 ## Goals
 
@@ -64,104 +66,98 @@ Checked against Farmer's Delight 1.21.1-1.3.4 (`farmersdelight:tree_bark`, `stra
 
 ## Quality, the same rules everywhere
 
-- **★ steps:** one or two minigames per profession set the ★. Each has its own kind of input (below), never a reskin.
-- **★ cap from a material,** like forging's flux: the tanning liquor, the thread, the wood finish.
-- **★ cap from the workshop level and the skill level,** as Forging does now.
-- **The timed step never sets the ★.** It's only a wait.
-- **A piece's ★** is the lowest ★ among its main parts.
+Every craft follows Forging's pattern:
 
-### The minigames, by feel
+1. **Prepare** the vanilla material (no minigame): leather → Scraped Hide, wool → Yarn, log → Seasoned Billet. Forging's
+   is the iron ingot itself.
+2. **Timed step, which sets the ★:** heating for metal; a vat for the rest. The liquid's tier is the piece's ★, as the
+   heated ingot's target is. Each ★ takes **30 seconds longer** (heating: +30 s per ★ past the first, half that in a
+   blast furnace; a vat: 1:00 plus 30 s per ★, so ★3 2:00, ★5 3:00, ★7 4:00).
+3. **Bench minigame:** keeps the ★; the minigame decides whether the piece survives (misses can ruin it, likelier with
+   each one). Like the anvil, the bench refuses a piece above the workshop's level or the player's skill, and a vat
+   refuses a liquid above the workshop's level.
+4. **Craft:** parts and gear, each taking the lowest ★ of its parts.
+
+| Craft | Prepare | Timed (sets ★) | Bench minigame | Gives |
+|---|---|---|---|---|
+| Forging | Iron ingot | Heat in a furnace | Strike, quench, grind | Tempered Ingot |
+| Leatherworking | Scrape at the Tanning Rack | Tanning Vat (liquor) | Cut at the Shaping Rack | 2 Leather Panels |
+| Weaving | Spin at the Spinning Wheel | Sizing Vat (sizing) | Thread the needle at the loom | 2 Cloth Panels |
+| Woodworking | Season in a smoker | Finishing Vat (finish) | Turn at the lathe | 2 Staves |
+
+Each vat is a cauldron with the liquid poured in; it holds four pieces a batch. The upgrades with a bigger vat (the
+Tanning Barrel, the Dye Works) hold eight and work a quarter faster.
+
+### The minigames
 
 | Minigame | Profession | Input |
 |---|---|---|
-| Strike, Grind | Forging | Tap when the sweeping marker is in the green (exists) |
-| Scrape | Leatherworking | One pass, tap as each patch goes by (exists) |
-| Thread the needle | Weaving | Tap when two bobbing marks line up (exists) |
-| **Cut** | Leatherworking | Hold to draw the blade along the pattern; release on the end mark. Closer is better. |
-| **Spin** | Weaving | Keep the wheel's speed inside a band by tapping; too slow and the yarn slubs, too fast and it snaps. |
-| **Sew** | Weaving | Alternate left and right clicks on the beat: needle in, needle out. |
-| **Carve** | Woodworking | The knife drifts off the grain line; tap to nudge it back, staying in the band to the end. |
-| **Turn** | Woodworking | Hold to press the chisel; a gauge rises; release in the green before it bites too deep. Two or three passes. |
+| Strike, Grind | Forging | Tap when the sweeping marker is in the green |
+| Thread the needle | Weaving | Tap when two bobbing marks line up |
+| Cut | Leatherworking | Hold to draw the blade along the pattern; release on the end mark |
+| Turn | Woodworking | Hold to press the chisel; release in the green before it bites too deep. Three passes |
 
 ## Forging
 
-Unchanged apart from the Guild Ledger: heat → strike → quench → grind → parts → gear.
+Unchanged apart from the Guild Ledger and heating time: heat → strike → quench → grind → parts → gear.
 
-- **Timed:** heating bars. **★ steps:** strike, grind. **★ cap:** flux.
+- **Timed:** heating, 5 s for iron and 30 s more for each ★ past the first. **★:** each pass through the forge raises
+  it by one. **★ cap:** flux, the workshop and the skill.
 - **Workshop levels:** as today (Blast Furnace and Master Anvil for 2; Bellows, Oil Cauldron and Grinding Wheel for 3).
 - **Dungeon materials:** the tier ingots (Thraggite, Wardsilver, Emberstone, Thailite), Borax, Runic Shards.
-- **New:** forged swords and axes need a **grip** (Leatherworking) or a **haft** (Woodworking).
+- **Later:** forged swords and axes need a **grip** (Leatherworking) or a **haft** (Woodworking).
 
 ## Leatherworking
 
-The tanner's process: tan liquor → flesh → tan → cut → finish.
+Scrape → tan → cut → craft.
 
 | Step | Station | In → out | Time | ★ |
 |---|---|---|---|---|
-| 1. Brew liquor | Cooking Pot (Farmer's Delight), heated | Water bucket + 4 Tree Bark → **Bark Liquor** (3 uses, bottled) | About 20 s | Liquor caps it |
-| 2. Flesh | Tanning Rack (exists) | Leather → **Scraped Hide** (today's scrape) | — | Sets it |
-| 3. Tan | **Tanning Vat**: pour liquor into a cauldron (as quench oil does), no heat | Up to 4 Scraped Hides → **Tanned Leather** | About 2 min | — |
-| 4. Cut | **Shaping Rack**, shears or a knife in hand | Tanned Leather → **Leather Panels** (2), or + string → **Straps** (4) | — | Sets it |
-| 5. Finish | Crafting | Panels + honeycomb → **Hardened Leather** (as today) | — | Keeps it |
-| 6. Assemble | Crafting table (starred recipes) | Light and medium armor, **Grips**, **Quivers**, **Leather Backings** | — | Lowest part |
+| 1. Scrape | Tanning Rack | Leather → **Scraped Hide** | — | — |
+| 2. Tan | **Tanning Vat** (liquor poured into a cauldron) | Up to 4 hides → **Tanned Leather** | 2:00–4:00 | The liquor's |
+| 3. Cut | **Shaping Rack**, shears or a knife | Tanned Leather → **Leather Panels** (2) | — | Keeps it |
+| 4. Craft | Crafting table | Straps, Hardened Leather (+ honeycomb), Leather Backings, RPG leather armor | — | Lowest part |
 
-- **Liquor tiers (the ★ cap):** Bark Liquor ★3; **Tannin Liquor** (+ Barrowmoss, an undead dungeon herb) ★5;
-  **Elder Liquor** (+ Emberroot, from tier 3 dungeons) ★7.
-- **Hide tiers:** vanilla leather and rabbit hide (tiers 1–2); **Warg Pelt** (orc dungeons) and **Gloomhide** (tier 3
-  undead) for the best armor; they take the same steps.
-- **Workshop levels:** 1: Tanning Rack, Shaping Rack, a cauldron. 2: a **Tanning Barrel** (barrel model; a vat that
-  holds 8 hides and tans 25% faster). 3: a **Fleshing Beam** (a stripped-log beam; a wider scrape patch).
-- **Pulls from:** combat (hides), Woodcutting (bark), Farming (honeycomb, and heat for the pot), string.
-- **XP:** a clean scrape 3, a tan 4 per hide, a cut 3, a crafted piece 15 × ★.
+- **Liquors (brewed in a cooking pot):** Bark Liquor (4 tree bark) ★3; **Tannin Liquor** (+ Barrowmoss) ★5; **Elder
+  Liquor** (+ Emberroot) ★7.
+- **Workshop levels:** 1: Tanning Rack, Shaping Rack, a cauldron. 2: a **Tanning Barrel** (a vat for 8, 25% faster).
+  3: a **Fleshing Beam** (a wider cutting mark).
+- **XP:** a scrape 1, a tan 2 × ★ per hide, a cut 5 × ★.
 
 ## Weaving (Tailoring)
 
-The weaver's process: fibre → spin → weave → full → cut and sew.
+Spin → size → weave → craft.
 
 | Step | Station | In → out | Time | ★ |
 |---|---|---|---|---|
-| 1. Fibre | Shears on sheep, cobwebs, Farmer's Delight straw | Wool, string, Canvas | — | — |
-| 2. Spin | **Spinning Wheel** | Wool → **Yarn** (3); string is thread as it is | — | Thread caps it |
-| 3. Weave | Loom (exists) | 3 Yarn or string → **Woven Cloth** (today's) | — | Sets it |
-| 4. Full | Water cauldron over heat | Up to 4 Woven Cloth → **Fulled Cloth** (today's padded cloth); add a dye first to color it | About 1 min | — |
-| 5. Cut and sew | Shaping Rack, shears or a knife, string in the off hand | Fulled Cloth → **Cloth Panels** (2) | — | Sets it |
-| 6. Assemble | Crafting table | Robes, hoods, gambesons, **Gambeson Backings**, **Bowstrings**, staff wraps | — | Lowest part |
+| 1. Spin | **Spinning Wheel** | Wool → **Yarn** (3) | — | — |
+| 2. Size | **Sizing Vat** (sizing poured into a cauldron) | Up to 4 yarn or string → **Sized Yarn** | 2:00–4:00 | The sizing's |
+| 3. Weave | Loom | 3 Sized Yarn → **Cloth Panels** (2) | — | Keeps it |
+| 4. Craft | Crafting table | Gambeson Backings, staff wraps, Bowstrings (3 sized yarn), RPG robes and cloth armor | — | Lowest part |
 
-- **Coarse tier:** Canvas (Farmer's Delight) goes straight to the Shaping Rack for sacks, backings and cheap
-  padding, ★1–2.
-- **Thread tiers (the ★ cap):** wool yarn ★3; **Silk Thread** (from dungeon spiders in goblin caves) ★5; **Spellsilk**
-  (silk thread steeped in a brewing stand with lapis and Arcane Dust from dungeon casters; a second timed step) ★7, the
-  base for the best mage robes.
-- **Workshop levels:** 1: Spinning Wheel, loom, Shaping Rack, a heated cauldron. 2: a **Great Loom** (wider needle
-  eye). 3: a **Dye Works** (a cauldron rack; fulls 8 cloth at once and keeps more ★ on dyed cloth).
-- **Pulls from:** sheep, spiders, Farming (dye plants, straw), Mining (coal or magma for heat).
-- **XP:** a spun yarn 1, a stitch 1 and a cloth 5, a fulling 2 per cloth, a sewn panel 3, a crafted piece 15 × ★.
+- **Sizings (brewed in a cooking pot):** Wheat Sizing (4 wheat) ★3; **Silk Sizing** (+ spider silk) ★5; **Arcane
+  Sizing** (+ Arcane Dust) ★7.
+- **Workshop levels:** 1: Spinning Wheel, loom, a cauldron. 2: a **Great Loom** (wider needle eye). 3: the **Dye
+  Works** (a sizing vat for 8, 25% faster; dyeing later).
+- **XP:** a spin 1, sizing 1 × ★ per yarn, a weave 5 × ★.
 
 ## Woodworking (new)
 
-The woodworker's process: fell → season → rough out → shape → bend → finish → fit.
+Season → cure → turn → craft.
 
 | Step | Station | In → out | Time | ★ |
 |---|---|---|---|---|
-| 1. Fell | Woodcutting | Logs; the wood matters (spruce for bows, oak for staves, dungeon woods for the best) | — | — |
-| 2. Season | Smoker | Log → **Seasoned Billet** | About 30 s (twice food's) | — |
-| 3. Rough out | **Chopping Block** (a stripped log with an axe stuck in it), axe in hand | Billet → **Bow Stave** (2), **Staff Blank**, **Hafts** (3), **Stock** | — | — |
-| 4a. Carve | Fletching table | Bow Stave → **Bow Limbs** | — | Sets it |
-| 4b. Turn | **Wood Lathe** (a stonecutter-style body with a spindle) | Staff Blank → **Staff Shaft**; a haft → **Wand Core** | — | Sets it |
-| 5. Bend (bows, crossbows) | Water cauldron over heat | Up to 4 limbs → **Bent Limbs** | About 1 min | — |
-| 6. Finish | Crafting with a wood finish | Any part + finish → finished part. The finish caps the ★. | — | Finish caps it |
-| 7. Assemble | Crafting table | Bows (bent limbs + bowstring), crossbows (stock + limbs + fittings), staves (shaft + focus + wrap), wands (core + focus), shields (boards + rim + straps), polearm hafts | — | Lowest part |
+| 1. Season | Smoker | Log → **Seasoned Billet** | About 30 s | — |
+| 2. Cure | **Finishing Vat** (a finish poured into a cauldron) | Up to 4 billets → **Cured Billets** | 2:00–4:00 | The finish's |
+| 3. Turn | **Wood Lathe** | Cured Billet → **Staves** (2) | — | Keeps it |
+| 4. Craft | Crafting table | Bow Limbs (2 staves → 2), Hafts (1 stave → 2), Staff Shaft (2 staves), Wand Core (a haft), Crossbow Stock (2 staves); bows (2 limbs, a haft, a bowstring) and crossbows (2 limbs, iron, a stock, a bowstring) | — | Lowest part |
 
-- **Finish tiers (the ★ cap):** **Linseed Oil** (wheat seeds in a brewing stand) ★3; **Heartwood Resin** (dryad
-  groves) ★5; **Sylvan Sap** (deep dryad groves) ★7.
-- **Wood tiers:** vanilla woods (★ up to 5); **Heartwood** and **Ironbark** from dryad groves for the best bows and
-  staves.
+- **Finishes:** **Linseed Oil** (4 wheat seeds in a cooking pot) ★3; **Heartwood Resin** (dryad groves) ★5; **Sylvan
+  Sap** (deep dryad groves) ★7.
 - **Staff foci:** a crystal or gem: Runic Shards and dungeon crystals now; cut gems once Jewelcrafting exists.
-- **Workshop levels:** 1: smoker, Chopping Block, fletching table, Wood Lathe, a heated cauldron. 2: a **Treadle
-  Lathe** (wider green on the gauge). 3: a **Bowyer's Bench** (a wider carving band).
-- **Pulls from:** Woodcutting (logs), Farming (seeds for oil), Weaving (bowstrings, staff wraps), Forging (crossbow
-  fittings, shield rims, ferrules), dungeons (foci, dryad woods).
-- **XP:** a seasoned billet 2, a split 1, a carve or turn 5, a bend 2 per limb, a crafted piece 15 × ★.
+- **Workshop levels:** 1: smoker, Wood Lathe, a cauldron. 2: a **Treadle Lathe** (wider green). 3: a **Bowyer's
+  Bench** (wider green again).
+- **XP:** a cure 2 × ★ per billet, a turn 5 × ★.
 - **A Woodworking skill tree** joins the crafting trees, in the same shape as Forging's.
 
 ### The dryads (a neutral faction)
@@ -191,13 +187,14 @@ A top bow needs a skilled woodworker and a skilled weaver, or one player who tra
 
 ## New blocks and items
 
-- **Blocks:** Guild Ledger; Shaping Rack; Spinning Wheel; Chopping Block; Wood Lathe; Tanning Vat (a filled cauldron)
-  and, for the upgrades, Tanning Barrel, Fleshing Beam, Great Loom, Dye Works, Treadle Lathe, Bowyer's Bench.
+- **Blocks:** Guild Ledger; Shaping Rack; Spinning Wheel; Wood Lathe; the Tanning, Sizing and Finishing Vats (filled
+  cauldrons) and, for the upgrades, Tanning Barrel, Fleshing Beam, Great Loom, Dye Works, Treadle Lathe, Bowyer's Bench.
 - **Models:** reuse vanilla parts and textures (lectern, barrel, grindstone wheel, stonecutter, stripped logs,
   loom), with new textures only where needed.
-- **Items:** Bark Liquor (and Tannin, Elder), Scraped Hide, Tanned Leather, Leather Panels, Straps, Grip, Yarn, Silk
-  Thread, Spellsilk, Cloth Panels, Bowstring, Staff Wrap, Seasoned Billet, Bow Stave, Staff Blank, Haft, Stock, Bow
-  Limbs, Bent Limbs, Staff Shaft, Wand Core, Linseed Oil, Heartwood Resin, Sylvan Sap, plus the dungeon materials.
+- **Items:** the liquors (Bark, Tannin, Elder), sizings (Wheat, Silk, Arcane) and finishes (Linseed Oil, Heartwood
+  Resin, Sylvan Sap); Scraped Hide, Tanned Leather, Leather Panels, Straps; Yarn, Sized Yarn, Cloth Panels, Bowstring,
+  Staff Wrap; Seasoned Billet, Cured Billet, Stave, Haft, Stock, Bow Limbs, Staff Shaft, Wand Core; plus the dungeon
+  materials.
 
 ## Build phases
 

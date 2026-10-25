@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(li)a $(item)Spinning Wheel$()$(li)a loom$(li)a $(item)Shaping Rack$()$(li)a cauldron (of water, over heat, for fulling)$(br2)Upgrades: a $(item)Great Loom$() (a wider needle eye) and the $(item)Dye Works$().",
+      "text": "$(li)a $(item)Spinning Wheel$(), to spin$(li)a cauldron, for the vat$(li)a loom, to weave$(br2)Upgrades: a $(item)Great Loom$() (a wider needle eye) and the $(item)Dye Works$() (a vat for eight, a quarter faster).",
       "title": "Stations"
     },
     {

@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "level=0,soaking=false": {
+      "model": "minecraft:block/cauldron"
+    },
+    "level=0,soaking=true": {
+      "model": "minecraft:block/cauldron"
+    },
+    "level=1,soaking=false": {
+      "model": "dungeondelving:block/finishing_vat_level1"
+    },
+    "level=1,soaking=true": {
+      "model": "dungeondelving:block/finishing_vat_level1"
+    },
+    "level=2,soaking=false": {
+      "model": "dungeondelving:block/finishing_vat_level2"
+    },
+    "level=2,soaking=true": {
+      "model": "dungeondelving:block/finishing_vat_level2"
+    },
+    "level=3,soaking=false": {
+      "model": "dungeondelving:block/finishing_vat_level3"
+    },
+    "level=3,soaking=true": {
+      "model": "dungeondelving:block/finishing_vat_level3"
+    }
+  }
+}

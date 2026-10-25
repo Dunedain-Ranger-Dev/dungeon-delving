@@ -29,7 +29,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,44 +41,49 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 /**
- * A vat for the crafts' timed step: pieces go in, and come out changed a while later. Three kinds:
+ * A vat for the crafts' timed step, their furnace: a prepared piece goes in, and comes out a while later with the ★ of
+ * the liquid it soaked in ({@link LiquorItem}). Better liquids take longer, {@link #STEP_TICKS} more for each ★ (as
+ * heating a better ingot does). Each craft has a cauldron vat, made by pouring its liquid into an empty cauldron:
  * <ul>
- * <li>{@link Type#TANNING_VAT} (Leatherworking): a cauldron of tanning liquor. Pour liquor into a cauldron to make one;
- * scraped hides tan into tanned leather. No heat.</li>
- * <li>{@link Type#TANNING_BARREL} (a level 2 tannery): the same, but holds twice as many hides and tans faster.</li>
- * <li>{@link Type#SOAKING_CAULDRON} (Weaving, Woodworking): a water cauldron over heat. Woven cloth fulls into fulled
- * cloth, bow limbs bend. Putting a piece into a heated water cauldron makes one; emptied, it's a water cauldron again.</li>
+ * <li>Leatherworking: a {@link Type#TANNING_VAT} of tanning liquor tans scraped hides into tanned leather.</li>
+ * <li>Weaving: a {@link Type#SIZING_VAT} of sizing stiffens yarn (or string) into sized yarn.</li>
+ * <li>Woodworking: a {@link Type#FINISHING_VAT} of finish cures seasoned billets into cured billets.</li>
  * </ul>
- * Each batch uses a level of liquid. Right-click with an empty hand to take the batch out once it's done (or to see how
- * long it has left). A piece comes out with its own ★, no better than the liquor's (water doesn't limit it).
+ * The Tanning Barrel and the Dye Works are the bigger, faster vats of a level 2 tannery and a level 3 weaving room. Each
+ * batch uses a level of liquid. Right-click with an empty hand to take the batch out once it's done (or to see how long
+ * it has left).
  */
 public class SoakingVatBlock extends BaseEntityBlock {
     public static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 3);
     public static final BooleanProperty SOAKING = BooleanProperty.create("soaking");
     private static final VoxelShape CAULDRON_SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 16.0);
+    /** How long a soak takes: this much, plus as much again for each ★ of the liquid. ★3 takes 2:00, ★5 3:00, ★7 4:00. */
+    public static final int STEP_TICKS = 600;
 
-    /** What a soak turns into what, for which craft, in which liquid, how long it takes and the XP each piece gives. */
-    public record Soak(Supplier<? extends Item> input, Supplier<? extends Item> output, Profession profession, boolean liquor, int ticks, int xp) {}
+    /** What a soak turns into what, for which craft, and the XP each piece gives (per ★). */
+    public record Soak(Supplier<? extends Item> input, Supplier<? extends Item> output, Profession profession, int xp) {}
 
     public static final List<Soak> SOAKS = List.of(
-            new Soak(Crafts.SCRAPED_HIDE, Forging.REFINED_LEATHER, Profession.LEATHERWORKING, true, 2400, 4),
-            new Soak(Forging.WOVEN_CLOTH, Forging.PADDED_CLOTH, Profession.WEAVING, false, 1200, 2),
-            new Soak(Crafts.BOW_LIMBS, Crafts.BENT_LIMBS, Profession.WOODWORKING, false, 1200, 2));
+            new Soak(Crafts.SCRAPED_HIDE, Forging.REFINED_LEATHER, Profession.LEATHERWORKING, 2),
+            new Soak(Crafts.YARN, Crafts.SIZED_YARN, Profession.WEAVING, 1),
+            new Soak(() -> Items.STRING, Crafts.SIZED_YARN, Profession.WEAVING, 1),
+            new Soak(Crafts.SEASONED_BILLET, Crafts.CURED_BILLET, Profession.WOODWORKING, 2));
 
     public enum Type {
-        TANNING_VAT(true, false, 4, 1.0f, true),
-        TANNING_BARREL(true, false, 8, 0.75f, false),
-        SOAKING_CAULDRON(false, true, 4, 1.0f, true);
+        TANNING_VAT(Profession.LEATHERWORKING, 4, 1.0f, true),
+        TANNING_BARREL(Profession.LEATHERWORKING, 8, 0.75f, false),
+        SIZING_VAT(Profession.WEAVING, 4, 1.0f, true),
+        DYE_WORKS(Profession.WEAVING, 8, 0.75f, false),
+        FINISHING_VAT(Profession.WOODWORKING, 4, 1.0f, true);
 
-        public final boolean liquor;
-        public final boolean heated;
+        public final Profession profession;
         public final int capacity;
         public final float timeScale;
+        /** A cauldron vat: made from a cauldron, and a cauldron again once its liquid is used up. */
         public final boolean cauldron;
 
-        Type(boolean liquor, boolean heated, int capacity, float timeScale, boolean cauldron) {
-            this.liquor = liquor;
-            this.heated = heated;
+        Type(Profession profession, int capacity, float timeScale, boolean cauldron) {
+            this.profession = profession;
             this.capacity = capacity;
             this.timeScale = timeScale;
             this.cauldron = cauldron;
@@ -91,7 +95,21 @@ public class SoakingVatBlock extends BaseEntityBlock {
     public SoakingVatBlock(Properties properties, Type type) {
         super(properties);
         this.type = type;
-        registerDefaultState(stateDefinition.any().setValue(LEVEL, type == Type.TANNING_BARREL ? 0 : 1).setValue(SOAKING, false));
+        registerDefaultState(stateDefinition.any().setValue(LEVEL, type.cauldron ? 1 : 0).setValue(SOAKING, false));
+    }
+
+    /** The cauldron vat a craft's liquid makes. */
+    public static SoakingVatBlock cauldronFor(Profession profession) {
+        return switch (profession) {
+            case LEATHERWORKING -> Crafts.TANNING_VAT.get();
+            case WEAVING -> Crafts.SIZING_VAT.get();
+            case WOODWORKING -> Crafts.FINISHING_VAT.get();
+        };
+    }
+
+    /** How long a batch soaks in a liquid of this ★ (before a bigger vat's speed-up). */
+    public static int soakTicks(int stars) {
+        return STEP_TICKS * (stars + 1);
     }
 
     @Override
@@ -124,9 +142,9 @@ public class SoakingVatBlock extends BaseEntityBlock {
         return new SoakingVatBlockEntity(pos, state);
     }
 
-    /** The soak that takes this piece in this kind of vat, if any. */
-    public static Optional<Soak> soakFor(ItemStack stack, boolean liquor) {
-        return SOAKS.stream().filter(soak -> soak.liquor == liquor && stack.is(soak.input.get())).findFirst();
+    /** The soak that takes this piece in a vat of this craft, if any. */
+    public static Optional<Soak> soakFor(ItemStack stack, Profession profession) {
+        return SOAKS.stream().filter(soak -> soak.profession == profession && stack.is(soak.input.get())).findFirst();
     }
 
     @Override
@@ -135,18 +153,10 @@ public class SoakingVatBlock extends BaseEntityBlock {
         if (!(level.getBlockEntity(pos) instanceof SoakingVatBlockEntity vat)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
-        if (type.liquor && stack.getItem() instanceof LiquorItem liquor) {
+        if (stack.getItem() instanceof LiquorItem liquor && liquor.profession == type.profession) {
             return pour(state, level, pos, player, hand, stack, vat, liquor);
         }
-        if (!type.liquor && stack.is(Items.WATER_BUCKET) && state.getValue(LEVEL) < 3) {
-            if (!level.isClientSide()) {
-                player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(Items.BUCKET)));
-                level.setBlockAndUpdate(pos, state.setValue(LEVEL, 3));
-                level.playSound(null, pos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0f, 1.0f);
-            }
-            return ItemInteractionResult.sidedSuccess(level.isClientSide());
-        }
-        Optional<Soak> soak = soakFor(stack, type.liquor);
+        Optional<Soak> soak = soakFor(stack, type.profession);
         if (soak.isEmpty()) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
@@ -159,22 +169,25 @@ public class SoakingVatBlock extends BaseEntityBlock {
     private ItemInteractionResult pour(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, ItemStack stack,
             SoakingVatBlockEntity vat, LiquorItem liquor) {
         int fill = state.getValue(LEVEL);
-        if (fill >= 3 || fill > 0 && vat.liquorStars() != liquor.maxStars) {
-            if (!level.isClientSide() && fill > 0 && vat.liquorStars() != liquor.maxStars) {
+        if (fill >= 3 || fill > 0 && vat.liquorStars() != liquor.stars) {
+            if (!level.isClientSide() && fill > 0 && vat.liquorStars() != liquor.stars) {
                 tell(player, Component.translatable("message.dungeondelving.vat.other_liquor").withStyle(ChatFormatting.YELLOW));
             }
             return ItemInteractionResult.CONSUME;
         }
         if (!level.isClientSide()) {
             player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(Items.GLASS_BOTTLE)));
-            vat.setLiquorStars(liquor.maxStars);
+            vat.setLiquorStars(liquor.stars);
             level.setBlockAndUpdate(pos, state.setValue(LEVEL, fill + 1));
             level.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0f, 0.8f);
         }
         return ItemInteractionResult.sidedSuccess(level.isClientSide());
     }
 
-    /** Puts as many of the held pieces as fit into the vat as a batch, using a level of its liquid. */
+    /**
+     * Puts as many of the held pieces as fit into the vat as a batch, using a level of its liquid. Refused for a liquid
+     * better than the workshop can work (its pieces couldn't be used there).
+     */
     public static void insert(Level level, BlockPos pos, BlockState state, SoakingVatBlockEntity vat, Player player, ItemStack stack, Soak soak) {
         SoakingVatBlock block = (SoakingVatBlock) state.getBlock();
         if (vat.soaking()) {
@@ -182,22 +195,23 @@ public class SoakingVatBlock extends BaseEntityBlock {
             return;
         }
         if (state.getValue(LEVEL) <= 0) {
-            tell(player, Component.translatable(block.type.liquor ? "message.dungeondelving.vat.no_liquor" : "message.dungeondelving.vat.no_water")
-                    .withStyle(ChatFormatting.RED));
+            tell(player, Component.translatable("message.dungeondelving.vat.no_liquor").withStyle(ChatFormatting.RED));
             return;
         }
-        if (block.type.heated && !ForgeActions.heatedFromBelow(level, pos)) {
-            tell(player, Component.translatable("message.dungeondelving.boil.no_heat").withStyle(ChatFormatting.RED));
-            return;
-        }
-        if (CraftWorkshop.around(level, pos, soak.profession()).isEmpty()) {
+        Optional<CraftWorkshop> workshop = CraftWorkshop.around(level, pos, soak.profession());
+        if (workshop.isEmpty()) {
             tell(player, Component.translatable("message.dungeondelving.craft.no_workshop", soak.profession().displayName()).withStyle(ChatFormatting.RED));
+            return;
+        }
+        if (vat.liquorStars() > workshop.get().maxStars()) {
+            tell(player, Component.translatable("message.dungeondelving.craft.workshop_too_low", StarredItem.starsText(workshop.get().maxStars()))
+                    .withStyle(ChatFormatting.RED));
             return;
         }
         int count = Math.min(stack.getCount(), block.type.capacity);
         List<ItemStack> batch = List.of(stack.copyWithCount(count));
         stack.shrink(count);
-        long ready = level.getGameTime() + Math.round(soak.ticks() * block.type.timeScale);
+        long ready = level.getGameTime() + Math.round(soakTicks(vat.liquorStars()) * block.type.timeScale);
         vat.start(batch, ready);
         level.setBlockAndUpdate(pos, state.setValue(LEVEL, state.getValue(LEVEL) - 1).setValue(SOAKING, true));
         level.playSound(null, pos, SoundEvents.GENERIC_SPLASH, SoundSource.BLOCKS, 0.6f, 1.0f);
@@ -215,7 +229,7 @@ public class SoakingVatBlock extends BaseEntityBlock {
         return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
-    /** Takes the batch out if it's done, or says how long it has left. */
+    /** Takes the batch out if it's done, with the liquid's ★, or says how long it has left. */
     public static void collect(Level level, BlockPos pos, BlockState state, SoakingVatBlockEntity vat, Player player) {
         long left = vat.readyAt() - level.getGameTime();
         if (left > 0) {
@@ -223,34 +237,30 @@ public class SoakingVatBlock extends BaseEntityBlock {
             return;
         }
         SoakingVatBlock block = (SoakingVatBlock) state.getBlock();
-        int cap = block.type.liquor ? vat.liquorStars() : Forging.MAX_STARS;
+        int stars = Math.clamp(vat.liquorStars(), 1, Forging.MAX_STARS);
         for (ItemStack piece : vat.takeAll()) {
-            Optional<Soak> soak = soakFor(piece, block.type.liquor);
+            Optional<Soak> soak = soakFor(piece, block.type.profession);
             if (soak.isEmpty()) {
                 Block.popResource(level, pos.above(), piece);
                 continue;
             }
             ItemStack out = new ItemStack(soak.get().output().get(), piece.getCount());
-            out.set(Forging.STARS.get(), Math.max(1, Math.min(Forging.stars(piece), cap)));
+            out.set(Forging.STARS.get(), stars);
             if (!player.getInventory().add(out)) {
                 player.drop(out, false);
             }
-            CraftingSkills.addXp(player, soak.get().profession().skill, soak.get().xp() * piece.getCount());
+            CraftingSkills.addXp(player, soak.get().profession().skill, soak.get().xp() * stars * piece.getCount());
         }
         level.playSound(null, pos, SoundEvents.BUCKET_FILL, SoundSource.BLOCKS, 0.6f, 1.2f);
-        int fill = state.getValue(LEVEL);
-        if (fill == 0 && block.type == Type.TANNING_VAT) {
+        if (state.getValue(LEVEL) == 0 && block.type.cauldron) {
             level.setBlockAndUpdate(pos, Blocks.CAULDRON.defaultBlockState());
-        } else if (block.type == Type.SOAKING_CAULDRON) {
-            level.setBlockAndUpdate(pos, fill == 0 ? Blocks.CAULDRON.defaultBlockState()
-                    : Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, fill));
         } else {
             level.setBlockAndUpdate(pos, state.setValue(SOAKING, false));
         }
     }
 
-    /** Time left as "m:ss". */
-    static String minutes(long ticks) {
+    /** Time as "m:ss". */
+    public static String minutes(long ticks) {
         long seconds = Math.max(0, (ticks + 19) / 20);
         return seconds / 60 + ":" + String.format("%02d", seconds % 60);
     }
@@ -262,8 +272,8 @@ public class SoakingVatBlock extends BaseEntityBlock {
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (state.getValue(SOAKING) && random.nextInt(3) == 0) {
-            level.addParticle(type.heated ? ParticleTypes.BUBBLE_POP : ParticleTypes.FALLING_DRIPSTONE_WATER, pos.getX() + 0.3 + random.nextDouble() * 0.4,
-                    pos.getY() + 0.9, pos.getZ() + 0.3 + random.nextDouble() * 0.4, 0.0, 0.02, 0.0);
+            level.addParticle(ParticleTypes.FALLING_DRIPSTONE_WATER, pos.getX() + 0.3 + random.nextDouble() * 0.4, pos.getY() + 0.9,
+                    pos.getZ() + 0.3 + random.nextDouble() * 0.4, 0.0, 0.02, 0.0);
         }
     }
 
@@ -275,44 +285,19 @@ public class SoakingVatBlock extends BaseEntityBlock {
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
-    /**
-     * Sets up the vanilla cauldrons: pouring liquor into an empty cauldron makes a Tanning Vat, and putting a piece to
-     * soak into a water cauldron makes a Soaking Cauldron (it checks for heat). Call once during common setup.
-     */
+    /** Sets up the vanilla cauldron: pouring a craft's liquid into an empty one makes that craft's vat. Call once during common setup. */
     public static void registerInteractions() {
-        for (Supplier<? extends Item> liquor : List.of(Crafts.BARK_LIQUOR, Crafts.TANNIN_LIQUOR, Crafts.ELDER_LIQUOR)) {
+        for (Supplier<LiquorItem> liquor : List.<Supplier<LiquorItem>>of(Crafts.BARK_LIQUOR, Crafts.TANNIN_LIQUOR, Crafts.ELDER_LIQUOR,
+                Crafts.WHEAT_SIZING, Crafts.SILK_SIZING, Crafts.ARCANE_SIZING, Crafts.LINSEED_OIL, Crafts.HEARTWOOD_RESIN, Crafts.SYLVAN_SAP)) {
             CauldronInteraction.EMPTY.map().put(liquor.get(), (state, level, pos, player, hand, stack) -> {
                 if (!level.isClientSide()) {
-                    level.setBlockAndUpdate(pos, Crafts.TANNING_VAT.get().defaultBlockState().setValue(LEVEL, 1));
+                    LiquorItem poured = (LiquorItem) stack.getItem();
+                    level.setBlockAndUpdate(pos, cauldronFor(poured.profession).defaultBlockState().setValue(LEVEL, 1));
                     if (level.getBlockEntity(pos) instanceof SoakingVatBlockEntity vat) {
-                        vat.setLiquorStars(((LiquorItem) stack.getItem()).maxStars);
+                        vat.setLiquorStars(poured.stars);
                     }
                     player.setItemInHand(hand, ItemUtils.createFilledResult(stack, player, new ItemStack(Items.GLASS_BOTTLE)));
                     level.playSound(null, pos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0f, 0.8f);
-                }
-                return ItemInteractionResult.sidedSuccess(level.isClientSide());
-            });
-        }
-        for (Soak soak : SOAKS) {
-            if (soak.liquor()) {
-                continue;
-            }
-            CauldronInteraction.WATER.map().put(soak.input().get(), (state, level, pos, player, hand, stack) -> {
-                if (!level.isClientSide()) {
-                    if (!ForgeActions.heatedFromBelow(level, pos)) {
-                        tell(player, Component.translatable("message.dungeondelving.boil.no_heat").withStyle(ChatFormatting.RED));
-                        return ItemInteractionResult.CONSUME;
-                    }
-                    if (CraftWorkshop.around(level, pos, soak.profession()).isEmpty()) {
-                        tell(player, Component.translatable("message.dungeondelving.craft.no_workshop", soak.profession().displayName())
-                                .withStyle(ChatFormatting.RED));
-                        return ItemInteractionResult.CONSUME;
-                    }
-                    BlockState soaking = Crafts.SOAKING_CAULDRON.get().defaultBlockState().setValue(LEVEL, state.getValue(LayeredCauldronBlock.LEVEL));
-                    level.setBlockAndUpdate(pos, soaking);
-                    if (level.getBlockEntity(pos) instanceof SoakingVatBlockEntity vat) {
-                        insert(level, pos, soaking, vat, player, stack, soak);
-                    }
                 }
                 return ItemInteractionResult.sidedSuccess(level.isClientSide());
             });

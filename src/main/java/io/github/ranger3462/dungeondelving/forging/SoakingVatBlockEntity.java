@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class SoakingVatBlockEntity extends BlockEntity {
     private final List<ItemStack> contents = new ArrayList<>();
     private long readyAt;
-    /** The liquor in a tanning vat (its ★ cap), or 0 for water. */
+    /** The ★ of the liquid in the vat (0 while it has none). */
     private int liquorStars;
 
     public SoakingVatBlockEntity(BlockPos pos, BlockState state) {

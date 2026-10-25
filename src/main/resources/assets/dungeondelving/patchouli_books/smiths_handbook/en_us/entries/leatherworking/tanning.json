@@ -1,0 +1,23 @@
+{
+  "name": "Scraping and Tanning",
+  "icon": "dungeondelving:scraped_hide",
+  "category": "dungeondelving:leatherworking",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Hold leather and right-click the $(item)Tanning Rack$() for a $(item)Scraped Hide$().",
+      "title": "Scraping"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Brew a liquor in a Farmer's Delight cooking pot and pour it into an empty cauldron to make a $(item)Tanning Vat$().$(li)$(item)Bark Liquor$(): four tree bark. \u26053$(li)$(item)Tannin Liquor$(): bark and Barrowmoss. \u26055$(li)$(item)Elder Liquor$(): bark and Emberroot. \u26057$(br2)Hides come out as $(item)Tanned Leather$() of the liquor's \u2605.",
+      "title": "Tanning"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Each vat takes four pieces a batch and uses a level of liquid. Better liquids take longer: 2 minutes at \u26053, 3 at \u26055, 4 at \u26057. Right-click with an empty hand to take the batch out, or to see how long it has left.",
+      "title": "The Vat"
+    }
+  ]
+}

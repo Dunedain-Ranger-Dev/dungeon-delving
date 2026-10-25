@@ -1,6 +1,5 @@
 package io.github.ranger3462.dungeondelving.gametest;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,18 +31,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CampfireBlock;
-import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 /**
- * Checks the rebuilt crafting professions (DD-88, docs/design/professions.md): the new minigames, the workshops around
- * a Guild Ledger, and each profession's steps from raw material to part, ★ and all.
+ * Checks the rebuilt crafting professions (DD-88, docs/design/professions.md): the minigames, the vats' timing, the
+ * workshops around a Guild Ledger, and each profession's steps from raw material to part, ★ and all. Each follows
+ * Forging's pattern: prepare, soak in a vat (which sets the ★), work at the bench, craft.
  */
 @GameTestHolder(DungeonDelving.MODID)
 @PrefixGameTestTemplate(false)
@@ -52,15 +51,28 @@ public class ProfessionTests {
 
     @GameTest(template = ANY_TEMPLATE)
     public static void theMinigamesWorkOutTheSameEverywhere(GameTestHelper helper) {
-        helper.assertTrue(TimingBar.performanceStars(6, 3) == 7 && TimingBar.performanceStars(3, 3) == 4 && TimingBar.performanceStars(0, 3) == 1,
-                "all gold is ★7, all green ★4, all misses ★1");
         helper.assertTrue(TimingBar.cut(20, 40) == 0.5f && TimingBar.cut(80, 40) == 1.0f, "the blade moves steadily while held, and stops at the end");
         helper.assertTrue(TimingBar.turn(18, 36) == 0.25f, "the chisel bites faster the deeper it goes");
-        helper.assertTrue(TimingBar.judgeBeat(TimingBar.beat(2, 14), 2, 14, 7, 0) == TimingBar.Hit.GOLD, "a stitch on the beat with the right button is gold");
-        helper.assertTrue(TimingBar.judgeBeat(TimingBar.beat(1, 14), 1, 14, 7, 0) == TimingBar.Hit.MISS, "the wrong button misses");
-        helper.assertTrue(TimingBar.spinSpeed(TimingBar.TAP_DURATION, List.of()) < 0.1f, "a wheel nobody taps runs down");
-        helper.assertTrue(TimingBar.judgeTapped(TimingBar.timeInBand(TimingBar.Kind.SPIN, steadyTaps(10, 14), 0, 0.40f, 0.70f)) != TimingBar.Hit.MISS,
-                "steady tapping keeps the wheel in the band");
+        helper.succeed();
+    }
+
+    /** Better tiers take longer: 30 seconds more for each ★, in a vat or heating an ingot in a furnace. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void betterTiersTakeLonger(GameTestHelper helper) {
+        helper.assertTrue(SoakingVatBlock.soakTicks(3) == 2400 && SoakingVatBlock.soakTicks(5) == 3600 && SoakingVatBlock.soakTicks(7) == 4800,
+                "a vat takes 2:00 at ★3, 3:00 at ★5 and 4:00 at ★7");
+        ServerLevel level = helper.getLevel();
+        int previous = 0;
+        for (int stars = 0; stars < Forging.MAX_STARS; stars++) {
+            ItemStack ingot = stars == 0 ? new ItemStack(Items.IRON_INGOT) : new ItemStack(Forging.TEMPERED_IRON_INGOT.get());
+            if (stars > 0) {
+                ingot.set(Forging.STARS.get(), stars);
+            }
+            int time = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(ingot), level).orElseThrow().value()
+                    .getCookingTime();
+            helper.assertTrue(stars == 0 ? time == 100 : time == previous + 600, "heating for ★" + (stars + 1) + " takes 30s more than the last, got " + time);
+            previous = time;
+        }
         helper.succeed();
     }
 
@@ -86,7 +98,7 @@ public class ProfessionTests {
         helper.succeed();
     }
 
-    /** Leatherworking from leather to panels: scrape, tan, cut. */
+    /** Leatherworking from leather to panels: scrape, tan (the liquor sets the ★), cut. */
     @GameTest(template = ANY_TEMPLATE)
     public static void leatherIsScrapedTannedAndCut(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -96,14 +108,14 @@ public class ProfessionTests {
         try {
             set(level, ledger, ModRegistries.GUILD_LEDGER.get());
             tannery(level, ledger);
-            // Scrape: all gold, capped at ★3 by the level 1 tannery.
+            // Scrape: no minigame, just a plain scraped hide.
             BlockPos rack = ledger.offset(2, 0, 0);
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.LEATHER, 2));
             for (int i = 0; i < 2; i++) {
-                strikeGold(player, level, rack, TimingBar.Kind.SCRAPE);
+                scrape(player, level, rack);
             }
             ItemStack hides = find(player, Crafts.SCRAPED_HIDE.get());
-            helper.assertTrue(hides.getCount() == 2 && Forging.stars(hides) == 3, "two clean scrapes make two ★3 scraped hides, got " + hides);
+            helper.assertTrue(hides.getCount() == 2 && !hides.has(Forging.STARS.get()), "two scrapes make two scraped hides, no ★ yet, got " + hides);
 
             // Tan: liquor poured into a cauldron makes a vat; the hides come out as tanned leather once they've soaked.
             BlockPos cauldron = ledger.offset(-2, 0, 0);
@@ -112,14 +124,15 @@ public class ProfessionTests {
                     InteractionHand.MAIN_HAND, liquor);
             helper.assertTrue(level.getBlockState(cauldron).is(Crafts.TANNING_VAT.get()), "liquor in a cauldron makes a Tanning Vat");
             SoakingVatBlockEntity vat = (SoakingVatBlockEntity) level.getBlockEntity(cauldron);
-            SoakingVatBlock.insert(level, cauldron, level.getBlockState(cauldron), vat, player, hides, SoakingVatBlock.soakFor(hides, true).orElseThrow());
+            SoakingVatBlock.insert(level, cauldron, level.getBlockState(cauldron), vat, player, hides,
+                    SoakingVatBlock.soakFor(hides, Profession.LEATHERWORKING).orElseThrow());
             helper.assertTrue(vat.soaking() && hides.isEmpty(), "the hides go in to soak");
             SoakingVatBlock.collect(level, cauldron, level.getBlockState(cauldron), vat, player);
             helper.assertTrue(vat.soaking(), "they aren't ready yet");
             vat.finishNow();
             SoakingVatBlock.collect(level, cauldron, level.getBlockState(cauldron), vat, player);
             ItemStack tanned = find(player, Forging.REFINED_LEATHER.get());
-            helper.assertTrue(tanned.getCount() == 2 && Forging.stars(tanned) == 3, "they come out as two ★3 tanned leather, got " + tanned);
+            helper.assertTrue(tanned.getCount() == 2 && Forging.stars(tanned) == 3, "they come out as two tanned leather at Bark Liquor's ★3, got " + tanned);
             helper.assertTrue(level.getBlockState(cauldron).is(Blocks.CAULDRON), "a vat with its liquor used up is a cauldron again");
 
             // Cut: on the Shaping Rack with shears.
@@ -130,6 +143,14 @@ public class ProfessionTests {
             ItemStack panels = find(player, Crafts.LEATHER_PANEL.get());
             helper.assertTrue(panels.getCount() == 2 && Forging.stars(panels) == 3, "a clean cut makes two ★3 leather panels, got " + panels);
             helper.assertTrue(((ShapingRackBlockEntity) level.getBlockEntity(shaping)).piece().isEmpty(), "and uses up the leather");
+
+            // Like Forging, the bench refuses a piece better than the workshop can work.
+            ItemStack fine = new ItemStack(Forging.REFINED_LEATHER.get());
+            fine.set(Forging.STARS.get(), 5);
+            ((ShapingRackBlockEntity) level.getBlockEntity(shaping)).setPiece(fine);
+            ForgeActions.end(player);
+            helper.assertTrue(ForgeActions.begin(player, level, shaping, level.getBlockState(shaping), player.getMainHandItem(), TimingBar.Kind.CUT,
+                    level.getGameTime()).isEmpty(), "a level 1 tannery can't cut ★5 leather");
         } finally {
             clear(level, ledger);
         }
@@ -140,15 +161,16 @@ public class ProfessionTests {
     public static void theProfessionRecipesLoad(GameTestHelper helper) {
         var recipes = helper.getLevel().getRecipeManager();
         for (String id : List.of("seasoned_billet", "bow_from_parts", "crossbow_from_parts", "straps", "hardened_leather", "leather_base",
-                "gambeson_base", "bowstring", "staff_wrap", "stock", "shaping_rack", "spinning_wheel", "chopping_block", "wood_lathe")) {
+                "gambeson_base", "bowstring", "staff_wrap", "stock", "bow_limbs", "haft", "staff_shaft", "wand_core", "shaping_rack", "spinning_wheel",
+                "wood_lathe")) {
             helper.assertTrue(recipes.byKey(DungeonDelving.id(id)).isPresent(), "the " + id + " recipe loads");
         }
         if (net.neoforged.fml.ModList.get().isLoaded("farmersdelight")) {
-            for (String id : List.of("bark_liquor", "tannin_liquor", "elder_liquor", "linseed_oil")) {
+            for (String id : List.of("bark_liquor", "tannin_liquor", "elder_liquor", "wheat_sizing", "silk_sizing", "arcane_sizing", "linseed_oil")) {
                 helper.assertTrue(recipes.byKey(DungeonDelving.id(id)).isPresent(), "the " + id + " cooking-pot recipe loads");
             }
         }
-        helper.assertTrue(recipes.byKey(DungeonDelving.id("padded_cloth")).isEmpty(), "fulled cloth is made by soaking, not crafting");
+        helper.assertTrue(recipes.byKey(DungeonDelving.id("chopping_block")).isEmpty(), "the chopping block is gone");
         helper.succeed();
     }
 
@@ -160,17 +182,17 @@ public class ProfessionTests {
         try {
             set(level, rack, Forging.TANNING_RACK.get());
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.LEATHER));
-            helper.assertTrue(ForgeActions.begin(player, level, rack, level.getBlockState(rack), player.getMainHandItem(), TimingBar.Kind.SCRAPE,
-                    level.getGameTime()).isEmpty(), "a Tanning Rack with no tannery around it does nothing");
+            scrape(player, level, rack);
+            helper.assertTrue(player.getMainHandItem().getCount() == 1, "a Tanning Rack with no tannery around it does nothing");
         } finally {
             clear(level, rack);
         }
         helper.succeed();
     }
 
-    /** Weaving from wool to panels: spin, weave, full, sew. */
+    /** Weaving from wool to panels: spin, size (the sizing sets the ★), weave. */
     @GameTest(template = ANY_TEMPLATE)
-    public static void woolIsSpunWovenFulledAndSewn(GameTestHelper helper) {
+    public static void woolIsSpunSizedAndWoven(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos ledger = spot(helper);
         ServerPlayer player = player(helper, "weaver");
@@ -178,52 +200,42 @@ public class ProfessionTests {
         try {
             set(level, ledger, ModRegistries.GUILD_LEDGER.get());
             weavingRoom(level, ledger);
-            // Spin: steady taps keep the wheel in the band.
-            BlockPos wheel = ledger.offset(2, 0, 0);
+            helper.assertTrue(CraftWorkshop.scan(level, ledger, Profession.WEAVING).complete(), "the weaving room is complete");
+            // Spin: no minigame, three yarn from a wool.
             player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.WHITE_WOOL));
-            ForgeActions.Session spin = begin(player, level, wheel, TimingBar.Kind.SPIN);
-            spin.taps().addAll(steadyTaps(10, 14));
-            ForgeActions.finishTapped(player, level, spin, player.getMainHandItem(), level.getGameTime());
+            ForgeActions.prepare(player, level, ledger.offset(2, 0, 0), player.getMainHandItem(), Profession.WEAVING, Crafts.YARN, ForgeActions.YARN_PER_WOOL,
+                    net.minecraft.sounds.SoundEvents.WOOL_PLACE, "message.dungeondelving.spin.done");
             ItemStack yarn = find(player, Crafts.YARN.get());
-            helper.assertTrue(yarn.getCount() == 3 && Forging.stars(yarn) >= 2, "a good spin makes three yarn, got " + yarn);
+            helper.assertTrue(yarn.getCount() == 3, "a wool spins into three yarn, got " + yarn);
 
-            // Weave: three yarn on the loom; the cloth is no better than the yarn.
-            int yarnStars = Forging.stars(yarn);
-            player.setItemInHand(InteractionHand.MAIN_HAND, yarn.copy());
-            yarn.setCount(0);
+            // Size: sizing poured into a cauldron makes a Sizing Vat; the yarn comes out at the sizing's ★.
+            BlockPos cauldron = ledger.offset(0, 0, 2);
+            CauldronInteraction.EMPTY.map().get(Crafts.WHEAT_SIZING.get()).interact(level.getBlockState(cauldron), level, cauldron, player,
+                    InteractionHand.MAIN_HAND, new ItemStack(Crafts.WHEAT_SIZING.get()));
+            helper.assertTrue(level.getBlockState(cauldron).is(Crafts.SIZING_VAT.get()), "sizing in a cauldron makes a Sizing Vat");
+            SoakingVatBlockEntity vat = (SoakingVatBlockEntity) level.getBlockEntity(cauldron);
+            helper.assertTrue(SoakingVatBlock.soakFor(new ItemStack(Crafts.SCRAPED_HIDE.get()), Profession.WEAVING).isEmpty(), "hides don't go in sizing");
+            SoakingVatBlock.insert(level, cauldron, level.getBlockState(cauldron), vat, player, yarn, SoakingVatBlock.soakFor(yarn, Profession.WEAVING).orElseThrow());
+            vat.finishNow();
+            SoakingVatBlock.collect(level, cauldron, level.getBlockState(cauldron), vat, player);
+            ItemStack sized = find(player, Crafts.SIZED_YARN.get());
+            helper.assertTrue(sized.getCount() == 3 && Forging.stars(sized) == 3, "three ★3 sized yarn, got " + sized);
+
+            // Weave: three sized yarn on the loom make two cloth panels, keeping the ★.
+            player.setItemInHand(InteractionHand.MAIN_HAND, sized.copy());
+            sized.setCount(0);
             landAll(player, level, ledger.offset(-2, 0, 0), TimingBar.Kind.WEAVE, TimingBar.Hit.GOLD);
-            ItemStack cloth = find(player, Forging.WOVEN_CLOTH.get());
-            helper.assertTrue(!cloth.isEmpty() && Forging.stars(cloth) == Math.min(3, yarnStars), "the cloth takes the yarn's ★, got " + cloth);
-
-            // Full: into a heated water cauldron, out as fulled cloth.
-            BlockPos cauldron = ledger.offset(0, 0, -2);
-            CauldronInteraction.WATER.map().get(Forging.WOVEN_CLOTH.get()).interact(level.getBlockState(cauldron), level, cauldron, player,
-                    InteractionHand.MAIN_HAND, cloth);
-            helper.assertTrue(level.getBlockState(cauldron).is(Crafts.SOAKING_CAULDRON.get()), "cloth in a heated water cauldron starts it soaking");
-            SoakingVatBlock.finishNow(level, cauldron);
-            SoakingVatBlockEntity soaking = (SoakingVatBlockEntity) level.getBlockEntity(cauldron);
-            SoakingVatBlock.collect(level, cauldron, level.getBlockState(cauldron), soaking, player);
-            ItemStack fulled = find(player, Forging.PADDED_CLOTH.get());
-            helper.assertTrue(!fulled.isEmpty(), "it comes out fulled");
-            helper.assertTrue(level.getBlockState(cauldron).is(Blocks.WATER_CAULDRON), "and the cauldron is a water cauldron again");
-
-            // Sew: on the Shaping Rack, with string.
-            BlockPos shaping = ledger.offset(0, 0, 2);
-            ((ShapingRackBlockEntity) level.getBlockEntity(shaping)).setPiece(fulled.split(1));
-            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.STRING, 2));
-            landAll(player, level, shaping, TimingBar.Kind.SEW, TimingBar.Hit.GREEN);
             ItemStack panels = find(player, Crafts.CLOTH_PANEL.get());
-            helper.assertTrue(panels.getCount() == 2, "sewing makes two cloth panels, got " + panels);
-            helper.assertTrue(player.getMainHandItem().getCount() == 1, "and uses a string");
+            helper.assertTrue(panels.getCount() == 2 && Forging.stars(panels) == 3, "weaving makes two ★3 cloth panels, got " + panels);
         } finally {
             clear(level, ledger);
         }
         helper.succeed();
     }
 
-    /** Woodworking from a billet to a bow: split, carve, bend, then craft with a bowstring and a finish. */
+    /** Woodworking from a billet to a bow: cure (the finish sets the ★), turn into staves, then craft the parts and the bow. */
     @GameTest(template = ANY_TEMPLATE)
-    public static void woodIsSplitCarvedBentAndStrung(GameTestHelper helper) {
+    public static void woodIsCuredTurnedAndCrafted(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos ledger = spot(helper);
         ServerPlayer player = player(helper, "bowyer");
@@ -232,37 +244,40 @@ public class ProfessionTests {
             set(level, ledger, ModRegistries.GUILD_LEDGER.get());
             woodshop(level, ledger);
             helper.assertTrue(CraftWorkshop.scan(level, ledger, Profession.WOODWORKING).complete(), "the woodshop is complete");
-            // Split, with an axe in the off hand.
-            player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Crafts.SEASONED_BILLET.get(), 2));
-            player.setItemInHand(InteractionHand.OFF_HAND, new ItemStack(Items.IRON_AXE));
-            ForgeActions.split(player, level, ledger.offset(-2, 0, 0), player.getMainHandItem());
-            helper.assertTrue(find(player, Crafts.STAVE.get()).getCount() == 2, "a billet splits into two staves");
+            // Cure: billets in a vat of linseed oil come out ★3.
+            BlockPos cauldron = ledger.offset(-2, 0, 0);
+            CauldronInteraction.EMPTY.map().get(Crafts.LINSEED_OIL.get()).interact(level.getBlockState(cauldron), level, cauldron, player,
+                    InteractionHand.MAIN_HAND, new ItemStack(Crafts.LINSEED_OIL.get()));
+            helper.assertTrue(level.getBlockState(cauldron).is(Crafts.FINISHING_VAT.get()), "linseed oil in a cauldron makes a Finishing Vat");
+            SoakingVatBlockEntity vat = (SoakingVatBlockEntity) level.getBlockEntity(cauldron);
+            ItemStack billets = new ItemStack(Crafts.SEASONED_BILLET.get(), 2);
+            SoakingVatBlock.insert(level, cauldron, level.getBlockState(cauldron), vat, player, billets,
+                    SoakingVatBlock.soakFor(billets, Profession.WOODWORKING).orElseThrow());
+            vat.finishNow();
+            SoakingVatBlock.collect(level, cauldron, level.getBlockState(cauldron), vat, player);
+            ItemStack cured = find(player, Crafts.CURED_BILLET.get());
+            helper.assertTrue(cured.getCount() == 2 && Forging.stars(cured) == 3, "two ★3 cured billets, got " + cured);
 
-            // Turn the other billet into a staff shaft.
+            // Turn each into two staves.
+            player.setItemInHand(InteractionHand.MAIN_HAND, cured.copy());
+            cured.setCount(0);
             BlockPos lathe = ledger.offset(0, 0, -2);
             landAll(player, level, lathe, TimingBar.Kind.TURN, TimingBar.Hit.GOLD);
-            helper.assertTrue(Forging.stars(find(player, Crafts.STAFF_SHAFT.get())) == 3, "a perfect turn makes a ★3 staff shaft (a level 1 woodshop)");
+            landAll(player, level, lathe, TimingBar.Kind.TURN, TimingBar.Hit.GOLD);
+            ItemStack staves = find(player, Crafts.STAVE.get());
+            helper.assertTrue(staves.getCount() == 4 && Forging.stars(staves) == 3, "turning makes two ★3 staves a billet, got " + staves);
 
-            // Carve a stave into limbs.
-            player.setItemInHand(InteractionHand.MAIN_HAND, find(player, Crafts.STAVE.get()).copy());
-            find(player, Crafts.STAVE.get()).setCount(0);
-            ForgeActions.Session carve = begin(player, level, ledger.offset(0, 0, 2), TimingBar.Kind.CARVE);
-            carve.taps().addAll(steadyTaps(8, 12));
-            ForgeActions.finishTapped(player, level, carve, player.getMainHandItem(), level.getGameTime());
-            ItemStack limbs = find(player, Crafts.BOW_LIMBS.get());
-            helper.assertTrue(!limbs.isEmpty() || find(player, Items.STICK).getCount() > 0, "carving makes limbs (or, badly, splits the stave)");
-
-            // Bend the limbs, then string the bow.
-            ItemStack bent = new ItemStack(Crafts.BENT_LIMBS.get(), 2);
-            bent.set(Forging.STARS.get(), 3);
+            // Craft limbs and a haft, then a bow, which takes its weakest part's ★.
+            ItemStack stave = staves.copyWithCount(1);
+            ItemStack air = ItemStack.EMPTY;
+            ItemStack limbs = craft(level, CraftingInput.of(2, 2, List.of(air, stave, stave.copy(), air)));
+            helper.assertTrue(limbs.is(Crafts.BOW_LIMBS.get()) && limbs.getCount() == 2 && Forging.stars(limbs) == 3, "two staves make two bow limbs, got " + limbs);
+            ItemStack haft = craft(level, CraftingInput.of(1, 1, List.of(stave.copy())));
+            helper.assertTrue(haft.is(Crafts.HAFT.get()) && Forging.stars(haft) == 3, "a stave makes hafts, got " + haft);
             ItemStack string = new ItemStack(Crafts.BOWSTRING.get());
             string.set(Forging.STARS.get(), 2);
-            ItemStack oil = new ItemStack(Crafts.LINSEED_OIL.get());
-            ItemStack air = ItemStack.EMPTY;
-            CraftingInput input = CraftingInput.of(3, 3, List.of(air, bent.copyWithCount(1), string.copy(), oil, air, string.copy(), air,
-                    bent.copyWithCount(1), string.copy()));
-            ItemStack bow = level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level).orElseThrow().value()
-                    .assemble(input, level.registryAccess());
+            ItemStack bow = craft(level, CraftingInput.of(3, 3, List.of(air, limbs.copyWithCount(1), air, haft.copyWithCount(1), air, string, air,
+                    limbs.copyWithCount(1), air)));
             helper.assertTrue(bow.is(Items.BOW) && Forging.stars(bow) == 2, "a bow from parts takes its weakest part's ★, got " + bow);
         } finally {
             clear(level, ledger);
@@ -272,18 +287,19 @@ public class ProfessionTests {
 
     // --- Helpers ---
 
-    /** Taps every {@code every} ticks from {@code first}, through the whole minigame. */
-    private static List<Float> steadyTaps(int first, int every) {
-        List<Float> taps = new ArrayList<>();
-        for (int tick = first; tick < TimingBar.TAP_DURATION; tick += every) {
-            taps.add((float) tick);
-        }
-        return taps;
-    }
-
     private static ForgeActions.Session begin(ServerPlayer player, ServerLevel level, BlockPos pos, TimingBar.Kind kind) {
         ForgeActions.end(player);
         return ForgeActions.begin(player, level, pos, level.getBlockState(pos), player.getMainHandItem(), kind, level.getGameTime()).orElseThrow();
+    }
+
+    private static ItemStack craft(ServerLevel level, CraftingInput input) {
+        return level.getRecipeManager().getRecipeFor(RecipeType.CRAFTING, input, level).orElseThrow().value().assemble(input, level.registryAccess());
+    }
+
+    /** Scrapes the held leather on a Tanning Rack. */
+    private static void scrape(ServerPlayer player, ServerLevel level, BlockPos rack) {
+        ForgeActions.prepare(player, level, rack, player.getMainHandItem(), Profession.LEATHERWORKING, Crafts.SCRAPED_HIDE, 1,
+                net.minecraft.sounds.SoundEvents.ARMOR_EQUIP_LEATHER.value(), "message.dungeondelving.scrape.done");
     }
 
     /** Plays a minigame through with every strike landing in its gold. */
@@ -331,21 +347,13 @@ public class ProfessionTests {
     private static void weavingRoom(ServerLevel level, BlockPos ledger) {
         set(level, ledger.offset(2, 0, 0), Crafts.SPINNING_WHEEL.get());
         set(level, ledger.offset(-2, 0, 0), Blocks.LOOM);
-        set(level, ledger.offset(0, 0, 2), Crafts.SHAPING_RACK.get());
-        heatedWater(level, ledger.offset(0, 0, -2));
+        set(level, ledger.offset(0, 0, 2), Blocks.CAULDRON);
     }
 
     private static void woodshop(ServerLevel level, BlockPos ledger) {
         set(level, ledger.offset(2, 0, 0), Blocks.SMOKER);
-        set(level, ledger.offset(-2, 0, 0), Crafts.CHOPPING_BLOCK.get());
-        set(level, ledger.offset(0, 0, 2), Blocks.FLETCHING_TABLE);
+        set(level, ledger.offset(-2, 0, 0), Blocks.CAULDRON);
         set(level, ledger.offset(0, 0, -2), Crafts.WOOD_LATHE.get());
-        heatedWater(level, ledger.offset(3, 0, 3));
-    }
-
-    private static void heatedWater(ServerLevel level, BlockPos cauldron) {
-        level.setBlock(cauldron.below(), Blocks.CAMPFIRE.defaultBlockState().setValue(CampfireBlock.LIT, true), Block.UPDATE_CLIENTS);
-        level.setBlock(cauldron, Blocks.WATER_CAULDRON.defaultBlockState().setValue(LayeredCauldronBlock.LEVEL, 3), Block.UPDATE_CLIENTS);
     }
 
     private static void clear(ServerLevel level, BlockPos center) {

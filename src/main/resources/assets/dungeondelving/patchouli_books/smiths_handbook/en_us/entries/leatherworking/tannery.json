@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(li)a $(item)Tanning Rack$()$(li)a cauldron, for the liquor$(li)a $(item)Shaping Rack$()$(br2)Upgrades: a $(item)Tanning Barrel$() (a bigger, faster vat) and a $(item)Fleshing Beam$() (wider scraping patches).",
+      "text": "$(li)a $(item)Tanning Rack$(), to scrape$(li)a cauldron, for the vat$(li)a $(item)Shaping Rack$(), to cut$(br2)Upgrades: a $(item)Tanning Barrel$() (a vat for eight, a quarter faster) and a $(item)Fleshing Beam$() (a wider cutting mark).",
       "title": "Stations"
     },
     {

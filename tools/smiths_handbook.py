@@ -1,4 +1,4 @@
-"""Writes The Smith's Handbook, the Patchouli guide to forging, leatherworking and weaving.
+"""Writes The Smith's Handbook, the Patchouli guide to forging. tools/profession_resources.py adds the other crafts' pages.
 
 Run from the project root: python tools/smiths_handbook.py
 The book is defined in data/ and its pages live in assets/ (use_resource_pack). Text uses Patchouli's formatting:
@@ -49,28 +49,27 @@ def smelting(recipe, body=None):
 
 
 CATEGORIES = {
-    "forge": ("The Forge", "Building a forge, and the upgrades that let it work finer metal.", f"{MOD}:forge_hearth", 0),
+    "forge": ("The Forge", "Building a forge, and the upgrades that let it work finer metal.", f"{MOD}:guild_ledger", 0),
     "smithing": ("Smithing", "Heating, striking, quenching and grinding iron into tempered ingots.", f"{MOD}:tempered_iron_ingot", 1),
     "parts": ("Flux and Parts", "Turning tempered ingots into plates, rivets and chain.", f"{MOD}:armor_plate", 2),
-    "leather_cloth": ("Leather and Cloth", "Scraping and hardening leather, and weaving cloth.", f"{MOD}:hardened_leather", 3),
-    "gear": ("Forged Gear", "The armor and weapons a smith can make, and keeping them in repair.", f"{MOD}:plate_chestplate", 4),
-    "skills": ("Crafting Skills", "Forging, Leatherworking and Weaving, and what practice earns you.", "minecraft:experience_bottle", 5),
+    "gear": ("Forged Gear", "The armor and weapons a smith can make, and keeping them in repair.", f"{MOD}:plate_chestplate", 7),
+    "skills": ("Crafting Skills", "Forging, Leatherworking, Weaving and Woodworking, and what practice earns you.", "minecraft:experience_bottle", 8),
 }
 
 ENTRIES = {
     "forge": {
-        "building": ("Building a Forge", f"{MOD}:forge_hearth", [
-            spotlight(f"{MOD}:forge_hearth", "Every forge starts with a $(item)Forge Hearth$(). Around it, within 7 blocks across and 4 up or down, "
-                      "it needs four stations, set out however you like:", "The Hearth"),
+        "building": ("Building a Forge", f"{MOD}:guild_ledger", [
+            spotlight(f"{MOD}:guild_ledger", "Every workshop starts with a $(item)Guild Ledger$(). A forge needs four stations within 7 "
+                      "blocks of it across, and 4 up or down, set out however you like:", "The Guild Ledger"),
             text("$(li)a $(item)furnace$() or $(item)blast furnace$(), to heat metal"
                  "$(li)an $(item)anvil$(), to strike it"
                  "$(li)a $(item)cauldron$() of water (or oil), to quench it"
                  "$(li)a $(item)grindstone$(), to finish it"
-                 "$(br2)Right-click the hearth to see what's missing. Its fire lights once the forge is complete; striking, quenching "
-                 "and grinding only work at stations near a lit hearth."),
-            crafting("forge_hearth"),
+                 "$(br2)Read the ledger to see what's missing. Striking, quenching and grinding only work at stations near a ledger "
+                 "with a complete forge. One ledger serves every craft in its range."),
+            crafting("guild_ledger"),
             text("Decoration counts too. Bricks, stone and deepslate bricks, chains, lanterns, iron bars, barrels and the like near "
-                 "the hearth widen every sweet spot a little: +0.5% for every 8 blocks, up to +2.5%. A forge that looks like a forge "
+                 "the ledger widen every sweet spot a little: +0.5% for every 8 blocks, up to +2.5%. A forge that looks like a forge "
                  "works like one.", "A Proper Workshop"),
         ]),
         "levels": ("Forge Levels", "minecraft:blast_furnace", [
@@ -99,6 +98,8 @@ ENTRIES = {
     "smithing": {
         "heating": ("Heating", f"{MOD}:heated_ingot", [
             smelting("heating/iron_smelting", "Smelt an iron ingot to get a $(item)Heated Ingot$(). A blast furnace is twice as fast."),
+            text("Finer metal takes longer: heating an ingot takes 30 seconds more for each ★ it's aiming for past the first (15 in a "
+                 "blast furnace). Iron heats in 5 seconds; a Tempered Ingot ★4, aiming for ★5, takes 2 minutes 5 seconds.", "Heating Time"),
             text("Metal starts cooling once it leaves the furnace: orange, then red, then faded red, then cold. You have about 30 "
                  "seconds to work it (longer as your Forging improves). Cooler metal is harder to strike: the marker sweeps faster. "
                  "Cold metal goes back in the furnace with no loss.", "Cooling"),
@@ -150,27 +151,6 @@ ENTRIES = {
             crafting("chain_links", "Two ingots and flux make eight Chain Links."),
         ]),
     },
-    "leather_cloth": {
-        "scraping": ("Scraping Leather", f"{MOD}:tanning_rack", [
-            spotlight(f"{MOD}:tanning_rack", "Hold leather and right-click a $(item)Tanning Rack$(). The scraper makes one pass across "
-                      "the hide; click as it crosses each dark patch, in order.", "The Tanning Rack"),
-            text("A patch missed (or passed by) might tear the hide, likelier with each miss, leaving only $(item)Leather Scraps$() "
-                 "(four make a leather again). Scrape it clean and you have $(item)Refined Leather$().", "Scraping"),
-            crafting("tanning_rack", recipe2="leather_from_scraps"),
-        ]),
-        "hardening": ("Hardening Leather", f"{MOD}:hardened_leather", [
-            text("Hold refined leather and right-click a water cauldron with heat under it: a lit campfire, fire, magma or lava. "
-                 "It boils into $(item)Boiled Leather$(), using a level of water.", "Boiling"),
-            crafting("hardened_leather", "Wax it with honeycomb and stitch it with string."),
-            crafting("leather_base", "The backing medium and heavy armor is built on."),
-        ]),
-        "weaving": ("Weaving", "minecraft:loom", [
-            text("Hold three string and right-click a loom. The needle's eye bobs up and down, and so does the thread's tip, at a "
-                 "different pace. Click when the thread lines up with the eye. Three stitches make a $(item)Woven Cloth$()."
-                 "$(br2)A missed stitch might snap the thread (likelier with each miss), saving just one string.", "Thread the Needle"),
-            crafting("padded_cloth", recipe2="gambeson_base"),
-        ]),
-    },
     "gear": {
         "weights": ("Three Weights", f"{MOD}:hauberk_chestplate", [
             text("Forged armor comes in three weights, made in the usual armor shapes:"
@@ -198,9 +178,10 @@ ENTRIES = {
     },
     "skills": {
         "skills": ("Crafting Skills", "minecraft:experience_bottle", [
-            text("Forging, Leatherworking and Weaving each level from 1 to 30 as you practice. Use $(item)/skills$() to see where "
-                 "you stand.$(br2)Higher levels widen sweet spots, lower the odds of ruining a piece, and (for smiths) slow cooling "
-                 "and save more scrap from cracks.", "Crafting Skills"),
+            text("Forging, Leatherworking, Weaving and Woodworking level as you practice, with no limit. Use $(item)/skills$() to "
+                 "see where you stand, and the skill trees (K) to spend the points each level gives.$(br2)Your level sets the best ★ "
+                 "you can make: ★2 from level 3, ★3 from 6, ★4 from 10, ★5 from 15, ★6 from 20, ★7 from 25. The trees' perks widen "
+                 "sweet spots and lower the odds of ruining a piece.", "Crafting Skills"),
         ]),
     },
 }

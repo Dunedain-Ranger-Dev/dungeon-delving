@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Lay tanned leather on the $(item)Shaping Rack$() and use shears or a knife on it. Hold the button to draw the blade along the pattern, and let go on the end mark. Two cuts make two $(item)Leather Panels$().",
+      "text": "Lay tanned leather on the $(item)Shaping Rack$() and use shears or a knife on it. Hold the button to draw the blade along the pattern, and let go on the end mark. Two cuts make two $(item)Leather Panels$() of the leather's \u2605. A cut far off the mark can ruin it into scraps.",
       "title": "Cutting"
     },
     {

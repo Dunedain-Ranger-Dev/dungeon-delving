@@ -1,6 +1,6 @@
 {
   "name": "Woodworking",
-  "description": "Seasoning, splitting, carving, turning and bending wood.",
-  "icon": "dungeondelving:bent_limbs",
+  "description": "Seasoning, curing and turning wood.",
+  "icon": "dungeondelving:stave",
   "sortnum": 6
 }

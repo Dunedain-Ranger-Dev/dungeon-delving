@@ -3,13 +3,13 @@
   "category": "equipment",
   "ingredients": [
     {
-      "tag": "dungeondelving:threads"
+      "item": "dungeondelving:sized_yarn"
     },
     {
-      "tag": "dungeondelving:threads"
+      "item": "dungeondelving:sized_yarn"
     },
     {
-      "tag": "dungeondelving:threads"
+      "item": "dungeondelving:sized_yarn"
     }
   ],
   "result": {

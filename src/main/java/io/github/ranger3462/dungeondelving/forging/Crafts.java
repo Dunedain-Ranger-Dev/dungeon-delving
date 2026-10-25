@@ -21,7 +21,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
  * The blocks and items of the crafting professions other than Forging (DD-88): Leatherworking and Weaving rebuilt, and
- * Woodworking. See docs/design/professions.md. Forging's own, and the leather and cloth items gear is assembled from, are
+ * Woodworking. Each follows Forging's pattern: a vanilla material is prepared, gets its ★ in a timed vat (the liquid's
+ * tier), is worked at a bench, then crafted into parts. See docs/design/professions.md. Forging's own, and the leather and cloth items gear is assembled from, are
  * in {@link Forging}.
  */
 public final class Crafts {
@@ -29,14 +30,14 @@ public final class Crafts {
 
     // --- Shared stations ---
 
-    /** Where tanned leather is cut and fulled cloth sewn. */
+    /** Where tanned leather is cut. */
     public static final DeferredBlock<ShapingRackBlock> SHAPING_RACK = ModRegistries.BLOCKS.registerBlock("shaping_rack", ShapingRackBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.0f).sound(SoundType.WOOD).noOcclusion());
     public static final DeferredItem<BlockItem> SHAPING_RACK_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(SHAPING_RACK);
 
     // --- Leatherworking ---
 
-    /** A cauldron of tanning liquor. It has no item: pour liquor into a cauldron to make one. */
+    /** A cauldron of tanning liquor. The vats have no item: pour a liquid into a cauldron to make one. */
     public static final DeferredBlock<SoakingVatBlock> TANNING_VAT = ModRegistries.BLOCKS.registerBlock("tanning_vat",
             properties -> new SoakingVatBlock(properties, SoakingVatBlock.Type.TANNING_VAT), BlockBehaviour.Properties.ofLegacyCopy(Blocks.CAULDRON));
     /** A bigger, faster vat: a level 2 tannery. */
@@ -44,18 +45,18 @@ public final class Crafts {
             properties -> new SoakingVatBlock(properties, SoakingVatBlock.Type.TANNING_BARREL),
             BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.5f).sound(SoundType.WOOD));
     public static final DeferredItem<BlockItem> TANNING_BARREL_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(TANNING_BARREL);
-    /** A beam a hide is thrown over to be fleshed: a level 3 tannery, with a wider scraping patch. */
+    /** A beam a hide is thrown over to be fleshed: a level 3 tannery, with a wider cutting mark. */
     public static final DeferredBlock<CraftStationBlock> FLESHING_BEAM = station("fleshing_beam", Block.box(0, 0, 4, 16, 12, 12));
     public static final DeferredItem<BlockItem> FLESHING_BEAM_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(FLESHING_BEAM);
 
-    /** A hide scraped clean, waiting to be tanned. */
-    public static final DeferredItem<StarredItem> SCRAPED_HIDE = starred("scraped_hide");
+    /** A hide scraped clean, waiting to be tanned. Its ★ comes from the liquor it's tanned in. */
+    public static final DeferredItem<Item> SCRAPED_HIDE = ModRegistries.ITEMS.registerSimpleItem("scraped_hide", new Item.Properties());
     /** Tanned leather cut to shape: what leather gear is assembled from. */
     public static final DeferredItem<StarredItem> LEATHER_PANEL = starred("leather_panel");
     public static final DeferredItem<StarredItem> STRAPS = starred("straps");
-    public static final DeferredItem<LiquorItem> BARK_LIQUOR = liquor("bark_liquor", 3);
-    public static final DeferredItem<LiquorItem> TANNIN_LIQUOR = liquor("tannin_liquor", 5);
-    public static final DeferredItem<LiquorItem> ELDER_LIQUOR = liquor("elder_liquor", 7);
+    public static final DeferredItem<LiquorItem> BARK_LIQUOR = liquor("bark_liquor", 3, Profession.LEATHERWORKING);
+    public static final DeferredItem<LiquorItem> TANNIN_LIQUOR = liquor("tannin_liquor", 5, Profession.LEATHERWORKING);
+    public static final DeferredItem<LiquorItem> ELDER_LIQUOR = liquor("elder_liquor", 7, Profession.LEATHERWORKING);
     /** Dungeon herbs for the better liquors. Found in dungeons (DD-88 phase 6). */
     public static final DeferredItem<Item> BARROWMOSS = ModRegistries.ITEMS.registerSimpleItem("barrowmoss", new Item.Properties());
     public static final DeferredItem<Item> EMBERROOT = ModRegistries.ITEMS.registerSimpleItem("emberroot", new Item.Properties());
@@ -67,58 +68,61 @@ public final class Crafts {
     /** A loom with a wider shed: a level 2 weaving room, and a loom in its own right. */
     public static final DeferredBlock<CraftStationBlock> GREAT_LOOM = station("great_loom", Block.box(0, 0, 0, 16, 16, 16));
     public static final DeferredItem<BlockItem> GREAT_LOOM_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(GREAT_LOOM);
-    /** A rack of dye vats: a level 3 weaving room. */
-    public static final DeferredBlock<CraftStationBlock> DYE_WORKS = station("dye_works", Block.box(0, 0, 0, 16, 12, 16));
+    /** A cauldron of sizing. */
+    public static final DeferredBlock<SoakingVatBlock> SIZING_VAT = ModRegistries.BLOCKS.registerBlock("sizing_vat",
+            properties -> new SoakingVatBlock(properties, SoakingVatBlock.Type.SIZING_VAT), BlockBehaviour.Properties.ofLegacyCopy(Blocks.CAULDRON));
+    /** A rack of dye vats: a level 3 weaving room, and a bigger, faster sizing vat. */
+    public static final DeferredBlock<SoakingVatBlock> DYE_WORKS = ModRegistries.BLOCKS.registerBlock("dye_works",
+            properties -> new SoakingVatBlock(properties, SoakingVatBlock.Type.DYE_WORKS),
+            BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.0f).sound(SoundType.WOOD).noOcclusion());
     public static final DeferredItem<BlockItem> DYE_WORKS_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(DYE_WORKS);
-    /** A water cauldron over heat with something soaking in it. It has no item: put cloth or limbs into a heated water cauldron. */
-    public static final DeferredBlock<SoakingVatBlock> SOAKING_CAULDRON = ModRegistries.BLOCKS.registerBlock("soaking_cauldron",
-            properties -> new SoakingVatBlock(properties, SoakingVatBlock.Type.SOAKING_CAULDRON), BlockBehaviour.Properties.ofLegacyCopy(Blocks.CAULDRON));
 
-    /** Spun wool: thread for Weaving, good for cloth up to ★3. */
-    public static final DeferredItem<StarredItem> YARN = starred("yarn");
-    /** Raw silk from dungeon spiders (DD-88 phase 6), spun into silk thread. */
+    /** Spun wool, sized in a vat before it's woven. */
+    public static final DeferredItem<Item> YARN = ModRegistries.ITEMS.registerSimpleItem("yarn", new Item.Properties());
+    /** Yarn (or string) stiffened in sizing: ready for the loom. Its ★ comes from the sizing. */
+    public static final DeferredItem<StarredItem> SIZED_YARN = starred("sized_yarn");
+    public static final DeferredItem<LiquorItem> WHEAT_SIZING = liquor("wheat_sizing", 3, Profession.WEAVING);
+    public static final DeferredItem<LiquorItem> SILK_SIZING = liquor("silk_sizing", 5, Profession.WEAVING);
+    public static final DeferredItem<LiquorItem> ARCANE_SIZING = liquor("arcane_sizing", 7, Profession.WEAVING);
+    /** Raw silk from dungeon spiders (DD-88 phase 6), for Silk Sizing. */
     public static final DeferredItem<Item> SPIDER_SILK = ModRegistries.ITEMS.registerSimpleItem("spider_silk", new Item.Properties());
-    /** Spun silk: thread good for cloth up to ★5. */
-    public static final DeferredItem<StarredItem> SILK_THREAD = starred("silk_thread");
-    /** Silk thread steeped in arcane dust: thread good for cloth up to ★7, for the best mage robes. */
-    public static final DeferredItem<StarredItem> SPELLSILK = starred("spellsilk");
-    /** Dust from dungeon casters (DD-88 phase 6), for steeping Spellsilk. */
+    /** Dust from dungeon casters (DD-88 phase 6), for Arcane Sizing. */
     public static final DeferredItem<Item> ARCANE_DUST = ModRegistries.ITEMS.registerSimpleItem("arcane_dust", new Item.Properties());
-    /** Fulled cloth sewn to shape: what cloth gear is assembled from. */
+    /** Woven cloth: what cloth gear is assembled from. */
     public static final DeferredItem<StarredItem> CLOTH_PANEL = starred("cloth_panel");
     public static final DeferredItem<StarredItem> BOWSTRING = starred("bowstring");
     public static final DeferredItem<StarredItem> STAFF_WRAP = starred("staff_wrap");
 
     // --- Woodworking ---
 
-    /** A stump with an axe in it, for splitting seasoned billets. */
-    public static final DeferredBlock<CraftStationBlock> CHOPPING_BLOCK = station("chopping_block", Block.box(1, 0, 1, 15, 10, 15));
-    public static final DeferredItem<BlockItem> CHOPPING_BLOCK_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(CHOPPING_BLOCK);
+    /** A cauldron of wood finish. */
+    public static final DeferredBlock<SoakingVatBlock> FINISHING_VAT = ModRegistries.BLOCKS.registerBlock("finishing_vat",
+            properties -> new SoakingVatBlock(properties, SoakingVatBlock.Type.FINISHING_VAT), BlockBehaviour.Properties.ofLegacyCopy(Blocks.CAULDRON));
     public static final DeferredBlock<CraftStationBlock> WOOD_LATHE = station("wood_lathe", Block.box(0, 0, 2, 16, 14, 14));
     public static final DeferredItem<BlockItem> WOOD_LATHE_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(WOOD_LATHE);
     /** A foot-driven lathe: a level 2 woodshop, a lathe with a wider green, and a lathe in its own right. */
     public static final DeferredBlock<CraftStationBlock> TREADLE_LATHE = station("treadle_lathe", Block.box(0, 0, 2, 16, 15, 14));
     public static final DeferredItem<BlockItem> TREADLE_LATHE_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(TREADLE_LATHE);
-    /** A bowyer's bench: a level 3 woodshop, with a wider carving band, and a carving station in its own right. */
+    /** A bowyer's bench: a level 3 woodshop, widening the lathe's green a little more. */
     public static final DeferredBlock<CraftStationBlock> BOWYERS_BENCH = station("bowyers_bench", Block.box(0, 0, 0, 16, 14, 16));
     public static final DeferredItem<BlockItem> BOWYERS_BENCH_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(BOWYERS_BENCH);
 
     /** A log dried in a smoker: green wood is no good for bows or staves. */
     public static final DeferredItem<Item> SEASONED_BILLET = ModRegistries.ITEMS.registerSimpleItem("seasoned_billet", new Item.Properties());
-    /** A billet split along the grain: carved into bow limbs, or turned into hafts. */
-    public static final DeferredItem<Item> STAVE = ModRegistries.ITEMS.registerSimpleItem("stave", new Item.Properties());
+    /** A billet soaked in a finish: ready for the lathe. Its ★ comes from the finish. */
+    public static final DeferredItem<StarredItem> CURED_BILLET = starred("cured_billet");
+    /** Turned from a cured billet: what wooden parts are crafted from. */
+    public static final DeferredItem<StarredItem> STAVE = starred("stave");
     /** A crossbow's stock, from two staves. */
-    public static final DeferredItem<Item> STOCK = ModRegistries.ITEMS.registerSimpleItem("stock", new Item.Properties());
+    public static final DeferredItem<StarredItem> STOCK = starred("stock");
     public static final DeferredItem<StarredItem> HAFT = starred("haft");
     public static final DeferredItem<StarredItem> STAFF_SHAFT = starred("staff_shaft");
     public static final DeferredItem<StarredItem> WAND_CORE = starred("wand_core");
     public static final DeferredItem<StarredItem> BOW_LIMBS = starred("bow_limbs");
-    /** Bow limbs bent in hot water: ready to string. */
-    public static final DeferredItem<StarredItem> BENT_LIMBS = starred("bent_limbs");
-    public static final DeferredItem<FinishItem> LINSEED_OIL = finish("linseed_oil", 3);
+    public static final DeferredItem<LiquorItem> LINSEED_OIL = liquor("linseed_oil", 3, Profession.WOODWORKING);
     /** Dryad finishes (DD-88 phase 7). */
-    public static final DeferredItem<FinishItem> HEARTWOOD_RESIN = finish("heartwood_resin", 5);
-    public static final DeferredItem<FinishItem> SYLVAN_SAP = finish("sylvan_sap", 7);
+    public static final DeferredItem<LiquorItem> HEARTWOOD_RESIN = liquor("heartwood_resin", 5, Profession.WOODWORKING);
+    public static final DeferredItem<LiquorItem> SYLVAN_SAP = liquor("sylvan_sap", 7, Profession.WOODWORKING);
 
     // --- Block entities ---
 
@@ -126,7 +130,15 @@ public final class Crafts {
             "shaping_rack", () -> BlockEntityType.Builder.of(ShapingRackBlockEntity::new, SHAPING_RACK.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SoakingVatBlockEntity>> SOAKING_VAT_ENTITY = BLOCK_ENTITIES.register(
             "soaking_vat", () -> BlockEntityType.Builder.of(SoakingVatBlockEntity::new, TANNING_VAT.get(), TANNING_BARREL.get(),
-                    SOAKING_CAULDRON.get()).build(null));
+                    SIZING_VAT.get(), DYE_WORKS.get(), FINISHING_VAT.get()).build(null));
+
+    static {
+        // Retired in the DD-88 rework: bending, sewing and the chopping block are gone.
+        ModRegistries.ITEMS.addAlias(DungeonDelving.id("bent_limbs"), DungeonDelving.id("bow_limbs"));
+        ModRegistries.ITEMS.addAlias(DungeonDelving.id("silk_thread"), DungeonDelving.id("yarn"));
+        ModRegistries.ITEMS.addAlias(DungeonDelving.id("spellsilk"), DungeonDelving.id("yarn"));
+        ModRegistries.BLOCKS.addAlias(DungeonDelving.id("soaking_cauldron"), DungeonDelving.id("finishing_vat"));
+    }
 
     private Crafts() {}
 
@@ -140,13 +152,8 @@ public final class Crafts {
     }
 
     /** Bottled, so a cooking pot fills them into glass bottles (and crafting with them hands the bottle back). */
-    private static DeferredItem<LiquorItem> liquor(String name, int maxStars) {
-        return ModRegistries.ITEMS.registerItem(name, properties -> new LiquorItem(properties, maxStars),
-                new Item.Properties().stacksTo(16).craftRemainder(net.minecraft.world.item.Items.GLASS_BOTTLE));
-    }
-
-    private static DeferredItem<FinishItem> finish(String name, int maxStars) {
-        return ModRegistries.ITEMS.registerItem(name, properties -> new FinishItem(properties, maxStars),
+    private static DeferredItem<LiquorItem> liquor(String name, int stars, Profession profession) {
+        return ModRegistries.ITEMS.registerItem(name, properties -> new LiquorItem(properties, stars, profession),
                 new Item.Properties().stacksTo(16).craftRemainder(net.minecraft.world.item.Items.GLASS_BOTTLE));
     }
 
@@ -161,9 +168,9 @@ public final class Crafts {
     /** The professions' items, for the creative tab. */
     public static java.util.List<DeferredItem<? extends Item>> creativeItems() {
         return java.util.List.of(SHAPING_RACK_ITEM, TANNING_BARREL_ITEM, FLESHING_BEAM_ITEM, SCRAPED_HIDE, LEATHER_PANEL, STRAPS, BARK_LIQUOR,
-                TANNIN_LIQUOR, ELDER_LIQUOR, BARROWMOSS, EMBERROOT, SPINNING_WHEEL_ITEM, GREAT_LOOM_ITEM, DYE_WORKS_ITEM, YARN, SPIDER_SILK,
-                SILK_THREAD, SPELLSILK, ARCANE_DUST, CLOTH_PANEL, BOWSTRING, STAFF_WRAP, CHOPPING_BLOCK_ITEM, WOOD_LATHE_ITEM, TREADLE_LATHE_ITEM,
-                BOWYERS_BENCH_ITEM, SEASONED_BILLET, STAVE, STOCK, HAFT, STAFF_SHAFT, WAND_CORE, BOW_LIMBS, BENT_LIMBS, LINSEED_OIL,
-                HEARTWOOD_RESIN, SYLVAN_SAP);
+                TANNIN_LIQUOR, ELDER_LIQUOR, BARROWMOSS, EMBERROOT, SPINNING_WHEEL_ITEM, GREAT_LOOM_ITEM, DYE_WORKS_ITEM, YARN, SIZED_YARN,
+                WHEAT_SIZING, SILK_SIZING, ARCANE_SIZING, SPIDER_SILK, ARCANE_DUST, CLOTH_PANEL, BOWSTRING, STAFF_WRAP, WOOD_LATHE_ITEM,
+                TREADLE_LATHE_ITEM, BOWYERS_BENCH_ITEM, SEASONED_BILLET, CURED_BILLET, STAVE, STOCK, HAFT, STAFF_SHAFT, WAND_CORE, BOW_LIMBS,
+                LINSEED_OIL, HEARTWOOD_RESIN, SYLVAN_SAP);
     }
 }

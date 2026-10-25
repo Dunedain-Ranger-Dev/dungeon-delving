@@ -214,11 +214,20 @@ def shapeless(name, ingredients, result=None, count=1):
     })
 
 
-def heating(name, ingredient, result):
-    for kind, time in (("smelting", 100), ("blasting", 50)):
+# Heating takes 30 seconds longer (in a furnace; 15 in a blast furnace) for each ★ the ingot is aiming past the first.
+HEAT_STEP = 600
+
+
+def heating(name, ingredient, result, stars=None):
+    """Heating recipes. With {@code stars}, only for an ingredient of that ★ (a Tempered Ingot ★n, aiming for ★n+1)."""
+    target = 1 if stars is None else min(stars + 1, 7)
+    match = {"item": ingredient} if stars is None else {
+        "type": "neoforge:components", "items": ingredient, "components": {f"{MOD}:stars": stars}, "strict": False}
+    for kind, time, scale in (("smelting", 100, 1.0), ("blasting", 50, 0.5)):
         write(DATA / f"recipe/heating/{name}_{kind}.json", {
-            "type": f"{MOD}:heating_{kind}", "category": "misc", "ingredient": {"item": ingredient},
-            "result": {"id": result, "count": 1}, "experience": 0.0, "cookingtime": time,
+            "type": f"{MOD}:heating_{kind}", "category": "misc", "ingredient": match,
+            "result": {"id": result, "count": 1}, "experience": 0.0,
+            "cookingtime": time + round(HEAT_STEP * scale) * (target - 1) if name.startswith(("iron", "tempered")) else time,
         })
 
 
@@ -231,7 +240,10 @@ def recipes():
            {"S": "minecraft:smooth_stone", "E": f"{MOD}:emberstone_ingot", "G": "minecraft:grindstone", "L": "minecraft:stripped_dark_oak_log"})
     shapeless("quenching_oil", ["minecraft:glass_bottle", "#c:seeds", "#c:seeds", "#c:seeds", "#c:seeds"])
     heating("iron", "minecraft:iron_ingot", f"{MOD}:heated_ingot")
-    heating("tempered", f"{MOD}:tempered_iron_ingot", f"{MOD}:heated_ingot")
+    for kind in ("smelting", "blasting"):
+        (DATA / f"recipe/heating/tempered_{kind}.json").unlink(missing_ok=True)  # One per ★ now.
+    for stars in range(1, 8):
+        heating(f"tempered_star{stars}", f"{MOD}:tempered_iron_ingot", f"{MOD}:heated_ingot", stars)
     heating("reheat", f"{MOD}:heated_ingot", f"{MOD}:heated_ingot")
     heating("reheat_struck", f"{MOD}:struck_ingot", f"{MOD}:struck_ingot")
 
@@ -417,8 +429,6 @@ GEAR_TEXTURES = {
     "leather_scraps": scraps((130, 82, 48)),
     "hardened_leather": hide((95, 58, 34), stitched=True),
     "leather_base": backing((140, 88, 52)),
-    "woven_cloth": cloth((222, 214, 196)),
-    "padded_cloth": cloth((206, 196, 172), padded=True),
     "gambeson_base": backing((210, 198, 170)),
     "forged_mark": FORGED_MARK,
 }

@@ -11,8 +11,13 @@
     },
     {
       "type": "patchouli:text",
-      "text": "Each craft's workshop has three levels. The basic stations make level 1 (up to ★3); its first upgrade makes level 2 (★5); both upgrades make level 3 (★7). Decoration that suits the craft widens its sweet spots a little.$(br2)Outside the forge, a piece's ★ comes from how well you did: all gold makes the best, all green a middling piece. It's never better than the workshop, your skill or the material allows.",
-      "title": "Levels and ★"
+      "text": "Every craft works like the forge:$(li)$(bold)Prepare$() the raw material.$(li)$(bold)Soak$() it in a vat. The liquid sets its \u2605, as heating sets an ingot's.$(li)$(bold)Work$() it at the bench. The minigame decides whether it survives.$(li)$(bold)Craft$() parts and gear from it.",
+      "title": "The Pattern"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Each workshop has three levels: the basic stations (up to \u26053), the first upgrade (\u26055), and both (\u26057). A vat won't take a liquid better than its workshop can work, and the bench refuses a piece above the workshop or your skill.$(br2)Decoration that suits the craft widens its sweet spots a little.",
+      "title": "Levels and \u2605"
     }
   ]
 }

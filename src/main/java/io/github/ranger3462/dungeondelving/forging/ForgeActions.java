@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.skill.CraftSkill;
@@ -28,7 +29,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -43,17 +43,18 @@ import net.neoforged.neoforge.network.PacketDistributor;
  * <ul>
  * <li>Smithing, at a forge ({@link ForgeWorkshop}): striking a heated ingot on an anvil, quenching a struck ingot, and
  * grinding a quenched one; plus salvaging forged gear at the grindstone.</li>
- * <li>Leatherworking: scraping leather on a Tanning Rack into a scraped hide; cutting tanned leather on a Shaping
- * Rack into panels (tanning itself is a soak, {@link SoakingVatBlock}).</li>
- * <li>Weaving: spinning wool on a Spinning Wheel into yarn, weaving thread on a loom into cloth, and sewing fulled cloth
+ * <li>Leatherworking: scraping leather on a Tanning Rack into a scraped hide (no minigame), and cutting tanned leather
  * on a Shaping Rack into panels.</li>
- * <li>Woodworking: splitting a seasoned billet on a Chopping Block (axe in the off hand), carving a stave at a
- * fletching table into bow limbs, and turning wood on a lathe into shafts, hafts and wand cores.</li>
+ * <li>Weaving: spinning wool on a Spinning Wheel into yarn (no minigame), and weaving sized yarn on a loom into cloth
+ * panels.</li>
+ * <li>Woodworking: turning a cured billet on a lathe into staves.</li>
  * </ul>
- * The minigames ({@link TimingBar}) take one strike per click (or per hold, or tap). Missed strikes can ruin the piece,
- * likelier with each miss: an ingot cracks into nuggets, thread snaps, a hide or panel tears into scraps, wood splits.
- * Outside Forging, a piece's ★ comes from how well its minigame went ({@link TimingBar#performanceStars}), capped by the
- * workshop ({@link CraftWorkshop}), the player's skill and the material. Each needs a Guild Ledger's workshop in range.
+ * The other crafts follow Forging's pattern: prepare the vanilla material, give it its ★ in a timed step (heating for
+ * metal; a vat of liquor, sizing or finish for the rest, {@link SoakingVatBlock}), work it at the bench, then craft
+ * with it. At the bench the ★ is already set; the minigame ({@link TimingBar}) decides whether the piece survives.
+ * Missed strikes can ruin it, likelier with each miss: an ingot cracks into nuggets, thread snaps, leather is cut to
+ * scraps, wood splits. A piece above what the workshop ({@link CraftWorkshop}) or the player's skill allows is refused.
+ * Each needs a Guild Ledger's workshop in range.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class ForgeActions {
@@ -89,30 +90,18 @@ public final class ForgeActions {
     public static final int EYE_PERIOD = 34;
     public static final int THREAD_PERIOD = 22;
 
-    /** Scraping: patches per hide, how wide each is, and how long the scraper's pass takes. */
-    public static final int SCRAPE_PATCHES = 3;
-    public static final float SCRAPE_WIDTH = 0.08f;
-    public static final int SCRAPE_PASS = 50;
-
     /** Cutting: cuts per piece, how long the blade takes along the whole line, and how wide the end mark is. */
     public static final int CUTS = 2;
     public static final int CUT_PERIOD = 40;
     public static final float CUT_WIDTH = 0.08f;
-    /** Sewing: stitches per panel, ticks between them, and how wide each stitch's window is, in ticks. */
-    public static final int SEW_STITCHES = 6;
-    public static final int SEW_PERIOD = 14;
-    public static final float SEW_WINDOW = 7.0f;
-    /** Spinning and carving: how wide the band is. */
-    public static final float SPIN_BAND = 0.30f;
-    public static final float CARVE_BAND = 0.26f;
     /** Turning: passes per piece, how long a full-depth press takes, and how wide the green is. */
     public static final int TURN_PASSES = 3;
     public static final int TURN_PERIOD = 36;
     public static final float TURN_WIDTH = 0.10f;
     /** What the workshop upgrades add to their minigame's sweet spot (the Fleshing Beam, Great Loom, Treadle Lathe, Bowyer's Bench). */
     public static final float UPGRADE_BONUS = 0.03f;
-    /** The best ★ plain wood (anything but dryad woods) can make. */
-    public static final int PLAIN_WOOD_STARS = 5;
+    /** Yarn a Spinning Wheel spins from one wool. */
+    public static final int YARN_PER_WOOL = 3;
 
     private static final Map<UUID, Session> SESSIONS = new HashMap<>();
 
@@ -135,56 +124,32 @@ public final class ForgeActions {
         /** Smithing: the sweet spot. */
         float low;
         float high;
-        /** Weaving: the thread's period and phase. Scraping: the patches, as low, high, low, high... */
+        /** Weaving: the thread's period and phase, and the eye's height. */
         float[] values = new float[0];
         int done;
         int misses;
         long lastAction;
         /** Counts up with each new bar, so a strike can't be applied to a bar it wasn't aimed at. */
         int bar;
-        /** Quality so far, outside Forging: 2 per gold strike, 1 per green, over {@link #strikes} strikes. */
-        int score;
-        int strikes;
-        /** The best ★ this piece can come out at: the workshop's, the player's skill's and the material's, whichever is lowest. */
-        int cap = Forging.MAX_STARS;
-        /** Spinning and carving: the tap times so far. */
-        final List<Float> taps = new ArrayList<>();
 
-        /** A marker position in the gold zone of the sweet spot (or the next patch). For tests. */
+        /** A marker position in the gold zone of the sweet spot. For tests. */
         public float goldMarker() {
-            return (spotLow() + spotHigh()) / 2;
+            return (low + high) / 2;
         }
 
         /** A marker position in the green but outside the gold. For tests. */
         public float greenMarker() {
-            return spotLow() + (TimingBar.goldLow(spotLow(), spotHigh()) - spotLow()) / 2;
+            return low + (TimingBar.goldLow(low, high) - low) / 2;
         }
 
         /** A marker position well outside the sweet spot. For tests. */
         public float missMarker() {
-            return spotLow() > 0.5f ? 0.0f : 1.0f;
+            return low > 0.5f ? 0.0f : 1.0f;
         }
 
-        /** The ★ the work so far earns, capped. */
-        public int earnedStars() {
-            return Math.min(cap, TimingBar.performanceStars(score, strikes));
-        }
-
-        public int cap() {
-            return cap;
-        }
-
-        public List<Float> taps() {
-            return taps;
-        }
-
-        /** The sweet spot being aimed at: smithing's, or the next patch when scraping. */
-        float spotLow() {
-            return kind == TimingBar.Kind.SCRAPE ? values[Math.min(done, values.length / 2 - 1) * 2] : low;
-        }
-
-        float spotHigh() {
-            return kind == TimingBar.Kind.SCRAPE ? values[Math.min(done, values.length / 2 - 1) * 2 + 1] : high;
+        /** The ★ the piece being worked has (and keeps). */
+        public int stars() {
+            return stars;
         }
 
         public int misses() {
@@ -262,18 +227,18 @@ public final class ForgeActions {
                 case GRIND -> begin(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.GRIND, now);
                 case QUENCH -> quench(serverPlayer, serverLevel, pos, state, held);
                 case WEAVE -> begin(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.WEAVE, now);
-                case SCRAPE -> begin(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.SCRAPE, now);
-                case SPIN -> begin(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.SPIN, now);
-                case CARVE -> begin(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.CARVE, now);
                 case TURN -> begin(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.TURN, now);
-                case SPLIT -> split(serverPlayer, serverLevel, pos, held);
+                case SCRAPE -> prepare(serverPlayer, serverLevel, pos, held, Profession.LEATHERWORKING, Crafts.SCRAPED_HIDE, 1,
+                        SoundEvents.ARMOR_EQUIP_LEATHER.value(), "message.dungeondelving.scrape.done");
+                case SPIN -> prepare(serverPlayer, serverLevel, pos, held, Profession.WEAVING, Crafts.YARN, YARN_PER_WOOL, SoundEvents.WOOL_PLACE,
+                        "message.dungeondelving.spin.done");
                 case SALVAGE -> salvage(serverPlayer, serverLevel, pos, held);
             }
         }
     }
 
     private enum Action {
-        STRIKE, QUENCH, GRIND, WEAVE, SCRAPE, SPIN, CARVE, TURN, SPLIT, SALVAGE
+        STRIKE, QUENCH, GRIND, WEAVE, SCRAPE, SPIN, TURN, SALVAGE
     }
 
     private static Action actionFor(Player player, ItemStack held, BlockState state) {
@@ -287,60 +252,26 @@ public final class ForgeActions {
             return Action.QUENCH;
         } else if (isGrindable(held) && (state.is(Blocks.GRINDSTONE) || state.is(Forging.GRINDING_WHEEL.get()))) {
             return Action.GRIND;
-        } else if (isThread(held) && (state.is(Blocks.LOOM) || state.is(Crafts.GREAT_LOOM.get()))) {
+        } else if (held.is(Crafts.SIZED_YARN.get()) && (state.is(Blocks.LOOM) || state.is(Crafts.GREAT_LOOM.get()))) {
             return Action.WEAVE;
         } else if (held.is(Items.LEATHER) && state.is(Forging.TANNING_RACK.get())) {
             return Action.SCRAPE;
-        } else if (isFibre(held) && state.is(Crafts.SPINNING_WHEEL.get())) {
+        } else if (held.is(net.minecraft.tags.ItemTags.WOOL) && state.is(Crafts.SPINNING_WHEEL.get())) {
             return Action.SPIN;
-        } else if (held.is(Crafts.STAVE.get()) && (state.is(Blocks.FLETCHING_TABLE) || state.is(Crafts.BOWYERS_BENCH.get()))) {
-            return Action.CARVE;
-        } else if (isTurnable(held) && (state.is(Crafts.WOOD_LATHE.get()) || state.is(Crafts.TREADLE_LATHE.get()))) {
+        } else if (held.is(Crafts.CURED_BILLET.get()) && (state.is(Crafts.WOOD_LATHE.get()) || state.is(Crafts.TREADLE_LATHE.get()))) {
             return Action.TURN;
-        } else if (held.is(Crafts.SEASONED_BILLET.get()) && state.is(Crafts.CHOPPING_BLOCK.get())) {
-            return Action.SPLIT;
         }
         return null;
     }
 
-    /** Thread a loom takes: string, yarn, silk thread or Spellsilk. */
-    public static boolean isThread(ItemStack stack) {
-        return stack.is(Items.STRING) || stack.is(Crafts.YARN.get()) || stack.is(Crafts.SILK_THREAD.get()) || stack.is(Crafts.SPELLSILK.get());
-    }
-
-    /** The best ★ cloth woven from this thread can be: string and yarn ★3, silk ★5, Spellsilk ★7; spun thread no better than its own ★. */
-    public static int threadCap(ItemStack thread) {
-        if (thread.is(Crafts.SPELLSILK.get())) {
-            return Math.min(Forging.MAX_STARS, Forging.stars(thread));
-        }
-        if (thread.is(Crafts.SILK_THREAD.get())) {
-            return Math.min(5, Forging.stars(thread));
-        }
-        return thread.is(Crafts.YARN.get()) ? Math.min(3, Forging.stars(thread)) : 3;
-    }
-
-    /** What a Spinning Wheel spins: wool, or dungeon spider silk. */
-    public static boolean isFibre(ItemStack stack) {
-        return stack.is(net.minecraft.tags.ItemTags.WOOL) || stack.is(Crafts.SPIDER_SILK.get());
-    }
-
-    /** What a lathe turns: a billet into a staff shaft, a stave into hafts, a haft into a wand core. */
-    public static boolean isTurnable(ItemStack stack) {
-        return stack.is(Crafts.SEASONED_BILLET.get()) || stack.is(Crafts.STAVE.get()) || stack.is(Crafts.HAFT.get());
-    }
-
-    /** Whether a stack is what a minigame works on: hot metal, quenched metal, string or leather. */
+    /** Whether a stack is what a minigame works on: hot metal, quenched metal, sized yarn, a blade or a cured billet. */
     public static boolean worksOn(TimingBar.Kind kind, ItemStack stack) {
         return switch (kind) {
             case STRIKE -> stack.is(Forging.HEATED_INGOT.get());
             case GRIND -> isGrindable(stack);
-            case WEAVE -> isThread(stack);
-            case SCRAPE -> stack.is(Items.LEATHER);
+            case WEAVE -> stack.is(Crafts.SIZED_YARN.get());
             case CUT -> ShapingRackBlock.isCuttingTool(stack);
-            case SEW -> stack.is(Items.STRING);
-            case SPIN -> isFibre(stack);
-            case CARVE -> stack.is(Crafts.STAVE.get());
-            case TURN -> isTurnable(stack);
+            case TURN -> stack.is(Crafts.CURED_BILLET.get());
         };
     }
 
@@ -415,8 +346,8 @@ public final class ForgeActions {
     /** The profession a minigame belongs to (outside Forging). */
     static Profession professionFor(TimingBar.Kind kind) {
         return switch (kind) {
-            case SCRAPE, CUT -> Profession.LEATHERWORKING;
-            case WEAVE, SPIN, SEW -> Profession.WEAVING;
+            case CUT -> Profession.LEATHERWORKING;
+            case WEAVE -> Profession.WEAVING;
             default -> Profession.WOODWORKING;
         };
     }
@@ -431,18 +362,18 @@ public final class ForgeActions {
         return stars;
     }
 
-    /** The best ★ the material itself allows: thread for weaving, the piece on the rack, fibre for spinning, wood for woodworking. */
-    private static int materialCap(TimingBar.Kind kind, ServerLevel level, BlockPos pos, ItemStack held) {
-        return switch (kind) {
-            case WEAVE -> threadCap(held);
-            case CUT, SEW -> level.getBlockEntity(pos) instanceof ShapingRackBlockEntity rack ? Forging.stars(rack.piece()) : 1;
-            case SPIN -> held.is(Crafts.SPIDER_SILK.get()) ? 5 : 3;
-            case CARVE, TURN -> held.has(Forging.STARS.get()) ? Math.min(PLAIN_WOOD_STARS, Forging.stars(held)) : PLAIN_WOOD_STARS;
-            default -> Forging.MAX_STARS;
-        };
+    /** The piece a bench minigame works: the sized yarn in hand, the leather on the rack, or the cured billet in hand. */
+    private static ItemStack pieceFor(TimingBar.Kind kind, ServerLevel level, BlockPos pos, ItemStack held) {
+        if (kind == TimingBar.Kind.CUT) {
+            return level.getBlockEntity(pos) instanceof ShapingRackBlockEntity rack ? rack.piece() : ItemStack.EMPTY;
+        }
+        return held;
     }
 
-    /** Starts a Leatherworking, Weaving or Woodworking minigame at a station in range of that profession's workshop. */
+    /**
+     * Starts a Leatherworking, Weaving or Woodworking minigame at a station in range of that profession's workshop. Like
+     * Forging, it's refused for a piece above what the workshop or the player's skill allows.
+     */
     private static Optional<Session> beginCraft(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState state, ItemStack held,
             TimingBar.Kind kind, long now) {
         Profession profession = professionFor(kind);
@@ -455,77 +386,62 @@ public final class ForgeActions {
             tell(player, Component.translatable("message.dungeondelving.weave.not_enough", WEAVE_STRING).withStyle(ChatFormatting.RED));
             return Optional.empty();
         }
-        int cap = Math.min(workshop.get().maxStars(), Math.min(skillStars(player, profession.skill), materialCap(kind, level, pos, held)));
-        float bonus = workshop.get().decorBonus();
+        int stars = Forging.stars(pieceFor(kind, level, pos, held));
+        if (stars > workshop.get().maxStars()) {
+            tell(player, Component.translatable("message.dungeondelving.craft.workshop_too_low", StarredItem.starsText(workshop.get().maxStars()))
+                    .withStyle(ChatFormatting.RED));
+            return Optional.empty();
+        }
+        if (stars > skillStars(player, profession.skill)) {
+            tell(player, Component.translatable("message.dungeondelving.craft.skill_too_low", profession.displayName(), ForgingPerks.levelFor(stars),
+                    StarredItem.starsText(stars)).withStyle(ChatFormatting.RED));
+            return Optional.empty();
+        }
+        float bonus = workshop.get().decorBonus() + CraftPerks.sweetSpotBonus(player, profession.skill);
         Session session = switch (kind) {
-            case SCRAPE -> {
-                bonus += workshop.get().stations().contains("fleshing_beam") ? UPGRADE_BONUS : 0.0f;
-                yield scrapeSession(player, level, pos, now, bonus);
-            }
             case WEAVE -> {
-                float gap = WEAVE_GAP + CraftPerks.sweetSpotBonus(player, CraftSkill.WEAVING) + bonus + (state.is(Crafts.GREAT_LOOM.get()) ? 2 * UPGRADE_BONUS : 0.0f);
-                Session weave = new Session(TimingBar.Kind.WEAVE, pos.immutable(), now, EYE_PERIOD, false, false, 1, WEAVE_STITCHES, gap);
+                float gap = WEAVE_GAP + bonus + (state.is(Crafts.GREAT_LOOM.get()) ? 2 * UPGRADE_BONUS : 0.0f);
+                Session weave = new Session(TimingBar.Kind.WEAVE, pos.immutable(), now, EYE_PERIOD, false, false, stars, WEAVE_STITCHES, gap);
                 nextStitch(weave, level, now);
                 yield weave;
             }
             case CUT -> {
-                float width = CUT_WIDTH + CraftPerks.sweetSpotBonus(player, CraftSkill.LEATHERWORKING) + bonus;
-                Session cut = new Session(kind, pos.immutable(), now, CUT_PERIOD, false, false, 1, CUTS, width);
+                float width = CUT_WIDTH + bonus + (workshop.get().stations().contains("fleshing_beam") ? UPGRADE_BONUS : 0.0f);
+                Session cut = new Session(kind, pos.immutable(), now, CUT_PERIOD, false, false, stars, CUTS, width);
                 nextMark(cut, level, now, 0.7f);
                 yield cut;
             }
-            case TURN -> {
-                float width = TURN_WIDTH + CraftPerks.sweetSpotBonus(player, CraftSkill.WOODWORKING) + bonus
-                        + (state.is(Crafts.TREADLE_LATHE.get()) ? UPGRADE_BONUS : 0.0f);
-                Session turn = new Session(kind, pos.immutable(), now, TURN_PERIOD, false, false, 1, TURN_PASSES, width);
+            default -> { // TURN
+                float width = TURN_WIDTH + bonus + (state.is(Crafts.TREADLE_LATHE.get()) ? UPGRADE_BONUS : 0.0f)
+                        + (workshop.get().stations().contains("bowyers_bench") ? UPGRADE_BONUS : 0.0f);
+                Session turn = new Session(kind, pos.immutable(), now, TURN_PERIOD, false, false, stars, TURN_PASSES, width);
                 nextMark(turn, level, now, 0.35f);
                 yield turn;
             }
-            case SEW -> {
-                Session sew = new Session(kind, pos.immutable(), now, SEW_PERIOD, false, false, 1, SEW_STITCHES,
-                        SEW_WINDOW + 20 * (CraftPerks.sweetSpotBonus(player, CraftSkill.WEAVING) + bonus));
-                sew.bar++;
-                sew.values = new float[] { sew.baseWidth };
-                yield sew;
-            }
-            default -> { // SPIN, CARVE
-                float band = (kind == TimingBar.Kind.SPIN ? SPIN_BAND : CARVE_BAND) + bonus
-                        + CraftPerks.sweetSpotBonus(player, kind == TimingBar.Kind.SPIN ? CraftSkill.WEAVING : CraftSkill.WOODWORKING)
-                        + (state.is(Crafts.BOWYERS_BENCH.get()) ? 2 * UPGRADE_BONUS : 0.0f);
-                Session tapped = new Session(kind, pos.immutable(), now, TimingBar.TAP_DURATION, false, false, 1, 1, band);
-                tapped.bar++;
-                float center = kind == TimingBar.Kind.SPIN ? 0.55f : 0.5f;
-                tapped.low = center - band / 2;
-                tapped.high = center + band / 2;
-                tapped.values = new float[] { tapped.low, tapped.high, 1.0f + level.getRandom().nextFloat() * 5.0f };
-                yield tapped;
-            }
         };
-        session.cap = cap;
         SoundEvent sound = switch (kind) {
             case WEAVE -> SoundEvents.UI_LOOM_SELECT_PATTERN;
-            case CARVE, TURN -> SoundEvents.AXE_STRIP;
-            case SPIN -> SoundEvents.WOOL_PLACE;
+            case TURN -> SoundEvents.AXE_STRIP;
             default -> SoundEvents.ARMOR_EQUIP_LEATHER.value();
         };
         return started(player, level, session, sound);
     }
 
-    /** Scraping a hide on the Tanning Rack. The patches are laid out along the scraper's one pass. */
-    private static Session scrapeSession(ServerPlayer player, ServerLevel level, BlockPos pos, long now, float bonus) {
-        float width = SCRAPE_WIDTH + CraftPerks.sweetSpotBonus(player, CraftSkill.LEATHERWORKING) + bonus;
-        Session session = new Session(TimingBar.Kind.SCRAPE, pos.immutable(), now, SCRAPE_PASS, false, false, 1, SCRAPE_PATCHES, width);
-        session.bar++;
-        session.values = new float[SCRAPE_PATCHES * 2];
-        // Each patch gets its own stretch of the pass, so they never overlap and come one after another.
-        float stretch = 0.8f / SCRAPE_PATCHES;
-        for (int i = 0; i < SCRAPE_PATCHES; i++) {
-            float from = 0.15f + i * stretch;
-            float center = from + width / 2 + level.getRandom().nextFloat() * Math.max(0.0f, stretch - width);
-            session.values[i * 2] = center - width / 2;
-            session.values[i * 2 + 1] = center + width / 2;
+    /**
+     * A preparing step with no minigame (scraping a hide, spinning wool): one of the held item becomes {@code count} of
+     * the result, at a station in range of the profession's workshop.
+     */
+    public static void prepare(ServerPlayer player, ServerLevel level, BlockPos pos, ItemStack held, Profession profession,
+            Supplier<? extends net.minecraft.world.item.Item> result, int count, SoundEvent sound, String message) {
+        if (CraftWorkshop.around(level, pos, profession).isEmpty()) {
+            tell(player, Component.translatable("message.dungeondelving.craft.no_workshop", profession.displayName()).withStyle(ChatFormatting.RED));
+            return;
         }
-        return session;
+        held.shrink(1);
+        give(player, new ItemStack(result.get(), count));
+        CraftingSkills.addXp(player, profession.skill, 1);
+        level.playSound(null, pos, sound, SoundSource.BLOCKS, 0.8f, 1.0f);
+        tell(player, Component.translatable(message).withStyle(ChatFormatting.GOLD));
     }
 
     /** Sets up the next cut or turning pass: a new mark to let go on, somewhere after {@code from} along the line, and a fresh hold. */
@@ -612,9 +528,6 @@ public final class ForgeActions {
         if (session == null || session.bar != bar || !worksOn(session.kind, held)) {
             return;
         }
-        if ((session.kind == TimingBar.Kind.SCRAPE || session.kind == TimingBar.Kind.SEW) && index != session.done) {
-            return; // A patch or stitch already counted.
-        }
         long now = player.level().getGameTime();
         float ping = player.connection.latency() / 50.0f;
         ServerLevel level = (ServerLevel) player.level();
@@ -625,38 +538,17 @@ public final class ForgeActions {
                     : TimingBar.turn(held_, session.period));
             return;
         }
-        if (session.kind.tapped()) {
-            if (index == StrikePayload.DONE) {
-                finishTapped(player, level, session, held, now);
-            } else {
-                float tap = checkedElapsed(session, now, elapsed, ping);
-                if (tap <= TimingBar.TAP_DURATION) {
-                    session.taps.add(tap);
-                    session.taps.sort(Float::compare);
-                    session.lastAction = now;
-                }
-            }
-            return;
-        }
         float ticks = checkedElapsed(session, now, elapsed, ping);
-        switch (session.kind) {
-            case WEAVE -> land(player, level, session, held, now,
-                    TimingBar.judgeStitch(ticks, session.period, session.values[0], session.values[1], session.values[2]));
-            case SCRAPE -> strike(player, level, session, held, now, TimingBar.pass(ticks, session.period));
-            case SEW -> land(player, level, session, held, now, TimingBar.judgeBeat(ticks, index, session.period, session.values[0], button));
-            default -> strike(player, level, session, held, now, TimingBar.marker(ticks, session.period));
+        if (session.kind == TimingBar.Kind.WEAVE) {
+            land(player, level, session, held, now, TimingBar.judgeStitch(ticks, session.period, session.values[0], session.values[1], session.values[2]));
+        } else {
+            strike(player, level, session, held, now, TimingBar.marker(ticks, session.period));
         }
     }
 
-    /** A spin or a carve is over: how long the wheel or knife stayed in the band decides how it went. */
-    public static void finishTapped(ServerPlayer player, ServerLevel level, Session session, ItemStack held, long now) {
-        float phase = session.kind == TimingBar.Kind.CARVE ? session.values[2] : 0.0f;
-        land(player, level, session, held, now, TimingBar.judgeTapped(TimingBar.timeInBand(session.kind, session.taps, phase, session.low, session.high)));
-    }
-
-    /** A smithing or scraping strike at game time {@code now}, with the marker at {@code marker}. */
+    /** A smithing strike (or a cut or turning pass) at game time {@code now}, with the marker at {@code marker}. */
     public static void strike(ServerPlayer player, ServerLevel level, Session session, ItemStack held, long now, float marker) {
-        land(player, level, session, held, now, TimingBar.judge(marker, session.spotLow(), session.spotHigh()));
+        land(player, level, session, held, now, TimingBar.judge(marker, session.low, session.high));
     }
 
     /** A strike landed: count it, and see whether the piece survives it. */
@@ -671,16 +563,13 @@ public final class ForgeActions {
         TimingBar.Kind kind = session.kind;
         CraftSkill skill = skillFor(kind);
         SoundEvent sound = switch (kind) {
-            case WEAVE, SEW -> SoundEvents.UI_LOOM_TAKE_RESULT;
-            case SCRAPE, CUT -> SoundEvents.ARMOR_EQUIP_LEATHER.value();
-            case SPIN -> SoundEvents.WOOL_HIT;
-            case CARVE, TURN -> SoundEvents.AXE_STRIP;
+            case WEAVE -> SoundEvents.UI_LOOM_TAKE_RESULT;
+            case CUT -> SoundEvents.ARMOR_EQUIP_LEATHER.value();
+            case TURN -> SoundEvents.AXE_STRIP;
             case GRIND -> SoundEvents.GRINDSTONE_USE;
             default -> SoundEvents.ANVIL_USE;
         };
         boolean countsTwice = kind == TimingBar.Kind.STRIKE || kind == TimingBar.Kind.GRIND || kind == TimingBar.Kind.WEAVE;
-        session.strikes++;
-        session.score += hit == TimingBar.Hit.GOLD ? 2 : hit == TimingBar.Hit.GREEN ? 1 : 0;
         float chance = 0.0f;
         switch (hit) {
             case GOLD -> {
@@ -727,7 +616,6 @@ public final class ForgeActions {
         if (session.done < session.needed) {
             switch (kind) {
                 case WEAVE -> nextStitch(session, level, now);
-                case SCRAPE, SEW -> {} // The same pass carries on to the next patch or stitch.
                 case CUT -> nextMark(session, level, now, 0.7f);
                 case TURN -> nextMark(session, level, now, Math.min(0.75f, 0.35f + 0.2f * session.done));
                 default -> nextSpot(session, heat, level, now);
@@ -760,37 +648,15 @@ public final class ForgeActions {
         switch (session.kind) {
             case WEAVE -> {
                 held.shrink(WEAVE_STRING);
-                made(player, level, session, new ItemStack(Forging.WOVEN_CLOTH.get()), 5, SoundEvents.UI_LOOM_TAKE_RESULT, "message.dungeondelving.weave.done");
-            }
-            case SCRAPE -> {
-                held.shrink(1);
-                made(player, level, session, new ItemStack(Crafts.SCRAPED_HIDE.get()), 5, SoundEvents.ARMOR_EQUIP_LEATHER.value(),
-                        "message.dungeondelving.scrape.done");
+                made(player, level, session, new ItemStack(Crafts.CLOTH_PANEL.get(), 2), 5, SoundEvents.UI_LOOM_TAKE_RESULT, "message.dungeondelving.weave.done");
             }
             case CUT -> {
                 takeRackPiece(level, session.station);
-                made(player, level, session, new ItemStack(Crafts.LEATHER_PANEL.get(), 2), 3, SoundEvents.SHEEP_SHEAR, "message.dungeondelving.cut.done");
-            }
-            case SEW -> {
-                held.shrink(1);
-                takeRackPiece(level, session.station);
-                made(player, level, session, new ItemStack(Crafts.CLOTH_PANEL.get(), 2), 3, SoundEvents.UI_LOOM_TAKE_RESULT, "message.dungeondelving.sew.done");
-            }
-            case SPIN -> {
-                boolean silk = held.is(Crafts.SPIDER_SILK.get());
-                held.shrink(1);
-                made(player, level, session, silk ? new ItemStack(Crafts.SILK_THREAD.get(), 2) : new ItemStack(Crafts.YARN.get(), 3), 3, SoundEvents.WOOL_PLACE,
-                        "message.dungeondelving.spin.done");
-            }
-            case CARVE -> {
-                held.shrink(1);
-                made(player, level, session, new ItemStack(Crafts.BOW_LIMBS.get()), 5, SoundEvents.AXE_STRIP, "message.dungeondelving.carve.done");
+                made(player, level, session, new ItemStack(Crafts.LEATHER_PANEL.get(), 2), 5, SoundEvents.SHEEP_SHEAR, "message.dungeondelving.cut.done");
             }
             case TURN -> {
-                ItemStack result = held.is(Crafts.SEASONED_BILLET.get()) ? new ItemStack(Crafts.STAFF_SHAFT.get())
-                        : held.is(Crafts.STAVE.get()) ? new ItemStack(Crafts.HAFT.get(), 2) : new ItemStack(Crafts.WAND_CORE.get());
                 held.shrink(1);
-                made(player, level, session, result, 5, SoundEvents.AXE_STRIP, "message.dungeondelving.turn.done");
+                made(player, level, session, new ItemStack(Crafts.STAVE.get(), 2), 5, SoundEvents.AXE_STRIP, "message.dungeondelving.turn.done");
             }
             default -> {
                 boolean failedGrind = session.kind == TimingBar.Kind.GRIND && session.misses > 0;
@@ -808,12 +674,12 @@ public final class ForgeActions {
         }
     }
 
-    /** A crafted piece is done: give it with the ★ its work earned, and the XP. */
+    /** A crafted piece is done: give it with the ★ of what it was made from, and the XP (more for better pieces, like Forging). */
     private static void made(ServerPlayer player, ServerLevel level, Session session, ItemStack result, int xp, SoundEvent sound, String message) {
-        int stars = session.earnedStars();
+        int stars = session.stars;
         result.set(Forging.STARS.get(), stars);
         give(player, result);
-        CraftingSkills.addXp(player, skillFor(session.kind), xp);
+        CraftingSkills.addXp(player, skillFor(session.kind), xp * stars);
         level.playSound(null, session.station, sound, SoundSource.BLOCKS, 1.0f, 1.0f);
         tell(player, Component.translatable(message, StarredItem.starsText(stars)).withStyle(ChatFormatting.GOLD));
     }
@@ -861,56 +727,19 @@ public final class ForgeActions {
                 level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 0.8f, 1.4f);
                 tell(player, Component.translatable("message.dungeondelving.weave.snapped").withStyle(ChatFormatting.RED));
             }
-            case SCRAPE -> {
-                held.shrink(1);
-                give(player, new ItemStack(Forging.LEATHER_SCRAPS.get()));
-                level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 0.8f, 0.7f);
-                tell(player, Component.translatable("message.dungeondelving.scrape.torn").withStyle(ChatFormatting.RED));
-            }
             case CUT -> {
                 takeRackPiece(level, pos);
                 give(player, new ItemStack(Forging.LEATHER_SCRAPS.get(), 2));
                 level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 0.8f, 0.7f);
                 tell(player, Component.translatable("message.dungeondelving.cut.ruined").withStyle(ChatFormatting.RED));
             }
-            case SEW -> { // The thread snaps; the cloth stays on the rack for another try.
-                held.shrink(1);
-                level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 0.8f, 1.4f);
-                tell(player, Component.translatable("message.dungeondelving.weave.snapped").withStyle(ChatFormatting.RED));
-            }
-            case SPIN -> {
-                held.shrink(1);
-                level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 0.8f, 1.4f);
-                tell(player, Component.translatable("message.dungeondelving.spin.snapped").withStyle(ChatFormatting.RED));
-            }
-            case CARVE, TURN -> {
+            case TURN -> {
                 held.shrink(1);
                 give(player, new ItemStack(Items.STICK, 2));
                 level.playSound(null, pos, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS, 0.8f, 0.8f);
                 tell(player, Component.translatable("message.dungeondelving.wood.split").withStyle(ChatFormatting.RED));
             }
             default -> crack(player, level, pos, held);
-        }
-    }
-
-    /**
-     * Finishes minigames that ran out without the client saying so: a scraping pass or a sewing run whose patches or
-     * stitches went by (those never struck count as missed), and a spin or carve whose time is up.
-     */
-    private static void finishOverdueScrape(ServerPlayer player, Session session, long now) {
-        long over = now - session.start - TIMING_SLACK * 4;
-        ServerLevel level = (ServerLevel) player.level();
-        if (session.kind.tapped() && over > TimingBar.TAP_DURATION) {
-            finishTapped(player, level, session, player.getMainHandItem(), now);
-            return;
-        }
-        boolean overdue = session.kind == TimingBar.Kind.SCRAPE ? over > session.period
-                : session.kind == TimingBar.Kind.SEW && over > TimingBar.beat(session.needed - 1, session.period) + session.values[0];
-        if (!overdue) {
-            return;
-        }
-        while (SESSIONS.get(player.getUUID()) == session) {
-            land(player, level, session, player.getMainHandItem(), now, TimingBar.Hit.MISS);
         }
     }
 
@@ -943,35 +772,6 @@ public final class ForgeActions {
         level.playSound(null, pos, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 1.0f, 0.8f);
         tell(player, Component.translatable("message.dungeondelving.forge.salvaged", ingots, StarredItem.starsText(stars), nuggets)
                 .withStyle(ChatFormatting.GOLD));
-    }
-
-    // --- Heat under a cauldron (fulling, bending) ---
-
-    /** Whether there's heat under a cauldron: a lit campfire, fire, magma or lava. */
-    public static boolean heatedFromBelow(Level level, BlockPos cauldron) {
-        BlockState below = level.getBlockState(cauldron.below());
-        return CampfireBlock.isLitCampfire(below) || below.is(BlockTags.FIRE) || below.is(Blocks.MAGMA_BLOCK) || below.is(Blocks.LAVA);
-    }
-
-    // --- Splitting wood ---
-
-    /** Splits a seasoned billet on a Chopping Block into two staves, with an axe in the off hand. */
-    public static void split(ServerPlayer player, ServerLevel level, BlockPos pos, ItemStack held) {
-        ItemStack axe = player.getOffhandItem();
-        if (!axe.is(net.minecraft.tags.ItemTags.AXES)) {
-            tell(player, Component.translatable("message.dungeondelving.split.needs_axe").withStyle(ChatFormatting.YELLOW));
-            return;
-        }
-        if (CraftWorkshop.around(level, pos, Profession.WOODWORKING).isEmpty()) {
-            tell(player, Component.translatable("message.dungeondelving.craft.no_workshop", Profession.WOODWORKING.displayName()).withStyle(ChatFormatting.RED));
-            return;
-        }
-        held.shrink(1);
-        give(player, new ItemStack(Crafts.STAVE.get(), 2));
-        axe.hurtAndBreak(1, player, net.minecraft.world.entity.EquipmentSlot.OFFHAND);
-        CraftingSkills.addXp(player, CraftSkill.WOODWORKING, 1);
-        level.playSound(null, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0f, 0.8f);
-        level.sendParticles(ParticleTypes.CRIT, pos.getX() + 0.5, pos.getY() + 0.8, pos.getZ() + 0.5, 6, 0.2, 0.1, 0.2, 0.05);
     }
 
     // --- Quenching ---
@@ -1058,17 +858,11 @@ public final class ForgeActions {
         return Optional.ofNullable(SESSIONS.get(player.getUUID()));
     }
 
-    /** Puts away minigames that were left alone, or whose piece left the player's hand, and finishes overdue scraping passes. */
+    /** Puts away minigames that were left alone, or whose piece left the player's hand. */
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         if (SESSIONS.isEmpty() || event.getServer().getTickCount() % 10 != 0) {
             return;
-        }
-        for (Map.Entry<UUID, Session> entry : List.copyOf(SESSIONS.entrySet())) {
-            ServerPlayer player = event.getServer().getPlayerList().getPlayer(entry.getKey());
-            if (player != null && worksOn(entry.getValue().kind, player.getMainHandItem())) {
-                finishOverdueScrape(player, entry.getValue(), player.level().getGameTime());
-            }
         }
         Iterator<Map.Entry<UUID, Session>> sessions = SESSIONS.entrySet().iterator();
         while (sessions.hasNext()) {

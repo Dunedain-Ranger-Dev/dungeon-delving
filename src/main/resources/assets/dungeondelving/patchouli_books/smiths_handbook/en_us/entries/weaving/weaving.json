@@ -1,0 +1,23 @@
+{
+  "name": "Weaving",
+  "icon": "dungeondelving:cloth_panel",
+  "category": "dungeondelving:weaving",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Hold three sized yarn and right-click a loom. Click when the thread lines up with the needle's eye. Three stitches make two $(item)Cloth Panels$() of the yarn's \u2605. A missed stitch can snap the thread.",
+      "title": "Weaving"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:gambeson_base",
+      "recipe2": "dungeondelving:staff_wrap"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:bowstring",
+      "text": "Three sized yarn make a bowstring."
+    }
+  ]
+}

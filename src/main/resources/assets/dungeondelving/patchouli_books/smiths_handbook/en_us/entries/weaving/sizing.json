@@ -1,0 +1,23 @@
+{
+  "name": "Spinning and Sizing",
+  "icon": "dungeondelving:sized_yarn",
+  "category": "dungeondelving:weaving",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Hold wool and right-click the $(item)Spinning Wheel$() for three $(item)Yarn$().",
+      "title": "Spinning"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Brew a sizing in a cooking pot and pour it into an empty cauldron to make a $(item)Sizing Vat$().$(li)$(item)Wheat Sizing$(): four wheat. \u26053$(li)$(item)Silk Sizing$(): wheat and Spider Silk. \u26055$(li)$(item)Arcane Sizing$(): wheat and Arcane Dust. \u26057$(br2)Yarn (or string) comes out as $(item)Sized Yarn$() of the sizing's \u2605.",
+      "title": "Sizing"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Each vat takes four pieces a batch and uses a level of liquid. Better liquids take longer: 2 minutes at \u26053, 3 at \u26055, 4 at \u26057. Right-click with an empty hand to take the batch out, or to see how long it has left.",
+      "title": "The Vat"
+    }
+  ]
+}

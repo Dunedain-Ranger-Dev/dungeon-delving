@@ -80,9 +80,9 @@ public class ShapingRackBlock extends BaseEntityBlock {
         return new ShapingRackBlockEntity(pos, state);
     }
 
-    /** What can lie on the rack: tanned leather (to cut) and fulled cloth (to sew). */
+    /** What can lie on the rack: tanned leather, to cut. */
     public static boolean isPiece(ItemStack stack) {
-        return stack.is(Forging.REFINED_LEATHER.get()) || stack.is(Forging.PADDED_CLOTH.get());
+        return stack.is(Forging.REFINED_LEATHER.get());
     }
 
     /** What cuts leather on the rack: shears or a knife. */
@@ -105,12 +105,10 @@ public class ShapingRackBlock extends BaseEntityBlock {
             }
             return ItemInteractionResult.sidedSuccess(level.isClientSide());
         }
-        TimingBar.Kind kind = piece.is(Forging.REFINED_LEATHER.get()) && isCuttingTool(stack) ? TimingBar.Kind.CUT
-                : piece.is(Forging.PADDED_CLOTH.get()) && stack.is(Items.STRING) ? TimingBar.Kind.SEW : null;
+        TimingBar.Kind kind = !piece.isEmpty() && isCuttingTool(stack) ? TimingBar.Kind.CUT : null;
         if (kind == null) {
             if (!piece.isEmpty() && !level.isClientSide() && player instanceof ServerPlayer serverPlayer) {
-                serverPlayer.displayClientMessage(Component.translatable(piece.is(Forging.REFINED_LEATHER.get())
-                        ? "message.dungeondelving.rack.needs_blade" : "message.dungeondelving.rack.needs_string").withStyle(ChatFormatting.YELLOW), true);
+                serverPlayer.displayClientMessage(Component.translatable("message.dungeondelving.rack.needs_blade").withStyle(ChatFormatting.YELLOW), true);
             }
             return piece.isEmpty() ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : ItemInteractionResult.CONSUME;
         }

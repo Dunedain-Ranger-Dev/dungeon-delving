@@ -3,24 +3,21 @@
   "category": "equipment",
   "pattern": [
     "LIL",
-    "SKS",
-    " F "
+    " K ",
+    " S "
   ],
   "key": {
     "L": {
-      "item": "dungeondelving:bent_limbs"
+      "item": "dungeondelving:bow_limbs"
     },
     "I": {
       "item": "minecraft:iron_ingot"
     },
-    "S": {
-      "item": "dungeondelving:bowstring"
-    },
     "K": {
       "item": "dungeondelving:stock"
     },
-    "F": {
-      "tag": "dungeondelving:wood_finishes"
+    "S": {
+      "item": "dungeondelving:bowstring"
     }
   },
   "result": {

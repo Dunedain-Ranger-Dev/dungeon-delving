@@ -1,14 +1,14 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "category": "misc",
-  "ingredients": [
-    {
-      "item": "dungeondelving:stave"
-    },
-    {
+  "type": "dungeondelving:starred_shaped",
+  "category": "equipment",
+  "pattern": [
+    "SS"
+  ],
+  "key": {
+    "S": {
       "item": "dungeondelving:stave"
     }
-  ],
+  },
   "result": {
     "id": "dungeondelving:stock",
     "count": 1
