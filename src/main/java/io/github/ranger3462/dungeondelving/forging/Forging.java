@@ -124,21 +124,30 @@ public final class Forging {
 
     // --- Leather and cloth ---
 
-    /** Where leather is scraped into refined leather. */
+    /** Where leather is scraped into a scraped hide, ready for tanning. */
     public static final DeferredBlock<TanningRackBlock> TANNING_RACK = ModRegistries.BLOCKS.registerBlock("tanning_rack", TanningRackBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.0f).sound(SoundType.WOOD).noOcclusion());
     public static final DeferredItem<BlockItem> TANNING_RACK_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(TANNING_RACK);
     /** What's left of a hide torn while scraping. Four make a leather again. */
     public static final DeferredItem<Item> LEATHER_SCRAPS = ModRegistries.ITEMS.registerSimpleItem("leather_scraps", new Item.Properties());
-    public static final DeferredItem<Item> REFINED_LEATHER = ModRegistries.ITEMS.registerSimpleItem("refined_leather", new Item.Properties());
-    public static final DeferredItem<Item> BOILED_LEATHER = ModRegistries.ITEMS.registerSimpleItem("boiled_leather", new Item.Properties());
-    public static final DeferredItem<Item> HARDENED_LEATHER = ModRegistries.ITEMS.registerSimpleItem("hardened_leather", new Item.Properties());
+    /**
+     * Tanned leather (its id is from when it was called refined leather): a scraped hide tanned in liquor (DD-88). Cut on
+     * a Shaping Rack into leather panels. Boiled leather, which tanning replaced, loads as this.
+     */
+    public static final DeferredItem<StarredItem> REFINED_LEATHER = ModRegistries.ITEMS.registerItem("refined_leather", StarredItem::new, new Item.Properties());
+    /** Leather panels waxed hard, for brigandine. */
+    public static final DeferredItem<StarredItem> HARDENED_LEATHER = ModRegistries.ITEMS.registerItem("hardened_leather", StarredItem::new, new Item.Properties());
     /** The backing every medium and heavy piece is built on. */
-    public static final DeferredItem<Item> LEATHER_BASE = ModRegistries.ITEMS.registerSimpleItem("leather_base", new Item.Properties());
-    public static final DeferredItem<Item> WOVEN_CLOTH = ModRegistries.ITEMS.registerSimpleItem("woven_cloth", new Item.Properties());
-    public static final DeferredItem<Item> PADDED_CLOTH = ModRegistries.ITEMS.registerSimpleItem("padded_cloth", new Item.Properties());
+    public static final DeferredItem<StarredItem> LEATHER_BASE = ModRegistries.ITEMS.registerItem("leather_base", StarredItem::new, new Item.Properties());
+    public static final DeferredItem<StarredItem> WOVEN_CLOTH = ModRegistries.ITEMS.registerItem("woven_cloth", StarredItem::new, new Item.Properties());
+    /** Fulled cloth (its id is from when it was called padded cloth): woven cloth thickened in hot water (DD-88). */
+    public static final DeferredItem<StarredItem> PADDED_CLOTH = ModRegistries.ITEMS.registerItem("padded_cloth", StarredItem::new, new Item.Properties());
     /** The quilted backing light armor is built on. */
-    public static final DeferredItem<Item> GAMBESON_BASE = ModRegistries.ITEMS.registerSimpleItem("gambeson_base", new Item.Properties());
+    public static final DeferredItem<StarredItem> GAMBESON_BASE = ModRegistries.ITEMS.registerItem("gambeson_base", StarredItem::new, new Item.Properties());
+
+    static {
+        ModRegistries.ITEMS.addAlias(DungeonDelving.id("boiled_leather"), DungeonDelving.id("refined_leather"));
+    }
 
     // --- Gear ---
 

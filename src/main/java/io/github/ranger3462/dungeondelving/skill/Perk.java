@@ -20,6 +20,9 @@ public enum Perk {
     // Weaving
     STEADY_NEEDLE("steady_needle", 3),
     CAREFUL_WEAVER("careful_weaver", 2),
+    // Woodworking
+    STEADY_KNIFE("steady_knife", 3),
+    CAREFUL_CARVER("careful_carver", 2),
     // Mining
     VEIN_MINER("vein_miner", 3),
     PROSPECTOR("prospector", 1),

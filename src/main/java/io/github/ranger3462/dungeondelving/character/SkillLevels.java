@@ -24,7 +24,7 @@ public final class SkillLevels {
     public static final List<String> DEFAULT_SKILLS = List.of(
             // Professions (DD-80)
             "dungeondelving:mining", "dungeondelving:woodcutting", "dungeondelving:excavation", "dungeondelving:farming", "dungeondelving:fishing",
-            "dungeondelving:forging", "dungeondelving:leatherworking", "dungeondelving:weaving",
+            "dungeondelving:forging", "dungeondelving:leatherworking", "dungeondelving:weaving", "dungeondelving:woodworking",
             // Combat styles, armor, magic schools and Beastmastery (DD-81)
             "dungeondelving:one_handed", "dungeondelving:two_handed", "dungeondelving:polearms", "dungeondelving:daggers", "dungeondelving:unarmed",
             "dungeondelving:archery", "dungeondelving:crossbows", "dungeondelving:dual_wielding", "dungeondelving:blocking",
@@ -48,6 +48,20 @@ public final class SkillLevels {
                     "dungeondelving:arcane_magic", "dungeondelving:holy_magic", "dungeondelving:earth_magic", "dungeondelving:water_magic",
                     "dungeondelving:air_magic", "dungeondelving:blood_magic", "dungeondelving:necromancy", "dungeondelving:beastmastery",
                     "skill_tree_rpgs:class_skills"),
+            // Before Woodworking (DD-88).
+            List.of(
+            // Professions (DD-80)
+            "dungeondelving:mining", "dungeondelving:woodcutting", "dungeondelving:excavation", "dungeondelving:farming", "dungeondelving:fishing",
+            "dungeondelving:forging", "dungeondelving:leatherworking", "dungeondelving:weaving",
+            // Combat styles, armor, magic schools and Beastmastery (DD-81)
+            "dungeondelving:one_handed", "dungeondelving:two_handed", "dungeondelving:polearms", "dungeondelving:daggers", "dungeondelving:unarmed",
+            "dungeondelving:archery", "dungeondelving:crossbows", "dungeondelving:dual_wielding", "dungeondelving:blocking",
+            "dungeondelving:light_armor", "dungeondelving:medium_armor", "dungeondelving:heavy_armor", "dungeondelving:mage_armor",
+            "dungeondelving:fire_magic", "dungeondelving:frost_magic", "dungeondelving:lightning_magic", "dungeondelving:arcane_magic",
+            "dungeondelving:holy_magic", "dungeondelving:earth_magic", "dungeondelving:water_magic", "dungeondelving:air_magic",
+            "dungeondelving:necromancy", "dungeondelving:beastmastery",
+            // Class trees (DD-83): only the player's own class is unlocked, so only it can level.
+            "dungeondelving:fighter", "dungeondelving:archer", "dungeondelving:rogue", "dungeondelving:mage"),
             // Before classes, with the RPG Series' class tree.
             List.of("dungeondelving:mining", "dungeondelving:woodcutting", "dungeondelving:excavation", "dungeondelving:farming",
                     "dungeondelving:fishing", "dungeondelving:forging", "dungeondelving:leatherworking", "dungeondelving:weaving",

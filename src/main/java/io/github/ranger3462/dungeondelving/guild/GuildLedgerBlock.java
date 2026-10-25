@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.serialization.MapCodec;
+import io.github.ranger3462.dungeondelving.forging.CraftWorkshop;
 import io.github.ranger3462.dungeondelving.forging.ForgeWorkshop;
+import io.github.ranger3462.dungeondelving.forging.Profession;
 import io.github.ranger3462.dungeondelving.forging.StarredItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -79,7 +81,33 @@ public class GuildLedgerBlock extends HorizontalDirectionalBlock {
         List<Component> lines = new ArrayList<>();
         lines.add(Component.translatable("guild.dungeondelving.report.header").withStyle(ChatFormatting.YELLOW));
         lines.addAll(forging(ForgeWorkshop.scan(level, pos)));
-        lines.add(Component.translatable("guild.dungeondelving.report.more").withStyle(ChatFormatting.DARK_GRAY));
+        for (Profession profession : Profession.values()) {
+            lines.addAll(craft(CraftWorkshop.scan(level, pos, profession)));
+        }
+        return lines;
+    }
+
+    /** A profession's part of the report: complete or what's missing, its upgrades, and its decoration. */
+    static List<Component> craft(CraftWorkshop workshop) {
+        List<Component> lines = new ArrayList<>();
+        MutableComponent title = workshop.profession().displayName().copy().withStyle(ChatFormatting.WHITE).append(Component.literal(": "));
+        if (workshop.complete()) {
+            lines.add(title.append(Component.translatable("craft.dungeondelving.report.complete", workshop.level(), StarredItem.starsText(workshop.maxStars()))
+                    .withStyle(ChatFormatting.GOLD)));
+        } else {
+            MutableComponent missing = Component.empty();
+            for (int i = 0; i < workshop.missing().size(); i++) {
+                missing.append(i == 0 ? Component.empty() : Component.literal(", ")).append(workshop.missing().get(i));
+            }
+            lines.add(title.append(Component.translatable("forge.dungeondelving.report.missing", missing).withStyle(ChatFormatting.RED)));
+        }
+        for (String upgrade : List.of(workshop.profession().upgrade2, workshop.profession().upgrade3)) {
+            boolean present = workshop.stations().contains(upgrade);
+            lines.add(Component.literal(present ? "  ✔ " : "  ✘ ").append(Component.translatable("craft.dungeondelving.station." + upgrade))
+                    .withStyle(present ? ChatFormatting.GREEN : ChatFormatting.DARK_GRAY));
+        }
+        lines.add(Component.translatable("forge.dungeondelving.report.decor", workshop.decor(), Math.round(workshop.decorBonus() * 100))
+                .withStyle(ChatFormatting.GRAY));
         return lines;
     }
 

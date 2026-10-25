@@ -415,7 +415,6 @@ GEAR_TEXTURES = {
     "chain_links": links(),
     "refined_leather": hide((160, 100, 60)),
     "leather_scraps": scraps((130, 82, 48)),
-    "boiled_leather": hide((120, 72, 40)),
     "hardened_leather": hide((95, 58, 34), stitched=True),
     "leather_base": backing((140, 88, 52)),
     "woven_cloth": cloth((222, 214, 196)),
@@ -518,14 +517,12 @@ def gear_recipes():
     starred_shapeless("rivets", [tempered, flux, "minecraft:iron_nugget"], count=4)
     starred_shapeless("chain_links", [tempered, tempered, flux], count=8)
 
-    # Refined leather is scraped on a Tanning Rack, not crafted. Torn hides leave scraps; four make a leather again.
+    # Tanned leather (refined_leather) comes from a Tanning Vat, not crafting. Torn hides leave scraps; four make a leather again.
     (DATA / "recipe/refined_leather.json").unlink(missing_ok=True)
     shapeless("leather_from_scraps", [f"{MOD}:leather_scraps"] * 4, result="minecraft:leather")
     shaped("tanning_rack", ["S S", "SLS", "P P"], {"S": "minecraft:stick", "L": "minecraft:leather", "P": "#minecraft:planks"})
-    shapeless("hardened_leather", [f"{MOD}:boiled_leather"] * 3 + ["minecraft:string", "minecraft:honeycomb"], count=3)
-    shapeless("leather_base", [f"{MOD}:refined_leather"] * 3)
-    shapeless("padded_cloth", [f"{MOD}:woven_cloth", f"{MOD}:woven_cloth", "#minecraft:wool"])
-    shapeless("gambeson_base", [f"{MOD}:padded_cloth", f"{MOD}:padded_cloth"])
+    # Hardened leather, leather and gambeson backings, and fulled cloth are now made by the professions (DD-88):
+    # tools/profession_resources.py writes their recipes.
 
     base, gambeson, hardened = f"{MOD}:leather_base", f"{MOD}:gambeson_base", f"{MOD}:hardened_leather"
     plate_, rivet, link = f"{MOD}:armor_plate", f"{MOD}:rivets", f"{MOD}:chain_links"

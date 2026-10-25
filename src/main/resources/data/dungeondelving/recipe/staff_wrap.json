@@ -1,0 +1,16 @@
+{
+  "type": "dungeondelving:starred_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "dungeondelving:cloth_panel"
+    },
+    {
+      "item": "minecraft:string"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:staff_wrap",
+    "count": 2
+  }
+}

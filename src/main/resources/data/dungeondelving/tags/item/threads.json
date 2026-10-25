@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:string",
+    "dungeondelving:yarn",
+    "dungeondelving:silk_thread",
+    "dungeondelving:spellsilk"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "type": "dungeondelving:starred_shaped",
+  "category": "equipment",
+  "pattern": [
+    " LS",
+    "F S",
+    " LS"
+  ],
+  "key": {
+    "L": {
+      "item": "dungeondelving:bent_limbs"
+    },
+    "S": {
+      "item": "dungeondelving:bowstring"
+    },
+    "F": {
+      "tag": "dungeondelving:wood_finishes"
+    }
+  },
+  "result": {
+    "id": "minecraft:bow",
+    "count": 1
+  }
+}

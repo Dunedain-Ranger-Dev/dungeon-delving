@@ -9,7 +9,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 /**
- * Crafting skill XP for crafting forged parts and gear, leather and cloth (on top of the XP from the stations themselves).
+ * Crafting skill XP for crafting forged parts and gear, leather, cloth and wooden pieces (on top of the XP from the stations
+ * themselves).
  * Gear trains the skill it's mostly made with: plate and weapons Forging, a hauberk (on its leather backing)
  * Leatherworking, and brigandine (on its woven gambeson) Weaving.
  */
@@ -43,10 +44,15 @@ public final class CraftingXp {
             CraftingSkills.addXp(event.getEntity(), skillFor(crafted), GEAR_XP_PER_STAR * stars);
         } else if (crafted.is(Forging.ARMOR_PLATE.get()) || crafted.is(Forging.RIVETS.get()) || crafted.is(Forging.CHAIN_LINKS.get())) {
             CraftingSkills.addXp(event.getEntity(), CraftSkill.FORGING, PART_XP_PER_STAR * stars);
-        } else if (crafted.is(Forging.HARDENED_LEATHER.get()) || crafted.is(Forging.LEATHER_BASE.get())) {
+        } else if (crafted.is(Forging.HARDENED_LEATHER.get()) || crafted.is(Forging.LEATHER_BASE.get()) || crafted.is(Crafts.STRAPS.get())) {
             CraftingSkills.addXp(event.getEntity(), CraftSkill.LEATHERWORKING, MATERIAL_XP);
-        } else if (crafted.is(Forging.PADDED_CLOTH.get()) || crafted.is(Forging.GAMBESON_BASE.get())) {
+        } else if (crafted.is(Forging.GAMBESON_BASE.get()) || crafted.is(Crafts.BOWSTRING.get()) || crafted.is(Crafts.STAFF_WRAP.get())) {
             CraftingSkills.addXp(event.getEntity(), CraftSkill.WEAVING, MATERIAL_XP);
+        } else if (crafted.has(Forging.STARS.get()) && (crafted.is(net.minecraft.world.item.Items.BOW) || crafted.is(net.minecraft.world.item.Items.CROSSBOW))) {
+            // A bow or crossbow from parts (the plain recipes give no stars).
+            CraftingSkills.addXp(event.getEntity(), CraftSkill.WOODWORKING, GEAR_XP_PER_STAR * stars);
+        } else if (crafted.is(Crafts.STOCK.get())) {
+            CraftingSkills.addXp(event.getEntity(), CraftSkill.WOODWORKING, MATERIAL_XP);
         }
     }
 }

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "dungeondelving:stave"
+    },
+    {
+      "item": "dungeondelving:stave"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:stock",
+    "count": 1
+  }
+}

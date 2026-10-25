@@ -9,7 +9,8 @@ import net.minecraft.network.chat.Component;
 public enum CraftSkill {
     FORGING("forging"),
     LEATHERWORKING("leatherworking"),
-    WEAVING("weaving");
+    WEAVING("weaving"),
+    WOODWORKING("woodworking");
 
     public final String id;
 

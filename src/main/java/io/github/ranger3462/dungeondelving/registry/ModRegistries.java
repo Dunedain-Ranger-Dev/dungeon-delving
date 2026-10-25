@@ -213,11 +213,12 @@ public final class ModRegistries {
                         Forging.GRINDING_WHEEL_ITEM, Forging.QUENCHING_OIL, Forging.COKE_INFUSED_IRON_INGOT, Forging.HEATED_INGOT, Forging.STRUCK_INGOT,
                         Forging.QUENCHED_INGOT, Forging.UNSTABLE_INGOT, Forging.TEMPERED_IRON_INGOT, Forging.SAND_FLUX, Forging.BORAX,
                         Forging.BORAX_DEPOSIT_ITEM, Forging.BORAX_FLUX, Forging.RUNIC_FLUX, Forging.RUNEFORGED_FLUX, Forging.ARMOR_PLATE, Forging.RIVETS,
-                        Forging.CHAIN_LINKS, Forging.TANNING_RACK_ITEM, Forging.LEATHER_SCRAPS, Forging.REFINED_LEATHER, Forging.BOILED_LEATHER, Forging.HARDENED_LEATHER, Forging.LEATHER_BASE,
+                        Forging.CHAIN_LINKS, Forging.TANNING_RACK_ITEM, Forging.LEATHER_SCRAPS, Forging.REFINED_LEATHER, Forging.HARDENED_LEATHER, Forging.LEATHER_BASE,
                         Forging.WOVEN_CLOTH, Forging.PADDED_CLOTH, Forging.GAMBESON_BASE)) {
                     output.accept(forging.get());
                 }
                 Forging.gear().forEach(output::accept);
+                io.github.ranger3462.dungeondelving.forging.Crafts.creativeItems().forEach(item -> output.accept(item.get()));
                 output.accept(RIFTSTONE_ITEM.get());
                 for (DungeonOre ore : DungeonOre.values()) {
                     output.accept(ore.oreItem.get());
@@ -244,6 +245,8 @@ public final class ModRegistries {
         RunicWorkshop.register(modEventBus);
         Forging.init();
         Forging.register(modEventBus);
+        io.github.ranger3462.dungeondelving.forging.Crafts.init();
+        io.github.ranger3462.dungeondelving.forging.Crafts.register(modEventBus);
         DungeonGates.init();
         DungeonGates.register(modEventBus);
         CraftingSkills.register(modEventBus);

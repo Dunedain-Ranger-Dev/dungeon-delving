@@ -1,0 +1,116 @@
+{
+  "apprentice_woodworker": {
+    "definition": "apprentice_woodworker",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "careful_carver_1": {
+    "definition": "careful_carver_1",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "seasoner": {
+    "definition": "seasoner",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "steady_knife_1": {
+    "definition": "steady_knife_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "steady_knife_2": {
+    "definition": "steady_knife_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "steady_knife_3": {
+    "definition": "steady_knife_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "careful_carver_2": {
+    "definition": "careful_carver_2",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "fine_split": {
+    "definition": "fine_split",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "master_bowyer": {
+    "definition": "master_bowyer",
+    "x": 0,
+    "y": 204,
+    "root": false
+  },
+  "sure_grip_1": {
+    "definition": "sure_grip_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "sure_grip_2": {
+    "definition": "sure_grip_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "sure_grip_3": {
+    "definition": "sure_grip_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "sure_grip_4": {
+    "definition": "sure_grip_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "sure_grip_5": {
+    "definition": "sure_grip_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "woodworking_studies_1": {
+    "definition": "woodworking_studies_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "woodworking_studies_2": {
+    "definition": "woodworking_studies_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "woodworking_studies_3": {
+    "definition": "woodworking_studies_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "woodworking_studies_4": {
+    "definition": "woodworking_studies_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "woodworking_studies_5": {
+    "definition": "woodworking_studies_5",
+    "x": 68,
+    "y": 170,
+    "root": false
+  }
+}

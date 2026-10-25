@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "W W",
+    " L "
+  ],
+  "key": {
+    "W": {
+      "item": "dungeondelving:wardsilver_ingot"
+    },
+    "L": {
+      "item": "dungeondelving:wood_lathe"
+    }
+  },
+  "result": {
+    "id": "dungeondelving:treadle_lathe",
+    "count": 1
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "dungeondelving:block/great_loom",
+      "y": 0
+    },
+    "facing=east": {
+      "model": "dungeondelving:block/great_loom",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "dungeondelving:block/great_loom",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "dungeondelving:block/great_loom",
+      "y": 270
+    }
+  }
+}

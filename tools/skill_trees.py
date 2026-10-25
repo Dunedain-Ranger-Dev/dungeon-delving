@@ -43,7 +43,8 @@ ROOT_COST, CHOICE_COST, SIGNATURE_COSTS, REFINEMENT_COST, CAPSTONE_COST, STAT_CO
 STAT_LEVELS = [2, 8, 15, 30, 45]
 # Perk tags our code acts on already (skill/Perk.java); the preview marks the rest as still to build.
 IMPLEMENTED = {"steady_hand", "slow_cooling", "thrifty", "sure_strikes", "steady_scraper", "careful_tanner", "water_saver",
-               "steady_needle", "careful_weaver", "vein_miner", "prospector", "tree_feller", "forester", "bountiful", "replanter"}
+               "steady_needle", "careful_weaver", "steady_knife", "careful_carver", "vein_miner", "prospector", "tree_feller", "forester",
+               "bountiful", "replanter"}
 
 
 def best_of(terms, floor="0"):
@@ -182,6 +183,8 @@ STATS = {
                        stats("tanning_studies", "Tanning Studies", "+5% Leatherworking XP.")),
     "weaving": (stats("nimble", "Nimble", "+1% movement speed.", [attribute(MOVE, 0.01)]),
                 stats("weaving_studies", "Weaving Studies", "+5% Weaving XP.")),
+    "woodworking": (stats("sure_grip", "Sure Grip", "+1% ranged damage.", [attribute(RANGED_DAMAGE, 0.01, "multiply_total")], ["ranged_weapon_api"]),
+                    stats("woodworking_studies", "Woodworking Studies", "+5% Woodworking XP.")),
     **{key: melee_stats(key) for key in ("one_handed", "two_handed", "polearms", "daggers", "unarmed")},
     **{key: ranged_stats(key) for key in ("archery", "crossbows")},
     "dual_wielding": tuple(reversed(melee_stats("dual_wielding"))),
@@ -301,6 +304,16 @@ add("Crafting", "weaving", "Weaving", "minecraft:string", None,
            perk("padding", "Padding", "Padded cloth takes one less woven cloth.")],
           perk("fine_weave", "Fine Weave", "A 25% chance of a second cloth.")),
     "Loom room, up to +5%")
+
+add("Crafting", "woodworking", "Woodworking", "minecraft:fletching_table", None,
+    shape(n("apprentice_woodworker", "Apprentice Woodworker", "Your first step as a woodworker. Your level sets the best ★ you can make."),
+          [perk("careful_carver_1", "Careful Carver I", "25% less chance a miss splits the wood."),
+           perk("seasoner", "Seasoner", "Billets season 25% faster.")],
+          ranks("steady_knife", "Steady Knife", ["+2% room on the grain and at the lathe."] * 3),
+          [perk("careful_carver_2", "Careful Carver II", "50% less chance a miss splits the wood."),
+           perk("fine_split", "Fine Split", "Splitting a billet sometimes gives a third stave.")],
+          perk("master_bowyer", "Master Bowyer", "Bows and crossbows you make have a 10% chance to come out one ★ higher, up to what the workshop allows.")),
+    "Room on the grain, up to +5%")
 
 # --- Combat styles ---
 MELEE = [attribute("minecraft:generic.attack_damage", 0.03)]

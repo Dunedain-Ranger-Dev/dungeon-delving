@@ -1,0 +1,30 @@
+{
+  "type": "dungeondelving:starred_shaped",
+  "category": "equipment",
+  "pattern": [
+    "LIL",
+    "SKS",
+    " F "
+  ],
+  "key": {
+    "L": {
+      "item": "dungeondelving:bent_limbs"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "S": {
+      "item": "dungeondelving:bowstring"
+    },
+    "K": {
+      "item": "dungeondelving:stock"
+    },
+    "F": {
+      "tag": "dungeondelving:wood_finishes"
+    }
+  },
+  "result": {
+    "id": "minecraft:crossbow",
+    "count": 1
+  }
+}

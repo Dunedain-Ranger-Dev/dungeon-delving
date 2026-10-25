@@ -1,0 +1,30 @@
+{
+  "type": "farmersdelight:cooking",
+  "experience": 0.2,
+  "cookingtime": 400,
+  "recipe_book_tab": "misc",
+  "ingredients": [
+    {
+      "tag": "dungeondelving:tree_bark"
+    },
+    {
+      "tag": "dungeondelving:tree_bark"
+    },
+    {
+      "tag": "dungeondelving:tree_bark"
+    },
+    {
+      "item": "dungeondelving:barrowmoss"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:tannin_liquor",
+    "count": 1
+  },
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "farmersdelight"
+    }
+  ]
+}
