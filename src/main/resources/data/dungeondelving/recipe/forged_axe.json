@@ -3,15 +3,15 @@
   "category": "equipment",
   "pattern": [
     "PP",
-    "PS",
-    " S"
+    "PH",
+    " H"
   ],
   "key": {
     "P": {
       "item": "dungeondelving:armor_plate"
     },
-    "S": {
-      "item": "minecraft:stick"
+    "H": {
+      "item": "dungeondelving:haft"
     }
   },
   "result": {

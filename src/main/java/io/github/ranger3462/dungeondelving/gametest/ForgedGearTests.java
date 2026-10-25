@@ -80,8 +80,11 @@ public class ForgedGearTests {
                 "hardened leather with a rivet around a gambeson backing makes a ★3 Brigandine Helm (its ★ from the rivets)");
         helper.assertTrue(helmet.getMaxDamage() == ForgedGear.armorDurability(ArmorItem.Type.HELMET, 2), "a ★2 helm gets ★2 durability");
         ItemStack sword = craft(level, part(Forging.ARMOR_PLATE.get(), 4), ItemStack.EMPTY, ItemStack.EMPTY, part(Forging.ARMOR_PLATE.get(), 4),
+                ItemStack.EMPTY, ItemStack.EMPTY, part(io.github.ranger3462.dungeondelving.forging.Crafts.HAFT.get(), 5));
+        helper.assertTrue(sword.is(Forging.FORGED_SWORD.get()) && Forging.stars(sword) == 4, "two ★4 plates and a ★5 haft make a ★4 sword");
+        ItemStack plain = craft(level, part(Forging.ARMOR_PLATE.get(), 4), ItemStack.EMPTY, ItemStack.EMPTY, part(Forging.ARMOR_PLATE.get(), 4),
                 ItemStack.EMPTY, ItemStack.EMPTY, new ItemStack(Items.STICK));
-        helper.assertTrue(sword.is(Forging.FORGED_SWORD.get()) && Forging.stars(sword) == 4, "two ★4 plates and a stick make a ★4 sword");
+        helper.assertFalse(plain.is(Forging.FORGED_SWORD.get()), "a stick won't do for a forged sword");
         helper.assertTrue(CraftingXp.skillFor(helmet) == CraftSkill.FORGING && CraftingXp.skillFor(brigandine) == CraftSkill.WEAVING
                 && CraftingXp.skillFor(new ItemStack(Forging.ARMOR.get(ForgedGear.Weight.MEDIUM).get(ArmorItem.Type.HELMET).get())) == CraftSkill.LEATHERWORKING,
                 "plate trains Forging, hauberks Leatherworking, brigandine Weaving");

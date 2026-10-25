@@ -168,7 +168,7 @@ ENTRIES = {
                  "Apotheosis puts on them; and ★7 gear comes off the table already enchanted with an Apotheosis rarity.", "Apotheosis"),
         ]),
         "weapons": ("Weapons", f"{MOD}:forged_sword", [
-            crafting("forged_sword", "Two plates over a stick.", "forged_axe"),
+            crafting("forged_sword", "Two plates over a haft, turned on a lathe. The haft's ★ counts too.", "forged_axe"),
         ]),
         "upkeep": ("Repair and Salvage", "minecraft:grindstone", [
             text("Repair forged gear at a vanilla anvil with a tempered ingot of the same star or better."

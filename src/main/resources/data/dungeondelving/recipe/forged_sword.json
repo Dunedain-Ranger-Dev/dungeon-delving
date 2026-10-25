@@ -4,14 +4,14 @@
   "pattern": [
     "P",
     "P",
-    "S"
+    "H"
   ],
   "key": {
     "P": {
       "item": "dungeondelving:armor_plate"
     },
-    "S": {
-      "item": "minecraft:stick"
+    "H": {
+      "item": "dungeondelving:haft"
     }
   },
   "result": {
