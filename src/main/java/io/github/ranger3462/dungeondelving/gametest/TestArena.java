@@ -12,12 +12,13 @@ import net.minecraft.world.phys.AABB;
 /**
  * Room well away from the other game tests, for tests that leave mobs alone for a while. Tests run a few blocks apart,
  * so mobs left near one get discarded by its neighbours' clean-up, walk off to heal their neighbours' hurt bosses, or
- * end up inside their neighbours' placed rooms. The test grid only runs a few dozen blocks along x (and on along z), so
- * arenas go well west of it, each test in its own slot.
+ * end up inside their neighbours' placed rooms. So each arena is at a fixed spot far west of the test grid, one per
+ * slot. The spot doesn't depend on where the test itself landed: when it did, a change to the test order could put two
+ * tests' arenas on top of each other.
  */
 final class TestArena {
-    /** How far west of its test an arena goes. */
-    private static final int DISTANCE = 1024;
+    /** Where slot 0's arena is: a chunk this far west of the world's centre, well past the test grid. */
+    private static final int DISTANCE = 4096;
     /** How far apart two slots' arenas are. */
     private static final int SLOT_SPACING = 256;
     /** How far a box's walls are from its middle; it stays inside one chunk. */
@@ -25,9 +26,9 @@ final class TestArena {
 
     private TestArena() {}
 
-    /** The middle of a chunk far from the test grid, {@code height} blocks above the test. Every test needs its own slot. */
+    /** The middle of a slot's chunk, far from the test grid, {@code height} blocks above the test. Every test needs its own slot. */
     static BlockPos away(GameTestHelper helper, int slot, int height) {
-        ChunkPos chunk = new ChunkPos(helper.absolutePos(BlockPos.ZERO).offset(-DISTANCE - slot * SLOT_SPACING, 0, 0));
+        ChunkPos chunk = new ChunkPos(new BlockPos(-DISTANCE - slot * SLOT_SPACING, 0, 0));
         return new BlockPos(chunk.getMiddleBlockX(), helper.absolutePos(BlockPos.ZERO).getY() + height, chunk.getMiddleBlockZ());
     }
 
