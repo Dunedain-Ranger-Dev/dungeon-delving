@@ -2,19 +2,16 @@
   "type": "dungeondelving:starred_shaped",
   "category": "equipment",
   "pattern": [
-    "MMM",
-    "MBM"
+    "X X",
+    "X X"
   ],
   "key": {
-    "M": {
+    "X": {
       "item": "dungeondelving:armor_plate"
-    },
-    "B": {
-      "item": "dungeondelving:leather_base"
     }
   },
   "result": {
-    "id": "dungeondelving:plate_helmet",
+    "id": "minecraft:iron_boots",
     "count": 1
   }
 }

@@ -43,7 +43,13 @@ public final class StarredRecipes {
         if (stars == Integer.MAX_VALUE) {
             return result;
         }
-        result.set(Forging.STARS.get(), Math.max(1, Math.min(stars, fluxCap)));
+        int earned = Math.max(1, Math.min(stars, fluxCap));
+        if (Quality.isGear(result)) {
+            // A forged iron piece is ★1 to ★3, whatever its parts.
+            int parts = earned;
+            earned = Quality.band(result).map(band -> band.clamp(parts)).orElse(parts);
+        }
+        result.set(Forging.STARS.get(), earned);
         ForgedGear.applyStats(result);
         return result;
     }
@@ -89,16 +95,37 @@ public final class StarredRecipes {
     }
 
     /**
-     * A smithing upgrade that keeps the ★: the base's, or the addition's if that's starred and lower. Its durability is
-     * worked out again for the upgraded item, rather than kept from the one it was made from.
+     * A smithing upgrade that carries the ★ through. Within a band it keeps the base's ★ (or the addition's, if that's
+     * starred and lower). Up into a better material's band (a forged iron piece smithed with a diamond, a forged
+     * diamond one with netherite) it starts that band: at its first ★, or its second from the top of the old band. A
+     * plain piece comes out plain. Its durability is worked out again for the upgraded item.
+     * <p>
+     * {@code dungeondelving:forged_smithing} recipes only take a forged (starred) base: they're the forged way up, and
+     * would otherwise be a cheap way to plain gear.
      */
     public static class Smithing extends SmithingTransformRecipe {
+        final boolean forgedOnly;
+
         public Smithing(Ingredient template, Ingredient base, Ingredient addition, ItemStack result) {
+            this(template, base, addition, result, false);
+        }
+
+        public Smithing(Ingredient template, Ingredient base, Ingredient addition, ItemStack result, boolean forgedOnly) {
             super(template, base, addition, result);
+            this.forgedOnly = forgedOnly;
         }
 
         static Smithing of(SmithingTransformRecipe recipe) {
-            return new Smithing(recipe.template, recipe.base, recipe.addition, recipe.result);
+            return new Smithing(recipe.template, recipe.base, recipe.addition, recipe.result, false);
+        }
+
+        static Smithing forgedOf(SmithingTransformRecipe recipe) {
+            return new Smithing(recipe.template, recipe.base, recipe.addition, recipe.result, true);
+        }
+
+        @Override
+        public boolean matches(SmithingRecipeInput input, net.minecraft.world.level.Level level) {
+            return super.matches(input, level) && (!forgedOnly || input.base().has(Forging.STARS.get()));
         }
 
         @Override
@@ -107,9 +134,20 @@ public final class StarredRecipes {
             if (!result.has(Forging.STARS.get())) {
                 return result;
             }
-            if (input.addition().has(Forging.STARS.get())) {
-                result.set(Forging.STARS.get(), Math.min(Forging.stars(result), Forging.stars(input.addition())));
+            int stars = Forging.stars(result);
+            var from = Quality.band(input.base());
+            var to = Quality.band(result);
+            boolean gear = Quality.isGear(result);
+            if (gear && from.isPresent() && to.isPresent() && to.get().low > from.get().high) {
+                stars = to.get().low + (Forging.stars(input.base()) >= from.get().high ? 1 : 0);
             }
+            if (input.addition().has(Forging.STARS.get())) {
+                stars = Math.min(stars, Forging.stars(input.addition()));
+            }
+            if (gear && to.isPresent()) {
+                stars = to.get().clamp(stars);
+            }
+            result.set(Forging.STARS.get(), stars);
             result.set(DataComponents.MAX_DAMAGE, result.getPrototype().getOrDefault(DataComponents.MAX_DAMAGE, 0));
             ForgedGear.applyStats(result);
             return result;
@@ -117,7 +155,7 @@ public final class StarredRecipes {
 
         @Override
         public RecipeSerializer<?> getSerializer() {
-            return Forging.STARRED_SMITHING.get();
+            return forgedOnly ? Forging.FORGED_SMITHING.get() : Forging.STARRED_SMITHING.get();
         }
     }
 
@@ -152,6 +190,24 @@ public final class StarredRecipes {
 
         @Override
         public StreamCodec<RegistryFriendlyByteBuf, Shapeless> streamCodec() {
+            return STREAM_CODEC;
+        }
+    }
+
+    /** Reads and writes forged-only smithing upgrades exactly like vanilla ones. */
+    public static final class ForgedSmithingSerializer implements RecipeSerializer<Smithing> {
+        private static final MapCodec<Smithing> CODEC = ((MapCodec<SmithingTransformRecipe>) RecipeSerializer.SMITHING_TRANSFORM.codec())
+                .xmap(Smithing::forgedOf, recipe -> recipe);
+        private static final StreamCodec<RegistryFriendlyByteBuf, Smithing> STREAM_CODEC = RecipeSerializer.SMITHING_TRANSFORM.streamCodec()
+                .map(Smithing::forgedOf, recipe -> recipe);
+
+        @Override
+        public MapCodec<Smithing> codec() {
+            return CODEC;
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, Smithing> streamCodec() {
             return STREAM_CODEC;
         }
     }

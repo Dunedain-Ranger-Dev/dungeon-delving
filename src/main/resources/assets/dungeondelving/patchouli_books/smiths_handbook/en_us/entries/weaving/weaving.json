@@ -11,8 +11,8 @@
     },
     {
       "type": "patchouli:crafting",
-      "recipe": "dungeondelving:gambeson_base",
-      "recipe2": "dungeondelving:staff_wrap"
+      "recipe": "dungeondelving:staff_wrap",
+      "text": "Cloth panels make staff wraps, and RPG robes and cloth armor."
     },
     {
       "type": "patchouli:crafting",

@@ -34,10 +34,9 @@ public class ApotheosisForgingTests {
             helper.succeed();
             return;
         }
-        Item helmet = Forging.ARMOR.get(ForgedGear.Weight.HEAVY).get(ArmorItem.Type.HELMET).get();
-        helper.assertTrue(SocketHelper.getSockets(starred(helmet, 3)) == 0, "★3 gear has no extra sockets");
-        helper.assertTrue(SocketHelper.getSockets(starred(helmet, 4)) == 1, "★4 gear has an extra socket");
-        helper.assertTrue(SocketHelper.getSockets(starred(helmet, 7)) == 2, "★5 and up have two");
+        helper.assertTrue(SocketHelper.getSockets(starred(net.minecraft.world.item.Items.IRON_HELMET, 3)) == 0, "forged iron (★3) has no extra sockets");
+        helper.assertTrue(SocketHelper.getSockets(starred(net.minecraft.world.item.Items.DIAMOND_HELMET, 4)) == 1, "★4 forged diamond has an extra socket");
+        helper.assertTrue(SocketHelper.getSockets(starred(net.minecraft.world.item.Items.NETHERITE_HELMET, 7)) == 2, "★5 and up have two");
         helper.succeed();
     }
 
@@ -54,7 +53,7 @@ public class ApotheosisForgingTests {
         double fiveBonus = 0;
         // A roll could (rarely) be all special effects with no attribute bonuses to scale; roll again if so.
         for (int roll = 0; roll < 10 && fiveBonus == 0; roll++) {
-            seven = starred(Forging.FORGED_SWORD.get(), 7);
+            seven = starred(net.minecraft.world.item.Items.NETHERITE_SWORD, 7);
             ApotheosisForging.roll(seven, player);
             five = seven.copy();
             five.set(Forging.STARS.get(), 5);

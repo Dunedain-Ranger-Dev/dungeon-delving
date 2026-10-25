@@ -1,0 +1,14 @@
+{
+  "type": "dungeondelving:forged_smithing",
+  "template": [],
+  "base": {
+    "item": "minecraft:iron_chestplate"
+  },
+  "addition": {
+    "item": "minecraft:diamond"
+  },
+  "result": {
+    "id": "minecraft:diamond_chestplate",
+    "count": 1
+  }
+}

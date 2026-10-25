@@ -12,12 +12,8 @@
     {
       "type": "patchouli:crafting",
       "recipe": "dungeondelving:straps",
-      "recipe2": "dungeondelving:hardened_leather"
-    },
-    {
-      "type": "patchouli:crafting",
-      "recipe": "dungeondelving:leather_base",
-      "text": "Panels make straps, hardened leather (waxed with honeycomb) and leather backings."
+      "recipe2": "dungeondelving:hardened_leather",
+      "text": "Panels make straps and hardened leather (waxed with honeycomb), and RPG leather armor."
     }
   ]
 }

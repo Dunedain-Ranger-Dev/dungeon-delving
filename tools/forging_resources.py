@@ -534,30 +534,43 @@ def gear_recipes():
     # Hardened leather, leather and gambeson backings, and fulled cloth are now made by the professions (DD-88):
     # tools/profession_resources.py writes their recipes.
 
-    base, gambeson, hardened = f"{MOD}:leather_base", f"{MOD}:gambeson_base", f"{MOD}:hardened_leather"
-    plate_, rivet, link = f"{MOD}:armor_plate", f"{MOD}:rivets", f"{MOD}:chain_links"
-    # Vanilla armor shapes: the main material (M) where the ingots go, the backing (B) in the gap.
-    shapes = {
-        "helmet": ["MMM", "MBM"],
-        "chestplate": ["MBM", "MMM", "MMM"],
-        "leggings": ["MMM", "MBM", "M M"],
-        "boots": ["MBM", "M M"],
-    }
-    # Brigandine is hardened leather (H) studded with rivets (R): the same shapes, with rivets in some of the leather's places.
-    brigandine = {
-        "helmet": ["HRH", "HBH"],
-        "chestplate": ["HBH", "RHR", "HHH"],
-        "leggings": ["HRH", "HBH", "R R"],
-        "boots": ["RBR", "H H"],
-    }
-    for slot in ARMOR_SLOTS:
-        starred_shaped(f"plate_{slot}", shapes[slot], {"M": plate_, "B": base})
-        starred_shaped(f"hauberk_{slot}", shapes[slot], {"M": link, "B": base})
-        starred_shaped(f"brigandine_{slot}", brigandine[slot], {"H": hardened, "R": rivet, "B": gambeson})
-    # A Woodworking haft, not a stick: what sets them apart from the vanilla iron sword and axe (DD-89). Its ★ counts too.
-    haft = f"{MOD}:haft"
-    starred_shaped("forged_sword", ["P", "P", "H"], {"P": plate_, "H": haft})
-    starred_shaped("forged_axe", ["PP", "PH", " H"], {"P": plate_, "H": haft})
+    # Our own forged gear is retired (DD-89): forged versions of vanilla and RPG gear took its place.
+    for weight in WEIGHTS:
+        for slot in ARMOR_SLOTS:
+            (DATA / f"recipe/{weight}_{slot}.json").unlink(missing_ok=True)
+    for name in ("forged_sword", "forged_axe"):
+        (DATA / f"recipe/{name}.json").unlink(missing_ok=True)
+    forged_vanilla()
+
+
+# Vanilla weapons and armor, and their crafting shapes (X the metal, # the stick).
+VANILLA_SHAPES = {
+    "sword": ["X", "X", "#"], "axe": ["XX", "X#", " #"],
+    "helmet": ["XXX", "X X"], "chestplate": ["X X", "XXX", "XXX"], "leggings": ["XXX", "X X", "X X"], "boots": ["X X", "X X"],
+}
+
+
+def forged_vanilla():
+    """Forged versions of vanilla weapons and armor (DD-89); the vanilla recipes stay as they are.
+
+    Iron: the vanilla shape in forged plates, ★1 to ★3. Diamond: a forged iron piece smithed with a diamond, ★4 or ★5.
+    Netherite: vanilla's own upgrade, which now carries a forged diamond piece's ★ up to ★6 or ★7 (a plain one stays plain).
+    """
+    for kind, pattern in VANILLA_SHAPES.items():
+        write(DATA / f"recipe/forged/iron_{kind}.json", {
+            "type": f"{MOD}:starred_shaped", "category": "equipment", "pattern": pattern,
+            "key": {"X": {"item": f"{MOD}:armor_plate"}, **({"#": {"item": "minecraft:stick"}} if "#" in "".join(pattern) else {})},
+            "result": {"id": f"minecraft:iron_{kind}", "count": 1},
+        })
+        write(DATA / f"recipe/forged/diamond_{kind}.json", {
+            "type": f"{MOD}:forged_smithing", "template": [], "base": {"item": f"minecraft:iron_{kind}"},
+            "addition": {"item": "minecraft:diamond"}, "result": {"id": f"minecraft:diamond_{kind}", "count": 1},
+        })
+        write(RES / f"data/minecraft/recipe/netherite_{kind}_smithing.json", {
+            "type": f"{MOD}:starred_smithing", "template": {"item": "minecraft:netherite_upgrade_smithing_template"},
+            "base": {"item": f"minecraft:diamond_{kind}"}, "addition": {"item": "minecraft:netherite_ingot"},
+            "result": {"id": f"minecraft:netherite_{kind}", "count": 1},
+        })
 
 
 def add_to_tag(path, values):

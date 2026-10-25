@@ -287,10 +287,10 @@ def recipes():
     # Leatherworking: panels into straps, hardened leather and backings.
     starred_shapeless("straps", [f"{MOD}:leather_panel", "minecraft:string"], count=4)
     starred_shapeless("hardened_leather", [f"{MOD}:leather_panel"] * 3 + ["minecraft:honeycomb"], count=3)
-    starred_shapeless("leather_base", [f"{MOD}:leather_panel"] * 2)
+    (DATA / "recipe/leather_base.json").unlink(missing_ok=True)  # Backings were for our own forged armor, retired (DD-89).
 
     # Weaving: panels into backings and wraps; sized yarn into bowstrings. (Spinning and weaving happen at stations.)
-    starred_shapeless("gambeson_base", [f"{MOD}:cloth_panel"] * 2)
+    (DATA / "recipe/gambeson_base.json").unlink(missing_ok=True)
     starred_shapeless("staff_wrap", [f"{MOD}:cloth_panel", "minecraft:string"], count=2)
     starred_shapeless("bowstring", [f"{MOD}:sized_yarn"] * 3)
     (DATA / "recipe/padded_cloth.json").unlink(missing_ok=True)
@@ -516,8 +516,7 @@ def handbook():
         page("Lay tanned leather on the $(item)Shaping Rack$() and use shears or a knife on it. Hold the button to draw the blade along "
              "the pattern, and let go on the end mark. Two cuts make two $(item)Leather Panels$() of the leather's ★. A cut far off the "
              "mark can ruin it into scraps.", "Cutting"),
-        crafting("straps", "hardened_leather"),
-        crafting("leather_base", text="Panels make straps, hardened leather (waxed with honeycomb) and leather backings."),
+        crafting("straps", "hardened_leather", "Panels make straps and hardened leather (waxed with honeycomb), and RPG leather armor."),
     ])
 
     entry("weaving", "room", "The Weaving Room", f"{MOD}:spinning_wheel", 0, [
@@ -538,7 +537,7 @@ def handbook():
     entry("weaving", "weaving", "Weaving", f"{MOD}:cloth_panel", 2, [
         page("Hold three sized yarn and right-click a loom. Click when the thread lines up with the needle's eye. Three stitches make "
              "two $(item)Cloth Panels$() of the yarn's ★. A missed stitch can snap the thread.", "Weaving"),
-        crafting("gambeson_base", "staff_wrap"),
+        crafting("staff_wrap", text="Cloth panels make staff wraps, and RPG robes and cloth armor."),
         crafting("bowstring", text="Three sized yarn make a bowstring."),
     ])
 

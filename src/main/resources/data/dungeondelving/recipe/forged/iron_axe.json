@@ -2,20 +2,20 @@
   "type": "dungeondelving:starred_shaped",
   "category": "equipment",
   "pattern": [
-    "PP",
-    "PH",
-    " H"
+    "XX",
+    "X#",
+    " #"
   ],
   "key": {
-    "P": {
+    "X": {
       "item": "dungeondelving:armor_plate"
     },
-    "H": {
-      "item": "dungeondelving:haft"
+    "#": {
+      "item": "minecraft:stick"
     }
   },
   "result": {
-    "id": "dungeondelving:forged_axe",
+    "id": "minecraft:iron_axe",
     "count": 1
   }
 }

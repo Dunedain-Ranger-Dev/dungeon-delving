@@ -2,20 +2,17 @@
   "type": "dungeondelving:starred_shaped",
   "category": "equipment",
   "pattern": [
-    "MMM",
-    "MBM",
-    "M M"
+    "X X",
+    "XXX",
+    "XXX"
   ],
   "key": {
-    "M": {
+    "X": {
       "item": "dungeondelving:armor_plate"
-    },
-    "B": {
-      "item": "dungeondelving:leather_base"
     }
   },
   "result": {
-    "id": "dungeondelving:plate_leggings",
+    "id": "minecraft:iron_chestplate",
     "count": 1
   }
 }

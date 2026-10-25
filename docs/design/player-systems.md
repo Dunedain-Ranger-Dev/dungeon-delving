@@ -32,6 +32,22 @@ The dev build is done. What's left:
 
 ## 2. Keeping forging relevant
 
+**Where it landed (DD-89, 2026-10-25), replacing the plans below:**
+
+- **Plain stays plain.** Vanilla and RPG gear keep their own recipes, and a plain piece has no ★ and its own stats.
+- **Forged versions sit beside them,** always stronger, with the same look. The ★ climbs with the material:
+  - **Iron, ★1–3:** the item's own shape in forged parts (armor plates for iron; leather and cloth panels for leather
+    and cloth).
+  - **Diamond, ★4–5:** a forged iron piece smithed with a diamond, giving ★5 from a ★3 piece.
+  - **Netherite, ★6–7:** the usual netherite upgrade of a forged diamond piece, giving ★7 from ★5.
+- **How much stronger:** each ★ into its material's band adds 5% to damage, armor, toughness, ranged damage and spell
+  power, and 10% to durability.
+- **Dungeon loot:** in a tier n dungeon, n in 4 pieces of gear come forged, with a random ★ in their band. Bosses and
+  objective chests always give forged gear.
+- **Apotheosis:** sockets at ★4 and ★5, and affix boosts at ★6 and ★7.
+- **Retired:** our own forged sword, axe, and brigandine, hauberk and plate armor. Pieces already made keep working.
+- **Gold:** waits for Jewelcrafting.
+
 The RPG mods add about 1,300 recipes, but most are smelting gear back down. The ones that matter are about 250
 shaped crafting recipes (base class gear, jewelry, relics) and 380 smithing upgrades (diamond to netherite, Armory
 and Arsenal tiers). Plan: a rule-based KubeJS script in the pack (where recipe overrides already live), not
