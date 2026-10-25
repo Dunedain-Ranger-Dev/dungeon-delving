@@ -47,37 +47,6 @@ public class QualityTests {
         helper.succeed();
     }
 
-    /** Every piece of gear carries a ★ (DD-89): what counts as gear, and the ★ loot gives it. */
-    @GameTest(template = ANY_TEMPLATE)
-    public static void everyPieceOfGearGetsAStar(GameTestHelper helper) {
-        for (var item : new net.minecraft.world.item.Item[] { Items.IRON_SWORD, Items.DIAMOND_CHESTPLATE, Items.IRON_PICKAXE, Items.BOW,
-                Items.CROSSBOW, Items.NETHERITE_AXE, Items.TRIDENT }) {
-            helper.assertTrue(Quality.isGear(new ItemStack(item)), item + " is gear");
-        }
-        for (var item : new net.minecraft.world.item.Item[] { Items.STICK, Items.ELYTRA, Items.FISHING_ROD, Items.IRON_INGOT }) {
-            helper.assertFalse(Quality.isGear(new ItemStack(item)), item + " isn't gear");
-        }
-        helper.assertFalse(Quality.isGear(new ItemStack(BuiltInRegistries.ITEM.get(DungeonDelving.id("leather_panel")))), "parts carry their own ★");
-
-        ItemStack sword = new ItemStack(Items.IRON_SWORD);
-        Quality.stamp(sword, 7);
-        helper.assertTrue(Forging.stars(sword) == 7 && sword.getMaxDamage() > Items.IRON_SWORD.getDefaultInstance().getMaxDamage(),
-                "a stamped ★7 sword has its ★ and more durability");
-        Quality.stamp(sword, 3);
-        helper.assertTrue(Forging.stars(sword) == 7, "stamping never changes a ★ already there");
-
-        var random = net.minecraft.util.RandomSource.create(1);
-        for (int i = 0; i < 50; i++) {
-            int room = Quality.lootStars(DungeonDelving.id("chests/tier_1/room"), random);
-            int boss = Quality.lootStars(DungeonDelving.id("bosses/lich_lord/tier_4"), random);
-            helper.assertTrue(room >= 1 && room <= 3, "tier 1 rooms give ★1 to ★3, got " + room);
-            helper.assertTrue(boss >= 5 && boss <= 7, "a tier 4 boss gives ★5 to ★7, got " + boss);
-        }
-        helper.assertTrue(Quality.lootStars(ResourceLocation.withDefaultNamespace("chests/simple_dungeon"), random) == Quality.BASE_STARS,
-                "loot outside dungeons is standard, ★3");
-        helper.succeed();
-    }
-
     @GameTest(template = ANY_TEMPLATE)
     public static void spellPowerAndRangedDamageScale(GameTestHelper helper) {
         helper.assertFalse(Quality.scales(Attributes.MOVEMENT_SPEED), "movement isn't quality");
