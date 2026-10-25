@@ -554,10 +554,8 @@ def gear_recipes():
         starred_shaped(f"plate_{slot}", shapes[slot], {"M": plate_, "B": base})
         starred_shaped(f"hauberk_{slot}", shapes[slot], {"M": link, "B": base})
         starred_shaped(f"brigandine_{slot}", brigandine[slot], {"H": hardened, "R": rivet, "B": gambeson})
-    # A Woodworking haft, not a stick: what sets them apart from the vanilla iron sword and axe (DD-89). Its ★ counts too.
-    haft = f"{MOD}:haft"
-    starred_shaped("forged_sword", ["P", "P", "H"], {"P": plate_, "H": haft})
-    starred_shaped("forged_axe", ["PP", "PH", " H"], {"P": plate_, "H": haft})
+    starred_shaped("forged_sword", ["P", "P", "S"], {"P": plate_, "S": "minecraft:stick"})
+    starred_shaped("forged_axe", ["PP", "PS", " S"], {"P": plate_, "S": "minecraft:stick"})
 
 
 def add_to_tag(path, values):
