@@ -41,6 +41,8 @@ public class ShapingRackBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
+        // Always written, even empty: an empty update tag is ignored by the client, which then keeps drawing the old piece.
+        tag.putBoolean("has_piece", !piece.isEmpty());
         if (!piece.isEmpty()) {
             tag.put("piece", piece.save(registries));
         }
