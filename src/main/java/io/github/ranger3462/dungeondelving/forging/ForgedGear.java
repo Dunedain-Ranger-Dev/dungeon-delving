@@ -37,7 +37,9 @@ public final class ForgedGear {
     public enum Weight {
         LIGHT("brigandine", 0.6f, 0.0f, false),
         MEDIUM("hauberk", 0.8f, 0.5f, false),
-        HEAVY("plate", 1.0f, 1.0f, true);
+        HEAVY("plate", 1.0f, 1.0f, true),
+        /** Goldsmithing's: gold fittings, a little less armor than chain but none of plate's weight, and piglins take it for gold. */
+        GILDED("gilded", 0.7f, 0.0f, false);
 
         public final String name;
         final float armorShare;
@@ -77,12 +79,20 @@ public final class ForgedGear {
                     new ArmorMaterial.Layer(ResourceLocation.withDefaultNamespace("leather"), "_overlay", false)), SoundEvents.ARMOR_EQUIP_LEATHER),
             Weight.MEDIUM, material("hauberk", List.of(new ArmorMaterial.Layer(ResourceLocation.withDefaultNamespace("chainmail"))),
                     SoundEvents.ARMOR_EQUIP_CHAIN),
-            Weight.HEAVY, material("plate", List.of(new ArmorMaterial.Layer(ResourceLocation.withDefaultNamespace("iron"))), SoundEvents.ARMOR_EQUIP_IRON)));
+            Weight.HEAVY, material("plate", List.of(new ArmorMaterial.Layer(ResourceLocation.withDefaultNamespace("iron"))), SoundEvents.ARMOR_EQUIP_IRON),
+            Weight.GILDED, material("gilded", List.of(new ArmorMaterial.Layer(ResourceLocation.withDefaultNamespace("gold"))), SoundEvents.ARMOR_EQUIP_GOLD,
+                    25)));
 
     private static DeferredHolder<ArmorMaterial, ArmorMaterial> material(String name, List<ArmorMaterial.Layer> layers,
             Holder<net.minecraft.sounds.SoundEvent> sound) {
+        return material(name, layers, sound, 12);
+    }
+
+    /** With its enchantability: gold takes enchantments far better than iron. */
+    private static DeferredHolder<ArmorMaterial, ArmorMaterial> material(String name, List<ArmorMaterial.Layer> layers,
+            Holder<net.minecraft.sounds.SoundEvent> sound, int enchantability) {
         return MATERIALS.register(name, () -> new ArmorMaterial(new EnumMap<>(Map.of(ArmorItem.Type.HELMET, 0, ArmorItem.Type.CHESTPLATE, 0,
-                ArmorItem.Type.LEGGINGS, 0, ArmorItem.Type.BOOTS, 0, ArmorItem.Type.BODY, 0)), 12, sound,
+                ArmorItem.Type.LEGGINGS, 0, ArmorItem.Type.BOOTS, 0, ArmorItem.Type.BODY, 0)), enchantability, sound,
                 () -> Ingredient.of(Forging.TEMPERED_IRON_INGOT.get()), layers, 0.0f, 0.0f));
     }
 
@@ -123,6 +133,7 @@ public final class ForgedGear {
             };
             return switch (armor.weight) {
                 case HEAVY -> pieces;
+                case GILDED -> 0.0f; // Gold, not tempered iron: nothing to salvage.
                 case MEDIUM -> pieces * 0.25f;
                 case LIGHT -> switch (armor.getType()) {
                     case HELMET -> 0.25f;
@@ -131,10 +142,11 @@ public final class ForgedGear {
                 };
             };
         }
-        if (stack.getItem() instanceof Sword) {
-            return 2.0f;
+        if (isGilded(stack)) {
+            return 0.0f;
         }
-        return stack.getItem() instanceof Axe ? 3.0f : 0.0f;
+        // Two blades (an ingot each), or an axe head (two ingots).
+        return stack.getItem() instanceof Sword || stack.getItem() instanceof Axe ? 2.0f : 0.0f;
     }
 
     public static boolean isGear(ItemStack stack) {
@@ -143,7 +155,12 @@ public final class ForgedGear {
 
     /** Whether {@code repair} can repair {@code gear}: a tempered ingot of the same ★ or better. */
     static boolean repairs(ItemStack gear, ItemStack repair) {
-        return repair.is(Forging.TEMPERED_IRON_INGOT.get()) && Forging.stars(repair) >= Forging.stars(gear);
+        return repair.is(isGilded(gear) ? Crafts.FINE_GOLD.get() : Forging.TEMPERED_IRON_INGOT.get()) && Forging.stars(repair) >= Forging.stars(gear);
+    }
+
+    /** Goldsmithing's gear: gilded armor and the gilded sword. */
+    public static boolean isGilded(ItemStack stack) {
+        return stack.getItem() instanceof Armor armor && armor.weight == Weight.GILDED || stack.is(Forging.GILDED_SWORD.get());
     }
 
     static Component nameWithStars(Component name, ItemStack stack) {
@@ -157,6 +174,11 @@ public final class ForgedGear {
         public Armor(Weight weight, ArmorItem.Type type, Item.Properties properties) {
             super(MATERIAL.get(weight), type, properties.durability(SLOT_DURABILITY.get(type) * DURABILITY[0]));
             this.weight = weight;
+        }
+
+        @Override
+        public boolean makesPiglinsNeutral(ItemStack stack, net.minecraft.world.entity.LivingEntity wearer) {
+            return weight == Weight.GILDED;
         }
 
         @Override
@@ -196,10 +218,14 @@ public final class ForgedGear {
         }
     }
 
-    /** The forged sword. */
+    /** The forged sword (and the gilded one, on gold's tier, for its enchantability). */
     public static class Sword extends SwordItem {
         public Sword(Item.Properties properties) {
-            super(Tiers.IRON, properties.durability(WEAPON_DURABILITY[0]));
+            this(Tiers.IRON, properties);
+        }
+
+        public Sword(net.minecraft.world.item.Tier tier, Item.Properties properties) {
+            super(tier, properties.durability(WEAPON_DURABILITY[0]));
         }
 
         @Override

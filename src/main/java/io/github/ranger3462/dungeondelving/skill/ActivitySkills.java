@@ -163,6 +163,7 @@ public final class ActivitySkills {
                 case LIGHT -> ArmorWeight.LIGHT;
                 case MEDIUM -> ArmorWeight.MEDIUM;
                 case HEAVY -> ArmorWeight.HEAVY;
+                case GILDED -> ArmorWeight.MEDIUM;
             });
         }
         var id = BuiltInRegistries.ITEM.getKey(stack.getItem());

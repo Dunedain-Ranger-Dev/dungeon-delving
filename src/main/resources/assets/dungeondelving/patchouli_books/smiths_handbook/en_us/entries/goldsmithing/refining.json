@@ -1,0 +1,23 @@
+{
+  "name": "Refining Gold",
+  "icon": "dungeondelving:fine_gold",
+  "category": "dungeondelving:goldsmithing",
+  "sortnum": 1,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Put a refining salt in a $(item)Crucible$(), then gold ingots. They come out as $(item)Fine Gold$() of the salt's \u2605.$(li)$(item)Bone Ash$(): bone meal and charcoal. \u26053$(li)$(item)Assay Salt$(): borax and bone ash. \u26055$(li)$(item)Sunsalt$(): assay salt and Arcane Dust. \u26057",
+      "title": "Refining"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Each vat takes four pieces a batch and uses a level of liquid. Better liquids take longer: 2 minutes at \u26053, 3 at \u26055, 4 at \u26057. Right-click with an empty hand to take the batch out, or to see how long it has left.",
+      "title": "The Crucible"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:bone_ash",
+      "recipe2": "dungeondelving:assay_salt"
+    }
+  ]
+}

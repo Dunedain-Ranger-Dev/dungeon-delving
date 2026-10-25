@@ -141,6 +141,32 @@ Spin → size → weave → craft.
   Works** (a sizing vat for 8, 25% faster; dyeing later).
 - **XP:** a spin 1, sizing 1 × ★ per yarn, a weave 5 × ★.
 
+## Goldsmithing (first pass, DD-89)
+
+Smelt → refine → chase → craft.
+
+| Step | Station | In → out | Time | ★ |
+|---|---|---|---|---|
+| 1. Smelt | Furnace | Raw gold → gold ingot (vanilla) | — | — |
+| 2. Refine | **Crucible** (a refining salt put in) | Up to 4 gold ingots → **Fine Gold** | 2:00–4:00 | The salt's |
+| 3. Chase | **Jeweler's Bench** | Fine Gold → **Gold Fittings** (2); a sweeping marker, three strikes | — | Keeps it |
+| 4. Craft | Crafting table | **Gold Ring** (+1 max health a ★), **Gold Amulet** (+0.5 armor a ★), in Curios slots; **gilded** armor and sword | — | Lowest part |
+
+- **Salts:** Bone Ash (bone meal, charcoal) ★3; **Assay Salt** (+ borax) ★5; **Sunsalt** (+ Arcane Dust) ★7.
+- **Gilded gear:** the golden shapes in fittings. A little less armor than chain, no weight, enchants like gold, and
+  piglins take it for gold. Repaired with fine gold.
+- **Workshop levels:** 1: furnace, Crucible, Jeweler's Bench. 2: a **Great Crucible** (8, 25% faster). 3: a **Jeweler's
+  Loupe** (a wider sweet spot at the bench).
+- **Later (DD-91):** cut gems and settings, staff foci, more jewelry.
+
+## Weaponsmithing and Armorsmithing (DD-89)
+
+Forging is two skills now, so a smith can be good at both by learning both. The forge work (heat, strike, quench,
+grind) trains both and goes as high as the better of the two. Blades (an ingot and flux) and axe heads (two ingots and
+flux) and the forged sword and axe train and are capped by Weaponsmithing; plates, rivets, chain links and plate armor
+by Armorsmithing. Each has its own tree: the anvil's perks in Weaponsmithing's, the grindstone's and the metal's in
+Armorsmithing's. Old Forging XP moved to both, and its perks were refunded.
+
 ## Woodworking (new)
 
 Season → cure → turn → craft.

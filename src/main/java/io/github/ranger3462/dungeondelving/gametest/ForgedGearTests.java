@@ -16,6 +16,7 @@ import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import io.github.ranger3462.dungeondelving.forging.ForgingPerks;
 import io.github.ranger3462.dungeondelving.forging.TimingBar;
 import io.github.ranger3462.dungeondelving.skill.CraftSkill;
+import io.github.ranger3462.dungeondelving.skill.CraftingSkills;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
@@ -79,12 +80,48 @@ public class ForgedGearTests {
         helper.assertTrue(brigandine.is(Forging.ARMOR.get(ForgedGear.Weight.LIGHT).get(ArmorItem.Type.HELMET).get()) && Forging.stars(brigandine) == 3,
                 "hardened leather with a rivet around a gambeson backing makes a ★3 Brigandine Helm (its ★ from the rivets)");
         helper.assertTrue(helmet.getMaxDamage() == ForgedGear.armorDurability(ArmorItem.Type.HELMET, 2), "a ★2 helm gets ★2 durability");
-        ItemStack sword = craft(level, part(Forging.ARMOR_PLATE.get(), 4), ItemStack.EMPTY, ItemStack.EMPTY, part(Forging.ARMOR_PLATE.get(), 4),
+        ItemStack sword = craft(level, part(Forging.BLADE.get(), 4), ItemStack.EMPTY, ItemStack.EMPTY, part(Forging.BLADE.get(), 4),
                 ItemStack.EMPTY, ItemStack.EMPTY, new ItemStack(Items.STICK));
-        helper.assertTrue(sword.is(Forging.FORGED_SWORD.get()) && Forging.stars(sword) == 4, "two ★4 plates and a stick make a ★4 sword");
-        helper.assertTrue(CraftingXp.skillFor(helmet) == CraftSkill.FORGING && CraftingXp.skillFor(brigandine) == CraftSkill.WEAVING
+        helper.assertTrue(sword.is(Forging.FORGED_SWORD.get()) && Forging.stars(sword) == 4, "two ★4 blades and a stick make a ★4 sword");
+        helper.assertTrue(CraftingXp.skillFor(helmet) == CraftSkill.ARMORSMITHING && CraftingXp.skillFor(brigandine) == CraftSkill.WEAVING
                 && CraftingXp.skillFor(new ItemStack(Forging.ARMOR.get(ForgedGear.Weight.MEDIUM).get(ArmorItem.Type.HELMET).get())) == CraftSkill.LEATHERWORKING,
                 "plate trains Forging, hauberks Leatherworking, brigandine Weaving");
+        helper.succeed();
+    }
+
+    /** Forging split in two (DD-89): weapon parts and weapons are Weaponsmithing's, armor parts and armor Armorsmithing's. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void eachSmithingSkillCapsItsOwnGear(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        ServerPlayer smith = FakePlayerFactory.get(level, new GameProfile(UUID.randomUUID(), "smith"));
+        CraftingSkills.setLevel(smith, CraftSkill.WEAPONSMITHING, ForgingPerks.levelFor(5));
+        CraftingSkills.setLevel(smith, CraftSkill.ARMORSMITHING, 1);
+        try {
+            net.neoforged.neoforge.common.CommonHooks.setCraftingPlayer(smith);
+            ItemStack sword = craft(level, part(Forging.BLADE.get(), 4), ItemStack.EMPTY, ItemStack.EMPTY, part(Forging.BLADE.get(), 4), ItemStack.EMPTY,
+                    ItemStack.EMPTY, new ItemStack(Items.STICK));
+            helper.assertTrue(sword.is(Forging.FORGED_SWORD.get()) && Forging.stars(sword) == 4, "a good weaponsmith makes a ★4 sword from ★4 blades");
+            ItemStack plate = part(Forging.ARMOR_PLATE.get(), 4);
+            ItemStack helmet = craft(level, plate, plate, plate, plate, part(Forging.LEATHER_BASE.get(), 4), plate);
+            helper.assertTrue(Forging.stars(helmet) == 1, "but a new armorsmith's helm is ★1, whatever the plates");
+        } finally {
+            net.neoforged.neoforge.common.CommonHooks.setCraftingPlayer(null);
+        }
+        helper.assertTrue(ForgingPerks.level(smith) == ForgingPerks.levelFor(5), "the forge work goes by the better of the two");
+        helper.succeed();
+    }
+
+    /** Players' old Forging XP moves to both new skills, and the old tree's perks go (DD-89). */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void oldForgingMovesToBothSmithingSkills(GameTestHelper helper) {
+        ServerPlayer player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "old_smith"));
+        player.setData(io.github.ranger3462.dungeondelving.skill.CraftingSkills.XP, new java.util.HashMap<>(java.util.Map.of("forging", CraftingSkills.xpFor(12))));
+        player.addTag(io.github.ranger3462.dungeondelving.skill.Perk.STEADY_HAND.tag(2));
+        io.github.ranger3462.dungeondelving.skill.ForgingSplit.migrate(player);
+        helper.assertTrue(CraftingSkills.level(player, CraftSkill.WEAPONSMITHING) == 12 && CraftingSkills.level(player, CraftSkill.ARMORSMITHING) == 12,
+                "Forging 12 becomes Weaponsmithing 12 and Armorsmithing 12");
+        helper.assertFalse(player.getData(io.github.ranger3462.dungeondelving.skill.CraftingSkills.XP).containsKey("forging"), "the old skill is gone");
+        helper.assertFalse(player.getTags().contains(io.github.ranger3462.dungeondelving.skill.Perk.STEADY_HAND.tag(2)), "its perks are refunded");
         helper.succeed();
     }
 

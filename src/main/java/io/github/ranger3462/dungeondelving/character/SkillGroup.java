@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 
 /** How the skill trees are grouped when listed (in /skills and /character), and each one's icon. */
 public enum SkillGroup {
-    PROFESSIONS("Professions", "mining", "woodcutting", "excavation", "farming", "fishing", "forging", "leatherworking", "weaving", "woodworking"),
+    PROFESSIONS("Professions", "mining", "woodcutting", "excavation", "farming", "fishing", "weaponsmithing", "armorsmithing", "leatherworking", "weaving", "woodworking", "goldsmithing"),
     COMBAT("Combat", "one_handed", "two_handed", "polearms", "daggers", "unarmed", "archery", "crossbows", "dual_wielding", "blocking"),
     ARMOR("Armor", "light_armor", "medium_armor", "heavy_armor", "mage_armor"),
     MAGIC("Magic", "fire_magic", "frost_magic", "lightning_magic", "arcane_magic", "holy_magic", "earth_magic", "water_magic", "air_magic",
@@ -21,7 +21,8 @@ public enum SkillGroup {
     /** Each skill's icon, the same as its tree's tab (tools/skill_trees.py): an item id, or "texture:" and a texture. */
     private static final Map<String, String> ICONS = Map.ofEntries(
             Map.entry("mining", "minecraft:iron_pickaxe"), Map.entry("woodcutting", "minecraft:iron_axe"), Map.entry("excavation", "minecraft:iron_shovel"),
-            Map.entry("farming", "minecraft:iron_hoe"), Map.entry("fishing", "minecraft:fishing_rod"), Map.entry("forging", "dungeondelving:master_anvil"),
+            Map.entry("farming", "minecraft:iron_hoe"), Map.entry("fishing", "minecraft:fishing_rod"), Map.entry("weaponsmithing", "dungeondelving:forged_sword"), Map.entry("armorsmithing", "dungeondelving:plate_chestplate"),
+            Map.entry("goldsmithing", "minecraft:gold_ingot"),
             Map.entry("leatherworking", "minecraft:leather"), Map.entry("weaving", "minecraft:string"), Map.entry("woodworking", "minecraft:fletching_table"), Map.entry("one_handed", "minecraft:iron_sword"),
             Map.entry("two_handed", "minecraft:netherite_axe"), Map.entry("polearms", "minecraft:trident"), Map.entry("daggers", "rogues:iron_dagger"),
             Map.entry("unarmed", "minecraft:leather"), Map.entry("archery", "minecraft:bow"), Map.entry("crossbows", "minecraft:crossbow"),

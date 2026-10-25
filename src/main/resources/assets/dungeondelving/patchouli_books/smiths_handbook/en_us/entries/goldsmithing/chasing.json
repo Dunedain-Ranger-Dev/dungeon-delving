@@ -1,0 +1,28 @@
+{
+  "name": "Chasing and Jewelry",
+  "icon": "dungeondelving:gold_fittings",
+  "category": "dungeondelving:goldsmithing",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Hold fine gold and right-click the $(item)Jeweler's Bench$(). Click when the marker is in the green, three times, to chase it into two $(item)Gold Fittings$() of its \u2605. A miss can spoil it back into nuggets.",
+      "title": "Chasing"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Fittings make $(item)Gold Rings$() (+1 max health a \u2605) and $(item)Gold Amulets$() (+0.5 armor a \u2605), worn in Curios' ring and necklace slots; and $(item)gilded$() armor and swords: lighter than plate, easy to enchant, and piglins take them for gold.",
+      "title": "Jewelry and Gilded Gear"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:gold_ring",
+      "recipe2": "dungeondelving:gold_amulet"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:gilded_helmet",
+      "recipe2": "dungeondelving:gilded_sword"
+    }
+  ]
+}

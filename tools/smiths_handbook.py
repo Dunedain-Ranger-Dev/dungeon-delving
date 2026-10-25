@@ -51,7 +51,7 @@ def smelting(recipe, body=None):
 CATEGORIES = {
     "forge": ("The Forge", "Building a forge, and the upgrades that let it work finer metal.", f"{MOD}:guild_ledger", 0),
     "smithing": ("Smithing", "Heating, striking, quenching and grinding iron into tempered ingots.", f"{MOD}:tempered_iron_ingot", 1),
-    "parts": ("Flux and Parts", "Turning tempered ingots into plates, rivets and chain.", f"{MOD}:armor_plate", 2),
+    "parts": ("Flux and Parts", "Turning tempered ingots into plates, rivets, chain, blades and axe heads.", f"{MOD}:armor_plate", 2),
     "gear": ("Forged Gear", "The armor and weapons a smith can make, and keeping them in repair.", f"{MOD}:plate_chestplate", 7),
     "skills": ("Crafting Skills", "Forging, Leatherworking, Weaving and Woodworking, and what practice earns you.", "minecraft:experience_bottle", 8),
 }
@@ -149,6 +149,7 @@ ENTRIES = {
             crafting("armor_plate", "An ingot and flux make an Armor Plate."),
             crafting("rivets", "An ingot, flux and a nugget make four Rivets."),
             crafting("chain_links", "Two ingots and flux make eight Chain Links."),
+            crafting("blade", "Weapon parts: an ingot and flux make a Blade; two ingots and flux an Axe Head.", "axe_head"),
         ]),
     },
     "gear": {
@@ -178,10 +179,13 @@ ENTRIES = {
     },
     "skills": {
         "skills": ("Crafting Skills", "minecraft:experience_bottle", [
-            text("Forging, Leatherworking, Weaving and Woodworking level as you practice, with no limit. Use $(item)/skills$() to "
-                 "see where you stand, and the skill trees (K) to spend the points each level gives.$(br2)Your level sets the best ★ "
-                 "you can make: ★2 from level 3, ★3 from 6, ★4 from 10, ★5 from 15, ★6 from 20, ★7 from 25. The trees' perks widen "
-                 "sweet spots and lower the odds of ruining a piece.", "Crafting Skills"),
+            text("Weaponsmithing, Armorsmithing, Leatherworking, Weaving, Woodworking and Goldsmithing level as you practice, with "
+                 "no limit. Use $(item)/skills$() to see where you stand, and the skill trees (K) to spend the points each level "
+                 "gives.$(br2)Your level sets the best ★ you can make: ★2 from level 3, ★3 from 6, ★4 from 10, ★5 from 15, ★6 from "
+                 "20, ★7 from 25. The trees' perks widen sweet spots and lower the odds of ruining a piece.", "Crafting Skills"),
+            text("Work at the forge (striking, quenching, grinding) trains both Weaponsmithing and Armorsmithing, and goes as high as "
+                 "the better of the two. Blades, axe heads and weapons train and are capped by Weaponsmithing; plates, rivets, chain "
+                 "and plate armor by Armorsmithing. A smith who wants the best of both just has more to learn.", "Two Smiths"),
         ]),
     },
 }

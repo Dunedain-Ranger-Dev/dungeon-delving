@@ -1,0 +1,19 @@
+{
+  "type": "dungeondelving:starred_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "dungeondelving:tempered_iron_ingot"
+    },
+    {
+      "item": "dungeondelving:tempered_iron_ingot"
+    },
+    {
+      "tag": "dungeondelving:flux"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:axe_head",
+    "count": 1
+  }
+}

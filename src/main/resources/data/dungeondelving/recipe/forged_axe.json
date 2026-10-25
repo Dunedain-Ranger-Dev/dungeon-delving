@@ -2,13 +2,13 @@
   "type": "dungeondelving:starred_shaped",
   "category": "equipment",
   "pattern": [
-    "PP",
-    "PS",
-    " S"
+    "H",
+    "S",
+    "S"
   ],
   "key": {
-    "P": {
-      "item": "dungeondelving:armor_plate"
+    "H": {
+      "item": "dungeondelving:axe_head"
     },
     "S": {
       "item": "minecraft:stick"

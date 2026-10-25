@@ -40,6 +40,9 @@ public class DungeonDelving {
         }
         if (ModList.get().isLoaded("curios")) {
             CuriosLoot.register();
+            // Items exist only after registration, so the jewelry is handed to Curios in common setup.
+            modEventBus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event) ->
+                    event.enqueueWork(io.github.ranger3462.dungeondelving.forging.GoldCurios::register));
         }
         if (ModList.get().isLoaded("apotheosis")) {
             ApotheosisForging.register();

@@ -1,0 +1,116 @@
+{
+  "apprentice_goldsmith": {
+    "definition": "apprentice_goldsmith",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "careful_goldsmith_1": {
+    "definition": "careful_goldsmith_1",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "assayer": {
+    "definition": "assayer",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "steady_chase_1": {
+    "definition": "steady_chase_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "steady_chase_2": {
+    "definition": "steady_chase_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "steady_chase_3": {
+    "definition": "steady_chase_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "careful_goldsmith_2": {
+    "definition": "careful_goldsmith_2",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "gem_setter": {
+    "definition": "gem_setter",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "masterwork_jewelry": {
+    "definition": "masterwork_jewelry",
+    "x": 0,
+    "y": 204,
+    "root": false
+  },
+  "gilded_luck_1": {
+    "definition": "gilded_luck_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "gilded_luck_2": {
+    "definition": "gilded_luck_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "gilded_luck_3": {
+    "definition": "gilded_luck_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "gilded_luck_4": {
+    "definition": "gilded_luck_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "gilded_luck_5": {
+    "definition": "gilded_luck_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "goldsmith_studies_1": {
+    "definition": "goldsmith_studies_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "goldsmith_studies_2": {
+    "definition": "goldsmith_studies_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "goldsmith_studies_3": {
+    "definition": "goldsmith_studies_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "goldsmith_studies_4": {
+    "definition": "goldsmith_studies_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "goldsmith_studies_5": {
+    "definition": "goldsmith_studies_5",
+    "x": 68,
+    "y": 170,
+    "root": false
+  }
+}

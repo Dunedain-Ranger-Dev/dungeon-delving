@@ -19,7 +19,9 @@ import net.minecraft.util.Mth;
 public final class TimingBar {
     /** Which minigame. */
     public enum Kind {
-        STRIKE, GRIND, WEAVE, CUT, TURN;
+        STRIKE, GRIND, WEAVE, CUT, TURN,
+        /** Goldsmithing, at the Jeweler's Bench: chasing a design into the gold, like striking (a sweeping marker). */
+        CHASE;
 
         /** Minigames the player plays by holding the button and letting go. */
         public boolean held() {

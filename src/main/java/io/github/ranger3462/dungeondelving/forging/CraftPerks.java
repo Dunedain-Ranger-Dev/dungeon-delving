@@ -16,6 +16,7 @@ public final class CraftPerks {
         Perk perk = switch (skill) {
             case WEAVING -> Perk.STEADY_NEEDLE;
             case WOODWORKING -> Perk.STEADY_KNIFE;
+            case GOLDSMITHING -> Perk.STEADY_CHASE;
             default -> Perk.STEADY_SCRAPER;
         };
         return 0.02f * perk.rank(player);
@@ -26,6 +27,7 @@ public final class CraftPerks {
         Perk perk = switch (skill) {
             case WEAVING -> Perk.CAREFUL_WEAVER;
             case WOODWORKING -> Perk.CAREFUL_CARVER;
+            case GOLDSMITHING -> Perk.CAREFUL_GOLDSMITH;
             default -> Perk.CAREFUL_TANNER;
         };
         return 1.0f - 0.25f * perk.rank(player);

@@ -1,0 +1,575 @@
+{
+  "apprentice_weaponsmith": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.apprentice_weaponsmith"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.apprentice_weaponsmith.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [],
+    "cost": 1
+  },
+  "sure_strikes_1": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.sure_strikes_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.sure_strikes_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.sure_strikes_1"
+        }
+      }
+    ],
+    "cost": 2,
+    "required_points": 4
+  },
+  "keen_edge": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.keen_edge"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.keen_edge.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.keen_edge"
+        }
+      }
+    ],
+    "cost": 2,
+    "required_points": 4
+  },
+  "steady_hand_1": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.steady_hand_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.steady_hand_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_hand_1"
+        }
+      }
+    ],
+    "cost": 3,
+    "required_points": 9
+  },
+  "steady_hand_2": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.steady_hand_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.steady_hand_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_hand_2"
+        }
+      }
+    ],
+    "cost": 5,
+    "required_points": 19
+  },
+  "steady_hand_3": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.steady_hand_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.steady_hand_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.steady_hand_3"
+        }
+      }
+    ],
+    "cost": 8,
+    "required_points": 34
+  },
+  "sure_strikes_2": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.sure_strikes_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.sure_strikes_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.sure_strikes_2"
+        }
+      }
+    ],
+    "cost": 4,
+    "required_points": 24
+  },
+  "balanced_blade": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.balanced_blade"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.balanced_blade.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.balanced_blade"
+        }
+      }
+    ],
+    "cost": 4,
+    "required_points": 24
+  },
+  "masterwork_weapon": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.masterwork_weapon"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.masterwork_weapon.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "challenge"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.masterwork_weapon"
+        }
+      }
+    ],
+    "cost": 10,
+    "required_points": 49,
+    "required_spent_points": 30
+  },
+  "strong_arm_1": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.strong_arm_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.strong_arm_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "strong_arm_2": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.strong_arm_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.strong_arm_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "strong_arm_3": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.strong_arm_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.strong_arm_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "strong_arm_4": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.strong_arm_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.strong_arm_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "strong_arm_5": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.strong_arm_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.strong_arm_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:attribute",
+        "data": {
+          "attribute": "minecraft:generic.attack_damage",
+          "operation": "addition",
+          "value": 0.2
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
+  },
+  "weapon_studies_1": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.weapon_studies_1"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.weapon_studies_1.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.weapon_studies_1"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 1
+  },
+  "weapon_studies_2": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.weapon_studies_2"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.weapon_studies_2.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.weapon_studies_2"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 7
+  },
+  "weapon_studies_3": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.weapon_studies_3"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.weapon_studies_3.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.weapon_studies_3"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 14
+  },
+  "weapon_studies_4": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.weapon_studies_4"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.weapon_studies_4.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.weapon_studies_4"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 29
+  },
+  "weapon_studies_5": {
+    "title": {
+      "translate": "skill.dungeondelving.weaponsmithing.weapon_studies_5"
+    },
+    "description": {
+      "translate": "skill.dungeondelving.weaponsmithing.weapon_studies_5.description"
+    },
+    "icon": {
+      "type": "item",
+      "data": {
+        "item": "dungeondelving:forged_sword"
+      }
+    },
+    "frame": {
+      "type": "advancement",
+      "data": {
+        "frame": "task"
+      }
+    },
+    "rewards": [
+      {
+        "type": "puffish_skills:tag",
+        "data": {
+          "tag": "dungeondelving.perk.weapon_studies_5"
+        }
+      }
+    ],
+    "cost": 1,
+    "required_points": 44
+  }
+}

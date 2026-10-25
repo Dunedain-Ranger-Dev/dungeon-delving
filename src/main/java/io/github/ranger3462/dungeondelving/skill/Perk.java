@@ -8,11 +8,13 @@ import net.minecraft.world.entity.player.Player;
  * are written by tools/skill_trees.py, which uses the same tag names.
  */
 public enum Perk {
-    // Forging
+    // Weaponsmithing (the anvil)
     STEADY_HAND("steady_hand", 3),
+    SURE_STRIKES("sure_strikes", 2),
+    // Armorsmithing (the grindstone, and the metal)
+    STEADY_GRIND("steady_grind", 3),
     SLOW_COOLING("slow_cooling", 2),
     THRIFTY("thrifty", 2),
-    SURE_STRIKES("sure_strikes", 2),
     // Leatherworking
     STEADY_SCRAPER("steady_scraper", 3),
     CAREFUL_TANNER("careful_tanner", 2),
@@ -23,6 +25,9 @@ public enum Perk {
     // Woodworking
     STEADY_KNIFE("steady_knife", 3),
     CAREFUL_CARVER("careful_carver", 2),
+    // Goldsmithing
+    STEADY_CHASE("steady_chase", 3),
+    CAREFUL_GOLDSMITH("careful_goldsmith", 2),
     // Mining
     VEIN_MINER("vein_miner", 3),
     PROSPECTOR("prospector", 1),

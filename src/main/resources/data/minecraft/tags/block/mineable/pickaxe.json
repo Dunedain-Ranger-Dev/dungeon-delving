@@ -20,6 +20,9 @@
     "dungeondelving:gate_tuner",
     "dungeondelving:tanning_vat",
     "dungeondelving:sizing_vat",
-    "dungeondelving:finishing_vat"
+    "dungeondelving:finishing_vat",
+    "dungeondelving:crucible",
+    "dungeondelving:great_crucible",
+    "dungeondelving:jewelers_loupe"
   ]
 }

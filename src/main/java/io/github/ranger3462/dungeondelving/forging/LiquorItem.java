@@ -9,8 +9,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
 /**
- * A bottle of a craft's vat liquid: tanning liquor (Leatherworking), sizing (Weaving) or a finish (Woodworking), brewed
- * in a cooking pot. Pour it into a cauldron to make that craft's vat. What soaks in it comes out at its {@link #stars}:
+ * A craft's vat liquid: tanning liquor (Leatherworking), sizing (Weaving) or a finish (Woodworking), brewed in a
+ * cooking pot and poured into a cauldron to make that craft's vat; or a refining salt (Goldsmithing), put into a
+ * crucible. What soaks in it comes out at its {@link #stars}:
  * the liquid is to these crafts what the heated ingot's tier is to Forging, and the better ones take longer.
  */
 public class LiquorItem extends Item {

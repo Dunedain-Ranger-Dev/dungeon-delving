@@ -285,6 +285,57 @@ public class ProfessionTests {
         helper.succeed();
     }
 
+    /** Goldsmithing from a gold ingot to jewelry and gilded gear: refine (the salt sets the ★), chase, craft (DD-89). */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void goldIsRefinedChasedAndCrafted(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos ledger = spot(helper);
+        ServerPlayer player = player(helper, "goldsmith");
+        CraftingSkills.setLevel(player, CraftSkill.GOLDSMITHING, 30);
+        try {
+            set(level, ledger, ModRegistries.GUILD_LEDGER.get());
+            set(level, ledger.offset(2, 0, 0), Blocks.FURNACE);
+            BlockPos crucible = ledger.offset(-2, 0, 0);
+            set(level, crucible, Crafts.CRUCIBLE.get());
+            BlockPos bench = ledger.offset(0, 0, 2);
+            set(level, bench, Crafts.JEWELERS_BENCH.get());
+            helper.assertTrue(CraftWorkshop.scan(level, ledger, Profession.GOLDSMITHING).complete(), "the goldsmithy is complete");
+
+            // Refine: bone ash in the crucible, then gold ingots; they come out as fine gold at the salt's ★3.
+            level.setBlock(crucible, level.getBlockState(crucible).setValue(SoakingVatBlock.LEVEL, 1), Block.UPDATE_CLIENTS);
+            SoakingVatBlockEntity vat = (SoakingVatBlockEntity) level.getBlockEntity(crucible);
+            vat.setLiquorStars(((io.github.ranger3462.dungeondelving.forging.LiquorItem) Crafts.BONE_ASH.get()).stars);
+            ItemStack gold = new ItemStack(Items.GOLD_INGOT, 2);
+            SoakingVatBlock.insert(level, crucible, level.getBlockState(crucible), vat, player, gold, SoakingVatBlock.soakFor(gold, Profession.GOLDSMITHING).orElseThrow());
+            vat.finishNow();
+            SoakingVatBlock.collect(level, crucible, level.getBlockState(crucible), vat, player);
+            ItemStack fine = find(player, Crafts.FINE_GOLD.get());
+            helper.assertTrue(fine.getCount() == 2 && Forging.stars(fine) == 3, "two ★3 fine gold, got " + fine);
+
+            // Chase both at the Jeweler's Bench: two fittings each.
+            player.setItemInHand(InteractionHand.MAIN_HAND, fine.copy());
+            fine.setCount(0);
+            landAll(player, level, bench, TimingBar.Kind.CHASE, TimingBar.Hit.GOLD);
+            landAll(player, level, bench, TimingBar.Kind.CHASE, TimingBar.Hit.GOLD);
+            ItemStack fittings = find(player, Crafts.GOLD_FITTINGS.get());
+            helper.assertTrue(fittings.getCount() == 4 && Forging.stars(fittings) == 3, "four ★3 gold fittings, got " + fittings);
+
+            // A ring, and a gilded helm.
+            ItemStack f = fittings.copyWithCount(1);
+            ItemStack air = ItemStack.EMPTY;
+            ItemStack ring = craft(level, CraftingInput.of(3, 3, List.of(air, f, air, f.copy(), air, f.copy(), air, f.copy(), air)));
+            helper.assertTrue(ring.is(Crafts.GOLD_RING.get()) && Forging.stars(ring) == 3
+                    && ((io.github.ranger3462.dungeondelving.forging.JewelryItem) ring.getItem()).bonus(ring) == 3.0, "a ★3 ring gives +3 max health, got " + ring);
+            ItemStack helm = craft(level, CraftingInput.of(3, 2, List.of(f, f.copy(), f.copy(), f.copy(), air, f.copy())));
+            helper.assertTrue(helm.is(Forging.ARMOR.get(io.github.ranger3462.dungeondelving.forging.ForgedGear.Weight.GILDED)
+                    .get(net.minecraft.world.item.ArmorItem.Type.HELMET).get()) && Forging.stars(helm) == 3, "fittings in a helmet's shape make a ★3 gilded helm");
+            helper.assertTrue(helm.makesPiglinsNeutral(player), "piglins take gilded armor for gold");
+        } finally {
+            clear(level, ledger);
+        }
+        helper.succeed();
+    }
+
     // --- Helpers ---
 
     private static ForgeActions.Session begin(ServerPlayer player, ServerLevel level, BlockPos pos, TimingBar.Kind kind) {

@@ -2,15 +2,15 @@
   "normal": {
     "bidirectional": [
       [
-        "apprentice_smith",
-        "thrifty_1"
+        "apprentice_weaponsmith",
+        "sure_strikes_1"
       ],
       [
-        "apprentice_smith",
-        "slow_cooling_1"
+        "apprentice_weaponsmith",
+        "keen_edge"
       ],
       [
-        "apprentice_smith",
+        "apprentice_weaponsmith",
         "steady_hand_1"
       ],
       [
@@ -23,26 +23,18 @@
       ],
       [
         "steady_hand_2",
-        "thrifty_2"
-      ],
-      [
-        "steady_hand_2",
-        "slow_cooling_2"
-      ],
-      [
-        "steady_hand_3",
-        "sure_strikes_1"
-      ],
-      [
-        "sure_strikes_1",
         "sure_strikes_2"
       ],
       [
-        "sure_strikes_2",
-        "masterwork"
+        "steady_hand_2",
+        "balanced_blade"
       ],
       [
-        "apprentice_smith",
+        "steady_hand_3",
+        "masterwork_weapon"
+      ],
+      [
+        "apprentice_weaponsmith",
         "strong_arm_1"
       ],
       [
@@ -62,24 +54,24 @@
         "strong_arm_5"
       ],
       [
-        "apprentice_smith",
-        "forge_studies_1"
+        "apprentice_weaponsmith",
+        "weapon_studies_1"
       ],
       [
-        "forge_studies_1",
-        "forge_studies_2"
+        "weapon_studies_1",
+        "weapon_studies_2"
       ],
       [
-        "forge_studies_2",
-        "forge_studies_3"
+        "weapon_studies_2",
+        "weapon_studies_3"
       ],
       [
-        "forge_studies_3",
-        "forge_studies_4"
+        "weapon_studies_3",
+        "weapon_studies_4"
       ],
       [
-        "forge_studies_4",
-        "forge_studies_5"
+        "weapon_studies_4",
+        "weapon_studies_5"
       ]
     ]
   }

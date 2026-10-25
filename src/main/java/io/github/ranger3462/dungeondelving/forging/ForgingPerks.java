@@ -6,27 +6,37 @@ import io.github.ranger3462.dungeondelving.skill.Perk;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * What the Forging skill does. The level sets the highest ★ a smith can forge; everything else is a perk in the Forging
- * tree (DD-70), bought with the points levels give.
+ * What the smithing skills do (DD-89: Forging split into Weaponsmithing and Armorsmithing). The forge work itself
+ * (striking, quenching, grinding) trains both, and its ★ is capped by the better of the two. Weapon parts and weapons
+ * are capped by Weaponsmithing, armor parts and armor by Armorsmithing ({@link CraftingXp}). Everything else is a perk
+ * in the two trees, bought with the points levels give: the anvil's (Steady Hand, Sure Strikes) in Weaponsmithing's,
+ * the grindstone's and the metal's (Steady Grind, Slow Cooling, Thrifty) in Armorsmithing's.
  */
 public final class ForgingPerks {
-    /** The Forging level needed to forge each ★ (index 0 is ★1). */
+    /** The smithing level needed to forge each ★ (index 0 is ★1). */
     private static final int[] LEVEL_FOR_STARS = { 1, 3, 6, 10, 15, 20, 25 };
 
     private ForgingPerks() {}
 
+    /** The forge work's level: the better of the player's Weaponsmithing and Armorsmithing. */
     public static int level(Player player) {
-        return CraftingSkills.level(player, CraftSkill.FORGING);
+        return Math.max(CraftingSkills.level(player, CraftSkill.WEAPONSMITHING), CraftingSkills.level(player, CraftSkill.ARMORSMITHING));
     }
 
-    /** The Forging level needed to forge up to this ★. */
+    /** XP for forge work: it trains both smithing skills. */
+    public static void addXp(Player player, int amount) {
+        CraftingSkills.addXp(player, CraftSkill.WEAPONSMITHING, amount);
+        CraftingSkills.addXp(player, CraftSkill.ARMORSMITHING, amount);
+    }
+
+    /** The smithing level needed to forge up to this ★. */
     public static int levelFor(int stars) {
         return LEVEL_FOR_STARS[Math.clamp(stars, 1, Forging.MAX_STARS) - 1];
     }
 
-    /** Extra sweet-spot width, as a share of the bar: +2% a rank of Steady Hand. */
-    public static float sweetSpotBonus(Player player) {
-        return 0.02f * Perk.STEADY_HAND.rank(player);
+    /** Extra sweet-spot width, as a share of the bar: +2% a rank of Steady Hand on the anvil, of Steady Grind at the grindstone. */
+    public static float sweetSpotBonus(Player player, TimingBar.Kind kind) {
+        return 0.02f * (kind == TimingBar.Kind.GRIND ? Perk.STEADY_GRIND : Perk.STEADY_HAND).rank(player);
     }
 
     /** How long hot metal stays workable for this smith, in ticks: a quarter longer a rank of Slow Cooling. */

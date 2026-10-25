@@ -22,6 +22,7 @@ Rewards are attribute bonuses, or player tags our own code checks for (skill/Per
 dungeondelving.perk.<key>, or <key>_<rank> for a ranked perk).
 """
 import json
+import shutil
 import zipfile
 from pathlib import Path
 
@@ -42,7 +43,7 @@ ROOT_COST, CHOICE_COST, SIGNATURE_COSTS, REFINEMENT_COST, CAPSTONE_COST, STAT_CO
 # The stat columns' ranks: the level each needs.
 STAT_LEVELS = [2, 8, 15, 30, 45]
 # Perk tags our code acts on already (skill/Perk.java); the preview marks the rest as still to build.
-IMPLEMENTED = {"steady_hand", "slow_cooling", "thrifty", "sure_strikes", "steady_scraper", "careful_tanner", "water_saver",
+IMPLEMENTED = {"steady_hand", "steady_grind", "steady_chase", "careful_goldsmith", "slow_cooling", "thrifty", "sure_strikes", "steady_scraper", "careful_tanner", "water_saver",
                "steady_needle", "careful_weaver", "steady_knife", "careful_carver", "vein_miner", "prospector", "tree_feller", "forester",
                "bountiful", "replanter"}
 
@@ -177,8 +178,12 @@ STATS = {
                 stats("farmhand", "Farmhand", "+1 max health.", [attribute(HEALTH, 1, "addition")])),
     "fishing": (stats("patience", "Patience", "+0.1 luck.", [attribute(LUCK, 0.1, "addition")]),
                 stats("deep_breath", "Deep Breath", "Stay underwater a little longer.", [attribute("minecraft:generic.oxygen_bonus", 0.2, "addition")])),
-    "forging": (stats("strong_arm", "Strong Arm", "+0.2 attack damage.", [attribute(DAMAGE, 0.2, "addition")]),
-                stats("forge_studies", "Forge Studies", "+5% Forging XP.")),
+    "weaponsmithing": (stats("strong_arm", "Strong Arm", "+0.2 attack damage.", [attribute(DAMAGE, 0.2, "addition")]),
+                       stats("weapon_studies", "Weapon Studies", "+5% Weaponsmithing XP.")),
+    "armorsmithing": (stats("hammered_hide", "Hammered Hide", "+0.2 armor.", [attribute(ARMOR, 0.2, "addition")]),
+                      stats("armor_studies", "Armor Studies", "+5% Armorsmithing XP.")),
+    "goldsmithing": (stats("gilded_luck", "Gilded Luck", "+0.1 luck.", [attribute(LUCK, 0.1, "addition")]),
+                     stats("goldsmith_studies", "Goldsmith Studies", "+5% Goldsmithing XP.")),
     "leatherworking": (stats("tough_hide", "Tough Hide", "+0.2 armor.", [attribute(ARMOR, 0.2, "addition")]),
                        stats("tanning_studies", "Tanning Studies", "+5% Leatherworking XP.")),
     "weaving": (stats("nimble", "Nimble", "+1% movement speed.", [attribute(MOVE, 0.01)]),
@@ -272,18 +277,28 @@ add("Gathering", "fishing", "Fishing", "minecraft:fishing_rod",
     "Luck of the sea, up to +3")
 
 # --- Crafting ---
-# The level still sets the best star you can forge; perks are bought here.
-add("Crafting", "forging", "Forging", "dungeondelving:master_anvil", None,
-    shape(n("apprentice_smith", "Apprentice Smith", "Your first step as a smith. Your level sets the best ★ you can forge."),
+# Forging split in two (DD-89). The forge work trains both and goes as high as the better; weapons and their parts are
+# capped by Weaponsmithing, armor and its parts by Armorsmithing. The anvil's perks are Weaponsmithing's; the grindstone's
+# and the metal's are Armorsmithing's.
+add("Crafting", "weaponsmithing", "Weaponsmithing", "dungeondelving:forged_sword", None,
+    shape(n("apprentice_weaponsmith", "Apprentice Weaponsmith", "Your first step as a weaponsmith. Your level sets the best ★ of the weapons and blades you make."),
+          [perk("sure_strikes_1", "Sure Strikes I", "25% less chance a strike cracks the piece."),
+           perk("keen_edge", "Keen Edge", "Blades and axe heads you make give 50% more Weaponsmithing XP.")],
+          ranks("steady_hand", "Steady Hand", ["+2% sweet spot on the anvil."] * 3),
+          [perk("sure_strikes_2", "Sure Strikes II", "50% less chance a strike cracks the piece."),
+           perk("balanced_blade", "Balanced Blade", "Forged weapons you make swing a little faster.")],
+          perk("masterwork_weapon", "Masterwork", "A forged weapon has a 10% chance to come out one ★ higher, up to what your skill allows.")),
+    "Sweet spot on the anvil, up to +5%")
+
+add("Crafting", "armorsmithing", "Armorsmithing", "dungeondelving:plate_chestplate", None,
+    shape(n("apprentice_armorsmith", "Apprentice Armorsmith", "Your first step as an armorsmith. Your level sets the best ★ of the armor and plates you make."),
           [perk("thrifty_1", "Thrifty I", "Cracks give back 6 nuggets instead of 5, and salvage returns 55% of the metal instead of 40%."),
            perk("slow_cooling_1", "Slow Cooling I", "Hot metal stays workable 25% longer.")],
-          ranks("steady_hand", "Steady Hand", ["+2% sweet spot on the anvil and grindstone."] * 3),
+          ranks("steady_grind", "Steady Grind", ["+2% sweet spot at the grindstone."] * 3),
           [perk("thrifty_2", "Thrifty II", "Cracks give back 8 nuggets, and salvage returns 70% of the metal."),
            perk("slow_cooling_2", "Slow Cooling II", "Hot metal stays workable 50% longer.")],
-          perk("masterwork", "Masterwork", "A forging with no misses has a 10% chance to come out one ★ higher, up to what the forge allows."),
-          extra=[(perk("sure_strikes_1", "Sure Strikes I", "25% less chance a strike cracks the piece."), 0, 6, 30, "steady_hand_3", 5),
-                 (perk("sure_strikes_2", "Sure Strikes II", "50% less chance a strike cracks the piece."), 0, 7, 40, "sure_strikes_1", 7)]),
-    "Sweet spot, up to +5%")
+          perk("masterwork_armor", "Masterwork", "A piece of plate armor has a 10% chance to come out one ★ higher, up to what your skill allows.")),
+    "Sweet spot at the grindstone, up to +5%")
 
 add("Crafting", "leatherworking", "Leatherworking", "minecraft:leather", None,
     shape(n("apprentice_tanner", "Apprentice Tanner", "Your first step as a tanner."),
@@ -314,6 +329,16 @@ add("Crafting", "woodworking", "Woodworking", "minecraft:fletching_table", None,
            perk("fine_split", "Fine Split", "Splitting a billet sometimes gives a third stave.")],
           perk("master_bowyer", "Master Bowyer", "Bows and crossbows you make have a 10% chance to come out one ★ higher, up to what the workshop allows.")),
     "Room on the grain, up to +5%")
+
+add("Crafting", "goldsmithing", "Goldsmithing", "dungeondelving:gold_ring", None,
+    shape(n("apprentice_goldsmith", "Apprentice Goldsmith", "Your first step as a goldsmith. Your level sets the best ★ you can make."),
+          [perk("careful_goldsmith_1", "Careful Goldsmith I", "25% less chance a miss spoils the gold."),
+           perk("assayer", "Assayer", "Gold refines 25% faster in a crucible.")],
+          ranks("steady_chase", "Steady Chase", ["+2% sweet spot at the Jeweler's Bench."] * 3),
+          [perk("careful_goldsmith_2", "Careful Goldsmith II", "50% less chance a miss spoils the gold."),
+           perk("gem_setter", "Gem Setter", "Jewelry can take a cut gem (with Jewelcrafting's gems, later).")],
+          perk("masterwork_jewelry", "Masterwork", "Jewelry you make has a 10% chance to come out one ★ higher, up to what your skill allows.")),
+    "Sweet spot at the bench, up to +5%")
 
 # --- Combat styles ---
 MELEE = [attribute("minecraft:generic.attack_damage", 0.03)]
@@ -490,6 +515,11 @@ def perk_key(node):
 lang = json.loads(LANG.read_text(encoding="utf-8"))
 # Names of nodes these trees no longer have (written again below for the ones they do).
 lang = {k: v for k, v in lang.items() if not (k.startswith(f"skill.{NS}.") and k.split(".")[2] in TREES)}
+# Trees that are gone: Forging, split into Weaponsmithing and Armorsmithing (DD-89).
+RETIRED_TREES = ("forging",)
+lang = {k: v for k, v in lang.items() if not (k.startswith((f"skill.{NS}.", f"skill_category.{NS}.")) and k.split(".")[2] in RETIRED_TREES)}
+for retired in RETIRED_TREES:
+    shutil.rmtree(DATA / "categories" / retired, ignore_errors=True)
 # The class trees (DD-83): the RPG Series' radial class tree (Skill Tree), split into one tree per class. Each keeps
 # its branches' nodes, layout, spells and experience (from kills), and starts locked: picking the class unlocks it.
 # Read from the Skill Tree jar in Gradle's cache, so run this after a Gradle build or run.

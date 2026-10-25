@@ -1,11 +1,11 @@
 {
   "title": {
-    "translate": "skill_category.dungeondelving.forging"
+    "translate": "skill_category.dungeondelving.goldsmithing"
   },
   "icon": {
     "type": "item",
     "data": {
-      "item": "dungeondelving:master_anvil"
+      "item": "dungeondelving:gold_ring"
     }
   },
   "unlocked_by_default": true,

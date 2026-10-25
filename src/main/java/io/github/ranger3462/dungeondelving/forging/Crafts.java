@@ -124,13 +124,45 @@ public final class Crafts {
     public static final DeferredItem<LiquorItem> HEARTWOOD_RESIN = liquor("heartwood_resin", 5, Profession.WOODWORKING);
     public static final DeferredItem<LiquorItem> SYLVAN_SAP = liquor("sylvan_sap", 7, Profession.WOODWORKING);
 
+    // --- Goldsmithing (DD-89) ---
+
+    /** A crucible of refining salt: gold ingots refine into fine gold, by the salt's ★. */
+    public static final DeferredBlock<SoakingVatBlock> CRUCIBLE = ModRegistries.BLOCKS.registerBlock("crucible",
+            properties -> new SoakingVatBlock(properties, SoakingVatBlock.Type.CRUCIBLE),
+            BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(2.5f).sound(SoundType.STONE).noOcclusion());
+    public static final DeferredItem<BlockItem> CRUCIBLE_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(CRUCIBLE);
+    /** A bigger, faster crucible: a level 2 goldsmithy. */
+    public static final DeferredBlock<SoakingVatBlock> GREAT_CRUCIBLE = ModRegistries.BLOCKS.registerBlock("great_crucible",
+            properties -> new SoakingVatBlock(properties, SoakingVatBlock.Type.GREAT_CRUCIBLE),
+            BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(3.0f).sound(SoundType.STONE).noOcclusion());
+    public static final DeferredItem<BlockItem> GREAT_CRUCIBLE_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(GREAT_CRUCIBLE);
+    /** Where fine gold is chased into fittings. */
+    public static final DeferredBlock<CraftStationBlock> JEWELERS_BENCH = station("jewelers_bench", Block.box(0, 0, 0, 16, 14, 16));
+    public static final DeferredItem<BlockItem> JEWELERS_BENCH_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(JEWELERS_BENCH);
+    /** A loupe on a stand: a level 3 goldsmithy, with a wider sweet spot at the bench. */
+    public static final DeferredBlock<CraftStationBlock> JEWELERS_LOUPE = station("jewelers_loupe", Block.box(5, 0, 5, 11, 12, 11));
+    public static final DeferredItem<BlockItem> JEWELERS_LOUPE_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(JEWELERS_LOUPE);
+
+    /** Refining salts: what a crucible refines gold with, setting its ★. */
+    public static final DeferredItem<LiquorItem> BONE_ASH = salt("bone_ash", 3);
+    public static final DeferredItem<LiquorItem> ASSAY_SALT = salt("assay_salt", 5);
+    public static final DeferredItem<LiquorItem> SUNSALT = salt("sunsalt", 7);
+    /** Gold refined in a crucible: ready for the bench. Its ★ comes from the salt. */
+    public static final DeferredItem<StarredItem> FINE_GOLD = starred("fine_gold");
+    /** Fine gold chased into shape: what gilded gear and jewelry are made from. */
+    public static final DeferredItem<StarredItem> GOLD_FITTINGS = starred("gold_fittings");
+    public static final DeferredItem<JewelryItem> GOLD_RING = ModRegistries.ITEMS.registerItem("gold_ring",
+            properties -> new JewelryItem(properties, JewelryItem.Kind.RING), new Item.Properties());
+    public static final DeferredItem<JewelryItem> GOLD_AMULET = ModRegistries.ITEMS.registerItem("gold_amulet",
+            properties -> new JewelryItem(properties, JewelryItem.Kind.AMULET), new Item.Properties());
+
     // --- Block entities ---
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ShapingRackBlockEntity>> SHAPING_RACK_ENTITY = BLOCK_ENTITIES.register(
             "shaping_rack", () -> BlockEntityType.Builder.of(ShapingRackBlockEntity::new, SHAPING_RACK.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SoakingVatBlockEntity>> SOAKING_VAT_ENTITY = BLOCK_ENTITIES.register(
             "soaking_vat", () -> BlockEntityType.Builder.of(SoakingVatBlockEntity::new, TANNING_VAT.get(), TANNING_BARREL.get(),
-                    SIZING_VAT.get(), DYE_WORKS.get(), FINISHING_VAT.get()).build(null));
+                    SIZING_VAT.get(), DYE_WORKS.get(), FINISHING_VAT.get(), CRUCIBLE.get(), GREAT_CRUCIBLE.get()).build(null));
 
     static {
         // Retired in the DD-88 rework: bending, sewing and the chopping block are gone.
@@ -157,6 +189,11 @@ public final class Crafts {
                 new Item.Properties().stacksTo(16).craftRemainder(net.minecraft.world.item.Items.GLASS_BOTTLE));
     }
 
+    /** A refining salt: a powder, used up when put into a crucible. */
+    private static DeferredItem<LiquorItem> salt(String name, int stars) {
+        return ModRegistries.ITEMS.registerItem(name, properties -> new LiquorItem(properties, stars, Profession.GOLDSMITHING), new Item.Properties());
+    }
+
     /** Makes sure the blocks and items above are registered; call once while setting up registries. */
     public static void init() {}
 
@@ -171,6 +208,7 @@ public final class Crafts {
                 TANNIN_LIQUOR, ELDER_LIQUOR, BARROWMOSS, EMBERROOT, SPINNING_WHEEL_ITEM, GREAT_LOOM_ITEM, DYE_WORKS_ITEM, YARN, SIZED_YARN,
                 WHEAT_SIZING, SILK_SIZING, ARCANE_SIZING, SPIDER_SILK, ARCANE_DUST, CLOTH_PANEL, BOWSTRING, STAFF_WRAP, WOOD_LATHE_ITEM,
                 TREADLE_LATHE_ITEM, BOWYERS_BENCH_ITEM, SEASONED_BILLET, CURED_BILLET, STAVE, STOCK, HAFT, STAFF_SHAFT, WAND_CORE, BOW_LIMBS,
-                LINSEED_OIL, HEARTWOOD_RESIN, SYLVAN_SAP);
+                LINSEED_OIL, HEARTWOOD_RESIN, SYLVAN_SAP, CRUCIBLE_ITEM, GREAT_CRUCIBLE_ITEM, JEWELERS_BENCH_ITEM, JEWELERS_LOUPE_ITEM, BONE_ASH,
+                ASSAY_SALT, SUNSALT, FINE_GOLD, GOLD_FITTINGS, GOLD_RING, GOLD_AMULET);
     }
 }

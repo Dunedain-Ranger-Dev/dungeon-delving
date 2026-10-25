@@ -79,13 +79,13 @@ public class CharacterTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void craftingSkillsCountTowardTheCharacterLevel(GameTestHelper helper) {
         ServerPlayer player = player(helper, "crafter");
-        CraftingSkills.setLevel(player, CraftSkill.FORGING, 13);
+        CraftingSkills.setLevel(player, CraftSkill.ARMORSMITHING, 13);
         List<Integer> levels = SkillLevels.levels(player);
-        helper.assertTrue(levels.contains(12), "Forging 13 should count as skill level 12 (counting from 0), got " + levels);
+        helper.assertTrue(levels.contains(12), "Armorsmithing 13 should count as skill level 12 (counting from 0), got " + levels);
         if (SkillLevels.pufferfish()) {
-            var forging = net.puffish.skillsmod.api.SkillsAPI.getCategory(ResourceLocation.fromNamespaceAndPath(DungeonDelving.MODID, "forging"))
+            var forging = net.puffish.skillsmod.api.SkillsAPI.getCategory(ResourceLocation.fromNamespaceAndPath(DungeonDelving.MODID, "armorsmithing"))
                     .flatMap(category -> category.getExperience()).orElseThrow();
-            helper.assertTrue(forging.getLevel(player) == 12, "the Forging tree should follow the Forging skill, got " + forging.getLevel(player));
+            helper.assertTrue(forging.getLevel(player) == 12, "the Armorsmithing tree should follow the Armorsmithing skill, got " + forging.getLevel(player));
         }
         helper.assertTrue(Characters.level(player) == 1 + 12 / 6, "one skill at 12 makes character level 3");
         helper.assertTrue(Characters.available(player) == 2, "two levels past 1: two points");

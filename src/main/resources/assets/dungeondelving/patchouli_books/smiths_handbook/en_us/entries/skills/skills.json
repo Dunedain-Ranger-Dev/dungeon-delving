@@ -6,8 +6,13 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Forging, Leatherworking, Weaving and Woodworking level as you practice, with no limit. Use $(item)/skills$() to see where you stand, and the skill trees (K) to spend the points each level gives.$(br2)Your level sets the best ★ you can make: ★2 from level 3, ★3 from 6, ★4 from 10, ★5 from 15, ★6 from 20, ★7 from 25. The trees' perks widen sweet spots and lower the odds of ruining a piece.",
+      "text": "Weaponsmithing, Armorsmithing, Leatherworking, Weaving, Woodworking and Goldsmithing level as you practice, with no limit. Use $(item)/skills$() to see where you stand, and the skill trees (K) to spend the points each level gives.$(br2)Your level sets the best ★ you can make: ★2 from level 3, ★3 from 6, ★4 from 10, ★5 from 15, ★6 from 20, ★7 from 25. The trees' perks widen sweet spots and lower the odds of ruining a piece.",
       "title": "Crafting Skills"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Work at the forge (striking, quenching, grinding) trains both Weaponsmithing and Armorsmithing, and goes as high as the better of the two. Blades, axe heads and weapons train and are capped by Weaponsmithing; plates, rivets, chain and plate armor by Armorsmithing. A smith who wants the best of both just has more to learn.",
+      "title": "Two Smiths"
     }
   ]
 }

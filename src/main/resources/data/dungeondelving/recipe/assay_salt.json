@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "dungeondelving:borax"
+    },
+    {
+      "item": "dungeondelving:bone_ash"
+    },
+    {
+      "item": "dungeondelving:bone_ash"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:assay_salt",
+    "count": 2
+  }
+}

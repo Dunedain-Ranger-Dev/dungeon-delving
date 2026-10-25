@@ -43,7 +43,14 @@ public final class StarredRecipes {
         if (stars == Integer.MAX_VALUE) {
             return result;
         }
-        result.set(Forging.STARS.get(), Math.max(1, Math.min(stars, fluxCap)));
+        int earned = Math.max(1, Math.min(stars, fluxCap));
+        // The crafter's skill caps it too (DD-89): Armorsmithing for armor and its parts, Weaponsmithing for weapons and theirs.
+        net.minecraft.world.entity.player.Player crafter = net.neoforged.neoforge.common.CommonHooks.getCraftingPlayer();
+        if (crafter != null) {
+            int capped = earned;
+            earned = CraftingXp.capSkill(result).map(skill -> Math.min(capped, ForgeActions.skillStars(crafter, skill))).orElse(capped);
+        }
+        result.set(Forging.STARS.get(), earned);
         ForgedGear.applyStats(result);
         return result;
     }

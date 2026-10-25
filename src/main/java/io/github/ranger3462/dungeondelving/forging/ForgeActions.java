@@ -98,6 +98,10 @@ public final class ForgeActions {
     public static final int TURN_PASSES = 3;
     public static final int TURN_PERIOD = 36;
     public static final float TURN_WIDTH = 0.10f;
+    /** Chasing gold: how wide the sweet spot is, how many strikes, and how fast the marker sweeps. */
+    public static final float CHASE_WIDTH = 0.10f;
+    public static final int CHASE_STRIKES = 3;
+    public static final int CHASE_PERIOD = 26;
     /** What the workshop upgrades add to their minigame's sweet spot (the Fleshing Beam, Great Loom, Treadle Lathe, Bowyer's Bench). */
     public static final float UPGRADE_BONUS = 0.03f;
     /** Yarn a Spinning Wheel spins from one wool. */
@@ -228,6 +232,7 @@ public final class ForgeActions {
                 case QUENCH -> quench(serverPlayer, serverLevel, pos, state, held);
                 case WEAVE -> begin(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.WEAVE, now);
                 case TURN -> begin(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.TURN, now);
+                case CHASE -> begin(serverPlayer, serverLevel, pos, state, held, TimingBar.Kind.CHASE, now);
                 case SCRAPE -> prepare(serverPlayer, serverLevel, pos, held, Profession.LEATHERWORKING, Crafts.SCRAPED_HIDE, 1,
                         SoundEvents.ARMOR_EQUIP_LEATHER.value(), "message.dungeondelving.scrape.done");
                 case SPIN -> prepare(serverPlayer, serverLevel, pos, held, Profession.WEAVING, Crafts.YARN, YARN_PER_WOOL, SoundEvents.WOOL_PLACE,
@@ -238,7 +243,7 @@ public final class ForgeActions {
     }
 
     private enum Action {
-        STRIKE, QUENCH, GRIND, WEAVE, SCRAPE, SPIN, TURN, SALVAGE
+        STRIKE, QUENCH, GRIND, WEAVE, SCRAPE, SPIN, TURN, CHASE, SALVAGE
     }
 
     private static Action actionFor(Player player, ItemStack held, BlockState state) {
@@ -260,6 +265,8 @@ public final class ForgeActions {
             return Action.SPIN;
         } else if (held.is(Crafts.CURED_BILLET.get()) && (state.is(Crafts.WOOD_LATHE.get()) || state.is(Crafts.TREADLE_LATHE.get()))) {
             return Action.TURN;
+        } else if (held.is(Crafts.FINE_GOLD.get()) && state.is(Crafts.JEWELERS_BENCH.get())) {
+            return Action.CHASE;
         }
         return null;
     }
@@ -272,6 +279,7 @@ public final class ForgeActions {
             case WEAVE -> stack.is(Crafts.SIZED_YARN.get());
             case CUT -> ShapingRackBlock.isCuttingTool(stack);
             case TURN -> stack.is(Crafts.CURED_BILLET.get());
+            case CHASE -> stack.is(Crafts.FINE_GOLD.get());
         };
     }
 
@@ -337,7 +345,7 @@ public final class ForgeActions {
             needed = passesFor(stars);
             period = Math.max(16, 24 - (stars - 1));
         }
-        width += ForgingPerks.sweetSpotBonus(player) + workshop.get().decorBonus();
+        width += ForgingPerks.sweetSpotBonus(player, kind) + workshop.get().decorBonus();
         Session session = new Session(kind, pos.immutable(), now, period, basic, held.is(Forging.UNSTABLE_INGOT.get()), stars, needed, width);
         nextSpot(session, heat, level, now);
         return started(player, level, session, kind == TimingBar.Kind.STRIKE ? SoundEvents.ANVIL_PLACE : SoundEvents.GRINDSTONE_USE);
@@ -348,6 +356,7 @@ public final class ForgeActions {
         return switch (kind) {
             case CUT -> Profession.LEATHERWORKING;
             case WEAVE -> Profession.WEAVING;
+            case CHASE -> Profession.GOLDSMITHING;
             default -> Profession.WOODWORKING;
         };
     }
@@ -411,6 +420,12 @@ public final class ForgeActions {
                 nextMark(cut, level, now, 0.7f);
                 yield cut;
             }
+            case CHASE -> {
+                float width = CHASE_WIDTH + bonus + (workshop.get().stations().contains("jewelers_loupe") ? UPGRADE_BONUS : 0.0f);
+                Session chase = new Session(kind, pos.immutable(), now, CHASE_PERIOD, false, false, stars, CHASE_STRIKES, width);
+                nextSpot(chase, 1.0f, level, now);
+                yield chase;
+            }
             default -> { // TURN
                 float width = TURN_WIDTH + bonus + (state.is(Crafts.TREADLE_LATHE.get()) ? UPGRADE_BONUS : 0.0f)
                         + (workshop.get().stations().contains("bowyers_bench") ? UPGRADE_BONUS : 0.0f);
@@ -422,6 +437,7 @@ public final class ForgeActions {
         SoundEvent sound = switch (kind) {
             case WEAVE -> SoundEvents.UI_LOOM_SELECT_PATTERN;
             case TURN -> SoundEvents.AXE_STRIP;
+            case CHASE -> SoundEvents.AMETHYST_BLOCK_HIT;
             default -> SoundEvents.ARMOR_EQUIP_LEATHER.value();
         };
         return started(player, level, session, sound);
@@ -561,7 +577,6 @@ public final class ForgeActions {
         }
         BlockPos pos = session.station;
         TimingBar.Kind kind = session.kind;
-        CraftSkill skill = skillFor(kind);
         SoundEvent sound = switch (kind) {
             case WEAVE -> SoundEvents.UI_LOOM_TAKE_RESULT;
             case CUT -> SoundEvents.ARMOR_EQUIP_LEATHER.value();
@@ -575,7 +590,7 @@ public final class ForgeActions {
             case GOLD -> {
                 // Gold counts twice at the forge and loom; elsewhere each strike is one step however well.
                 session.done += countsTwice ? 2 : 1;
-                CraftingSkills.addXp(player, skill, 5);
+                addXp(player, kind, 5);
                 level.playSound(null, pos, sound, SoundSource.BLOCKS, 0.7f, 1.6f);
                 level.sendParticles(ParticleTypes.WAX_OFF, pos.getX() + 0.5, pos.getY() + 1.1, pos.getZ() + 0.5, 10, 0.2, 0.1, 0.2, 0.1);
                 tell(player, Component.translatable(countsTwice ? "message.dungeondelving.forge.critical" : "message.dungeondelving.forge.perfect")
@@ -583,7 +598,7 @@ public final class ForgeActions {
             }
             case GREEN -> {
                 session.done++;
-                CraftingSkills.addXp(player, skill, 3);
+                addXp(player, kind, 3);
                 level.playSound(null, pos, sound, SoundSource.BLOCKS, 0.6f, 1.3f);
                 level.sendParticles(kind == TimingBar.Kind.STRIKE ? ParticleTypes.LAVA : ParticleTypes.CRIT, pos.getX() + 0.5, pos.getY() + 1.05,
                         pos.getZ() + 0.5, 6, 0.15, 0.05, 0.15, 0.05);
@@ -594,7 +609,7 @@ public final class ForgeActions {
                 session.misses++;
                 // A missed grinding pass doesn't break the ingot outright: it leaves it unstable (see the end of the bar).
                 chance = kind == TimingBar.Kind.GRIND ? 0.0f : missChance(session.misses);
-                CraftingSkills.addXp(player, skill, 1);
+                addXp(player, kind, 1);
                 level.playSound(null, pos, sound, SoundSource.BLOCKS, 0.6f, 0.7f);
             }
         }
@@ -629,13 +644,26 @@ public final class ForgeActions {
 
     /** The skill a minigame trains. */
     static CraftSkill skillFor(TimingBar.Kind kind) {
-        return kind == TimingBar.Kind.STRIKE || kind == TimingBar.Kind.GRIND ? CraftSkill.FORGING : professionFor(kind).skill;
+        return isSmithing(kind) ? CraftSkill.ARMORSMITHING : professionFor(kind).skill;
+    }
+
+    /** Forge work (striking, grinding), which trains both smithing skills. */
+    static boolean isSmithing(TimingBar.Kind kind) {
+        return kind == TimingBar.Kind.STRIKE || kind == TimingBar.Kind.GRIND;
+    }
+
+    /** XP for a minigame's strike: forge work trains both smithing skills, the rest their profession's. */
+    private static void addXp(ServerPlayer player, TimingBar.Kind kind, int amount) {
+        if (isSmithing(kind)) {
+            ForgingPerks.addXp(player, amount);
+        } else {
+            CraftingSkills.addXp(player, skillFor(kind), amount);
+        }
     }
 
     /** Scales the chance a miss ruins the piece, by the player's perks in that minigame's skill. */
     private static float failMultiplier(Player player, TimingBar.Kind kind) {
-        CraftSkill skill = skillFor(kind);
-        return skill == CraftSkill.FORGING ? ForgingPerks.crackMultiplier(player) : CraftPerks.failMultiplier(player, skill);
+        return isSmithing(kind) ? ForgingPerks.crackMultiplier(player) : CraftPerks.failMultiplier(player, skillFor(kind));
     }
 
     /** The chance the {@code misses}th miss in a minigame ruins the piece, before skill: it climbs with every miss. */
@@ -657,6 +685,11 @@ public final class ForgeActions {
             case TURN -> {
                 held.shrink(1);
                 made(player, level, session, new ItemStack(Crafts.STAVE.get(), 2), 5, SoundEvents.AXE_STRIP, "message.dungeondelving.turn.done");
+            }
+            case CHASE -> {
+                held.shrink(1);
+                made(player, level, session, new ItemStack(Crafts.GOLD_FITTINGS.get(), 2), 5, SoundEvents.AMETHYST_BLOCK_CHIME,
+                        "message.dungeondelving.chase.done");
             }
             default -> {
                 boolean failedGrind = session.kind == TimingBar.Kind.GRIND && session.misses > 0;
@@ -708,7 +741,7 @@ public final class ForgeActions {
             tell(player, Component.translatable("message.dungeondelving.forge.struck").withStyle(ChatFormatting.GOLD));
         } else {
             result = new ItemStack(Forging.TEMPERED_IRON_INGOT.get());
-            CraftingSkills.addXp(player, CraftSkill.FORGING, 10 * session.stars);
+            ForgingPerks.addXp(player, 10 * session.stars);
             tell(player, Component.translatable("message.dungeondelving.forge.tempered", StarredItem.starsText(session.stars)).withStyle(ChatFormatting.GOLD));
             level.playSound(null, session.station, SoundEvents.SMITHING_TABLE_USE, SoundSource.BLOCKS, 0.8f, 1.0f);
         }
@@ -732,6 +765,12 @@ public final class ForgeActions {
                 give(player, new ItemStack(Forging.LEATHER_SCRAPS.get(), 2));
                 level.playSound(null, pos, SoundEvents.SHEEP_SHEAR, SoundSource.BLOCKS, 0.8f, 0.7f);
                 tell(player, Component.translatable("message.dungeondelving.cut.ruined").withStyle(ChatFormatting.RED));
+            }
+            case CHASE -> { // The gold is spoiled, but most of it melts down again.
+                held.shrink(1);
+                give(player, new ItemStack(Items.GOLD_NUGGET, 6));
+                level.playSound(null, pos, SoundEvents.ANVIL_DESTROY, SoundSource.BLOCKS, 0.5f, 1.6f);
+                tell(player, Component.translatable("message.dungeondelving.chase.ruined").withStyle(ChatFormatting.RED));
             }
             case TURN -> {
                 held.shrink(1);
@@ -768,7 +807,7 @@ public final class ForgeActions {
         if (nuggets > 0) {
             give(player, new ItemStack(Items.IRON_NUGGET, nuggets));
         }
-        CraftingSkills.addXp(player, CraftSkill.FORGING, 5);
+        ForgingPerks.addXp(player, 5);
         level.playSound(null, pos, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 1.0f, 0.8f);
         tell(player, Component.translatable("message.dungeondelving.forge.salvaged", ingots, StarredItem.starsText(stars), nuggets)
                 .withStyle(ChatFormatting.GOLD));
@@ -798,7 +837,7 @@ public final class ForgeActions {
         }
         level.playSound(null, pos, SoundEvents.LAVA_EXTINGUISH, SoundSource.BLOCKS, 0.8f, 1.0f);
         level.sendParticles(ParticleTypes.CLOUD, pos.getX() + 0.5, pos.getY() + 1.0, pos.getZ() + 0.5, 12, 0.25, 0.2, 0.25, 0.02);
-        CraftingSkills.addXp(player, CraftSkill.FORGING, 2);
+        ForgingPerks.addXp(player, 2);
         if (level.getRandom().nextFloat() < chance) {
             crack(player, level, pos, held);
             return;
@@ -834,7 +873,7 @@ public final class ForgeActions {
 
     private static void send(ServerPlayer player, Session session) {
         List<Float> values = new ArrayList<>();
-        if (session.kind == TimingBar.Kind.STRIKE || session.kind == TimingBar.Kind.GRIND || session.kind.held()) {
+        if (session.kind == TimingBar.Kind.STRIKE || session.kind == TimingBar.Kind.GRIND || session.kind == TimingBar.Kind.CHASE || session.kind.held()) {
             values.add(session.low);
             values.add(session.high);
         } else {

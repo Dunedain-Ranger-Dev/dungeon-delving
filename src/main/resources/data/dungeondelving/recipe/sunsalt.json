@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "dungeondelving:assay_salt"
+    },
+    {
+      "item": "dungeondelving:assay_salt"
+    },
+    {
+      "item": "dungeondelving:arcane_dust"
+    }
+  ],
+  "result": {
+    "id": "dungeondelving:sunsalt",
+    "count": 2
+  }
+}

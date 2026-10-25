@@ -1,0 +1,116 @@
+{
+  "apprentice_armorsmith": {
+    "definition": "apprentice_armorsmith",
+    "x": 0,
+    "y": 0,
+    "root": true
+  },
+  "thrifty_1": {
+    "definition": "thrifty_1",
+    "x": -34,
+    "y": 34,
+    "root": false
+  },
+  "slow_cooling_1": {
+    "definition": "slow_cooling_1",
+    "x": 34,
+    "y": 34,
+    "root": false
+  },
+  "steady_grind_1": {
+    "definition": "steady_grind_1",
+    "x": 0,
+    "y": 68,
+    "root": false
+  },
+  "steady_grind_2": {
+    "definition": "steady_grind_2",
+    "x": 0,
+    "y": 102,
+    "root": false
+  },
+  "steady_grind_3": {
+    "definition": "steady_grind_3",
+    "x": 0,
+    "y": 170,
+    "root": false
+  },
+  "thrifty_2": {
+    "definition": "thrifty_2",
+    "x": -34,
+    "y": 136,
+    "root": false
+  },
+  "slow_cooling_2": {
+    "definition": "slow_cooling_2",
+    "x": 34,
+    "y": 136,
+    "root": false
+  },
+  "masterwork_armor": {
+    "definition": "masterwork_armor",
+    "x": 0,
+    "y": 204,
+    "root": false
+  },
+  "hammered_hide_1": {
+    "definition": "hammered_hide_1",
+    "x": -68,
+    "y": 34,
+    "root": false
+  },
+  "hammered_hide_2": {
+    "definition": "hammered_hide_2",
+    "x": -68,
+    "y": 68,
+    "root": false
+  },
+  "hammered_hide_3": {
+    "definition": "hammered_hide_3",
+    "x": -68,
+    "y": 102,
+    "root": false
+  },
+  "hammered_hide_4": {
+    "definition": "hammered_hide_4",
+    "x": -68,
+    "y": 136,
+    "root": false
+  },
+  "hammered_hide_5": {
+    "definition": "hammered_hide_5",
+    "x": -68,
+    "y": 170,
+    "root": false
+  },
+  "armor_studies_1": {
+    "definition": "armor_studies_1",
+    "x": 68,
+    "y": 34,
+    "root": false
+  },
+  "armor_studies_2": {
+    "definition": "armor_studies_2",
+    "x": 68,
+    "y": 68,
+    "root": false
+  },
+  "armor_studies_3": {
+    "definition": "armor_studies_3",
+    "x": 68,
+    "y": 102,
+    "root": false
+  },
+  "armor_studies_4": {
+    "definition": "armor_studies_4",
+    "x": 68,
+    "y": 136,
+    "root": false
+  },
+  "armor_studies_5": {
+    "definition": "armor_studies_5",
+    "x": 68,
+    "y": 170,
+    "root": false
+  }
+}

@@ -124,7 +124,7 @@ public class ForgingTests {
             ForgeActions.Session strike = ForgeActions.begin(player, level, anvil, level.getBlockState(anvil), player.getMainHandItem(),
                     TimingBar.Kind.STRIKE, now).orElseThrow();
             helper.assertTrue(strike.needed() == ForgeActions.strikesFor(1), "a ★1 ingot takes " + ForgeActions.strikesFor(1) + " strikes");
-            int xpBefore = CraftingSkills.xp(player, CraftSkill.FORGING);
+            int xpBefore = CraftingSkills.xp(player, CraftSkill.ARMORSMITHING);
             while (ForgeActions.session(player).isPresent()) {
                 now += 3;
                 ForgeActions.strike(player, level, strike, player.getMainHandItem(), now, strike.greenMarker());
@@ -133,7 +133,7 @@ public class ForgingTests {
             helper.assertTrue(!struck.isEmpty() && Forging.stars(struck) == 1, "strikes in the green on glowing-hot metal never crack");
             helper.assertTrue(find(player, Forging.HEATED_INGOT.get()).isEmpty(), "the heated ingot is used up");
             helper.assertTrue(player.getMainHandItem().is(Forging.STRUCK_INGOT.get()), "the struck ingot lands in hand, ready to quench");
-            helper.assertTrue(CraftingSkills.xp(player, CraftSkill.FORGING) == xpBefore + 3 * strike.needed(), "each good strike gives 3 XP");
+            helper.assertTrue(CraftingSkills.xp(player, CraftSkill.ARMORSMITHING) == xpBefore + 3 * strike.needed(), "each good strike gives 3 XP");
 
             player.setItemInHand(InteractionHand.MAIN_HAND, struck.copy());
             struck.setCount(0);
@@ -171,11 +171,11 @@ public class ForgingTests {
             set(level, ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState());
             buildBasicForge(level, ledger);
             BlockPos anvil = ledger.offset(2, 0, 0);
-            CraftingSkills.setLevel(player, CraftSkill.FORGING, ForgingPerks.levelFor(4));
+            CraftingSkills.setLevel(player, CraftSkill.ARMORSMITHING, ForgingPerks.levelFor(4));
             helper.assertTrue(tryStrike(player, level, anvil, 4).isEmpty(), "a level 1 forge can't work ★4 metal");
-            CraftingSkills.setLevel(player, CraftSkill.FORGING, 1);
+            CraftingSkills.setLevel(player, CraftSkill.ARMORSMITHING, 1);
             helper.assertTrue(tryStrike(player, level, anvil, 2).isEmpty(), "a level 1 smith can't forge ★2");
-            CraftingSkills.setLevel(player, CraftSkill.FORGING, ForgingPerks.levelFor(2));
+            CraftingSkills.setLevel(player, CraftSkill.ARMORSMITHING, ForgingPerks.levelFor(2));
             Optional<ForgeActions.Session> session = tryStrike(player, level, anvil, 2);
             helper.assertTrue(session.isPresent(), "a level " + ForgingPerks.levelFor(2) + " smith can forge ★2 at a level 1 forge");
             ForgeActions.end(player);
@@ -353,7 +353,7 @@ public class ForgingTests {
         try {
             set(level, ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState());
             buildBasicForge(level, ledger);
-            CraftingSkills.setLevel(player, CraftSkill.FORGING, CraftingSkills.MAX_LEVEL);
+            CraftingSkills.setLevel(player, CraftSkill.ARMORSMITHING, CraftingSkills.MAX_LEVEL);
             BlockPos cauldron = ledger.offset(0, 0, -2);
             int cracks = 0;
             for (int i = 0; i < 200; i++) {
@@ -432,9 +432,9 @@ public class ForgingTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void craftingSkillsLevelUpWithXp(GameTestHelper helper) {
         ServerPlayer player = smith(helper);
-        helper.assertTrue(CraftingSkills.level(player, CraftSkill.FORGING) == 1, "everyone starts at level 1");
-        CraftingSkills.addXp(player, CraftSkill.FORGING, CraftingSkills.xpFor(5));
-        helper.assertTrue(CraftingSkills.level(player, CraftSkill.FORGING) == 5, "enough XP for level 5 reaches level 5");
+        helper.assertTrue(CraftingSkills.level(player, CraftSkill.ARMORSMITHING) == 1, "everyone starts at level 1");
+        CraftingSkills.addXp(player, CraftSkill.ARMORSMITHING, CraftingSkills.xpFor(5));
+        helper.assertTrue(CraftingSkills.level(player, CraftSkill.ARMORSMITHING) == 5, "enough XP for level 5 reaches level 5");
         helper.assertTrue(CraftingSkills.level(player, CraftSkill.WEAVING) == 1, "skills level separately");
         for (int level = 1; level <= CraftingSkills.MAX_LEVEL; level++) {
             helper.assertTrue(CraftingSkills.levelFor(CraftingSkills.xpFor(level)) == level, "the XP for level " + level + " should reach it exactly");

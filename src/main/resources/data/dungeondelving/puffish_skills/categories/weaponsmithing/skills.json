@@ -1,18 +1,18 @@
 {
-  "apprentice_smith": {
-    "definition": "apprentice_smith",
+  "apprentice_weaponsmith": {
+    "definition": "apprentice_weaponsmith",
     "x": 0,
     "y": 0,
     "root": true
   },
-  "thrifty_1": {
-    "definition": "thrifty_1",
+  "sure_strikes_1": {
+    "definition": "sure_strikes_1",
     "x": -34,
     "y": 34,
     "root": false
   },
-  "slow_cooling_1": {
-    "definition": "slow_cooling_1",
+  "keen_edge": {
+    "definition": "keen_edge",
     "x": 34,
     "y": 34,
     "root": false
@@ -35,34 +35,22 @@
     "y": 170,
     "root": false
   },
-  "thrifty_2": {
-    "definition": "thrifty_2",
+  "sure_strikes_2": {
+    "definition": "sure_strikes_2",
     "x": -34,
     "y": 136,
     "root": false
   },
-  "slow_cooling_2": {
-    "definition": "slow_cooling_2",
+  "balanced_blade": {
+    "definition": "balanced_blade",
     "x": 34,
     "y": 136,
     "root": false
   },
-  "sure_strikes_1": {
-    "definition": "sure_strikes_1",
+  "masterwork_weapon": {
+    "definition": "masterwork_weapon",
     "x": 0,
     "y": 204,
-    "root": false
-  },
-  "sure_strikes_2": {
-    "definition": "sure_strikes_2",
-    "x": 0,
-    "y": 238,
-    "root": false
-  },
-  "masterwork": {
-    "definition": "masterwork",
-    "x": 0,
-    "y": 272,
     "root": false
   },
   "strong_arm_1": {
@@ -95,32 +83,32 @@
     "y": 170,
     "root": false
   },
-  "forge_studies_1": {
-    "definition": "forge_studies_1",
+  "weapon_studies_1": {
+    "definition": "weapon_studies_1",
     "x": 68,
     "y": 34,
     "root": false
   },
-  "forge_studies_2": {
-    "definition": "forge_studies_2",
+  "weapon_studies_2": {
+    "definition": "weapon_studies_2",
     "x": 68,
     "y": 68,
     "root": false
   },
-  "forge_studies_3": {
-    "definition": "forge_studies_3",
+  "weapon_studies_3": {
+    "definition": "weapon_studies_3",
     "x": 68,
     "y": 102,
     "root": false
   },
-  "forge_studies_4": {
-    "definition": "forge_studies_4",
+  "weapon_studies_4": {
+    "definition": "weapon_studies_4",
     "x": 68,
     "y": 136,
     "root": false
   },
-  "forge_studies_5": {
-    "definition": "forge_studies_5",
+  "weapon_studies_5": {
+    "definition": "weapon_studies_5",
     "x": 68,
     "y": 170,
     "root": false

@@ -23,6 +23,12 @@
       "type": "patchouli:crafting",
       "recipe": "dungeondelving:chain_links",
       "text": "Two ingots and flux make eight Chain Links."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:blade",
+      "recipe2": "dungeondelving:axe_head",
+      "text": "Weapon parts: an ingot and flux make a Blade; two ingots and flux an Axe Head."
     }
   ]
 }

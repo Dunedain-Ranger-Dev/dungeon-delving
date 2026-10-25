@@ -16,6 +16,7 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.DropExperienceBlock;
@@ -115,12 +116,25 @@ public final class Forging {
 
     // --- Parts ---
 
-    /** Two tempered ingots and flux, hammered into a plate: heavy armor and weapons. */
+    /** A tempered ingot and flux, hammered into a plate: heavy armor. */
     public static final DeferredItem<StarredItem> ARMOR_PLATE = ModRegistries.ITEMS.registerItem("armor_plate", StarredItem::new, new Item.Properties());
     /** Rivets, four from an ingot: hold every forged piece together. */
     public static final DeferredItem<StarredItem> RIVETS = ModRegistries.ITEMS.registerItem("rivets", StarredItem::new, new Item.Properties());
     /** Chain links, four from an ingot: medium armor. */
     public static final DeferredItem<StarredItem> CHAIN_LINKS = ModRegistries.ITEMS.registerItem("chain_links", StarredItem::new, new Item.Properties());
+    /** A sword blade, from an ingot and flux: Weaponsmithing's part (DD-89). Two make a forged sword. */
+    public static final DeferredItem<StarredItem> BLADE = ModRegistries.ITEMS.registerItem("blade", StarredItem::new, new Item.Properties());
+    /** An axe head, from two ingots and flux: Weaponsmithing's part (DD-89). */
+    public static final DeferredItem<StarredItem> AXE_HEAD = ModRegistries.ITEMS.registerItem("axe_head", StarredItem::new, new Item.Properties());
+
+    /** Weaponsmithing's parts, and Armorsmithing's. */
+    public static boolean isWeaponPart(ItemStack stack) {
+        return stack.is(BLADE.get()) || stack.is(AXE_HEAD.get());
+    }
+
+    public static boolean isArmorPart(ItemStack stack) {
+        return stack.is(ARMOR_PLATE.get()) || stack.is(RIVETS.get()) || stack.is(CHAIN_LINKS.get());
+    }
 
     // --- Leather and cloth ---
 
@@ -155,6 +169,9 @@ public final class Forging {
     public static final DeferredItem<ForgedGear.Sword> FORGED_SWORD = ModRegistries.ITEMS.registerItem("forged_sword", ForgedGear.Sword::new,
             new Item.Properties());
     public static final DeferredItem<ForgedGear.Axe> FORGED_AXE = ModRegistries.ITEMS.registerItem("forged_axe", ForgedGear.Axe::new, new Item.Properties());
+    /** Goldsmithing's sword: gold fittings over a stick. */
+    public static final DeferredItem<ForgedGear.Sword> GILDED_SWORD = ModRegistries.ITEMS.registerItem("gilded_sword",
+            properties -> new ForgedGear.Sword(net.minecraft.world.item.Tiers.GOLD, properties), new Item.Properties());
 
     private static DeferredItem<FluxItem> flux(String name, int maxStars) {
         return ModRegistries.ITEMS.registerItem(name, properties -> new FluxItem(properties, maxStars), new Item.Properties());
@@ -179,6 +196,7 @@ public final class Forging {
         ARMOR.values().forEach(pieces -> pieces.values().forEach(piece -> gear.add(piece.get())));
         gear.add(FORGED_SWORD.get());
         gear.add(FORGED_AXE.get());
+        gear.add(GILDED_SWORD.get());
         return gear;
     }
 

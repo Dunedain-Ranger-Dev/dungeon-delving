@@ -24,7 +24,8 @@ public final class SkillLevels {
     public static final List<String> DEFAULT_SKILLS = List.of(
             // Professions (DD-80)
             "dungeondelving:mining", "dungeondelving:woodcutting", "dungeondelving:excavation", "dungeondelving:farming", "dungeondelving:fishing",
-            "dungeondelving:forging", "dungeondelving:leatherworking", "dungeondelving:weaving", "dungeondelving:woodworking",
+            "dungeondelving:weaponsmithing", "dungeondelving:armorsmithing", "dungeondelving:leatherworking", "dungeondelving:weaving",
+            "dungeondelving:woodworking", "dungeondelving:goldsmithing",
             // Combat styles, armor, magic schools and Beastmastery (DD-81)
             "dungeondelving:one_handed", "dungeondelving:two_handed", "dungeondelving:polearms", "dungeondelving:daggers", "dungeondelving:unarmed",
             "dungeondelving:archery", "dungeondelving:crossbows", "dungeondelving:dual_wielding", "dungeondelving:blocking",
@@ -35,7 +36,20 @@ public final class SkillLevels {
             // Class trees (DD-83): only the player's own class is unlocked, so only it can level.
             "dungeondelving:fighter", "dungeondelving:archer", "dungeondelving:rogue", "dungeondelving:mage");
     /** Earlier defaults: a config still holding one of these was never edited, so it moves to the new list. */
-    public static final List<List<String>> OLD_DEFAULT_SKILLS = List.of(List.of("dungeondelving:mining", "dungeondelving:woodcutting",
+    public static final List<List<String>> OLD_DEFAULT_SKILLS = List.of(
+            // Before Forging split into Weaponsmithing and Armorsmithing, and Goldsmithing (DD-89).
+            List.of(// Professions (DD-80)
+            "dungeondelving:mining", "dungeondelving:woodcutting", "dungeondelving:excavation", "dungeondelving:farming", "dungeondelving:fishing",
+            "dungeondelving:forging", "dungeondelving:leatherworking", "dungeondelving:weaving", "dungeondelving:woodworking",
+            // Combat styles, armor, magic schools and Beastmastery (DD-81)
+            "dungeondelving:one_handed", "dungeondelving:two_handed", "dungeondelving:polearms", "dungeondelving:daggers", "dungeondelving:unarmed",
+            "dungeondelving:archery", "dungeondelving:crossbows", "dungeondelving:dual_wielding", "dungeondelving:blocking",
+            "dungeondelving:light_armor", "dungeondelving:medium_armor", "dungeondelving:heavy_armor", "dungeondelving:mage_armor",
+            "dungeondelving:fire_magic", "dungeondelving:frost_magic", "dungeondelving:lightning_magic", "dungeondelving:arcane_magic",
+            "dungeondelving:holy_magic", "dungeondelving:earth_magic", "dungeondelving:water_magic", "dungeondelving:air_magic",
+            "dungeondelving:necromancy", "dungeondelving:beastmastery",
+            // Class trees (DD-83): only the player's own class is unlocked, so only it can level.
+            "dungeondelving:fighter", "dungeondelving:archer", "dungeondelving:rogue", "dungeondelving:mage"),List.of("dungeondelving:mining", "dungeondelving:woodcutting",
             "dungeondelving:excavation", "dungeondelving:farming", "dungeondelving:fishing", "dungeondelving:forging", "dungeondelving:leatherworking",
             "dungeondelving:weaving", "skill_tree_rpgs:class_skills", "skill_tree_rpgs:weapon_skills"),
             // Before Blood Magic was folded into Necromancy.

@@ -112,7 +112,31 @@ RETIRED = ["blockstates/soaking_cauldron.json", "blockstates/chopping_block.json
                                                          for kind, ext in (("textures", ".png"), ("models", ".json"))]
 
 
+def gold_blocks():
+    """Goldsmithing's stations (DD-89)."""
+    # Crucibles: a clay pot on a brick hearth, bigger for the Great Crucible.
+    for name, (low, high) in (("crucible", (3, 13)), ("great_crucible", (1, 15))):
+        plain_block(name, model({"pot": "minecraft:block/terracotta", "base": "minecraft:block/bricks", "gold": "minecraft:block/gold_block"}, [
+            box([0, 0, 0], [16, 4, 16], "base"),
+            box([low, 4, low], [high, 13, high], "pot"),
+            box([low + 1, 12, low + 1], [high - 1, 12.5, high - 1], "gold"),
+        ]))
+    # Jeweler's Bench: a small table with a pin (the bench peg) and a gold block's glint.
+    facing_block("jewelers_bench", model({"top": "minecraft:block/smithing_table_top", "wood": PLANKS, "gold": "minecraft:block/gold_block"}, [
+        box([1, 0, 1], [3, 12, 3], "wood"), box([13, 0, 1], [15, 12, 3], "wood"),
+        box([1, 0, 13], [3, 12, 15], "wood"), box([13, 0, 13], [15, 12, 15], "wood"),
+        box([0, 12, 0], [16, 14, 16], "top"),
+        box([6, 14, 6], [8, 15, 8], "gold"),
+    ]))
+    # Jeweler's Loupe: a glass lens on a little stand.
+    facing_block("jewelers_loupe", model({"stand": "minecraft:block/gold_block", "lens": "minecraft:block/glass"}, [
+        box([6, 0, 6], [10, 1, 10], "stand"), box([7.5, 1, 7.5], [8.5, 9, 8.5], "stand"),
+        box([5, 8, 7], [11, 12, 9], "lens"),
+    ]))
+
+
 def blocks():
+    gold_blocks()
     for path in RETIRED:
         (ASSETS / path).unlink(missing_ok=True)
     for path in ("loot_table/blocks/soaking_cauldron.json", "loot_table/blocks/chopping_block.json", "recipe/chopping_block.json",
@@ -209,6 +233,27 @@ def thread(color):
     return image
 
 
+def ring(color):
+    image = {}
+    for y in range(4, 13):
+        for x in range(4, 13):
+            d = (x - 8) ** 2 + (y - 8) ** 2
+            if 9 <= d <= 18:
+                image[(x, y)] = shade(color, 25 if x + y < 15 else -20)
+    return image
+
+
+def amulet(color):
+    image = {}
+    for i in range(9):
+        image[(3 + i, 2 + abs(4 - i))] = shade((200, 200, 200), -10)  # the chain
+    for y in range(8, 14):
+        for x in range(5, 12):
+            if abs(x - 8) + abs(y - 10) <= 3:
+                image[(x, y)] = shade(color, 25 if y < 10 else -15)
+    return image
+
+
 def leaf(color):
     image = {}
     for y in range(3, 14):
@@ -246,6 +291,13 @@ ITEMS = {
     "wand_core": rod((180, 140, 90), 8, 2),
     "bow_limbs": limbs((165, 125, 75), bent=True),
     "linseed_oil": bottle((200, 170, 70)),
+    "bone_ash": powder((226, 222, 210)),
+    "assay_salt": powder((236, 224, 160)),
+    "sunsalt": powder((250, 170, 60)),
+    "fine_gold": billet((240, 196, 60)),
+    "gold_fittings": thread((246, 206, 70)),
+    "gold_ring": ring((248, 204, 64)),
+    "gold_amulet": amulet((248, 204, 64)),
     "heartwood_resin": bottle((180, 90, 30)),
     "sylvan_sap": bottle((120, 200, 110)),
 }
@@ -267,6 +319,7 @@ LIQUOR = {"bark_liquor": [f"#{MOD}:tree_bark"] * 4, "tannin_liquor": [f"#{MOD}:t
           "elder_liquor": [f"#{MOD}:tree_bark"] * 3 + [f"{MOD}:emberroot"],
           "wheat_sizing": ["minecraft:wheat"] * 4, "silk_sizing": ["minecraft:wheat"] * 3 + [f"{MOD}:spider_silk"],
           "arcane_sizing": ["minecraft:wheat"] * 3 + [f"{MOD}:arcane_dust"], "linseed_oil": ["minecraft:wheat_seeds"] * 4}
+GILDED_SHAPES = {"helmet": ["FFF", "F F"], "chestplate": ["F F", "FFF", "FFF"], "leggings": ["FFF", "F F", "F F"], "boots": ["F F", "F F"]}
 
 
 def recipes():
@@ -305,6 +358,22 @@ def recipes():
     starred_shaped_result("wand_core", ["H"], {"H": f"{MOD}:haft"}, f"{MOD}:wand_core")
     starred_shaped_result("stock", ["SS"], {"S": stave}, f"{MOD}:stock")
 
+    # Goldsmithing (DD-89): refining salts, stations, and gilded gear and jewelry from gold fittings.
+    shapeless("bone_ash", ["minecraft:bone_meal"] * 3 + ["minecraft:charcoal"], count=2)
+    shapeless("assay_salt", [f"{MOD}:borax", f"{MOD}:bone_ash", f"{MOD}:bone_ash"], count=2)
+    shapeless("sunsalt", [f"{MOD}:assay_salt", f"{MOD}:assay_salt", f"{MOD}:arcane_dust"], count=2)
+    shaped("crucible", ["T T", "TGT", "BBB"], {"T": "minecraft:terracotta", "G": "minecraft:gold_ingot", "B": "minecraft:bricks"})
+    shaped("great_crucible", ["W W", " C "], {"W": f"{MOD}:wardsilver_ingot", "C": f"{MOD}:crucible"})
+    shaped("jewelers_bench", ["NGN", "PTP"], {"N": "minecraft:gold_nugget", "G": "minecraft:glass_pane", "P": "#minecraft:planks",
+                                              "T": "minecraft:crafting_table"})
+    shaped("jewelers_loupe", ["G", "E", "N"], {"G": "minecraft:glass", "E": f"{MOD}:emberstone_ingot", "N": "minecraft:gold_ingot"})
+    fittings = f"{MOD}:gold_fittings"
+    for slot, pattern in GILDED_SHAPES.items():
+        starred_shaped_result(f"gilded_{slot}", pattern, {"F": fittings}, f"{MOD}:gilded_{slot}")
+    starred_shaped_result("gilded_sword", ["F", "F", "S"], {"F": fittings, "S": "minecraft:stick"}, f"{MOD}:gilded_sword")
+    starred_shaped_result("gold_ring", [" F ", "F F", " F "], {"F": fittings}, f"{MOD}:gold_ring")
+    starred_shaped_result("gold_amulet", ["S S", "F F", " F "], {"F": fittings, "S": "minecraft:string"}, f"{MOD}:gold_amulet")
+
     # Bows and crossbows from parts (cross-crafting): the weakest part sets the ★.
     starred_shaped_result("bow_from_parts", [" L ", "H S", " L "], {"L": f"{MOD}:bow_limbs", "H": f"{MOD}:haft", "S": f"{MOD}:bowstring"},
                           "minecraft:bow")
@@ -327,9 +396,14 @@ DECOR = {
 def tags():
     for profession, values in DECOR.items():
         write(DATA / f"tags/block/{profession}_decor.json", {"replace": False, "values": values})
+    # Jewelry in Curios' ring and necklace slots, which every player gets (Curios loads these only when it's installed).
+    write(RES / "data/curios/tags/item/ring.json", {"replace": False, "values": [f"{MOD}:gold_ring"]})
+    write(RES / "data/curios/tags/item/necklace.json", {"replace": False, "values": [f"{MOD}:gold_amulet"]})
+    write(DATA / "curios/entities/goldsmithing.json", {"entities": ["player"], "slots": ["ring", "necklace"]})
     write(DATA / "tags/item/tree_bark.json", {"replace": False, "values": [{"id": f"{FD}:tree_bark", "required": False}]})
     for kind, names in (("axe", ("shaping_rack", "tanning_barrel", "fleshing_beam", "spinning_wheel", "great_loom", "dye_works", "wood_lathe",
-                                 "treadle_lathe", "bowyers_bench")), ("pickaxe", ("tanning_vat", "sizing_vat", "finishing_vat"))):
+                                 "treadle_lathe", "bowyers_bench", "jewelers_bench")),
+                        ("pickaxe", ("tanning_vat", "sizing_vat", "finishing_vat", "crucible", "great_crucible", "jewelers_loupe"))):
         path = RES / f"data/minecraft/tags/block/mineable/{kind}.json"
         tag = json.loads(path.read_text(encoding="utf-8"))
         tag["values"] = [v for v in tag["values"] if v not in (f"{MOD}:chopping_block", f"{MOD}:soaking_cauldron")]
@@ -383,6 +457,39 @@ NAMES = {
     "item.dungeondelving.heartwood_resin": "Heartwood Resin",
     "item.dungeondelving.sylvan_sap": "Sylvan Sap",
     "skill.dungeondelving.woodworking": "Woodworking",
+    "skill.dungeondelving.weaponsmithing": "Weaponsmithing",
+    "block.dungeondelving.crucible": "Crucible",
+    "block.dungeondelving.great_crucible": "Great Crucible",
+    "block.dungeondelving.jewelers_bench": "Jeweler's Bench",
+    "block.dungeondelving.jewelers_loupe": "Jeweler's Loupe",
+    "item.dungeondelving.bone_ash": "Bone Ash",
+    "item.dungeondelving.assay_salt": "Assay Salt",
+    "item.dungeondelving.sunsalt": "Sunsalt",
+    "item.dungeondelving.fine_gold": "Fine Gold",
+    "item.dungeondelving.gold_fittings": "Gold Fittings",
+    "item.dungeondelving.gold_ring": "Gold Ring",
+    "item.dungeondelving.gold_amulet": "Gold Amulet",
+    "item.dungeondelving.gilded_helmet": "Gilded Helm",
+    "item.dungeondelving.gilded_chestplate": "Gilded Cuirass",
+    "item.dungeondelving.gilded_leggings": "Gilded Greaves",
+    "item.dungeondelving.gilded_boots": "Gilded Boots",
+    "item.dungeondelving.gilded_sword": "Gilded Sword",
+    "guild.dungeondelving.profession.goldsmithing": "Goldsmithing",
+    "craft.dungeondelving.station.furnace": "a furnace (for smelting gold)",
+    "craft.dungeondelving.station.crucible": "a Crucible",
+    "craft.dungeondelving.station.jewelers_bench": "a Jeweler's Bench",
+    "craft.dungeondelving.station.great_crucible": "Great Crucible",
+    "craft.dungeondelving.station.jewelers_loupe": "Jeweler's Loupe",
+    "message.dungeondelving.chase.done": "Chased into gold fittings %s.",
+    "message.dungeondelving.chase.ruined": "The design went wrong. The gold melts back into nuggets.",
+    "gui.dungeondelving.timing.chase": "Click to chase the design when the marker's in the green",
+    "tooltip.dungeondelving.liquor.goldsmithing": "Refines gold to %s in %s. Put it in a crucible.",
+    "tooltip.dungeondelving.jewelry.ring": "+%s max health, worn in a ring slot",
+    "tooltip.dungeondelving.jewelry.amulet": "+%s armor, worn in a necklace slot",
+    "skill.dungeondelving.armorsmithing": "Armorsmithing",
+    "skill.dungeondelving.goldsmithing": "Goldsmithing",
+    "item.dungeondelving.blade": "Blade",
+    "item.dungeondelving.axe_head": "Axe Head",
     "guild.dungeondelving.profession.leatherworking": "Leatherworking",
     "guild.dungeondelving.profession.weaving": "Weaving",
     "guild.dungeondelving.profession.woodworking": "Woodworking",
@@ -426,6 +533,7 @@ NAMES = {
 
 # Keys from the old steps, gone now.
 RETIRED_NAMES = [
+    "skill.dungeondelving.forging", "skill_category.dungeondelving.forging",
     "item.dungeondelving.boiled_leather", "message.dungeondelving.boil.done", "block.dungeondelving.soaking_cauldron", "block.dungeondelving.chopping_block",
     "item.dungeondelving.padded_cloth", "item.dungeondelving.woven_cloth", "item.dungeondelving.silk_thread", "item.dungeondelving.spellsilk",
     "item.dungeondelving.bent_limbs", "craft.dungeondelving.station.cauldron", "craft.dungeondelving.station.chopping_block",
@@ -540,6 +648,32 @@ def handbook():
              "two $(item)Cloth Panels$() of the yarn's ★. A missed stitch can snap the thread.", "Weaving"),
         crafting("gambeson_base", "staff_wrap"),
         crafting("bowstring", text="Three sized yarn make a bowstring."),
+    ])
+
+    write(BOOK / "categories/goldsmithing.json", {"name": "Goldsmithing", "description": "Refining and chasing gold into jewelry and gilded gear.",
+                                                  "icon": f"{MOD}:gold_ring", "sortnum": 7})
+    entry("goldsmithing", "goldsmithy", "The Goldsmithy", f"{MOD}:jewelers_bench", 0, [
+        page("$(li)a furnace, to smelt gold$(li)a $(item)Crucible$(), to refine it$(li)a $(item)Jeweler's Bench$(), to chase it$(br2)"
+             "Upgrades: a $(item)Great Crucible$() (eight at once, a quarter faster) and a $(item)Jeweler's Loupe$() (a wider sweet spot "
+             "at the bench).", "Stations"),
+        crafting("crucible", "jewelers_bench"),
+        crafting("great_crucible", "jewelers_loupe"),
+    ])
+    entry("goldsmithing", "refining", "Refining Gold", f"{MOD}:fine_gold", 1, [
+        page("Put a refining salt in a $(item)Crucible$(), then gold ingots. They come out as $(item)Fine Gold$() of the salt's ★."
+             "$(li)$(item)Bone Ash$(): bone meal and charcoal. ★3$(li)$(item)Assay Salt$(): borax and bone ash. ★5"
+             "$(li)$(item)Sunsalt$(): assay salt and Arcane Dust. ★7", "Refining"),
+        page(VAT, "The Crucible"),
+        crafting("bone_ash", "assay_salt"),
+    ])
+    entry("goldsmithing", "chasing", "Chasing and Jewelry", f"{MOD}:gold_fittings", 2, [
+        page("Hold fine gold and right-click the $(item)Jeweler's Bench$(). Click when the marker is in the green, three times, to chase "
+             "it into two $(item)Gold Fittings$() of its ★. A miss can spoil it back into nuggets.", "Chasing"),
+        page("Fittings make $(item)Gold Rings$() (+1 max health a ★) and $(item)Gold Amulets$() (+0.5 armor a ★), worn in Curios' ring "
+             "and necklace slots; and $(item)gilded$() armor and swords: lighter than plate, easy to enchant, and piglins take them for "
+             "gold.", "Jewelry and Gilded Gear"),
+        crafting("gold_ring", "gold_amulet"),
+        crafting("gilded_helmet", "gilded_sword"),
     ])
 
     entry("woodworking", "woodshop", "The Woodshop", f"{MOD}:wood_lathe", 0, [

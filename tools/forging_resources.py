@@ -350,6 +350,32 @@ def rivets():
     return image
 
 
+def blade():
+    """A sword blade, point up and to the right, with its tang."""
+    image = {}
+    for i in range(10):
+        x, y = 4 + i, 11 - i
+        image[(x, y)] = shade(STEEL, 45)
+        image[(x + 1, y)] = shade(STEEL, -15)
+        image[(x, y + 1)] = shade(STEEL, -40)
+    for i in range(3):
+        image[(2 + i, 13 - i)] = shade((120, 90, 60), -10)  # the tang
+    return image
+
+
+def axe_head():
+    """An axe head: a curved bit and its eye."""
+    image = {}
+    for y in range(3, 13):
+        width = 6 - abs(y - 8) // 2
+        for x in range(4, 4 + width):
+            image[(x, y)] = shade(STEEL, 45 if x == 4 else (-30 if y in (3, 12) else 0))
+    for y in range(6, 10):
+        for x in range(10, 13):
+            image[(x, y)] = shade(STEEL, -40 if y in (6, 9) or x == 12 else -10)
+    return image
+
+
 def links():
     """A short length of chain."""
     image = {}
@@ -425,6 +451,8 @@ GEAR_TEXTURES = {
     "armor_plate": plate(),
     "rivets": rivets(),
     "chain_links": links(),
+    "blade": blade(),
+    "axe_head": axe_head(),
     "refined_leather": hide((160, 100, 60)),
     "leather_scraps": scraps((130, 82, 48)),
     "hardened_leather": hide((95, 58, 34), stitched=True),
@@ -434,7 +462,7 @@ GEAR_TEXTURES = {
 }
 
 ARMOR_SLOTS = ("helmet", "chestplate", "leggings", "boots")
-WEIGHTS = {"brigandine": "leather", "hauberk": "chainmail", "plate": "iron"}
+WEIGHTS = {"brigandine": "leather", "hauberk": "chainmail", "plate": "iron", "gilded": "golden"}
 
 
 def borax_deposit():
@@ -463,7 +491,7 @@ def gear():
                 layers["layer1"] = f"minecraft:item/leather_{slot}_overlay"
             layers[f"layer{len(layers)}"] = f"{MOD}:item/forged_mark"
             write(ASSETS / f"models/item/{weight}_{slot}.json", {"parent": "minecraft:item/generated", "textures": layers})
-    for weapon, vanilla in (("forged_sword", "iron_sword"), ("forged_axe", "iron_axe")):
+    for weapon, vanilla in (("forged_sword", "iron_sword"), ("forged_axe", "iron_axe"), ("gilded_sword", "golden_sword")):
         write(ASSETS / f"models/item/{weapon}.json", {"parent": "minecraft:item/handheld",
                                                       "textures": {"layer0": f"minecraft:item/{vanilla}", "layer1": f"{MOD}:item/forged_mark"}})
 
@@ -526,6 +554,9 @@ def gear_recipes():
     starred_shapeless("armor_plate", [tempered, flux])
     starred_shapeless("rivets", [tempered, flux, "minecraft:iron_nugget"], count=4)
     starred_shapeless("chain_links", [tempered, tempered, flux], count=8)
+    # Weaponsmithing's parts (DD-89): plates, rivets and chain are armor's.
+    starred_shapeless("blade", [tempered, flux])
+    starred_shapeless("axe_head", [tempered, tempered, flux])
 
     # Tanned leather (refined_leather) comes from a Tanning Vat, not crafting. Torn hides leave scraps; four make a leather again.
     (DATA / "recipe/refined_leather.json").unlink(missing_ok=True)
@@ -554,8 +585,9 @@ def gear_recipes():
         starred_shaped(f"plate_{slot}", shapes[slot], {"M": plate_, "B": base})
         starred_shaped(f"hauberk_{slot}", shapes[slot], {"M": link, "B": base})
         starred_shaped(f"brigandine_{slot}", brigandine[slot], {"H": hardened, "R": rivet, "B": gambeson})
-    starred_shaped("forged_sword", ["P", "P", "S"], {"P": plate_, "S": "minecraft:stick"})
-    starred_shaped("forged_axe", ["PP", "PS", " S"], {"P": plate_, "S": "minecraft:stick"})
+    # The iron sword's and axe's shapes, in weapon parts.
+    starred_shaped("forged_sword", ["B", "B", "S"], {"B": f"{MOD}:blade", "S": "minecraft:stick"})
+    starred_shaped("forged_axe", ["H", "S", "S"], {"H": f"{MOD}:axe_head", "S": "minecraft:stick"})
 
 
 def add_to_tag(path, values):
@@ -574,7 +606,7 @@ def gear_tags():
     for slot, tag in (("helmet", "head_armor"), ("chestplate", "chest_armor"), ("leggings", "leg_armor"), ("boots", "foot_armor")):
         add_to_tag(vanilla_tags / f"{tag}.json", [f"{MOD}:{weight}_{slot}" for weight in WEIGHTS])
     add_to_tag(vanilla_tags / "dyeable.json", [f"{MOD}:brigandine_{slot}" for slot in ARMOR_SLOTS])
-    add_to_tag(vanilla_tags / "swords.json", [f"{MOD}:forged_sword"])
+    add_to_tag(vanilla_tags / "swords.json", [f"{MOD}:forged_sword", f"{MOD}:gilded_sword"])
     add_to_tag(vanilla_tags / "axes.json", [f"{MOD}:forged_axe"])
     for tier in (2, 3, 4):
         add_to_tag(DATA / f"tags/block/dungeon_resources/tier_{tier}.json", [f"{MOD}:borax_deposit"])

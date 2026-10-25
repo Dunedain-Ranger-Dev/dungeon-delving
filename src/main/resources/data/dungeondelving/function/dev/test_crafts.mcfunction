@@ -1,4 +1,4 @@
-# Builds a test crafts hall south of the test forge: a level 3 tannery, weaving room and woodshop around one Guild
+# Builds a test crafts hall south of the test forge: a level 3 tannery, weaving room, woodshop and goldsmithy around one Guild
 # Ledger (DD-88), and gives a kit for every step. Run with /function dungeondelving:dev/test_crafts.
 function dungeondelving:dev/clear_test_crafts
 
@@ -29,10 +29,20 @@ setblock -13 -60 27 dungeondelving:wood_lathe[facing=north]
 setblock -11 -60 28 dungeondelving:treadle_lathe[facing=west]
 setblock -9 -60 26 dungeondelving:bowyers_bench[facing=west]
 
+# Goldsmithy (south): furnace, Crucible, Jeweler's Bench, Great Crucible, Jeweler's Loupe
+setblock -17 -60 29 minecraft:furnace[facing=north]
+setblock -15 -60 29 dungeondelving:crucible
+setblock -13 -60 29 dungeondelving:jewelers_bench[facing=north]
+setblock -11 -60 29 dungeondelving:great_crucible
+setblock -19 -60 29 dungeondelving:jewelers_loupe[facing=north]
+
 # Skill levels high enough for ★7, and a kit for each craft
 skills set leatherworking 30
 skills set weaving 30
 skills set woodworking 30
+skills set goldsmithing 30
+skills set weaponsmithing 30
+skills set armorsmithing 30
 give @p minecraft:leather 8
 give @p dungeondelving:bark_liquor 3
 give @p dungeondelving:elder_liquor 3
@@ -44,4 +54,7 @@ give @p minecraft:oak_log 8
 give @p dungeondelving:linseed_oil 2
 give @p dungeondelving:sylvan_sap 2
 give @p minecraft:coal 8
+give @p minecraft:gold_ingot 12
+give @p dungeondelving:bone_ash 2
+give @p dungeondelving:sunsalt 2
 tellraw @a {"text":"Test crafts hall built. Right-click the Guild Ledger to check it.","color":"green"}

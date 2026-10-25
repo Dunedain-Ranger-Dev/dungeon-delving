@@ -20,7 +20,8 @@ import net.minecraft.world.level.block.state.BlockState;
 public enum Profession {
     LEATHERWORKING(CraftSkill.LEATHERWORKING, List.of("tanning_rack", "vat", "shaping_rack"), "tanning_barrel", "fleshing_beam"),
     WEAVING(CraftSkill.WEAVING, List.of("spinning_wheel", "vat", "loom"), "great_loom", "dye_works"),
-    WOODWORKING(CraftSkill.WOODWORKING, List.of("smoker", "vat", "lathe"), "treadle_lathe", "bowyers_bench");
+    WOODWORKING(CraftSkill.WOODWORKING, List.of("smoker", "vat", "lathe"), "treadle_lathe", "bowyers_bench"),
+    GOLDSMITHING(CraftSkill.GOLDSMITHING, List.of("furnace", "crucible", "jewelers_bench"), "great_crucible", "jewelers_loupe");
 
     public final CraftSkill skill;
     /** Stations the workshop needs (each id met by one or more blocks, see {@link #stations}). */
@@ -84,6 +85,23 @@ public enum Profession {
                 }
                 if (state.is(Crafts.DYE_WORKS.get())) {
                     ids.add("dye_works");
+                }
+            }
+            case GOLDSMITHING -> {
+                if (state.is(Blocks.FURNACE) || state.is(Blocks.BLAST_FURNACE)) {
+                    ids.add("furnace");
+                }
+                if (state.getBlock() instanceof SoakingVatBlock crucible && crucible.type.profession == this) {
+                    ids.add("crucible");
+                }
+                if (state.is(Crafts.GREAT_CRUCIBLE.get())) {
+                    ids.add("great_crucible");
+                }
+                if (state.is(Crafts.JEWELERS_BENCH.get())) {
+                    ids.add("jewelers_bench");
+                }
+                if (state.is(Crafts.JEWELERS_LOUPE.get())) {
+                    ids.add("jewelers_loupe");
                 }
             }
             case WOODWORKING -> {

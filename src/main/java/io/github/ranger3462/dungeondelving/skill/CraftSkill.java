@@ -7,10 +7,16 @@ import net.minecraft.network.chat.Component;
 
 /** The crafting skills. Each player has XP and a level in each one (see {@link CraftingSkills}). */
 public enum CraftSkill {
-    FORGING("forging"),
+    // Forging split in two (DD-89): the forge work trains both; armor and weapons each train their own.
+    WEAPONSMITHING("weaponsmithing"),
+    ARMORSMITHING("armorsmithing"),
     LEATHERWORKING("leatherworking"),
     WEAVING("weaving"),
-    WOODWORKING("woodworking");
+    WOODWORKING("woodworking"),
+    GOLDSMITHING("goldsmithing");
+
+    /** The skill Weaponsmithing and Armorsmithing were split from: players' XP in it moves to both. */
+    public static final String OLD_FORGING = "forging";
 
     public final String id;
 
