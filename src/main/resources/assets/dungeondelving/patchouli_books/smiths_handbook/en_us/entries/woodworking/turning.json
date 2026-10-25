@@ -1,0 +1,27 @@
+{
+  "name": "Turning and Assembly",
+  "icon": "dungeondelving:staff_shaft",
+  "category": "dungeondelving:woodworking",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Hold wood and right-click the $(item)Wood Lathe$(). Hold to press the chisel in, faster the deeper it goes; let go in the green. Three passes. A billet becomes a $(item)Staff Shaft$(), a stave two $(item)Hafts$(), a haft a $(item)Wand Core$().",
+      "title": "Turning"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "A finish caps wooden gear's ★: $(item)Linseed Oil$() (four wheat seeds in a cooking pot) for ★3, dryad resins for more. Bows take bent limbs, bowstrings and a finish; crossbows add a stock and iron.",
+      "title": "Finishes"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:bow_from_parts",
+      "recipe2": "dungeondelving:crossbow_from_parts"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:stock"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "The Weaving Room",
+  "icon": "dungeondelving:spinning_wheel",
+  "category": "dungeondelving:weaving",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(li)a $(item)Spinning Wheel$()$(li)a loom$(li)a $(item)Shaping Rack$()$(li)a cauldron (of water, over heat, for fulling)$(br2)Upgrades: a $(item)Great Loom$() (a wider needle eye) and the $(item)Dye Works$().",
+      "title": "Stations"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:spinning_wheel",
+      "recipe2": "dungeondelving:great_loom"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:dye_works"
+    }
+  ]
+}

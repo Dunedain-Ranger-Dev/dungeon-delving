@@ -94,26 +94,9 @@ flux: ★5 ingots with Sand Flux make a ★3 part.
 
 ## Leather and weaving
 
-**Leather:**
-- Refined Leather: hold leather and right-click a **Tanning Rack**. The scraper makes one pass across the hide, over 3
-  dark patches; click as it crosses each, in order. A patch you miss (or pass without clicking) can tear the hide:
-  30% for the first miss, then +15% per miss, lowered by Leatherworking. A torn hide leaves **Leather Scraps**, and 4
-  scraps make a leather.
-- Boiled Leather: hold refined leather and right-click a water cauldron with heat under it (a lit campfire, fire,
-  magma or lava). Each piece uses a level of water.
-- Hardened Leather: 3 boiled leather + string + honeycomb (the wax) → 3.
-
-**Weaving:**
-- Woven Cloth: hold 3 string and right-click a loom (any loom, no forge needed). Weaving is "thread the needle": the
-  needle's eye and the thread's tip both bob up and down, at different speeds. Click when the thread lines up with the
-  eye (gold dead center). Three stitches make a cloth. A missed stitch can snap the thread, stacking like smithing; a
-  snap saves 1 of the 3 string.
-- Bonus results (a second cloth, extra leather) are for talents (DD-70), not the default.
-- Padded Cloth: 2 woven cloth + wool.
-
-**Backings** go under every armor piece, one per piece:
-- Leather Backing: 3 refined leather, for medium and heavy armor.
-- Gambeson Backing: 2 padded cloth, for light armor.
+Rebuilt as their own professions in DD-88: see professions.md. Gear here still uses their parts: the **Leather Backing**
+(two leather panels) under medium and heavy armor, the **Gambeson Backing** (two cloth panels) under light armor, and
+**hardened leather** (three leather panels and a honeycomb) for brigandine. All three carry the ★ of how well they were made.
 
 ## Forged gear
 

@@ -1,0 +1,28 @@
+{
+  "name": "Fulling and Sewing",
+  "icon": "dungeondelving:cloth_panel",
+  "category": "dungeondelving:weaving",
+  "sortnum": 2,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Put woven cloth into a water cauldron with heat under it. A minute later it's $(item)Fulled Cloth$(), thick and tight.",
+      "title": "Fulling"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Lay fulled cloth on the $(item)Shaping Rack$() and use string on it. Stitch on the beat: right-click for R (needle in), left-click for L (needle out). Six stitches make two $(item)Cloth Panels$().",
+      "title": "Sewing"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:gambeson_base",
+      "recipe2": "dungeondelving:staff_wrap"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:bowstring",
+      "text": "Three thread make a bowstring."
+    }
+  ]
+}

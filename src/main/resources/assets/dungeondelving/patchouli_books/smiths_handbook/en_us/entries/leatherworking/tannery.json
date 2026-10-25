@@ -1,0 +1,23 @@
+{
+  "name": "The Tannery",
+  "icon": "dungeondelving:tanning_rack",
+  "category": "dungeondelving:leatherworking",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(li)a $(item)Tanning Rack$()$(li)a cauldron, for the liquor$(li)a $(item)Shaping Rack$()$(br2)Upgrades: a $(item)Tanning Barrel$() (a bigger, faster vat) and a $(item)Fleshing Beam$() (wider scraping patches).",
+      "title": "Stations"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:shaping_rack",
+      "recipe2": "dungeondelving:tanning_barrel"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:fleshing_beam",
+      "recipe2": "dungeondelving:leather_from_scraps"
+    }
+  ]
+}

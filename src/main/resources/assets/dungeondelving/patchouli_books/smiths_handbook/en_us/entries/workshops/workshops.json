@@ -1,0 +1,18 @@
+{
+  "name": "A Guild Workshop",
+  "icon": "dungeondelving:guild_ledger",
+  "category": "dungeondelving:workshops",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "A $(item)Guild Ledger$() marks a workshop for every craft: the forge, the tannery, the weaving room and the woodshop. Each craft's stations must be within 7 blocks of it across and 4 up or down. Read the ledger to see what each craft has and needs.",
+      "title": "One Ledger"
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Each craft's workshop has three levels. The basic stations make level 1 (up to ★3); its first upgrade makes level 2 (★5); both upgrades make level 3 (★7). Decoration that suits the craft widens its sweet spots a little.$(br2)Outside the forge, a piece's ★ comes from how well you did: all gold makes the best, all green a middling piece. It's never better than the workshop, your skill or the material allows.",
+      "title": "Levels and ★"
+    }
+  ]
+}

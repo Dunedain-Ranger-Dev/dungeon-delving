@@ -1,0 +1,23 @@
+{
+  "name": "The Woodshop",
+  "icon": "dungeondelving:chopping_block",
+  "category": "dungeondelving:woodworking",
+  "sortnum": 0,
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(li)a smoker, to season wood$(li)a $(item)Chopping Block$()$(li)a fletching table, to carve$(li)a $(item)Wood Lathe$()$(li)a cauldron (of water, over heat, to bend)$(br2)Upgrades: a $(item)Treadle Lathe$() (a wider green) and a $(item)Bowyer's Bench$() (a wider band when carving).",
+      "title": "Stations"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:chopping_block",
+      "recipe2": "dungeondelving:wood_lathe"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:treadle_lathe",
+      "recipe2": "dungeondelving:bowyers_bench"
+    }
+  ]
+}

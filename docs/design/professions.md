@@ -8,6 +8,17 @@ is built yet.
 are fine. **Farmer's Delight** joins the pack for its bark, straw, canvas, knives and cooking pot. Dryad dungeons are
 **mixed**: groves to explore, with puzzles, trades and fights.
 
+## Built so far (2026-10-25)
+
+- **Phase 1:** the Guild Ledger (replacing the Forge Hearth) and Farmer's Delight.
+- **Phases 2–4, the core:** every step below for Leatherworking, Weaving and Woodworking, with their stations,
+  workshop levels and upgrades, minigames and ★ rules; the Woodworking skill and tree; bows and crossbows from parts.
+  The pack's RPG recipe rewrite uses leather and cloth panels, so RPG leather and cloth gear takes their ★.
+- **Not yet:** sources for the dungeon materials (Barrowmoss, Emberroot, spider silk, Arcane Dust; phase 6) and the
+  dryads' woods and finishes (phase 7); Spellsilk's brewing; dyeing at the Dye Works (it only raises the level now);
+  real art for the new blocks and items (placeholders and vanilla models for now); RPG staves, wands, bows and
+  shields from parts (phase 5); the Woodworking tree's Seasoner, Fine Split and Master Bowyer perks.
+
 ## Goals
 
 - **Full gear from crafting.** Armor, melee weapons, bows, crossbows, staves, wands and shields can all be made, with
