@@ -17,6 +17,7 @@ import io.github.ranger3462.dungeondelving.character.TomeOfInsightItem;
 import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import io.github.ranger3462.dungeondelving.forging.Forging;
+import io.github.ranger3462.dungeondelving.guild.GuildLedgerBlock;
 import io.github.ranger3462.dungeondelving.gate.DungeonGates;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsOrcs;
 import io.github.ranger3462.dungeondelving.skill.CraftingSkills;
@@ -59,6 +60,16 @@ public final class ModRegistries {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DungeonDelving.MODID);
     public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> LOOT_MODIFIERS =
             DeferredRegister.create(NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, DungeonDelving.MODID);
+
+    /** Marks a guild workshop for every crafting profession (DD-88). It replaced the Forge Hearth, so old hearths load as ledgers. */
+    public static final DeferredBlock<GuildLedgerBlock> GUILD_LEDGER = BLOCKS.registerBlock("guild_ledger", GuildLedgerBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.5f).sound(SoundType.WOOD).noOcclusion());
+    public static final DeferredItem<BlockItem> GUILD_LEDGER_ITEM = ITEMS.registerSimpleBlockItem(GUILD_LEDGER);
+
+    static {
+        BLOCKS.addAlias(DungeonDelving.id("forge_hearth"), DungeonDelving.id("guild_ledger"));
+        ITEMS.addAlias(DungeonDelving.id("forge_hearth"), DungeonDelving.id("guild_ledger"));
+    }
 
     /** Right-click in the overworld to start a dungeon run. */
     public static final DeferredBlock<DungeonGateBlock> DUNGEON_GATE = BLOCKS.registerBlock("dungeon_gate", DungeonGateBlock::new,
@@ -198,7 +209,7 @@ public final class ModRegistries {
                         "skeleton_mage_spawn_egg", "wither_skeleton_mage_spawn_egg", "lich_lord_spawn_egg" }) {
                     BuiltInRegistries.ITEM.getOptional(DungeonDelving.id(optional)).ifPresent(output::accept);
                 }
-                for (var forging : java.util.List.of(Forging.FORGE_HEARTH_ITEM, Forging.BELLOWS_ITEM, Forging.MASTER_ANVIL_ITEM,
+                for (var forging : java.util.List.of(GUILD_LEDGER_ITEM, Forging.BELLOWS_ITEM, Forging.MASTER_ANVIL_ITEM,
                         Forging.GRINDING_WHEEL_ITEM, Forging.QUENCHING_OIL, Forging.COKE_INFUSED_IRON_INGOT, Forging.HEATED_INGOT, Forging.STRUCK_INGOT,
                         Forging.QUENCHED_INGOT, Forging.UNSTABLE_INGOT, Forging.TEMPERED_IRON_INGOT, Forging.SAND_FLUX, Forging.BORAX,
                         Forging.BORAX_DEPOSIT_ITEM, Forging.BORAX_FLUX, Forging.RUNIC_FLUX, Forging.RUNEFORGED_FLUX, Forging.ARMOR_PLATE, Forging.RIVETS,

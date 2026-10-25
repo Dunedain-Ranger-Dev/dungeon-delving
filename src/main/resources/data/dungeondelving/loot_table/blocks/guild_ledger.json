@@ -6,7 +6,7 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "dungeondelving:forge_hearth"
+          "name": "dungeondelving:guild_ledger"
         }
       ],
       "conditions": [

@@ -12,6 +12,7 @@ import io.github.ranger3462.dungeondelving.forging.CraftingXp;
 import io.github.ranger3462.dungeondelving.forging.ForgeActions;
 import io.github.ranger3462.dungeondelving.forging.ForgedGear;
 import io.github.ranger3462.dungeondelving.forging.Forging;
+import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import io.github.ranger3462.dungeondelving.forging.ForgingPerks;
 import io.github.ranger3462.dungeondelving.forging.TimingBar;
 import io.github.ranger3462.dungeondelving.skill.CraftSkill;
@@ -233,14 +234,14 @@ public class ForgedGearTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void salvagingReturnsTemperedIngots(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BlockPos hearth = helper.absolutePos(new BlockPos(0, 1, 0)).above(110);
+        BlockPos ledger = helper.absolutePos(new BlockPos(0, 1, 0)).above(110);
         ServerPlayer player = FakePlayerFactory.get(level, new GameProfile(UUID.randomUUID(), "salvage_tester"));
         try {
-            level.setBlock(hearth, Forging.FORGE_HEARTH.get().defaultBlockState(), Block.UPDATE_CLIENTS);
-            level.setBlock(hearth.offset(0, 0, 2), Blocks.FURNACE.defaultBlockState(), Block.UPDATE_CLIENTS);
-            level.setBlock(hearth.offset(2, 0, 0), Blocks.ANVIL.defaultBlockState(), Block.UPDATE_CLIENTS);
-            level.setBlock(hearth.offset(0, 0, -2), Blocks.WATER_CAULDRON.defaultBlockState(), Block.UPDATE_CLIENTS);
-            BlockPos grindstone = hearth.offset(-2, 0, 0);
+            level.setBlock(ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState(), Block.UPDATE_CLIENTS);
+            level.setBlock(ledger.offset(0, 0, 2), Blocks.FURNACE.defaultBlockState(), Block.UPDATE_CLIENTS);
+            level.setBlock(ledger.offset(2, 0, 0), Blocks.ANVIL.defaultBlockState(), Block.UPDATE_CLIENTS);
+            level.setBlock(ledger.offset(0, 0, -2), Blocks.WATER_CAULDRON.defaultBlockState(), Block.UPDATE_CLIENTS);
+            BlockPos grindstone = ledger.offset(-2, 0, 0);
             level.setBlock(grindstone, Blocks.GRINDSTONE.defaultBlockState(), Block.UPDATE_CLIENTS);
             ItemStack chest = starred(Forging.ARMOR.get(ForgedGear.Weight.HEAVY).get(ArmorItem.Type.CHESTPLATE).get(), 3);
             player.setItemInHand(InteractionHand.MAIN_HAND, chest);
@@ -253,7 +254,7 @@ public class ForgedGearTests {
             helper.assertTrue(ForgingPerks.salvageShare(player) > plain, "Thrifty smiths salvage more");
             player.removeTag(io.github.ranger3462.dungeondelving.skill.Perk.THRIFTY.tag(2));
         } finally {
-            for (BlockPos pos : BlockPos.betweenClosed(hearth.offset(-3, 0, -3), hearth.offset(3, 0, 3))) {
+            for (BlockPos pos : BlockPos.betweenClosed(ledger.offset(-3, 0, -3), ledger.offset(3, 0, 3))) {
                 level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
             }
         }

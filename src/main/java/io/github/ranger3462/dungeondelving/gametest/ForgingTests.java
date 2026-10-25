@@ -10,6 +10,7 @@ import io.github.ranger3462.dungeondelving.forging.BellowsBlock;
 import io.github.ranger3462.dungeondelving.forging.ForgeActions;
 import io.github.ranger3462.dungeondelving.forging.ForgeWorkshop;
 import io.github.ranger3462.dungeondelving.forging.Forging;
+import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import io.github.ranger3462.dungeondelving.forging.ForgingPerks;
 import io.github.ranger3462.dungeondelving.forging.HotMetalItem;
 import io.github.ranger3462.dungeondelving.forging.OilCauldronBlock;
@@ -36,7 +37,7 @@ import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
-/** Checks forging: heating, the Forge Hearth's workshop, striking, quenching and grinding, and the Forging skill. */
+/** Checks forging: heating, the Guild Ledger's workshop, striking, quenching and grinding, and the Forging skill. */
 @GameTestHolder(DungeonDelving.MODID)
 @PrefixGameTestTemplate(false)
 public class ForgingTests {
@@ -70,33 +71,37 @@ public class ForgingTests {
     }
 
     @GameTest(template = ANY_TEMPLATE)
-    public static void theHearthCountsItsStations(GameTestHelper helper) {
+    public static void theLedgerCountsItsStations(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BlockPos hearth = forgeOrigin(helper);
+        BlockPos ledger = forgeOrigin(helper);
         try {
-            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
-            ForgeWorkshop empty = ForgeWorkshop.scan(level, hearth);
-            helper.assertTrue(!empty.complete() && empty.missing().size() == 4 && empty.forgeLevel() == 0, "a lone hearth needs all four stations");
-            buildBasicForge(level, hearth);
-            ForgeWorkshop basic = ForgeWorkshop.scan(level, hearth);
+            set(level, ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState());
+            ForgeWorkshop empty = ForgeWorkshop.scan(level, ledger);
+            helper.assertTrue(!empty.complete() && empty.missing().size() == 4 && empty.forgeLevel() == 0, "a lone ledger needs all four stations");
+            buildBasicForge(level, ledger);
+            ForgeWorkshop basic = ForgeWorkshop.scan(level, ledger);
             helper.assertTrue(basic.complete() && basic.forgeLevel() == 1 && basic.maxStars() == 3, "the basic stations make a level 1 forge (up to ★3)");
-            set(level, hearth.offset(3, 0, 0), Blocks.BLAST_FURNACE.defaultBlockState());
-            set(level, hearth.offset(-3, 0, 2), Forging.MASTER_ANVIL.get().defaultBlockState());
-            helper.assertTrue(ForgeWorkshop.scan(level, hearth).forgeLevel() == 2, "a blast furnace and Master Anvil make a level 2 forge");
-            set(level, hearth.offset(4, 0, 0), Forging.BELLOWS.get().defaultBlockState());
-            set(level, hearth.offset(0, 0, 4), Forging.OIL_CAULDRON.get().defaultBlockState());
-            set(level, hearth.offset(0, 0, -4), Forging.GRINDING_WHEEL.get().defaultBlockState());
-            ForgeWorkshop full = ForgeWorkshop.scan(level, hearth);
+            set(level, ledger.offset(3, 0, 0), Blocks.BLAST_FURNACE.defaultBlockState());
+            set(level, ledger.offset(-3, 0, 2), Forging.MASTER_ANVIL.get().defaultBlockState());
+            helper.assertTrue(ForgeWorkshop.scan(level, ledger).forgeLevel() == 2, "a blast furnace and Master Anvil make a level 2 forge");
+            set(level, ledger.offset(4, 0, 0), Forging.BELLOWS.get().defaultBlockState());
+            set(level, ledger.offset(0, 0, 4), Forging.OIL_CAULDRON.get().defaultBlockState());
+            set(level, ledger.offset(0, 0, -4), Forging.GRINDING_WHEEL.get().defaultBlockState());
+            ForgeWorkshop full = ForgeWorkshop.scan(level, ledger);
             helper.assertTrue(full.forgeLevel() == 3 && full.maxStars() == Forging.MAX_STARS, "every upgrade makes a level 3 forge (up to ★7)");
             for (int i = 0; i < 16; i++) {
-                set(level, hearth.offset(-6 + i % 8, 1, 6 - i / 8), Blocks.BRICKS.defaultBlockState());
+                set(level, ledger.offset(-6 + i % 8, 1, 6 - i / 8), Blocks.BRICKS.defaultBlockState());
             }
-            helper.assertTrue(Math.abs(ForgeWorkshop.scan(level, hearth).decorBonus() - 0.01f) < 0.001f, "16 bricks give a +1% workshop bonus");
-            helper.assertTrue(ForgeWorkshop.around(level, hearth.offset(0, 0, 3)).isPresent(), "a station in range belongs to the workshop");
-            helper.assertTrue(ForgeWorkshop.around(level, hearth.offset(ForgeWorkshop.RADIUS * 3, 0, 0)).isEmpty(),
-                    "a spot far from any hearth has no workshop");
+            helper.assertTrue(Math.abs(ForgeWorkshop.scan(level, ledger).decorBonus() - 0.01f) < 0.001f, "16 bricks give a +1% workshop bonus");
+            helper.assertTrue(ForgeWorkshop.around(level, ledger.offset(0, 0, 3)).isPresent(), "a station in range belongs to the workshop");
+            helper.assertTrue(ForgeWorkshop.around(level, ledger.offset(ForgeWorkshop.RADIUS * 3, 0, 0)).isEmpty(),
+                    "a spot far from any ledger has no workshop");
+            var report = io.github.ranger3462.dungeondelving.guild.GuildLedgerBlock.report(level, ledger);
+            helper.assertTrue(report.stream().anyMatch(line -> line.getString().startsWith("Forging")), "reading the ledger shows the forge, got " + report);
+            helper.assertTrue(net.minecraft.core.registries.BuiltInRegistries.BLOCK.get(io.github.ranger3462.dungeondelving.DungeonDelving.id("forge_hearth"))
+                    == ModRegistries.GUILD_LEDGER.get(), "old Forge Hearths load as Guild Ledgers");
         } finally {
-            clear(level, hearth);
+            clear(level, ledger);
         }
         helper.succeed();
     }
@@ -105,15 +110,15 @@ public class ForgingTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void aPerfectRunMakesATemperedIngot(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BlockPos hearth = forgeOrigin(helper);
+        BlockPos ledger = forgeOrigin(helper);
         ServerPlayer player = smith(helper);
         try {
-            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
-            buildBasicForge(level, hearth);
+            set(level, ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState());
+            buildBasicForge(level, ledger);
             ItemStack heated = new ItemStack(Forging.HEATED_INGOT.get());
             heated.set(Forging.STARS.get(), 1);
             player.setItemInHand(InteractionHand.MAIN_HAND, heated);
-            BlockPos anvil = hearth.offset(3, 0, 3);
+            BlockPos anvil = ledger.offset(3, 0, 3);
             set(level, anvil, Forging.MASTER_ANVIL.get().defaultBlockState());
             long now = level.getGameTime();
             ForgeActions.Session strike = ForgeActions.begin(player, level, anvil, level.getBlockState(anvil), player.getMainHandItem(),
@@ -132,7 +137,7 @@ public class ForgingTests {
 
             player.setItemInHand(InteractionHand.MAIN_HAND, struck.copy());
             struck.setCount(0);
-            BlockPos tub = hearth.offset(0, 0, 4);
+            BlockPos tub = ledger.offset(0, 0, 4);
             set(level, tub, Forging.OIL_CAULDRON.get().defaultBlockState().setValue(OilCauldronBlock.LEVEL, 2));
             ForgeActions.quench(player, level, tub, level.getBlockState(tub), player.getMainHandItem());
             ItemStack quenched = find(player, Forging.QUENCHED_INGOT.get());
@@ -141,7 +146,7 @@ public class ForgingTests {
 
             player.setItemInHand(InteractionHand.MAIN_HAND, quenched.copy());
             quenched.setCount(0);
-            BlockPos grindstone = hearth.offset(-3, 0, 3);
+            BlockPos grindstone = ledger.offset(-3, 0, 3);
             set(level, grindstone, Forging.GRINDING_WHEEL.get().defaultBlockState());
             ForgeActions.Session grind = ForgeActions.begin(player, level, grindstone, level.getBlockState(grindstone), player.getMainHandItem(),
                     TimingBar.Kind.GRIND, now).orElseThrow();
@@ -152,7 +157,7 @@ public class ForgingTests {
             ItemStack tempered = find(player, Forging.TEMPERED_IRON_INGOT.get());
             helper.assertTrue(!tempered.isEmpty() && Forging.stars(tempered) == 1, "grinding finishes a ★1 Tempered Iron Ingot");
         } finally {
-            clear(level, hearth);
+            clear(level, ledger);
         }
         helper.succeed();
     }
@@ -160,12 +165,12 @@ public class ForgingTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void starsNeedABetterForgeAndMoreSkill(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BlockPos hearth = forgeOrigin(helper);
+        BlockPos ledger = forgeOrigin(helper);
         ServerPlayer player = smith(helper);
         try {
-            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
-            buildBasicForge(level, hearth);
-            BlockPos anvil = hearth.offset(2, 0, 0);
+            set(level, ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState());
+            buildBasicForge(level, ledger);
+            BlockPos anvil = ledger.offset(2, 0, 0);
             CraftingSkills.setLevel(player, CraftSkill.FORGING, ForgingPerks.levelFor(4));
             helper.assertTrue(tryStrike(player, level, anvil, 4).isEmpty(), "a level 1 forge can't work ★4 metal");
             CraftingSkills.setLevel(player, CraftSkill.FORGING, 1);
@@ -180,7 +185,7 @@ public class ForgingTests {
             helper.assertTrue(ForgeActions.begin(player, level, anvil, level.getBlockState(anvil), cold, TimingBar.Kind.STRIKE, level.getGameTime() + 1)
                     .isEmpty(), "cold metal can't be struck");
         } finally {
-            clear(level, hearth);
+            clear(level, ledger);
         }
         helper.succeed();
     }
@@ -195,12 +200,12 @@ public class ForgingTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void offStrikesCanCrackTheIngotIntoNuggets(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BlockPos hearth = forgeOrigin(helper);
+        BlockPos ledger = forgeOrigin(helper);
         ServerPlayer player = smith(helper);
         try {
-            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
-            buildBasicForge(level, hearth);
-            BlockPos anvil = hearth.offset(2, 0, 0);
+            set(level, ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState());
+            buildBasicForge(level, ledger);
+            BlockPos anvil = ledger.offset(2, 0, 0);
             boolean cracked = false;
             long now = level.getGameTime();
             for (int attempt = 0; attempt < 30 && !cracked; attempt++) {
@@ -226,7 +231,7 @@ public class ForgingTests {
             helper.assertTrue(ForgingPerks.scrapNuggets(player) == 8, "or 8 with Thrifty II");
             player.removeTag(io.github.ranger3462.dungeondelving.skill.Perk.THRIFTY.tag(2));
         } finally {
-            clear(level, hearth);
+            clear(level, ledger);
         }
         helper.succeed();
     }
@@ -235,12 +240,12 @@ public class ForgingTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void goldStrikesCountTwice(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BlockPos hearth = forgeOrigin(helper);
+        BlockPos ledger = forgeOrigin(helper);
         ServerPlayer player = smith(helper);
         try {
-            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
-            buildBasicForge(level, hearth);
-            BlockPos anvil = hearth.offset(3, 0, 3);
+            set(level, ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState());
+            buildBasicForge(level, ledger);
+            BlockPos anvil = ledger.offset(3, 0, 3);
             set(level, anvil, Forging.MASTER_ANVIL.get().defaultBlockState());
             ForgeActions.Session session = tryStrike(player, level, anvil, 1).orElseThrow();
             long now = level.getGameTime();
@@ -253,7 +258,7 @@ public class ForgingTests {
                     && TimingBar.judge(session.greenMarker(), session.low(), session.high()) == TimingBar.Hit.GREEN
                     && TimingBar.judge(session.missMarker(), session.low(), session.high()) == TimingBar.Hit.MISS, "the zones judge strikes");
         } finally {
-            clear(level, hearth);
+            clear(level, ledger);
         }
         helper.succeed();
     }
@@ -262,19 +267,19 @@ public class ForgingTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void basicStationsSometimesSpoilThePiece(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BlockPos hearth = forgeOrigin(helper);
+        BlockPos ledger = forgeOrigin(helper);
         ServerPlayer player = smith(helper);
         try {
-            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
-            buildBasicForge(level, hearth);
-            BlockPos master = hearth.offset(3, 0, 3);
+            set(level, ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState());
+            buildBasicForge(level, ledger);
+            BlockPos master = ledger.offset(3, 0, 3);
             set(level, master, Forging.MASTER_ANVIL.get().defaultBlockState());
-            int basicCracks = strikeGold(player, level, hearth.offset(2, 0, 0), 200);
+            int basicCracks = strikeGold(player, level, ledger.offset(2, 0, 0), 200);
             int masterCracks = strikeGold(player, level, master, 50);
             helper.assertTrue(basicCracks > 5 && basicCracks < 40, "about 10% of 200 perfect bars on a vanilla anvil should crack; got " + basicCracks);
             helper.assertTrue(masterCracks == 0, "perfect bars on the Master Anvil never crack; got " + masterCracks);
         } finally {
-            clear(level, hearth);
+            clear(level, ledger);
         }
         helper.succeed();
     }
@@ -302,12 +307,12 @@ public class ForgingTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void aBadGrindLeavesAnUnstableIngot(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BlockPos hearth = forgeOrigin(helper);
+        BlockPos ledger = forgeOrigin(helper);
         ServerPlayer player = smith(helper);
         try {
-            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
-            buildBasicForge(level, hearth);
-            BlockPos wheel = hearth.offset(-3, 0, 3);
+            set(level, ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState());
+            buildBasicForge(level, ledger);
+            BlockPos wheel = ledger.offset(-3, 0, 3);
             set(level, wheel, Forging.GRINDING_WHEEL.get().defaultBlockState());
             long now = level.getGameTime();
             now = grind(player, level, wheel, new ItemStack(Forging.QUENCHED_INGOT.get()), now, true);
@@ -319,7 +324,7 @@ public class ForgingTests {
             helper.assertTrue(find(player, Forging.TEMPERED_IRON_INGOT.get()).isEmpty() && find(player, Forging.UNSTABLE_INGOT.get()).isEmpty()
                     && !find(player, Items.IRON_NUGGET).isEmpty(), "missing on an unstable ingot breaks it");
         } finally {
-            clear(level, hearth);
+            clear(level, ledger);
         }
         helper.succeed();
     }
@@ -343,13 +348,13 @@ public class ForgingTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void waterQuenchingIsRisky(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BlockPos hearth = forgeOrigin(helper);
+        BlockPos ledger = forgeOrigin(helper);
         ServerPlayer player = smith(helper);
         try {
-            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
-            buildBasicForge(level, hearth);
+            set(level, ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState());
+            buildBasicForge(level, ledger);
             CraftingSkills.setLevel(player, CraftSkill.FORGING, CraftingSkills.MAX_LEVEL);
-            BlockPos cauldron = hearth.offset(0, 0, -2);
+            BlockPos cauldron = ledger.offset(0, 0, -2);
             int cracks = 0;
             for (int i = 0; i < 200; i++) {
                 player.getInventory().clearContent();
@@ -373,9 +378,9 @@ public class ForgingTests {
             player.setItemInHand(InteractionHand.MAIN_HAND, dry);
             ForgeActions.quench(player, level, cauldron, level.getBlockState(cauldron), dry);
             helper.assertTrue(player.getMainHandItem().is(Forging.STRUCK_INGOT.get()), "an empty cauldron can't quench until it's refilled");
-            helper.assertTrue(ForgeWorkshop.scan(level, hearth).complete(), "an empty cauldron still counts as the forge's quench station");
+            helper.assertTrue(ForgeWorkshop.scan(level, ledger).complete(), "an empty cauldron still counts as the forge's quench station");
         } finally {
-            clear(level, hearth);
+            clear(level, ledger);
         }
         helper.succeed();
     }
@@ -384,12 +389,12 @@ public class ForgingTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void reportedMarkersAreChecked(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
-        BlockPos hearth = forgeOrigin(helper);
+        BlockPos ledger = forgeOrigin(helper);
         ServerPlayer player = smith(helper);
         try {
-            set(level, hearth, Forging.FORGE_HEARTH.get().defaultBlockState());
-            buildBasicForge(level, hearth);
-            ForgeActions.Session session = tryStrike(player, level, hearth.offset(2, 0, 0), 1).orElseThrow();
+            set(level, ledger, ModRegistries.GUILD_LEDGER.get().defaultBlockState());
+            buildBasicForge(level, ledger);
+            ForgeActions.Session session = tryStrike(player, level, ledger.offset(2, 0, 0), 1).orElseThrow();
             long now = session.start() + 30;
             helper.assertTrue(ForgeActions.checkedElapsed(session, now, 28.5f, 1.0f) == 28.5f, "a timing that fits a good connection is taken as is");
             helper.assertTrue(ForgeActions.checkedElapsed(session, now, 12.0f, 10.0f) == 12.0f, "a laggy player's timing is taken as is too");
@@ -399,7 +404,7 @@ public class ForgingTests {
             ForgeActions.strike(player, level, session, player.getMainHandItem(), now, session.greenMarker());
             helper.assertTrue(session.bar() == bar + 1, "each strike moves on to a new bar, so a late or doubled strike can't land on it");
         } finally {
-            clear(level, hearth);
+            clear(level, ledger);
         }
         helper.succeed();
     }
@@ -451,20 +456,20 @@ public class ForgingTests {
         return helper.absolutePos(new BlockPos(0, 1, 0)).above(110);
     }
 
-    /** A furnace, anvil, water cauldron and grindstone around a hearth. */
-    private static void buildBasicForge(ServerLevel level, BlockPos hearth) {
-        set(level, hearth.offset(0, 0, 2), Blocks.FURNACE.defaultBlockState());
-        set(level, hearth.offset(2, 0, 0), Blocks.ANVIL.defaultBlockState());
-        set(level, hearth.offset(0, 0, -2), Blocks.WATER_CAULDRON.defaultBlockState());
-        set(level, hearth.offset(-2, 0, 0), Blocks.GRINDSTONE.defaultBlockState());
+    /** A furnace, anvil, water cauldron and grindstone around a ledger. */
+    private static void buildBasicForge(ServerLevel level, BlockPos ledger) {
+        set(level, ledger.offset(0, 0, 2), Blocks.FURNACE.defaultBlockState());
+        set(level, ledger.offset(2, 0, 0), Blocks.ANVIL.defaultBlockState());
+        set(level, ledger.offset(0, 0, -2), Blocks.WATER_CAULDRON.defaultBlockState());
+        set(level, ledger.offset(-2, 0, 0), Blocks.GRINDSTONE.defaultBlockState());
     }
 
     private static void set(ServerLevel level, BlockPos pos, BlockState state) {
         level.setBlock(pos, state, Block.UPDATE_CLIENTS);
     }
 
-    private static void clear(ServerLevel level, BlockPos hearth) {
-        for (BlockPos pos : BlockPos.betweenClosed(hearth.offset(-8, -1, -8), hearth.offset(8, 2, 8))) {
+    private static void clear(ServerLevel level, BlockPos ledger) {
+        for (BlockPos pos : BlockPos.betweenClosed(ledger.offset(-8, -1, -8), ledger.offset(8, 2, 8))) {
             level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         }
     }

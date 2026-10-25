@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "dungeondelving:bellows",
-    "dungeondelving:tanning_rack"
+    "dungeondelving:tanning_rack",
+    "dungeondelving:guild_ledger"
   ]
 }

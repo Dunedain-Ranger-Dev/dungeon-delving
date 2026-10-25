@@ -1,5 +1,6 @@
 package io.github.ranger3462.dungeondelving.forging;
 
+import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +14,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * A Forge Hearth's workshop: the stations within its range and what they add up to. Stations can be placed any way
+ * A forge: the forging stations in range of a Guild Ledger, and what they add up to. Stations can be placed any way
  * the player likes, as long as they're within {@link #RADIUS} blocks across and {@link #HEIGHT} up or down.
  *
  * @param bellows a Bellows next to one of the workshop's furnaces
  * @param decor how many decoration blocks ({@link Forging#FORGE_DECOR}) are in range
  */
-public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurnace, boolean bellows, boolean anvil, boolean masterAnvil,
+public record ForgeWorkshop(BlockPos ledger, boolean furnace, boolean blastFurnace, boolean bellows, boolean anvil, boolean masterAnvil,
         boolean waterCauldron, boolean oilCauldron, boolean grindstone, boolean grindingWheel, int decor) {
     public static final int RADIUS = 7;
     public static final int HEIGHT = 4;
@@ -27,12 +28,12 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
     public static final int DECOR_PER_BONUS = 8;
     public static final float MAX_DECOR_BONUS = 0.025f;
 
-    /** Looks over everything in range of a hearth. */
-    public static ForgeWorkshop scan(Level level, BlockPos hearth) {
+    /** Looks over everything in range of a Guild Ledger. */
+    public static ForgeWorkshop scan(Level level, BlockPos ledger) {
         boolean furnace = false, blastFurnace = false, bellows = false, anvil = false, masterAnvil = false, waterCauldron = false,
                 oilCauldron = false, grindstone = false, grindingWheel = false;
         int decor = 0;
-        for (BlockPos pos : BlockPos.betweenClosed(hearth.offset(-RADIUS, -HEIGHT, -RADIUS), hearth.offset(RADIUS, HEIGHT, RADIUS))) {
+        for (BlockPos pos : BlockPos.betweenClosed(ledger.offset(-RADIUS, -HEIGHT, -RADIUS), ledger.offset(RADIUS, HEIGHT, RADIUS))) {
             BlockState state = level.getBlockState(pos);
             if (state.isAir()) {
                 continue;
@@ -59,7 +60,7 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
                 decor++;
             }
         }
-        return new ForgeWorkshop(hearth.immutable(), furnace, blastFurnace, bellows, anvil, masterAnvil, waterCauldron, oilCauldron, grindstone,
+        return new ForgeWorkshop(ledger.immutable(), furnace, blastFurnace, bellows, anvil, masterAnvil, waterCauldron, oilCauldron, grindstone,
                 grindingWheel, decor);
     }
 
@@ -73,11 +74,11 @@ public record ForgeWorkshop(BlockPos hearth, boolean furnace, boolean blastFurna
         return false;
     }
 
-    /** The complete workshop a station belongs to: the best one among the hearths in range of it. */
+    /** The complete forge a station belongs to: the best one among the Guild Ledgers in range of it. */
     public static Optional<ForgeWorkshop> around(Level level, BlockPos station) {
         ForgeWorkshop best = null;
         for (BlockPos pos : BlockPos.betweenClosed(station.offset(-RADIUS, -HEIGHT, -RADIUS), station.offset(RADIUS, HEIGHT, RADIUS))) {
-            if (level.getBlockState(pos).is(Forging.FORGE_HEARTH.get())) {
+            if (level.getBlockState(pos).is(ModRegistries.GUILD_LEDGER.get())) {
                 ForgeWorkshop workshop = scan(level, pos);
                 if (workshop.complete() && (best == null || workshop.forgeLevel() > best.forgeLevel())) {
                     best = workshop;

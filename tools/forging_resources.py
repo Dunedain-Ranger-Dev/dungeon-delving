@@ -117,16 +117,11 @@ def item_model(name, parent=None):
 
 
 def blocks():
-    # Forge Hearth: a carved stone hearth (after the BFME2 hearth): a stepped base, two pillars under a lintel and a
-    # stepped peak, a sooty back wall, a coal bed and a low lip at the front (north). Lit, the coals glow and a flame
-    # burns between the pillars. Each material is its own texture, so real art can replace them one at a time:
-    # stone, trim, soot and coals (the flame stays vanilla's animated campfire flame).
-    for lit in (False, True):
-        write(ASSETS / f"models/block/forge_hearth{'_on' if lit else ''}.json", hearth_model(lit))
-    write(ASSETS / "blockstates/forge_hearth.json", {"variants": {
-        f"facing={facing},lit={str(lit).lower()}": {"model": f"{MOD}:block/forge_hearth{'_on' if lit else ''}", "y": y}
-        for facing, y in HORIZONTAL.items() for lit in (False, True)}})
-    item_model("forge_hearth", f"{MOD}:block/forge_hearth")
+    # Guild Ledger (DD-88): marks a guild workshop for every profession. The vanilla lectern for now.
+    write(ASSETS / "models/block/guild_ledger.json", {"parent": "minecraft:block/lectern"})
+    write(ASSETS / "blockstates/guild_ledger.json", {"variants": {
+        f"facing={facing}": {"model": f"{MOD}:block/guild_ledger", "y": y} for facing, y in HORIZONTAL.items()}})
+    item_model("guild_ledger", f"{MOD}:block/guild_ledger")
 
     # Bellows: two boards with leather between, and an iron nozzle at the front.
     write(ASSETS / "models/block/bellows.json", {
@@ -183,7 +178,7 @@ def blocks():
                    "conditions": [{"condition": "minecraft:survives_explosion"}]}],
     })
 
-    for name in ("forge_hearth", "bellows", "master_anvil", "grinding_wheel"):
+    for name in ("guild_ledger", "bellows", "master_anvil", "grinding_wheel"):
         block_loot(name)
 
 
@@ -195,57 +190,6 @@ def oil_surface():
             swirl = (x * 3 + y * 5) % 11 == 0 or (x * 7 + y * 2) % 13 == 0
             image[(x, y)] = shade((120, 78, 22), 30 if swirl else ((x + y) % 3) * 4)
     return image
-
-
-# The hearth's materials. Stone and trim are real art (docs/texture-prompts.md, cleaned up with
-# tools/texture_cleanup.py); soot stays a vanilla stand-in for now.
-HEARTH_TEXTURES = {
-    "stone": f"{MOD}:block/hearth_stone",
-    "trim": f"{MOD}:block/hearth_trim",
-    "soot": "minecraft:block/polished_blackstone",
-}
-
-# The hearth's shape (facing north), after the concept art: a two-tier base, a firebox with pillars at its front
-# corners and a sooty back, a lintel with a raised block on top, and a fire tray jutting out at the front. Shared with
-# ForgeHearthBlock's hitbox, so keep them in step.
-HEARTH_SHAPE = {
-    "base": ([0, 0, 0], [16, 2, 16]),
-    "step": ([1, 2, 2], [15, 4, 15]),
-    "tray": ([4.5, 4, 2.5], [11.5, 5, 6]),
-    "body": ([2, 4, 6], [14, 16, 15]),
-}
-
-
-def hearth_model(lit):
-    """The Forge Hearth's model, facing north. Everything stays inside the block."""
-    textures = dict(HEARTH_TEXTURES)
-    textures["coals"] = "minecraft:block/magma" if lit else "minecraft:block/coal_block"
-    textures["particle"] = HEARTH_TEXTURES["stone"]
-    elements = [
-        box([0, 0, 0], [16, 2, 16], "stone"),            # base, lower tier
-        box([1, 2, 2], [15, 4, 15], "trim"),             # base, upper tier
-        box([2, 4, 6], [5, 12, 15], "stone"),            # left side of the firebox (its pillar at the front)
-        box([11, 4, 6], [14, 12, 15], "stone"),          # right side
-        box([5, 4, 12.5], [11, 12, 15], "soot"),         # sooty back of the firebox
-        box([5, 4, 7], [11, 4.5, 12.5], "coals"),        # embers on the firebox floor
-        box([1.5, 12, 5.5], [14.5, 14, 15.5], "trim"),   # lintel, overhanging a little
-        box([4, 14, 7.5], [12, 15, 13.5], "stone"),      # raised block on top
-        box([5.5, 15, 8.5], [10.5, 16, 12.5], "stone"),  # its rounded crown
-        box([4.5, 4, 2.5], [11.5, 5, 6], "trim"),        # fire tray: low, jutting out in front of the pillars
-        box([5.5, 5, 3.5], [10.5, 5.25, 5.5], "coals"),  # coals in the tray
-    ]
-    if lit:
-        textures["fire"] = "minecraft:block/campfire_fire"
-        flame = {"texture": "#fire", "uv": [0, 0, 16, 16]}
-        # Flames fill the recessed firebox, from the embers up to the lintel: two rows across it and two along it, so
-        # it looks full from any angle. The tray in front just glows.
-        for z in (8, 11):
-            elements.append({"from": [5, 4.5, z], "to": [11, 12, z], "shade": False,
-                             "faces": {"north": dict(flame), "south": dict(flame)}})
-        for x in (6.5, 9.5):
-            elements.append({"from": [x, 4.5, 6.5], "to": [x, 12, 12.5], "shade": False,
-                             "faces": {"east": dict(flame), "west": dict(flame)}})
-    return {"parent": "minecraft:block/block", "render_type": "minecraft:cutout", "textures": textures, "elements": elements}
 
 
 def box(start, end, texture):
@@ -279,7 +223,7 @@ def heating(name, ingredient, result):
 
 
 def recipes():
-    shaped("forge_hearth", ["BBB", "BCB", "BIB"], {"B": "minecraft:bricks", "C": "minecraft:campfire", "I": "minecraft:iron_block"})
+    shapeless("guild_ledger", ["minecraft:lectern", "minecraft:writable_book"])
     shaped("bellows", ["PPP", "LLL", "PIP"], {"P": "#minecraft:planks", "L": "minecraft:leather", "I": "minecraft:iron_ingot"})
     shaped("master_anvil", ["WWW", " A ", "DDD"],
            {"W": f"{MOD}:wardsilver_ingot", "A": "minecraft:anvil", "D": "minecraft:polished_deepslate"})
@@ -312,13 +256,14 @@ def tags():
     write(DATA / "tags/block/forge_decor.json", {"replace": False, "values": DECOR})
     pickaxe = RES / "data/minecraft/tags/block/mineable/pickaxe.json"
     tag = json.loads(pickaxe.read_text(encoding="utf-8"))
-    for name in ("forge_hearth", "master_anvil", "grinding_wheel"):
+    tag["values"] = [v for v in tag["values"] if v != f"{MOD}:forge_hearth"]
+    for name in ("master_anvil", "grinding_wheel"):
         if f"{MOD}:{name}" not in tag["values"]:
             tag["values"].append(f"{MOD}:{name}")
     write(pickaxe, tag)
     axe = RES / "data/minecraft/tags/block/mineable/axe.json"
     tag = json.loads(axe.read_text(encoding="utf-8")) if axe.exists() else {"replace": False, "values": []}
-    for name in ("bellows",):
+    for name in ("bellows", "guild_ledger"):
         if f"{MOD}:{name}" not in tag["values"]:
             tag["values"].append(f"{MOD}:{name}")
     write(axe, tag)

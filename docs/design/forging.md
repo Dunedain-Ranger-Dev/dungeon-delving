@@ -8,7 +8,7 @@ points, and balancing waits for playtesters.
 
 ## The forge
 
-A **Forge Hearth** block is the center. Within 7 blocks across and 4 up or down, it looks for these stations, which
+A **Guild Ledger** is the center (it replaced the Forge Hearth in DD-88; see professions.md). Within 7 blocks across and 4 up or down, it looks for these stations, which
 can be arranged any way:
 
 | Station | Basic | Upgrade (raises the forge level) |
@@ -26,12 +26,11 @@ can be arranged any way:
 | 2 | Blast Furnace and Master Anvil | ★5 |
 | 3 | Level 2, plus Bellows, Oil Cauldron and Grinding Wheel | ★7 |
 
-**Workshop bonus:** decoration blocks near the hearth (the `dungeondelving:forge_decor` tag: bricks, stone and
+**Workshop bonus:** decoration blocks near the ledger (the `dungeondelving:forge_decor` tag: bricks, stone and
 deepslate bricks, chains, lanterns, iron bars, barrels, smithing tables, campfires and so on) widen every sweet spot.
 Each 8 blocks add +0.5%, up to +2.5%.
 
-Right-click the hearth to see what's missing, the forge level and the workshop bonus. The hearth's fire lights up once
-the forge is complete. Striking, quenching and grinding only work at stations that are in range of a complete hearth.
+Right-click the ledger to see what's missing, the forge level and the workshop bonus. Striking, quenching and grinding only work at stations that are in range of a ledger with a complete forge.
 
 ## The loop
 

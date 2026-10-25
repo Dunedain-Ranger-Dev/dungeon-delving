@@ -1,26 +1,26 @@
 {
   "name": "Building a Forge",
-  "icon": "dungeondelving:forge_hearth",
+  "icon": "dungeondelving:guild_ledger",
   "category": "dungeondelving:forge",
   "sortnum": 0,
   "pages": [
     {
       "type": "patchouli:spotlight",
-      "item": "dungeondelving:forge_hearth",
-      "text": "Every forge starts with a $(item)Forge Hearth$(). Around it, within 7 blocks across and 4 up or down, it needs four stations, set out however you like:",
-      "title": "The Hearth"
+      "item": "dungeondelving:guild_ledger",
+      "title": "The Guild Ledger",
+      "text": "Every workshop starts with a $(item)Guild Ledger$(). A forge needs four stations within 7 blocks of it across, and 4 up or down, set out however you like:"
     },
     {
       "type": "patchouli:text",
-      "text": "$(li)a $(item)furnace$() or $(item)blast furnace$(), to heat metal$(li)an $(item)anvil$(), to strike it$(li)a $(item)cauldron$() of water (or oil), to quench it$(li)a $(item)grindstone$(), to finish it$(br2)Right-click the hearth to see what's missing. Its fire lights once the forge is complete; striking, quenching and grinding only work at stations near a lit hearth."
+      "text": "$(li)a $(item)furnace$() or $(item)blast furnace$(), to heat metal$(li)an $(item)anvil$(), to strike it$(li)a $(item)cauldron$() of water (or oil), to quench it$(li)a $(item)grindstone$(), to finish it$(br2)Read the ledger to see what's missing. Striking, quenching and grinding only work at stations near a ledger with a complete forge. One ledger serves every craft in its range."
     },
     {
       "type": "patchouli:crafting",
-      "recipe": "dungeondelving:forge_hearth"
+      "recipe": "dungeondelving:guild_ledger"
     },
     {
       "type": "patchouli:text",
-      "text": "Decoration counts too. Bricks, stone and deepslate bricks, chains, lanterns, iron bars, barrels and the like near the hearth widen every sweet spot a little: +0.5% for every 8 blocks, up to +2.5%. A forge that looks like a forge works like one.",
+      "text": "Decoration counts too. Bricks, stone and deepslate bricks, chains, lanterns, iron bars, barrels and the like near the ledger widen every sweet spot a little: +0.5% for every 8 blocks, up to +2.5%. A forge that looks like a forge works like one.",
       "title": "A Proper Workshop"
     }
   ]

@@ -11,8 +11,8 @@ setblock -21 -60 11 minecraft:barrel
 setblock -9 -60 11 minecraft:smithing_table
 fill -22 -60 -2 -22 -58 -2 minecraft:chain
 
-# The hearth in the middle, with the stations around it
-setblock -15 -60 5 dungeondelving:forge_hearth[facing=south]
+# The Guild Ledger in the middle, with the stations around it
+setblock -15 -60 5 dungeondelving:guild_ledger[facing=south]
 setblock -18 -60 3 minecraft:furnace[facing=south]
 setblock -17 -60 3 minecraft:blast_furnace[facing=south]
 setblock -16 -60 3 dungeondelving:bellows[facing=south]
@@ -33,4 +33,4 @@ setblock -14 -60 10 minecraft:water_cauldron[level=3]
 give @p minecraft:iron_ingot 16
 give @p minecraft:coal 16
 give @p dungeondelving:quenching_oil 4
-tellraw @a {"text":"Test forge built. Right-click the Forge Hearth to check it.","color":"green"}
+tellraw @a {"text":"Test forge built. Right-click the Guild Ledger to check it.","color":"green"}

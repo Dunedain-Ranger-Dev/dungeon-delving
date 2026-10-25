@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * What a Dungeon Gate has around it, like a forge hearth's workshop: a Riftstone portal frame and Gate Tuners, within
+ * What a Dungeon Gate has around it, like a Guild Ledger's workshop: a Riftstone portal frame and Gate Tuners, within
  * {@link #RADIUS} blocks across and from {@link #BELOW} below to {@link #ABOVE} above the gate.
  */
 public record GateArea(BlockPos gate, Optional<Frame> frame, List<BlockPos> tuners, int tunerSlots) {

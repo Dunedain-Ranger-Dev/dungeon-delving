@@ -22,14 +22,14 @@ are fine. **Farmer's Delight** joins the pack for its bark, straw, canvas, knive
 
 | From Farmer's Delight | Used for |
 |---|---|
-| Tree Bark (stripping logs with an axe) | Tanning liquor |
-| Straw (harvesting with a knife) → Canvas | The plant fibre for Weaving's coarse tier |
+| Tree Bark (a log chopped on its Cutting Board with an axe, which also gives the stripped log) | Tanning liquor |
+| Straw (harvesting with a knife) → Canvas (4 straw) | The plant fibre for Weaving's coarse tier |
 | Rope | Bindings, and the Shaping Rack's recipe |
-| Knives (flint to netherite) | The cutting tool at the Shaping Rack, beside shears |
+| Knives (flint to netherite; the `c:tools/knife` tag) | The cutting tool at the Shaping Rack, beside shears |
 | Cooking Pot (a timed, heated pot) | Brewing the tanning liquor |
 | Rice, cabbage, tomatoes, onions | Cooking, and more Farming XP sources |
 
-To confirm when adding: exact item ids and that each works this way on 1.21.1.
+Checked against Farmer's Delight 1.21.1-1.3.4 (`farmersdelight:tree_bark`, `straw`, `canvas`, `rope`, `cooking_pot`, `cutting_board`).
 
 ## The Guild Ledger (replaces the Forge Hearth)
 

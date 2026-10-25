@@ -287,7 +287,7 @@ public final class ForgeActions {
             TimingBar.Kind kind, long now) {
         Optional<ForgeWorkshop> workshop = ForgeWorkshop.around(level, pos);
         if (workshop.isEmpty()) {
-            tell(player, Component.translatable("message.dungeondelving.forge.no_hearth").withStyle(ChatFormatting.RED));
+            tell(player, Component.translatable("message.dungeondelving.forge.no_workshop").withStyle(ChatFormatting.RED));
             return Optional.empty();
         }
         int stars = Forging.stars(held);
@@ -642,7 +642,7 @@ public final class ForgeActions {
      */
     public static void salvage(ServerPlayer player, ServerLevel level, BlockPos pos, ItemStack held) {
         if (ForgeWorkshop.around(level, pos).isEmpty()) {
-            tell(player, Component.translatable("message.dungeondelving.forge.no_hearth").withStyle(ChatFormatting.RED));
+            tell(player, Component.translatable("message.dungeondelving.forge.no_workshop").withStyle(ChatFormatting.RED));
             return;
         }
         float condition = held.isDamageableItem() ? 1.0f - (float) held.getDamageValue() / held.getMaxDamage() : 1.0f;
@@ -693,7 +693,7 @@ public final class ForgeActions {
 
     public static void quench(ServerPlayer player, ServerLevel level, BlockPos pos, BlockState state, ItemStack held) {
         if (ForgeWorkshop.around(level, pos).isEmpty()) {
-            tell(player, Component.translatable("message.dungeondelving.forge.no_hearth").withStyle(ChatFormatting.RED));
+            tell(player, Component.translatable("message.dungeondelving.forge.no_workshop").withStyle(ChatFormatting.RED));
             return;
         }
         if (heatOf(player, held, level.getGameTime()) <= 0.0f) {

@@ -32,7 +32,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 /**
  * Forging: heat iron, strike it on an anvil, quench it and grind it into Tempered Ingots, then make those into forged
- * gear. See {@code docs/design/forging.md}. Stations only count when they're in range of a complete Forge Hearth
+ * gear. See {@code docs/design/forging.md}. Stations only count when they're in range of a Guild Ledger with a complete forge
  * (see {@link ForgeWorkshop}).
  */
 public final class Forging {
@@ -52,15 +52,11 @@ public final class Forging {
 
     // --- Tags ---
 
-    /** Blocks near a Forge Hearth that count towards its workshop bonus. */
+    /** Blocks near a Guild Ledger that count towards its forge's workshop bonus. */
     public static final TagKey<Block> FORGE_DECOR = TagKey.create(Registries.BLOCK, DungeonDelving.id("forge_decor"));
 
     // --- Blocks ---
 
-    public static final DeferredBlock<ForgeHearthBlock> FORGE_HEARTH = ModRegistries.BLOCKS.registerBlock("forge_hearth", ForgeHearthBlock::new,
-            BlockBehaviour.Properties.of().mapColor(MapColor.QUARTZ).strength(3.5f, 6.0f).requiresCorrectToolForDrops().sound(SoundType.STONE)
-                    .noOcclusion().lightLevel(state -> state.getValue(ForgeHearthBlock.LIT) ? 13 : 0));
-    public static final DeferredItem<BlockItem> FORGE_HEARTH_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(FORGE_HEARTH);
     public static final DeferredBlock<BellowsBlock> BELLOWS = ModRegistries.BLOCKS.registerBlock("bellows", BellowsBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.0f).sound(SoundType.WOOD).noOcclusion());
     public static final DeferredItem<BlockItem> BELLOWS_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(BELLOWS);
