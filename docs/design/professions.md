@@ -12,14 +12,14 @@ are fine. **Farmer's Delight** joins the pack for its bark, straw, canvas, knive
 
 - **Phase 1:** the Guild Ledger (replacing the Forge Hearth) and Farmer's Delight.
 - **Phases 2–4, the core:** Leatherworking, Weaving and Woodworking, with their stations, workshop levels and upgrades;
-  the Woodworking skill and tree; bows and crossbows from parts. The pack's RPG recipe rewrite uses leather and cloth
-  panels, so RPG leather and cloth gear takes their ★.
+  the Woodworking skill and tree; bows and crossbows from parts. RPG and vanilla gear keep their own recipes
+  (DD-89): Dungeon Delving's forged gear is the one forged set for now.
 - **Reworked after the first playtest (2026-10-25):** every craft now follows Forging's pattern (below). The scraping,
   spinning, sewing and carving minigames, fulling, bending and the Chopping Block are gone.
 - **Not yet:** sources for the dungeon materials (Barrowmoss, Emberroot, spider silk, Arcane Dust; phase 6) and the
   dryads' woods and finishes (phase 7); dyeing at the Dye Works; real art for the new blocks and items (placeholders and
   vanilla models for now); RPG staves, wands and shields from parts (phase 5); the Woodworking tree's Seasoner, Fine
-  Split and Master Bowyer perks; re-checking how forged gear sits beside the RPG and vanilla weapons.
+  Split and Master Bowyer perks; forged gear for more weapon and armor classes, and variant recipes for specific looks.
 
 ## Goals
 
@@ -116,7 +116,7 @@ Scrape → tan → cut → craft.
 | 1. Scrape | Tanning Rack | Leather → **Scraped Hide** | — | — |
 | 2. Tan | **Tanning Vat** (liquor poured into a cauldron) | Up to 4 hides → **Tanned Leather** | 2:00–4:00 | The liquor's |
 | 3. Cut | **Shaping Rack**, shears or a knife | Tanned Leather → **Leather Panels** (2) | — | Keeps it |
-| 4. Craft | Crafting table | Straps, Hardened Leather (+ honeycomb), Leather Backings, RPG leather armor | — | Lowest part |
+| 4. Craft | Crafting table | Straps, Hardened Leather (+ honeycomb), Leather Backings | — | Lowest part |
 
 - **Liquors (brewed in a cooking pot):** Bark Liquor (4 tree bark) ★3; **Tannin Liquor** (+ Barrowmoss) ★5; **Elder
   Liquor** (+ Emberroot) ★7.
@@ -133,7 +133,7 @@ Spin → size → weave → craft.
 | 1. Spin | **Spinning Wheel** | Wool → **Yarn** (3) | — | — |
 | 2. Size | **Sizing Vat** (sizing poured into a cauldron) | Up to 4 yarn or string → **Sized Yarn** | 2:00–4:00 | The sizing's |
 | 3. Weave | Loom | 3 Sized Yarn → **Cloth Panels** (2) | — | Keeps it |
-| 4. Craft | Crafting table | Gambeson Backings, staff wraps, Bowstrings (3 sized yarn), RPG robes and cloth armor | — | Lowest part |
+| 4. Craft | Crafting table | Gambeson Backings, staff wraps, Bowstrings (3 sized yarn) | — | Lowest part |
 
 - **Sizings (brewed in a cooking pot):** Wheat Sizing (4 wheat) ★3; **Silk Sizing** (+ spider silk) ★5; **Arcane
   Sizing** (+ Arcane Dust) ★7.

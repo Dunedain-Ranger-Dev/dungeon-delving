@@ -32,6 +32,12 @@ The dev build is done. What's left:
 
 ## 2. Keeping forging relevant
 
+**Where it landed (DD-89, 2026-10-25), replacing the plans below:** one set of forged gear, Dungeon Delving's own
+(forged sword and axe; brigandine, hauberk and plate armor), each made like its iron counterpart but from forged parts,
+its ★ from those parts. RPG and vanilla gear keep their own recipes and stay unstarred. Later: forged gear for more
+weapon and armor classes, and variant recipes for specific looks. Until forged gear has its own art, a cosmetic mod can
+let players wear the look of other gear.
+
 The RPG mods add about 1,300 recipes, but most are smelting gear back down. The ones that matter are about 250
 shaped crafting recipes (base class gear, jewelry, relics) and 380 smithing upgrades (diamond to netherite, Armory
 and Arsenal tiers). Plan: a rule-based KubeJS script in the pack (where recipe overrides already live), not
