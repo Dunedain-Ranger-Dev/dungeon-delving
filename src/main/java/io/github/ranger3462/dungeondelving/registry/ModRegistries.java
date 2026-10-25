@@ -156,6 +156,8 @@ public final class ModRegistries {
             LOOT_MODIFIERS.register("tag_dungeon_loot", () -> TagDungeonLootModifier.CODEC);
     public static final DeferredHolder<MapCodec<? extends IGlobalLootModifier>, MapCodec<RemoveDungeonOnlyModifier>> REMOVE_DUNGEON_ONLY =
             LOOT_MODIFIERS.register("remove_dungeon_only", () -> RemoveDungeonOnlyModifier.CODEC);
+    public static final DeferredHolder<MapCodec<? extends IGlobalLootModifier>, MapCodec<io.github.ranger3462.dungeondelving.forging.GearStarsLootModifier>> GEAR_STARS =
+            LOOT_MODIFIERS.register("gear_stars", () -> io.github.ranger3462.dungeondelving.forging.GearStarsLootModifier.CODEC);
 
     /** Gate, exit and markers, for players and builders. */
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TAB = TABS.register("dungeon_delving", () -> CreativeModeTab.builder()

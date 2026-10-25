@@ -2,6 +2,7 @@
   "replace": false,
   "entries": [
     "dungeondelving:tag_dungeon_loot",
-    "dungeondelving:remove_dungeon_only"
+    "dungeondelving:remove_dungeon_only",
+    "dungeondelving:gear_stars"
   ]
 }
