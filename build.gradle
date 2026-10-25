@@ -27,16 +27,16 @@ sourceSets.main.resources {
 }
 
 repositories {
-    // Modrinth's Maven, used only for the pack's mods in dev runs (see dependencies below).
+    // CurseMaven: the pack's mods from CurseForge, for dev runs (see dependencies below), as curse.maven:<slug>-<project>:<file>.
     exclusiveContent {
         forRepository {
             maven {
-                name = "Modrinth"
-                url = "https://api.modrinth.com/maven"
+                name = "CurseMaven"
+                url = "https://cursemaven.com"
             }
         }
         filter {
-            includeGroup "maven.modrinth"
+            includeGroup "curse.maven"
         }
     }
     // The Curios API, compiled against so dungeon loot in Curios slots can be found.
@@ -51,29 +51,7 @@ repositories {
             includeGroup "top.theillusivec4.curios"
         }
     }
-    // FTB's and Architectury's Mavens, for FTB Quests and its libraries (they aren't on Modrinth).
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "Architectury"
-                url = "https://maven.architectury.dev"
-            }
-        }
-        filter {
-            includeGroup "dev.architectury"
-        }
-    }
-    exclusiveContent {
-        forRepository {
-            maven {
-                name = "FTB"
-                url = "https://maven.ftb.dev/releases"
-            }
-        }
-        filter {
-            includeGroup "dev.ftb.mods"
-        }
-    }
+
 }
 
 base {
@@ -188,24 +166,24 @@ dependencies {
     // Optional integration: the Curios API at compile time only. CuriosLoot is only used when Curios is installed.
     compileOnly "top.theillusivec4.curios:curios-neoforge:9.5.1+1.21.1:api"
     // Optional integration: Iron's Spells, for the goblin shaman. Only used when Iron's Spells is installed.
-    compileOnly "maven.modrinth:irons-spells-n-spellbooks:slKLosTb"  // 1.21.1-3.16.3
-    compileOnly "maven.modrinth:irons-lib:lUwUKYPl"
-    compileOnly "maven.modrinth:geckolib:Grwn5rUB"
-    compileOnly "maven.modrinth:playeranimator:HJZB6bmA"
+    compileOnly "curse.maven:irons-spells-n-spellbooks-855414:8680204"  // 1.21.1-3.16.3
+    compileOnly "curse.maven:irons-lib-1492763:8973642"
+    compileOnly "curse.maven:geckolib-388172:8893490"
+    compileOnly "curse.maven:playeranimator-658587:7389814"
     // Optional integration: Ars Nouveau mana, for the Tester's Charm. Only used when Ars Nouveau is installed.
-    compileOnly "maven.modrinth:ars-nouveau:yWDnir1o"                // 5.13.3
-    compileOnly "maven.modrinth:skills:8tfcI2wU"                     // Pufferfish's Skills 0.19.2
-    compileOnly "maven.modrinth:better-combat:VhIOvcXP"              // 2.4.0+1.21.1-neoforge
-    compileOnly "maven.modrinth:spell-engine:IYoY9AHA"               // 1.10.9+1.21.1-neoforge
-    compileOnly "maven.modrinth:spell-power:RFCD8Aio"                // 1.6.0+1.21.1-neoforge
+    compileOnly "curse.maven:ars-nouveau-401955:9052154"                // 5.13.3
+    compileOnly "curse.maven:puffish-skills-835091:9101377"                     // Pufferfish's Skills 0.19.2
+    compileOnly "curse.maven:better-combat-by-daedelus-639842:8430183"              // 2.4.0+1.21.1-neoforge
+    compileOnly "curse.maven:spell-engine-807653:9011566"               // 1.10.9+1.21.1-neoforge
+    compileOnly "curse.maven:spell-power-771265:8634104"                // 1.6.0+1.21.1-neoforge
     // Apotheosis, for forged gear's sockets and affix multipliers (integration/apotheosis); optional too.
-    compileOnly "maven.modrinth:apotheosis:veL1ccTb"                 // 1.21.1-8.9.0
-    compileOnly "maven.modrinth:placebo:B5zbSVlT"                    // 1.21.1-9.9.4
-    compileOnly "maven.modrinth:apothic-attributes:64fZbLnj"         // 1.21.1-2.11.0
+    compileOnly "curse.maven:apotheosis-313970:8993983"                 // 1.21.1-8.9.0
+    compileOnly "curse.maven:placebo-283644:9153039"                    // 1.21.1-9.9.4
+    compileOnly "curse.maven:apothic-attributes-898963:9006294"         // 1.21.1-2.11.0
 
     // The pack's mods, loaded in dev runs (client, server, game tests) so features can be tested against them.
     // localRuntime keeps them out of this mod's published dependencies: Dungeon Delving doesn't require any.
-    // Versions are pinned to Modrinth version IDs for NeoForge 1.21.1. They're left out of runData, because
+    // Versions are pinned to CurseForge file IDs for NeoForge 1.21.1, the same as the pack's pack.json. They're left out of runData, because
     // Apotheosis's own data generators need its optional Gateways mod.
     if (!gradle.startParameter.taskNames.any { it.toLowerCase().contains('rundata') }) {
         // Our other mods in development (see settings.gradle), built from their own repositories next to this one.
@@ -215,105 +193,105 @@ dependencies {
             }
         }
         // Apotheosis and its libraries
-        localRuntime "maven.modrinth:apotheosis:veL1ccTb"            // 1.21.1-8.9.0
-        localRuntime "maven.modrinth:placebo:B5zbSVlT"               // 1.21.1-9.9.4
-        localRuntime "maven.modrinth:apothic-attributes:64fZbLnj"    // 1.21.1-2.11.0
-        localRuntime "maven.modrinth:apothic-enchanting:JAQJkLJ1"    // 1.21.1-1.6.4
-        localRuntime "maven.modrinth:apothic-spawners:pWfxcfO2"      // 1.21.1-1.4.0
-        localRuntime "maven.modrinth:patchouli:BIogJv2D"             // 1.21.1-93-neoforge
+        localRuntime "curse.maven:apotheosis-313970:8993983"            // 1.21.1-8.9.0
+        localRuntime "curse.maven:placebo-283644:9153039"               // 1.21.1-9.9.4
+        localRuntime "curse.maven:apothic-attributes-898963:9006294"    // 1.21.1-2.11.0
+        localRuntime "curse.maven:apothic-enchanting-1063926:9095862"    // 1.21.1-1.6.4
+        localRuntime "curse.maven:apothic-spawners-986583:8469405"      // 1.21.1-1.4.0
+        localRuntime "curse.maven:patchouli-306770:7730942"             // 1.21.1-93-neoforge
         // Iron's Spells 'n Spellbooks and its libraries
-        localRuntime "maven.modrinth:irons-spells-n-spellbooks:slKLosTb" // 1.21.1-3.16.3
-        localRuntime "maven.modrinth:irons-lib:lUwUKYPl"             // 1.21.1-2.2.0
-        localRuntime "maven.modrinth:playeranimator:HJZB6bmA"        // 2.0.4+1.21.1
+        localRuntime "curse.maven:irons-spells-n-spellbooks-855414:8680204" // 1.21.1-3.16.3
+        localRuntime "curse.maven:irons-lib-1492763:8973642"             // 1.21.1-2.2.0
+        localRuntime "curse.maven:playeranimator-658587:7389814"        // 2.0.4+1.21.1
         // Ars Nouveau
-        localRuntime "maven.modrinth:ars-nouveau:yWDnir1o"           // 5.13.3
+        localRuntime "curse.maven:ars-nouveau-401955:9052154"           // 5.13.3
         // Shared libraries
-        localRuntime "maven.modrinth:geckolib:Grwn5rUB"              // 4.9.3
-        localRuntime "maven.modrinth:curios:yohfFbgD"                // 9.5.1+1.21.1
+        localRuntime "curse.maven:geckolib-388172:8893490"              // 4.9.3
+        localRuntime "curse.maven:curios-309927:6529130"                // 9.5.1+1.21.1
         // KubeJS, for the pack's recipe scripts
-        localRuntime "maven.modrinth:kubejs:THIGFPwf"                // 2101.7.2-build.377
-        localRuntime "maven.modrinth:rhino:cQ4POTah"                 // 2101.2.7-build.85
-        localRuntime "maven.modrinth:better-advanced-tooltips:uPFbnD32" // 2101.1.0-build.5
+        localRuntime "curse.maven:kubejs-238086:8843626"                // 2101.7.2-build.377
+        localRuntime "curse.maven:rhino-416294:8218748"                 // 2101.2.7-build.85
+        localRuntime "curse.maven:better-advanced-tooltips-1637623:8576077" // 2101.1.0-build.5
         // JEI, to look up recipes while testing
-        localRuntime "maven.modrinth:jei:ufHUqt9b"                   // 19.51.0.418
+        localRuntime "curse.maven:jei-238222:8792638"                   // 19.51.0.418
         // FTB Quests and its libraries, for the pack's quest book
-        localRuntime "dev.ftb.mods:ftb-quests-neoforge:2101.1.36"
-        localRuntime "dev.ftb.mods:ftb-library-neoforge:2101.1.37"
-        localRuntime "dev.ftb.mods:ftb-teams-neoforge:2101.1.11"
-        localRuntime "dev.architectury:architectury-neoforge:13.0.8"
+        localRuntime "curse.maven:ftb-quests-forge-289412:8885017"
+        localRuntime "curse.maven:ftb-library-forge-404465:9008089"
+        localRuntime "curse.maven:ftb-teams-forge-404468:8724782"
+        localRuntime "curse.maven:architectury-api-419699:5786327"
         // Lootr, so world loot chests are per player
-        localRuntime "maven.modrinth:lootr:SPOrIzX8"                 // 1.21.1-1.11.38.127
+        localRuntime "curse.maven:lootr-361276:8968561"                 // 1.21.1-1.11.38.127
         // Sophisticated Backpacks, for storage
-        localRuntime "maven.modrinth:sophisticated-backpacks:QkVLEgt1" // 1.21.1-3.26.12.2208
-        localRuntime "maven.modrinth:sophisticated-core:DAcZAWzl"    // 1.21.1-1.5.13.2404
+        localRuntime "curse.maven:sophisticated-backpacks-422301:9154769" // 1.21.1-3.26.12.2208
+        localRuntime "curse.maven:sophisticated-core-618298:9201381"    // 1.21.1-1.5.13.2404
         // Inventory quick-moves: Mouse Tweaks (shift-drag over slots) and Inventory Essentials (move all, sorting)
-        localRuntime "maven.modrinth:mouse-tweaks:9I21YYxf"          // 1.21-2.26.1-neoforge
-        localRuntime "maven.modrinth:inventory-essentials:B2gBjJSj"  // 21.1.20+neoforge-1.21.1
-        localRuntime "maven.modrinth:balm:CquiaiDj"                  // 21.0.66+neoforge-1.21.1
+        localRuntime "curse.maven:mouse-tweaks-60089:5637846"          // 1.21-2.26.1-neoforge
+        localRuntime "curse.maven:inventory-essentials-368825:9035078"  // 21.1.20+neoforge-1.21.1
+        localRuntime "curse.maven:balm-531761:8969738"                  // 21.0.66+neoforge-1.21.1
         // Better Combat, Spell Engine and the RPG Series (DD-76), with their libraries
-        localRuntime "maven.modrinth:better-combat:VhIOvcXP"         // 2.4.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:combat-roll:FT7t1n1a"           // 2.0.6+1.21.1-neoforge
-        localRuntime "maven.modrinth:apothic-combat:8gwHTe22"        // 1.2.1+1.21.1, Apotheosis x Better Combat
-        localRuntime "maven.modrinth:better-mob-combat-reimagined:EasF5aC6" // 1.1.16, Better Combat swings for humanoid mobs
-        localRuntime "maven.modrinth:spell-engine:IYoY9AHA"          // 1.10.9+1.21.1-neoforge
-        localRuntime "maven.modrinth:spell-power:RFCD8Aio"           // 1.6.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:runes:Br4oP4M6"                 // 1.3.2+1.21.1-neoforge
-        localRuntime "maven.modrinth:bundle-api:w5F5wdko"            // 1.1.0-neoforge
-        localRuntime "maven.modrinth:ranged-weapon-api:WxNYN3Zh"     // 3.0.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:armor-model-api:QRkmKYGJ"       // 1.1.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:shield-api:fgK2cNYi"            // 2.2.0-neoforge
-        localRuntime "maven.modrinth:critical-strike:2LZ76MSH"       // 1.0.4+1.21.1-neoforge
-        localRuntime "maven.modrinth:structure-pool-api:kdWVYKdx"    // 1.2.1+1.21.1-neoforge
-        localRuntime "maven.modrinth:cloth-config:izKINKFg"          // 15.0.140+neoforge
-        localRuntime "maven.modrinth:wizards:lxbf57N2"               // 3.1.3+1.21.1-neoforge
-        localRuntime "maven.modrinth:paladins-and-priests:7oCw7txX"  // 3.1.3+1.21.1-neoforge
-        localRuntime "maven.modrinth:rogues-and-warriors:WxwS7HDW"   // 3.1.3+1.21.1-neoforge
-        localRuntime "maven.modrinth:archers:7oSRQwU0"               // 3.1.3+1.21.1-neoforge
-        localRuntime "maven.modrinth:jewelry:iLTExB6G"               // 2.5.1+1.21.1-neoforge
-        localRuntime "maven.modrinth:relics-rpg:O6zfkTwx"            // 1.4.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:arsenal-rpg-series:rYyhslig"    // 1.5.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:armory-rpg-series:51cccxUm"     // 1.5.2+1.21.1-neoforge
-        localRuntime "maven.modrinth:skill-tree:Vr94BeiF"            // 1.6.1+1.21.1-neoforge
-        localRuntime "maven.modrinth:skills:8tfcI2wU"                // Pufferfish's Skills 0.19.2
-        localRuntime "maven.modrinth:dungeon-difficulty:uwoMCnrI"    // 3.9.2+1.21.1-neoforge
-        localRuntime "maven.modrinth:gazebos:ktRCCPX3"               // 2.2.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:village-taverns:qhOcjQ6u"       // 1.3.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:sensible-survival:Fc9Sd9Wm"     // 1.1.2+1.21.1-neoforge
-        localRuntime "maven.modrinth:hunger-tweaks:1fs4FiOW"         // 1.0.1-neoforge
+        localRuntime "curse.maven:better-combat-by-daedelus-639842:8430183"         // 2.4.0+1.21.1-neoforge
+        localRuntime "curse.maven:combat-roll-678036:7348018"           // 2.0.6+1.21.1-neoforge
+        localRuntime "curse.maven:apothic-combat-986982:6105085"        // 1.2.1+1.21.1, Apotheosis x Better Combat
+        localRuntime "curse.maven:better-mob-combat-reimagined-1606434:8867297" // 1.1.16, Better Combat swings for humanoid mobs
+        localRuntime "curse.maven:spell-engine-807653:9011566"          // 1.10.9+1.21.1-neoforge
+        localRuntime "curse.maven:spell-power-771265:8634104"           // 1.6.0+1.21.1-neoforge
+        localRuntime "curse.maven:rune-crafting-775518:8702937"                 // 1.3.2+1.21.1-neoforge
+        localRuntime "curse.maven:bundle-api-1189983:7006149"            // 1.1.0-neoforge
+        localRuntime "curse.maven:ranged-weapon-api-962162:8723067"     // 3.0.0+1.21.1-neoforge
+        localRuntime "curse.maven:armor-model-api-1659764:8793923"       // 1.1.0+1.21.1-neoforge
+        localRuntime "curse.maven:shield-api-1048720:7156464"            // 2.2.0-neoforge
+        localRuntime "curse.maven:critical-strike-1379562:7224268"       // 1.0.4+1.21.1-neoforge
+        localRuntime "curse.maven:structure-pool-api-927915:7145227"    // 1.2.1+1.21.1-neoforge
+        localRuntime "curse.maven:cloth-config-348521:5729127"          // 15.0.140+neoforge
+        localRuntime "curse.maven:wizards-734325:8982151"               // 3.1.3+1.21.1-neoforge
+        localRuntime "curse.maven:paladins-and-priests-856548:8982136"  // 3.1.3+1.21.1-neoforge
+        localRuntime "curse.maven:rogues-and-warriors-1048409:8982142"   // 3.1.3+1.21.1-neoforge
+        localRuntime "curse.maven:archers-932359:8982143"               // 3.1.3+1.21.1-neoforge
+        localRuntime "curse.maven:jewelry-910706:9002835"               // 2.5.1+1.21.1-neoforge
+        localRuntime "curse.maven:relics-rpg-1204049:8694266"            // 1.4.0+1.21.1-neoforge
+        localRuntime "curse.maven:arsenal-rpg-series-1230054:8694625"    // 1.5.0+1.21.1-neoforge
+        localRuntime "curse.maven:armory-rpg-series-1311561:8787781"     // 1.5.2+1.21.1-neoforge
+        localRuntime "curse.maven:skill-tree-1311513:8982842"            // 1.6.1+1.21.1-neoforge
+        localRuntime "curse.maven:puffish-skills-835091:9101377"                // Pufferfish's Skills 0.19.2
+        localRuntime "curse.maven:dungeon-difficulty-645559:9110961"    // 3.9.2+1.21.1-neoforge
+        localRuntime "curse.maven:gazebos-865298:8694227"               // 2.2.0+1.21.1-neoforge
+        localRuntime "curse.maven:village-taverns-1178224:8727899"       // 1.3.0+1.21.1-neoforge
+        localRuntime "curse.maven:sensible-survival-1266889:8974842"     // 1.1.2+1.21.1-neoforge
+        localRuntime "curse.maven:hunger-tweaks-1266883:6836306"         // 1.0.1-neoforge
         // More RPG Classes (Spell Engine partner mods)
-        localRuntime "maven.modrinth:more-rpg-library:oA6DragU"      // 2.8.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:archers-expansion:GOnpQHSG"     // 2.2.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:berserker-rpg-class:val86kc4"   // 3.2.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:elemental-wizards-rpg:yciypA9F" // 3.2.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:forcemaster-rpg-class:fyug07lZ" // 3.2.0+1.21.1-neoforge
-        localRuntime "maven.modrinth:witcher-rpg-class:FcCltY07"     // 3.2.0+1.21.1-neoforge
+        localRuntime "curse.maven:more-rpg-library-923030:9129315"      // 2.8.0+1.21.1-neoforge
+        localRuntime "curse.maven:archers-expansion-1109024:9129496"     // 2.2.0+1.21.1-neoforge
+        localRuntime "curse.maven:berserker-rpg-class-991968:9129753"   // 3.2.0+1.21.1-neoforge
+        localRuntime "curse.maven:elemental-wizards-rpg-class-1006892:9129748" // 3.2.0+1.21.1-neoforge
+        localRuntime "curse.maven:forcemaster-rpg-class-992388:9129786" // 3.2.0+1.21.1-neoforge
+        localRuntime "curse.maven:witcher-rpg-class-992290:9130055"     // 3.2.0+1.21.1-neoforge
         // World generation: Terralith (with Lithostitched) and YUNG's structures, caves and title cards
-        localRuntime "maven.modrinth:terralith:IY93YaEe"              // 2.6.2
-        localRuntime "maven.modrinth:lithostitched:cZu4cHY3"          // 1.8.1-neoforge-21.1
-        localRuntime "maven.modrinth:yungs-api:2prKITKh"              // 1.21.1-NeoForge-5.1.9
-        localRuntime "maven.modrinth:yungs-menu-tweaks:OB9hQTpQ"      // 1.21.1-NeoForge-2.1.2
-        localRuntime "maven.modrinth:travelers-titles:2y01mBUy"       // 1.21.1-NeoForge-5.1.3
-        localRuntime "maven.modrinth:yungs-better-caves:Feo6YOjN"     // 1.21.1-NeoForge-3.1.6
-        localRuntime "maven.modrinth:terrablender:6e8GCrLb"           // 4.1.0.8, YUNG's Cave Biomes needs it
-        localRuntime "maven.modrinth:yungs-cave-biomes:HYGqXWqQ"      // 1.21.1-NeoForge-3.1.1
-        localRuntime "maven.modrinth:yungs-better-mineshafts:Go3nbneL"// 1.21.1-NeoForge-5.1.1
-        localRuntime "maven.modrinth:yungs-better-dungeons:D6aZn0Em"  // 1.21.1-NeoForge-5.1.4
-        localRuntime "maven.modrinth:yungs-better-strongholds:8U0dIfSM"// 1.21.1-NeoForge-5.1.3
-        localRuntime "maven.modrinth:yungs-better-desert-temples:GQ9iNWkI"// 1.21.1-NeoForge-4.1.5
-        localRuntime "maven.modrinth:yungs-better-jungle-temples:P00i2hJn"// 1.21.1-NeoForge-3.1.2
-        localRuntime "maven.modrinth:yungs-better-witch-huts:AvedwcIe"// 1.21.1-NeoForge-4.1.1
-        localRuntime "maven.modrinth:yungs-better-ocean-monuments:yFjEcj2g"// 1.21.1-NeoForge-4.1.2
-        localRuntime "maven.modrinth:yungs-better-nether-fortresses:iopJiJQp"// 1.21.1-NeoForge-3.1.5
-        localRuntime "maven.modrinth:yungs-better-end-island:I52NZ1qK"// 1.21.1-NeoForge-3.1.2
-        localRuntime "maven.modrinth:yungs-bridges:urkCzBf6"          // 1.21.1-NeoForge-5.1.1
-        localRuntime "maven.modrinth:yungs-extras:N2EpMhR7"           // 1.21.1-NeoForge-5.1.1
+        localRuntime "curse.maven:terralith-513688:8222737"              // 2.6.2
+        localRuntime "curse.maven:lithostitched-936015:9170709"          // 1.8.1-neoforge-21.1
+        localRuntime "curse.maven:yungs-api-neoforge-1015100:8894736"              // 1.21.1-NeoForge-5.1.9
+        localRuntime "curse.maven:yungs-menu-tweaks-neoforge-1015152:6158374"      // 1.21.1-NeoForge-2.1.2
+        localRuntime "curse.maven:travelers-titles-neoforge-1015155:6294123"       // 1.21.1-NeoForge-5.1.3
+        localRuntime "curse.maven:yungs-better-caves-340583:8806071"     // 1.21.1-NeoForge-3.1.6
+        localRuntime "curse.maven:terrablender-neoforge-940057:6054947"           // 4.1.0.8, YUNG's Cave Biomes needs it
+        localRuntime "curse.maven:yungs-cave-biomes-1111586:6913179"      // 1.21.1-NeoForge-3.1.1
+        localRuntime "curse.maven:yungs-better-mineshafts-neoforge-1015096:5812193"// 1.21.1-NeoForge-5.1.1
+        localRuntime "curse.maven:yungs-better-dungeons-neoforge-1015112:5954804"  // 1.21.1-NeoForge-5.1.4
+        localRuntime "curse.maven:yungs-better-strongholds-neoforge-1015105:6272264"// 1.21.1-NeoForge-5.1.3
+        localRuntime "curse.maven:yungs-better-desert-temples-neoforge-1015114:6276955"// 1.21.1-NeoForge-4.1.5
+        localRuntime "curse.maven:yungs-better-jungle-temples-neoforge-1015123:5924482"// 1.21.1-NeoForge-3.1.2
+        localRuntime "curse.maven:yungs-better-witch-huts-neoforge-1015144:5812532"// 1.21.1-NeoForge-4.1.1
+        localRuntime "curse.maven:yungs-better-ocean-monuments-neoforge-1015115:5924487"// 1.21.1-NeoForge-4.1.2
+        localRuntime "curse.maven:yungs-better-nether-fortresses-neoforge-1015118:6606621"// 1.21.1-NeoForge-3.1.5
+        localRuntime "curse.maven:yungs-better-end-island-neoforge-1015127:6300968"// 1.21.1-NeoForge-3.1.2
+        localRuntime "curse.maven:yungs-bridges-neoforge-1015149:5812553"          // 1.21.1-NeoForge-5.1.1
+        localRuntime "curse.maven:yungs-extras-neoforge-1015146:5812546"           // 1.21.1-NeoForge-5.1.1
         // Fast leaf decay after felling trees (Tree Feller)
-        localRuntime "maven.modrinth:leaves-be-gone:kAbmpvF3"         // v21.1.1-1.21.1-NeoForge
-        localRuntime "maven.modrinth:puzzles-lib:lATqZwtV"            // 21.1.64, Leaves Be Gone's library
+        localRuntime "curse.maven:leaves-be-gone-686435:8036398"         // v21.1.1-1.21.1-NeoForge
+        localRuntime "curse.maven:puzzles-lib-495476:9130151"            // 21.1.64, Leaves Be Gone's library
         // Farmer's Delight: tree bark, straw, canvas, knives and the cooking pot for the crafting professions (DD-88)
-        localRuntime "maven.modrinth:farmers-delight:XTVZDOol"        // 1.21.1-1.3.4
+        localRuntime "curse.maven:farmers-delight-398521:8765184"        // 1.21.1-1.3.4
         // Cosmetic armor slots: wear another armor's look over forged armor (DD-89)
-        localRuntime "maven.modrinth:cosmetic-armor-reworked-forked:U6kExSSz"  // 1.21.1-0.0.4
+        localRuntime "curse.maven:cosmetic-armor-reworked-forked-1434118:7685857"  // 1.21.1-0.0.4
     }
 
     // For more info:
