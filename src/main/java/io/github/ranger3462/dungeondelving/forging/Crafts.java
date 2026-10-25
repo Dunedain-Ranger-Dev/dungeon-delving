@@ -126,15 +126,13 @@ public final class Crafts {
 
     // --- Goldsmithing (DD-89) ---
 
-    /** A crucible of refining salt: gold ingots refine into fine gold, by the salt's ★. */
-    public static final DeferredBlock<SoakingVatBlock> CRUCIBLE = ModRegistries.BLOCKS.registerBlock("crucible",
-            properties -> new SoakingVatBlock(properties, SoakingVatBlock.Type.CRUCIBLE),
-            BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(2.5f).sound(SoundType.STONE).noOcclusion());
+    /** A brick furnace for refining gold, worked like a furnace: gold ingots in, a refining salt as fuel, fine gold out. */
+    public static final DeferredBlock<CrucibleBlock> CRUCIBLE = ModRegistries.BLOCKS.registerBlock("crucible", CrucibleBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_RED).strength(3.0f).sound(SoundType.STONE).requiresCorrectToolForDrops());
     public static final DeferredItem<BlockItem> CRUCIBLE_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(CRUCIBLE);
-    /** A bigger, faster crucible: a level 2 goldsmithy. */
-    public static final DeferredBlock<SoakingVatBlock> GREAT_CRUCIBLE = ModRegistries.BLOCKS.registerBlock("great_crucible",
-            properties -> new SoakingVatBlock(properties, SoakingVatBlock.Type.GREAT_CRUCIBLE),
-            BlockBehaviour.Properties.of().mapColor(MapColor.STONE).strength(3.0f).sound(SoundType.STONE).noOcclusion());
+    /** A faster crucible: a level 2 goldsmithy. */
+    public static final DeferredBlock<CrucibleBlock> GREAT_CRUCIBLE = ModRegistries.BLOCKS.registerBlock("great_crucible", CrucibleBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).strength(3.5f).sound(SoundType.DEEPSLATE_BRICKS).requiresCorrectToolForDrops());
     public static final DeferredItem<BlockItem> GREAT_CRUCIBLE_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(GREAT_CRUCIBLE);
     /** Where fine gold is chased into fittings. */
     public static final DeferredBlock<CraftStationBlock> JEWELERS_BENCH = station("jewelers_bench", Block.box(0, 0, 0, 16, 14, 16));
@@ -143,7 +141,7 @@ public final class Crafts {
     public static final DeferredBlock<CraftStationBlock> JEWELERS_LOUPE = station("jewelers_loupe", Block.box(5, 0, 5, 11, 12, 11));
     public static final DeferredItem<BlockItem> JEWELERS_LOUPE_ITEM = ModRegistries.ITEMS.registerSimpleBlockItem(JEWELERS_LOUPE);
 
-    /** Refining salts: what a crucible refines gold with, setting its ★. */
+    /** Refining salts: a crucible's fuel, setting the ★ of the gold it refines. */
     public static final DeferredItem<LiquorItem> BONE_ASH = salt("bone_ash", 3);
     public static final DeferredItem<LiquorItem> ASSAY_SALT = salt("assay_salt", 5);
     public static final DeferredItem<LiquorItem> SUNSALT = salt("sunsalt", 7);
@@ -162,7 +160,13 @@ public final class Crafts {
             "shaping_rack", () -> BlockEntityType.Builder.of(ShapingRackBlockEntity::new, SHAPING_RACK.get()).build(null));
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<SoakingVatBlockEntity>> SOAKING_VAT_ENTITY = BLOCK_ENTITIES.register(
             "soaking_vat", () -> BlockEntityType.Builder.of(SoakingVatBlockEntity::new, TANNING_VAT.get(), TANNING_BARREL.get(),
-                    SIZING_VAT.get(), DYE_WORKS.get(), FINISHING_VAT.get(), CRUCIBLE.get(), GREAT_CRUCIBLE.get()).build(null));
+                    SIZING_VAT.get(), DYE_WORKS.get(), FINISHING_VAT.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CrucibleBlockEntity>> CRUCIBLE_ENTITY = BLOCK_ENTITIES.register(
+            "crucible", () -> BlockEntityType.Builder.of(CrucibleBlockEntity::new, CRUCIBLE.get(), GREAT_CRUCIBLE.get()).build(null));
+
+    public static final DeferredRegister<net.minecraft.world.inventory.MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, DungeonDelving.MODID);
+    public static final DeferredHolder<net.minecraft.world.inventory.MenuType<?>, net.minecraft.world.inventory.MenuType<CrucibleMenu>> CRUCIBLE_MENU =
+            MENUS.register("crucible", () -> new net.minecraft.world.inventory.MenuType<>(CrucibleMenu::new, net.minecraft.world.flag.FeatureFlags.VANILLA_SET));
 
     static {
         // Retired in the DD-88 rework: bending, sewing and the chopping block are gone.
@@ -189,7 +193,7 @@ public final class Crafts {
                 new Item.Properties().stacksTo(16).craftRemainder(net.minecraft.world.item.Items.GLASS_BOTTLE));
     }
 
-    /** A refining salt: a powder, used up when put into a crucible. */
+    /** A refining salt: a powder, burned as a crucible's fuel. */
     private static DeferredItem<LiquorItem> salt(String name, int stars) {
         return ModRegistries.ITEMS.registerItem(name, properties -> new LiquorItem(properties, stars, Profession.GOLDSMITHING), new Item.Properties());
     }
@@ -199,6 +203,7 @@ public final class Crafts {
 
     public static void register(IEventBus modEventBus) {
         BLOCK_ENTITIES.register(modEventBus);
+        MENUS.register(modEventBus);
         modEventBus.addListener((FMLCommonSetupEvent event) -> event.enqueueWork(SoakingVatBlock::registerInteractions));
     }
 

@@ -6,12 +6,12 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "Put a refining salt in a $(item)Crucible$(), then gold ingots. They come out as $(item)Fine Gold$() of the salt's \u2605.$(li)$(item)Bone Ash$(): bone meal and charcoal. \u26053$(li)$(item)Assay Salt$(): borax and bone ash. \u26055$(li)$(item)Sunsalt$(): assay salt and Arcane Dust. \u26057",
+      "text": "A $(item)Crucible$() works like a furnace: gold ingots on top, a refining salt in the fuel slot, $(item)Fine Gold$() out, at the salt's \u2605. It glows while it works.$(li)$(item)Bone Ash$(): bone meal and charcoal. \u26053$(li)$(item)Assay Salt$(): borax and bone ash. \u26055$(li)$(item)Sunsalt$(): assay salt and Arcane Dust. \u26057",
       "title": "Refining"
     },
     {
       "type": "patchouli:text",
-      "text": "Each vat takes four pieces a batch and uses a level of liquid. Better liquids take longer: 2 minutes at \u26053, 3 at \u26055, 4 at \u26057. Right-click with an empty hand to take the batch out, or to see how long it has left.",
+      "text": "Each salt refines four ingots. Better salts take longer: 30 seconds an ingot with bone ash, a minute with assay salt, a minute and a half with sunsalt (a quarter less in a Great Crucible). The goldsmithy must be good enough for the salt.",
       "title": "The Crucible"
     },
     {

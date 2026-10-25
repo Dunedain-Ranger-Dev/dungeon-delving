@@ -114,13 +114,20 @@ RETIRED = ["blockstates/soaking_cauldron.json", "blockstates/chopping_block.json
 
 def gold_blocks():
     """Goldsmithing's stations (DD-89)."""
-    # Crucibles: a clay pot on a brick hearth, bigger for the Great Crucible.
-    for name, (low, high) in (("crucible", (3, 13)), ("great_crucible", (1, 15))):
-        plain_block(name, model({"pot": "minecraft:block/terracotta", "base": "minecraft:block/bricks", "gold": "minecraft:block/gold_block"}, [
-            box([0, 0, 0], [16, 4, 16], "base"),
-            box([low, 4, low], [high, 13, high], "pot"),
-            box([low + 1, 12, low + 1], [high - 1, 12.5, high - 1], "gold"),
-        ]))
+    # Crucibles: a brick furnace on a brick-slab hearth, its mouth glowing while it refines. The Great Crucible is deepslate.
+    for name, brick, front in (("crucible", "minecraft:block/bricks", "furnace_front"), ("great_crucible", "minecraft:block/deepslate_bricks",
+                                                                                       "blast_furnace_front")):
+        for lit in (False, True):
+            mouth = f"minecraft:block/{front}{'_on' if lit else ''}"
+            furnace = box([1, 8, 1], [15, 16, 15], "brick")
+            furnace["faces"]["north"] = {"texture": "#mouth"}
+            write(ASSETS / f"models/block/{name}{'_on' if lit else ''}.json", model({"brick": brick, "mouth": mouth}, [
+                box([0, 0, 0], [16, 8, 16], "brick"), furnace]))
+        write(ASSETS / f"blockstates/{name}.json", {"variants": {
+            f"facing={facing},lit={str(lit).lower()}": {"model": f"{MOD}:block/{name}{'_on' if lit else ''}", "y": y}
+            for facing, y in HORIZONTAL.items() for lit in (False, True)}})
+        item_model(name, f"{MOD}:block/{name}")
+        block_loot(name)
     # Jeweler's Bench: a small table with a pin (the bench peg) and a gold block's glint.
     facing_block("jewelers_bench", model({"top": "minecraft:block/smithing_table_top", "wood": PLANKS, "gold": "minecraft:block/gold_block"}, [
         box([1, 0, 1], [3, 12, 3], "wood"), box([13, 0, 1], [15, 12, 3], "wood"),
@@ -483,7 +490,7 @@ NAMES = {
     "message.dungeondelving.chase.done": "Chased into gold fittings %s.",
     "message.dungeondelving.chase.ruined": "The design went wrong. The gold melts back into nuggets.",
     "gui.dungeondelving.timing.chase": "Click to chase the design when the marker's in the green",
-    "tooltip.dungeondelving.liquor.goldsmithing": "Refines gold to %s in %s. Put it in a crucible.",
+    "tooltip.dungeondelving.liquor.goldsmithing": "Refines 4 gold ingots to %s, %s each. Burn it in a crucible's fuel slot.",
     "tooltip.dungeondelving.jewelry.ring": "+%s max health, worn in a ring slot",
     "tooltip.dungeondelving.jewelry.amulet": "+%s armor, worn in a necklace slot",
     "skill.dungeondelving.armorsmithing": "Armorsmithing",
@@ -654,16 +661,19 @@ def handbook():
                                                   "icon": f"{MOD}:gold_ring", "sortnum": 7})
     entry("goldsmithing", "goldsmithy", "The Goldsmithy", f"{MOD}:jewelers_bench", 0, [
         page("$(li)a furnace, to smelt gold$(li)a $(item)Crucible$(), to refine it$(li)a $(item)Jeweler's Bench$(), to chase it$(br2)"
-             "Upgrades: a $(item)Great Crucible$() (eight at once, a quarter faster) and a $(item)Jeweler's Loupe$() (a wider sweet spot "
-             "at the bench).", "Stations"),
+             "Upgrades: a $(item)Great Crucible$() (a quarter faster) and a $(item)Jeweler's Loupe$() (a wider sweet spot at the "
+             "bench).", "Stations"),
         crafting("crucible", "jewelers_bench"),
         crafting("great_crucible", "jewelers_loupe"),
     ])
     entry("goldsmithing", "refining", "Refining Gold", f"{MOD}:fine_gold", 1, [
-        page("Put a refining salt in a $(item)Crucible$(), then gold ingots. They come out as $(item)Fine Gold$() of the salt's ★."
+        page("A $(item)Crucible$() works like a furnace: gold ingots on top, a refining salt in the fuel slot, $(item)Fine Gold$() "
+             "out, at the salt's ★. It glows while it works."
              "$(li)$(item)Bone Ash$(): bone meal and charcoal. ★3$(li)$(item)Assay Salt$(): borax and bone ash. ★5"
              "$(li)$(item)Sunsalt$(): assay salt and Arcane Dust. ★7", "Refining"),
-        page(VAT, "The Crucible"),
+        page("Each salt refines four ingots. Better salts take longer: 30 seconds an ingot with bone ash, a minute with assay salt, a "
+             "minute and a half with sunsalt (a quarter less in a Great Crucible). The goldsmithy must be good enough for the salt.",
+             "The Crucible"),
         crafting("bone_ash", "assay_salt"),
     ])
     entry("goldsmithing", "chasing", "Chasing and Jewelry", f"{MOD}:gold_fittings", 2, [

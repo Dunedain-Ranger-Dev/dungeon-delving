@@ -11,7 +11,7 @@ import net.minecraft.world.item.TooltipFlag;
 /**
  * A craft's vat liquid: tanning liquor (Leatherworking), sizing (Weaving) or a finish (Woodworking), brewed in a
  * cooking pot and poured into a cauldron to make that craft's vat; or a refining salt (Goldsmithing), put into a
- * crucible. What soaks in it comes out at its {@link #stars}:
+ * crucible's fuel slot. What soaks in it comes out at its {@link #stars}:
  * the liquid is to these crafts what the heated ingot's tier is to Forging, and the better ones take longer.
  */
 public class LiquorItem extends Item {
@@ -26,7 +26,9 @@ public class LiquorItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(Component.translatable("tooltip.dungeondelving.liquor." + profession.id(), StarredItem.starsText(stars),
-                SoakingVatBlock.minutes(SoakingVatBlock.soakTicks(stars))).withStyle(ChatFormatting.GRAY));
+        // A vat's time is for its whole batch; a crucible's for each ingot.
+        long ticks = profession == Profession.GOLDSMITHING ? CrucibleBlockEntity.ticksFor(stars, false) : SoakingVatBlock.soakTicks(stars);
+        tooltip.add(Component.translatable("tooltip.dungeondelving.liquor." + profession.id(), StarredItem.starsText(stars), SoakingVatBlock.minutes(ticks))
+                .withStyle(ChatFormatting.GRAY));
     }
 }

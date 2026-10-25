@@ -48,7 +48,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * <li>Leatherworking: a {@link Type#TANNING_VAT} of tanning liquor tans scraped hides into tanned leather.</li>
  * <li>Weaving: a {@link Type#SIZING_VAT} of sizing stiffens yarn (or string) into sized yarn.</li>
  * <li>Woodworking: a {@link Type#FINISHING_VAT} of finish cures seasoned billets into cured billets.</li>
- * <li>Goldsmithing: a {@link Type#CRUCIBLE} (a block of its own) of refining salt refines gold ingots into fine gold.</li>
  * </ul>
  * The Tanning Barrel and the Dye Works are the bigger, faster vats of a level 2 tannery and a level 3 weaving room. Each
  * batch uses a level of liquid. Right-click with an empty hand to take the batch out once it's done (or to see how long
@@ -68,18 +67,14 @@ public class SoakingVatBlock extends BaseEntityBlock {
             new Soak(Crafts.SCRAPED_HIDE, Forging.REFINED_LEATHER, Profession.LEATHERWORKING, 2),
             new Soak(Crafts.YARN, Crafts.SIZED_YARN, Profession.WEAVING, 1),
             new Soak(() -> Items.STRING, Crafts.SIZED_YARN, Profession.WEAVING, 1),
-            new Soak(Crafts.SEASONED_BILLET, Crafts.CURED_BILLET, Profession.WOODWORKING, 2),
-            new Soak(() -> Items.GOLD_INGOT, Crafts.FINE_GOLD, Profession.GOLDSMITHING, 2));
+            new Soak(Crafts.SEASONED_BILLET, Crafts.CURED_BILLET, Profession.WOODWORKING, 2));
 
     public enum Type {
         TANNING_VAT(Profession.LEATHERWORKING, 4, 1.0f, true),
         TANNING_BARREL(Profession.LEATHERWORKING, 8, 0.75f, false),
         SIZING_VAT(Profession.WEAVING, 4, 1.0f, true),
         DYE_WORKS(Profession.WEAVING, 8, 0.75f, false),
-        FINISHING_VAT(Profession.WOODWORKING, 4, 1.0f, true),
-        /** Goldsmithing's: gold refined with a refining salt. Not a cauldron: pour the salt straight in. */
-        CRUCIBLE(Profession.GOLDSMITHING, 4, 1.0f, false),
-        GREAT_CRUCIBLE(Profession.GOLDSMITHING, 8, 0.75f, false);
+        FINISHING_VAT(Profession.WOODWORKING, 4, 1.0f, true);
 
         public final Profession profession;
         public final int capacity;
@@ -109,7 +104,7 @@ public class SoakingVatBlock extends BaseEntityBlock {
             case LEATHERWORKING -> Crafts.TANNING_VAT.get();
             case WEAVING -> Crafts.SIZING_VAT.get();
             case WOODWORKING -> Crafts.FINISHING_VAT.get();
-            case GOLDSMITHING -> Crafts.CRUCIBLE.get();
+            case GOLDSMITHING -> throw new IllegalArgumentException("Goldsmithing refines in a crucible, not a vat");
         };
     }
 

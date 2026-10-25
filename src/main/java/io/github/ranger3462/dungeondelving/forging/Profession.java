@@ -91,7 +91,7 @@ public enum Profession {
                 if (state.is(Blocks.FURNACE) || state.is(Blocks.BLAST_FURNACE)) {
                     ids.add("furnace");
                 }
-                if (state.getBlock() instanceof SoakingVatBlock crucible && crucible.type.profession == this) {
+                if (state.getBlock() instanceof CrucibleBlock) {
                     ids.add("crucible");
                 }
                 if (state.is(Crafts.GREAT_CRUCIBLE.get())) {

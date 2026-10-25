@@ -470,7 +470,7 @@
   "message.dungeondelving.chase.done": "Chased into gold fittings %s.",
   "message.dungeondelving.chase.ruined": "The design went wrong. The gold melts back into nuggets.",
   "gui.dungeondelving.timing.chase": "Click to chase the design when the marker's in the green",
-  "tooltip.dungeondelving.liquor.goldsmithing": "Refines gold to %s in %s. Put it in a crucible.",
+  "tooltip.dungeondelving.liquor.goldsmithing": "Refines 4 gold ingots to %s, %s each. Burn it in a crucible's fuel slot.",
   "tooltip.dungeondelving.jewelry.ring": "+%s max health, worn in a ring slot",
   "tooltip.dungeondelving.jewelry.amulet": "+%s armor, worn in a necklace slot",
   "skill.dungeondelving.mining.quick_pick": "Quick Pick",
@@ -1729,5 +1729,9 @@
   "skill.dungeondelving.necromancy.necromancy_wellspring_5": "Wellspring V",
   "skill.dungeondelving.necromancy.necromancy_wellspring_5.description": "+5 max mana for Iron's Spells.",
   "skill.dungeondelving.beastmastery.animal_friend": "Animal Friend",
-  "skill.dungeondelving.beastmastery.animal_friend.description": "Your first step as a beastmaster. Companions and their perks come in a later update."
+  "skill.dungeondelving.beastmastery.animal_friend.description": "Your first step as a beastmaster. Companions and their perks come in a later update.",
+  "skill.dungeondelving.woodworking": "Woodworking",
+  "skill.dungeondelving.weaponsmithing": "Weaponsmithing",
+  "skill.dungeondelving.armorsmithing": "Armorsmithing",
+  "skill.dungeondelving.goldsmithing": "Goldsmithing"
 }

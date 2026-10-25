@@ -301,16 +301,18 @@ public class ProfessionTests {
             set(level, bench, Crafts.JEWELERS_BENCH.get());
             helper.assertTrue(CraftWorkshop.scan(level, ledger, Profession.GOLDSMITHING).complete(), "the goldsmithy is complete");
 
-            // Refine: bone ash in the crucible, then gold ingots; they come out as fine gold at the salt's ★3.
-            level.setBlock(crucible, level.getBlockState(crucible).setValue(SoakingVatBlock.LEVEL, 1), Block.UPDATE_CLIENTS);
-            SoakingVatBlockEntity vat = (SoakingVatBlockEntity) level.getBlockEntity(crucible);
-            vat.setLiquorStars(((io.github.ranger3462.dungeondelving.forging.LiquorItem) Crafts.BONE_ASH.get()).stars);
-            ItemStack gold = new ItemStack(Items.GOLD_INGOT, 2);
-            SoakingVatBlock.insert(level, crucible, level.getBlockState(crucible), vat, player, gold, SoakingVatBlock.soakFor(gold, Profession.GOLDSMITHING).orElseThrow());
-            vat.finishNow();
-            SoakingVatBlock.collect(level, crucible, level.getBlockState(crucible), vat, player);
-            ItemStack fine = find(player, Crafts.FINE_GOLD.get());
-            helper.assertTrue(fine.getCount() == 2 && Forging.stars(fine) == 3, "two ★3 fine gold, got " + fine);
+            // Refine: like a furnace, gold ingots on top and bone ash as the fuel; fine gold comes out at the salt's ★3.
+            var refiner = (io.github.ranger3462.dungeondelving.forging.CrucibleBlockEntity) level.getBlockEntity(crucible);
+            refiner.setItem(io.github.ranger3462.dungeondelving.forging.CrucibleBlockEntity.INPUT, new ItemStack(Items.GOLD_INGOT, 5));
+            refiner.setItem(io.github.ranger3462.dungeondelving.forging.CrucibleBlockEntity.SALT, new ItemStack(Crafts.BONE_ASH.get()));
+            refiner.runUntilIdle(level);
+            ItemStack fine = refiner.getItem(io.github.ranger3462.dungeondelving.forging.CrucibleBlockEntity.OUTPUT).copy();
+            helper.assertTrue(fine.getCount() == 4 && Forging.stars(fine) == 3, "one bone ash refines four ingots into ★3 fine gold, got " + fine);
+            helper.assertTrue(refiner.getItem(io.github.ranger3462.dungeondelving.forging.CrucibleBlockEntity.INPUT).getCount() == 1,
+                    "and the fifth waits for more salt");
+            helper.assertTrue(io.github.ranger3462.dungeondelving.forging.CrucibleBlockEntity.ticksFor(7, false)
+                    == io.github.ranger3462.dungeondelving.forging.CrucibleBlockEntity.ticksFor(5, false) + 600, "each better salt takes 30s more an ingot");
+            fine.setCount(2);
 
             // Chase both at the Jeweler's Bench: two fittings each.
             player.setItemInHand(InteractionHand.MAIN_HAND, fine.copy());
