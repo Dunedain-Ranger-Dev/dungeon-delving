@@ -9,10 +9,11 @@ plugins {
 }
 rootProject.name = 'dungeon-delving'
 
-// Our other mods in development (checked out next to this repository), built from source and loaded in dev runs, so
-// one runClient tests them all together. Missing ones are skipped. See siblingMods in build.gradle.
+// Our other mods in development, built from source and loaded in dev runs, so one runClient tests them all together.
+// They live in the pack repository (checked out next to this one); missing ones are skipped. See siblingMods in
+// build.gradle.
 ['deep-mines'].each { name ->
-    if (file("../${name}").isDirectory()) {
-        includeBuild("../${name}")
+    if (file("../dungeon-delving-pack/${name}").isDirectory()) {
+        includeBuild("../dungeon-delving-pack/${name}")
     }
 }
