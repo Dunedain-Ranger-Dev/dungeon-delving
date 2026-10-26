@@ -1,10 +1,12 @@
 package io.github.ranger3462.dungeondelving.gametest;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.mojang.authlib.GameProfile;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
+import io.github.ranger3462.dungeondelving.entity.TownGuard;
 import io.github.ranger3462.dungeondelving.realm.Realm;
 import io.github.ranger3462.dungeondelving.realm.RealmLiveRaids;
 import io.github.ranger3462.dungeondelving.realm.RealmNode;
@@ -13,7 +15,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -89,6 +93,34 @@ public class LiveRaidTests {
             helper.assertTrue(town.stat("damage") > 0 && town.stat("wealth") < 10, "raiders far ahead sack the town: " + town.stats());
             helper.assertTrue(level.getEntitiesOfClass(Mob.class, new net.minecraft.world.phys.AABB(town.pos()).inflate(40),
                     mob -> mob.getPersistentData().contains(DungeonDelving.MODID + ":raider")).isEmpty(), "and the raiders are cleared away");
+        } finally {
+            RealmLiveRaids.clearAll();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 200)
+    public static void guardsTurnOutByMoraleArmedByWealthToughByDefense(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        Realm realm = frontier(helper);
+        try {
+            RealmNode town = realm.node("riverhold").orElseThrow();
+            realm.setStat(town, "morale", 3);
+            realm.setStat(town, "wealth", 25);
+            realm.setStat(town, "defense", 30);
+            Realm.Raid raid = RealmRaids.declare(realm, "riverhold", 0L).orElseThrow();
+            RealmLiveRaids.LiveRaid live = RealmLiveRaids.start(realm, raid, level);
+            List<Mob> guards = RealmLiveRaids.guards(live);
+            helper.assertTrue(guards.size() == 2 && guards.stream().allMatch(guard -> guard instanceof TownGuard),
+                    "low morale turns out 2 town guards: " + guards.size());
+            Mob guard = guards.get(0);
+            helper.assertTrue(guard.getItemBySlot(EquipmentSlot.CHEST).is(Items.DIAMOND_CHESTPLATE) && guard.getMainHandItem().is(Items.DIAMOND_SWORD),
+                    "a wealthy town arms them in diamond");
+            int defense = RealmRaids.defense(realm, town);
+            helper.assertTrue(guard.getMaxHealth() == (float) TownGuard.health(defense) && guard.getMaxHealth() > 20,
+                    "a strong defense makes them tougher: " + guard.getMaxHealth());
+            helper.assertTrue(RealmLiveRaids.guardCount(10) == 4 && TownGuard.armorTier(10) == 2 && TownGuard.armorTier(2) == 0,
+                    "a usual town turns out 4 in iron; a poor one, leather");
         } finally {
             RealmLiveRaids.clearAll();
         }

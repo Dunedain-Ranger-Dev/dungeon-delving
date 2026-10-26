@@ -11,6 +11,8 @@ import java.util.UUID;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.SpawnerMobs;
+import io.github.ranger3462.dungeondelving.entity.TownGuard;
+import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -24,7 +26,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.animal.IronGolem;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -37,8 +38,8 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 /**
  * Live raids (DD-98, docs/design/realm.md). When a raid's dusk comes and a player is at the town, it isn't rolled: it's
  * fought. The attacking nation's mobs come in {@link #WAVES} waves from all round the town (its dungeon faction's mobs,
- * of a tier by the stronghold's military), against the town's guards (iron golems, for now, more for a better defense)
- * and whoever's there.
+ * of a tier by the stronghold's military), against the town's guards ({@link TownGuard}s: more for better morale, better
+ * armed for more wealth, tougher for a better defense) and whoever's there.
  * <p>
  * The damage each side does decides it: what the raiders deal to guards, villagers and players, plus what's left of
  * them when time runs out, against what they take. Beat every wave and the town holds; run out the clock behind, and it's
@@ -159,18 +160,23 @@ public final class RealmLiveRaids {
         return Mth.clamp(1 + military / 15, 1, 4);
     }
 
+    /** How many guards a town turns out for its morale: 1, plus 1 per 3 morale, up to 6 (4 at the usual 10). */
+    public static int guardCount(int morale) {
+        return Mth.clamp(1 + morale / 3, 1, 6);
+    }
+
     /** Starts fighting a raid at its town: guards turn out and the first wave comes. */
     public static LiveRaid start(Realm realm, Realm.Raid raid, ServerLevel level) {
         RealmNode town = realm.node(raid.town()).orElseThrow();
         int military = realm.node(raid.stronghold()).map(node -> node.stat("military")).orElse(10);
         LiveRaid live = new LiveRaid(raid, level, town.pos(), tier(military), Mth.clamp(3 + military / 8, 3, 12));
         ACTIVE.put(raid.town(), live);
-        int guards = Mth.clamp(RealmRaids.defense(realm, town) / 8, 1, 4);
+        int guards = guardCount(town.stat("morale"));
         for (int i = 0; i < guards; i++) {
-            IronGolem golem = EntityType.IRON_GOLEM.spawn(level, surface(level, town.pos(), 4, level.getRandom()), MobSpawnType.EVENT);
-            if (golem != null) {
-                golem.setPersistenceRequired();
-                live.guards.add(golem.getUUID());
+            TownGuard guard = ModEntities.TOWN_GUARD.get().spawn(level, surface(level, town.pos(), 4, level.getRandom()), MobSpawnType.EVENT);
+            if (guard != null) {
+                guard.equip(town.stat("wealth"), RealmRaids.defense(realm, town));
+                live.guards.add(guard.getUUID());
             }
         }
         realm.news(town.name() + " is under attack by the " + raid.nation() + "! Its guards turn out.");
