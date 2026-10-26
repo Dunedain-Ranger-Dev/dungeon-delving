@@ -48,7 +48,7 @@ public final class RealmTurns {
             long now = System.currentTimeMillis();
             RandomSource random = event.getServer().overworld().getRandom();
             catchUp(realm, now, random);
-            RealmRaids.resolveDue(realm, now, random);
+            RealmRaids.resolveDue(event.getServer(), realm, now, random);
             tellNews(event.getServer(), realm);
         }
     }

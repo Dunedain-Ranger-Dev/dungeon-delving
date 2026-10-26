@@ -37,6 +37,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * {@code /realm turn [count]}: take turns now. {@code /realm log [count]}: what's happened lately (DD-95).</li>
  * <li>{@code /realm blueprint save <id> <radius> [down] [up]}: snapshot the blocks around a node, to rebuild it from after
  * raids. {@code info}, {@code damage <id> <points>} (as a sacking would), {@code repair <id>} (all of it, now) (DD-97).</li>
+ * <li>{@code /realm raid <town>}: the strongest stronghold bordering a town raids it, in 10 seconds: fought if you're
+ * there, rolled if not (DD-98).</li>
  * </ul>
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
@@ -59,6 +61,7 @@ public final class RealmCommands {
                                 .executes(context -> list(context, StringArgumentType.getString(context, "type")))))
                 .then(Commands.literal("info").then(node("id").executes(RealmCommands::info)))
                 .then(Commands.literal("clock").executes(RealmCommands::clock))
+                .then(Commands.literal("raid").then(node("town").executes(RealmCommands::raid)))
                 .then(Commands.literal("blueprint")
                         .then(Commands.literal("save").then(node("id").then(Commands.argument("radius", IntegerArgumentType.integer(1, 48))
                                 .executes(context -> saveBlueprint(context, 8, 24))
@@ -324,6 +327,20 @@ public final class RealmCommands {
         realm.setStat(node, "damage", 0);
         Feedback.tell(context.getSource(), "Rebuilt " + rebuilt + " blocks of " + node.id + ".");
         return rebuilt;
+    }
+
+    private static int raid(CommandContext<CommandSourceStack> context) {
+        String town = StringArgumentType.getString(context, "town");
+        Realm realm = realm(context);
+        var raid = io.github.ranger3462.dungeondelving.realm.RealmRaids.declare(realm, town, System.currentTimeMillis() + 10_000L);
+        if (raid.isEmpty()) {
+            Feedback.fail(context.getSource(), "No raid: " + town + " must be a town bordering a monster stronghold, with no raid on it already.");
+            return 0;
+        }
+        RealmTurns.tellNews(context.getSource().getServer(), realm);
+        Feedback.tell(context.getSource(), "The " + raid.get().nation() + " raid " + town + " in 10 seconds. Be within "
+                + io.github.ranger3462.dungeondelving.realm.RealmLiveRaids.PRESENCE + " blocks of it to fight it.");
+        return 1;
     }
 
     private static int clock(CommandContext<CommandSourceStack> context) {
