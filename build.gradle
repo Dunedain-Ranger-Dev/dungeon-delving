@@ -294,6 +294,10 @@ dependencies {
         localRuntime "curse.maven:cosmetic-armor-reworked-forked-1434118:7685857"  // 1.21.1-0.0.4
         // Human villagers: replaces the villager look with human models, keeping their trades (on trial)
         localRuntime "curse.maven:villagers-reborn-1361000:8585406"  // 1.0.9b
+        // Land claims, coins and shops, and buying or renting claimed land with coins (on trial, for the realm)
+        localRuntime "curse.maven:ftb-chunks-forge-314906:8791113"  // 2101.1.22
+        localRuntime "curse.maven:lightmans-currency-472521:9048585"  // 1.21-2.3.0.6
+        localRuntime "curse.maven:lcompat-1267119:7942926"  // 1.21-0.1.2a
     }
 
     // For more info:
