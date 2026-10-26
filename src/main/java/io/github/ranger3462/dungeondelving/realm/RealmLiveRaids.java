@@ -161,9 +161,9 @@ public final class RealmLiveRaids {
         return Mth.clamp(1 + military / 15, 1, 4);
     }
 
-    /** How many guards a town turns out for its morale: 1, plus 1 per 3 morale, up to 6 (4 at the usual 10). */
-    public static int guardCount(int morale) {
-        return Mth.clamp(1 + morale / 3, 1, 6);
+    /** How many guards a town turns out: 1, plus 1 per 3 morale (4 at the usual 10), up to 3 more than its tier. */
+    public static int guardCount(int morale, int tier) {
+        return Mth.clamp(1 + morale / 3, 1, 3 + tier);
     }
 
     /** Starts fighting a raid at its town: guards turn out and the first wave comes. */
@@ -172,14 +172,15 @@ public final class RealmLiveRaids {
         int military = realm.node(raid.stronghold()).map(node -> node.stat("military")).orElse(10);
         LiveRaid live = new LiveRaid(raid, level, town.pos(), tier(military), Mth.clamp(3 + military / 8, 3, 12));
         ACTIVE.put(raid.town(), live);
-        int guards = guardCount(town.stat("morale"));
+        int tier = RealmTiers.tier(town);
+        int guards = guardCount(town.stat("morale"), tier);
         java.util.Optional<net.minecraft.world.item.DyeColor> color = java.util.Optional.ofNullable(
                 net.minecraft.world.item.DyeColor.byName(town.guardColor(), null));
         for (int i = 0; i < guards; i++) {
             TownGuard guard = ModEntities.TOWN_GUARD.get().spawn(level, surface(level, town.pos(), 4, level.getRandom()), MobSpawnType.EVENT);
             if (guard != null) {
                 guard.setSkin(TownGuard.pickSkin(town.guardSkin(), level.getRandom()));
-                guard.equip(town.stat("wealth"), RealmRaids.defense(realm, town), color);
+                guard.equip(town.name(), town.stat("wealth"), RealmRaids.defense(realm, town), tier, color);
                 live.guards.add(guard.getUUID());
             }
         }

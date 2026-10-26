@@ -39,6 +39,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * raids. {@code info}, {@code damage <id> <points>} (as a sacking would), {@code repair <id>} (all of it, now) (DD-97).</li>
  * <li>{@code /realm raid <town>}: the strongest stronghold bordering a town raids it, in 10 seconds: fought if you're
  * there, rolled if not (DD-98).</li>
+ * <li>{@code /realm danger}: the danger level where you stand, and why (DD-100).</li>
  * <li>{@code /realm side town|raiders}: which side you fight for in the raid you're at (the town's, unless you say).</li>
  * <li>{@code /realm guards <town>}: how its guards look. {@code skin set|mixed|<name>} (our guard set, the game's built-in
  * faces, or one skin from textures/entity/town_guard/), {@code color <dye>|none}.</li>
@@ -71,6 +72,7 @@ public final class RealmCommands {
                                 .executes(context -> list(context, StringArgumentType.getString(context, "type")))))
                 .then(Commands.literal("info").then(node("id").executes(RealmCommands::info)))
                 .then(Commands.literal("clock").executes(RealmCommands::clock))
+                .then(Commands.literal("danger").executes(RealmCommands::danger))
                 .then(Commands.literal("raid").then(node("town").executes(RealmCommands::raid)))
                 .then(Commands.literal("guards").then(node("town").executes(RealmCommands::guards)
                         .then(Commands.literal("skin").then(Commands.argument("skin", StringArgumentType.word()).suggests(GUARD_SKINS)
@@ -358,6 +360,18 @@ public final class RealmCommands {
         Feedback.tell(context.getSource(), "The " + raid.get().nation() + " raid " + town + " in 10 seconds. Be within "
                 + io.github.ranger3462.dungeondelving.realm.RealmLiveRaids.PRESENCE + " blocks of it to fight it.");
         return 1;
+    }
+
+    private static int danger(CommandContext<CommandSourceStack> context) {
+        BlockPos pos = BlockPos.containing(context.getSource().getPosition());
+        Realm realm = realm(context);
+        int level = io.github.ranger3462.dungeondelving.realm.RealmLevels.level(realm, context.getSource().getLevel().dimension(), pos);
+        String nearest = realm.nodes().stream().filter(node -> node.dimension().equals(context.getSource().getLevel().dimension()))
+                .min(java.util.Comparator.comparingDouble(node -> node.pos().distSqr(pos)))
+                .map(node -> " Nearest node: " + node.id + " (" + node.owner() + "), " + (int) Math.sqrt(node.pos().distSqr(pos)) + " blocks.").orElse("");
+        context.getSource().sendSuccess(() -> io.github.ranger3462.dungeondelving.realm.RealmLevels.describe(level).copy()
+                .append(net.minecraft.network.chat.Component.literal(nearest).withStyle(net.minecraft.ChatFormatting.GRAY)), false);
+        return level;
     }
 
     private static int guards(CommandContext<CommandSourceStack> context) {

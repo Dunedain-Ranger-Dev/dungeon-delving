@@ -122,41 +122,51 @@ public class TownGuard extends PathfinderMob {
         return wealth >= 20 ? 3 : wealth >= 10 ? 2 : wealth >= 5 ? 1 : 0;
     }
 
-    /** A guard's health for a town's defense: 20, plus 1 per point of defense, up to 60. */
-    public static double health(int defense) {
-        return Mth.clamp(20.0 + defense, 20.0, 60.0);
+    /** A guard's health: 20, plus 1 per point of the town's defense (up to 40 of it), plus 10 per tier above the first. */
+    public static double health(int defense, int tier) {
+        return 20.0 + Mth.clamp(defense, 0, 40) + 10.0 * (tier - 1);
     }
 
-    /** A guard's attack damage (before its weapon) for a town's defense: 1, plus 1 per 5 points, up to 7. */
-    public static double attack(int defense) {
-        return Mth.clamp(1.0 + defense / 5, 1.0, 7.0);
+    /** A guard's attack damage before its weapon: 1, plus 1 per 5 defense (up to 6 of it), plus 1 per tier above the first. */
+    public static double attack(int defense, int tier) {
+        return 1.0 + Mth.clamp(defense / 5, 0, 6) + (tier - 1);
+    }
+
+    /** The gear a guard wears: what the town's wealth buys, but at least chainmail from tier 2, iron from 4, diamond at 5. */
+    public static int gearTier(int wealth, int tier) {
+        int least = tier >= 5 ? 3 : tier >= 4 ? 2 : tier >= 2 ? 1 : 0;
+        return Math.max(armorTier(wealth), least);
     }
 
     /**
-     * Kits a guard out for its town: armor and weapon by wealth, health and attack by defense, and the town's color, if
-     * it has one: leather dyed, metal armor trimmed, the shield painted.
+     * Kits a guard out for its town: armor and weapon by wealth (at least what its tier gives), health and attack by
+     * defense and tier, a level by tier, and the town's color, if it has one: leather dyed, metal armor trimmed, the
+     * shield painted. Named for its town and level, shown when you look at it.
      */
-    public void equip(int wealth, int defense, java.util.Optional<DyeColor> color) {
-        getAttribute(Attributes.MAX_HEALTH).setBaseValue(health(defense));
-        getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(attack(defense));
+    public void equip(String townName, int wealth, int defense, int tier, java.util.Optional<DyeColor> color) {
+        getAttribute(Attributes.MAX_HEALTH).setBaseValue(health(defense, tier));
+        getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(attack(defense, tier));
         setHealth(getMaxHealth());
+        int level = io.github.ranger3462.dungeondelving.realm.RealmTiers.guardLevel(tier);
+        getPersistentData().putInt(io.github.ranger3462.dungeondelving.realm.RealmLevels.LEVEL_TAG, level);
+        setCustomName(net.minecraft.network.chat.Component.literal(townName + " Guard (Lv " + level + ")"));
         Item[][] sets = {
                 { Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS },
                 { Items.CHAINMAIL_HELMET, Items.CHAINMAIL_CHESTPLATE, Items.CHAINMAIL_LEGGINGS, Items.CHAINMAIL_BOOTS },
                 { Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS },
                 { Items.DIAMOND_HELMET, Items.DIAMOND_CHESTPLATE, Items.DIAMOND_LEGGINGS, Items.DIAMOND_BOOTS } };
         Item[] weapons = { Items.STONE_SWORD, Items.IRON_SWORD, Items.IRON_SWORD, Items.DIAMOND_SWORD };
-        int tier = armorTier(wealth);
+        int gear = gearTier(wealth, tier);
         EquipmentSlot[] slots = { EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET };
         for (int i = 0; i < slots.length; i++) {
-            ItemStack piece = new ItemStack(sets[tier][i]);
+            ItemStack piece = new ItemStack(sets[gear][i]);
             color.ifPresent(dye -> colorPiece(piece, dye));
             setItemSlot(slots[i], piece);
             setDropChance(slots[i], 0.0f);
         }
-        setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(weapons[tier]));
+        setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(weapons[gear]));
         setDropChance(EquipmentSlot.MAINHAND, 0.0f);
-        ItemStack shield = tier >= 1 ? new ItemStack(Items.SHIELD) : ItemStack.EMPTY;
+        ItemStack shield = gear >= 1 ? new ItemStack(Items.SHIELD) : ItemStack.EMPTY;
         color.ifPresent(dye -> shield.set(DataComponents.BASE_COLOR, dye));
         setItemSlot(EquipmentSlot.OFFHAND, shield);
         setDropChance(EquipmentSlot.OFFHAND, 0.0f);

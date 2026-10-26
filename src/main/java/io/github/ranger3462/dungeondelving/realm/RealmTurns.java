@@ -109,6 +109,7 @@ public final class RealmTurns {
     public static void takeTurn(Realm realm, RandomSource random, long time) {
         realm.turn++;
         RealmDamage.fundRepairs(realm);
+        RealmTiers.grow(realm);
         kingdomAct(realm, pick(kingdomWeights(realm), random));
         for (String nation : realm.nations()) {
             nationAct(realm, nation, pick(nationWeights(realm, nation), random), time);

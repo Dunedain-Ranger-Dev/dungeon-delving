@@ -117,9 +117,9 @@ public class LiveRaidTests {
             helper.assertTrue(guard.getItemBySlot(EquipmentSlot.CHEST).is(Items.DIAMOND_CHESTPLATE) && guard.getMainHandItem().is(Items.DIAMOND_SWORD),
                     "a wealthy town arms them in diamond");
             int defense = RealmRaids.defense(realm, town);
-            helper.assertTrue(guard.getMaxHealth() == (float) TownGuard.health(defense) && guard.getMaxHealth() > 20,
+            helper.assertTrue(guard.getMaxHealth() == (float) TownGuard.health(defense, 1) && guard.getMaxHealth() > 20,
                     "a strong defense makes them tougher: " + guard.getMaxHealth());
-            helper.assertTrue(RealmLiveRaids.guardCount(10) == 4 && TownGuard.armorTier(10) == 2 && TownGuard.armorTier(2) == 0,
+            helper.assertTrue(RealmLiveRaids.guardCount(10, 1) == 4 && TownGuard.armorTier(10) == 2 && TownGuard.armorTier(2) == 0,
                     "a usual town turns out 4 in iron; a poor one, leather");
         } finally {
             RealmLiveRaids.clearAll();
