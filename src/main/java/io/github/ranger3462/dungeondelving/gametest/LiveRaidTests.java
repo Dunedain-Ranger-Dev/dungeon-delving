@@ -33,16 +33,33 @@ public class LiveRaidTests {
             Realm.Raid raid = RealmRaids.declare(realm, "riverhold", 0L).orElseThrow();
             helper.assertTrue(RealmRaids.declare(realm, "riverhold", 0L).isEmpty(), "one raid on a town at a time");
             RealmLiveRaids.LiveRaid live = RealmLiveRaids.start(realm, raid, level);
+            RealmLiveRaids.pretendPresent(live, true);
             helper.assertTrue(RealmLiveRaids.isLive(raid) && live.wave() == 1, "the fight starts with wave 1");
             helper.assertTrue(RealmRaids.resolveDue(realm, Long.MAX_VALUE, net.minecraft.util.RandomSource.create(1)) == 0,
                     "a raid being fought isn't rolled");
             helper.assertTrue(live.raiders().size() == 4, "a military of 10 sends waves of 4: " + live.raiders().size());
 
-            // Damage counts: a player hurting a raider is the town's; a player hurting a guard is a turncoat's.
+            // Damage counts: a player hurting a raider is the town's.
             FakePlayer player = FakePlayerFactory.get(level, new GameProfile(UUID.randomUUID(), "defender"));
+            player.moveTo(realm.node("riverhold").orElseThrow().pos().getCenter());
             Mob raider = RealmLiveRaids.raiders(live).get(0);
             raider.hurt(level.damageSources().playerAttack(player), 4.0f);
             helper.assertTrue(live.defenseScore() >= 3.9f, "hurting a raider counts for the town: " + live.defenseScore());
+
+            // No friendly fire: the town's side can't hurt its guards; declared for the raiders, a player can't hurt raiders.
+            Mob guard = RealmLiveRaids.guards(live).get(0);
+            float guardHealth = guard.getHealth();
+            guard.hurt(level.damageSources().playerAttack(player), 4.0f);
+            helper.assertTrue(guard.getHealth() == guardHealth, "a defender can't hurt the town's guards");
+            RealmLiveRaids.side(live, player.getUUID(), true);
+            float raiderHealth = raider.getHealth();
+            raider.hurt(level.damageSources().playerAttack(player), 2.0f);
+            helper.assertTrue(raider.getHealth() == raiderHealth, "nor can a turncoat hurt the raiders");
+            raider.invulnerableTime = 0;
+            guard.hurt(level.damageSources().playerAttack(player), 4.0f);
+            helper.assertTrue(guard.getHealth() < guardHealth && live.attackScore() > 0, "but a turncoat can hurt the guards, for the raiders");
+            RealmLiveRaids.side(live, player.getUUID(), false);
+            guard.heal(100);
 
             for (int wave = 1; wave <= RealmLiveRaids.WAVES; wave++) {
                 RealmLiveRaids.raiders(live).forEach(Mob::discard);
@@ -64,6 +81,7 @@ public class LiveRaidTests {
         try {
             Realm.Raid raid = RealmRaids.declare(realm, "riverhold", 0L).orElseThrow();
             RealmLiveRaids.LiveRaid live = RealmLiveRaids.start(realm, raid, level);
+            RealmLiveRaids.pretendPresent(live, true);
             RealmLiveRaids.score(live, 200, 20);
             RealmLiveRaids.tick(level.getServer(), realm, RealmLiveRaids.TIME_LIMIT);
             helper.assertFalse(RealmLiveRaids.isLive(raid), "the fight ends when time runs out");
@@ -71,6 +89,42 @@ public class LiveRaidTests {
             helper.assertTrue(town.stat("damage") > 0 && town.stat("wealth") < 10, "raiders far ahead sack the town: " + town.stats());
             helper.assertTrue(level.getEntitiesOfClass(Mob.class, new net.minecraft.world.phys.AABB(town.pos()).inflate(40),
                     mob -> mob.getPersistentData().contains(DungeonDelving.MODID + ":raider")).isEmpty(), "and the raiders are cleared away");
+        } finally {
+            RealmLiveRaids.clearAll();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 200)
+    public static void whenTheGuardsFallTheTownIsSacked(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        Realm realm = frontier(helper);
+        try {
+            Realm.Raid raid = RealmRaids.declare(realm, "riverhold", 0L).orElseThrow();
+            RealmLiveRaids.LiveRaid live = RealmLiveRaids.start(realm, raid, level);
+            RealmLiveRaids.pretendPresent(live, true);
+            RealmLiveRaids.score(live, 0, 100); // The town was even ahead on damage.
+            RealmLiveRaids.guards(live).forEach(Mob::discard);
+            RealmLiveRaids.tick(level.getServer(), realm, 20);
+            helper.assertFalse(RealmLiveRaids.isLive(raid), "with every guard down, the fight is over");
+            helper.assertTrue(realm.node("riverhold").orElseThrow().stat("damage") > 0, "and the town is sacked");
+            helper.assertTrue(realm.log().stream().anyMatch(entry -> entry.text().contains("have fallen")), "the news says the guards fell");
+        } finally {
+            RealmLiveRaids.clearAll();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 200)
+    public static void aFightWithNoOneThereWaitsThenIsRolled(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        Realm realm = frontier(helper);
+        try {
+            Realm.Raid raid = RealmRaids.declare(realm, "riverhold", 0L).orElseThrow();
+            RealmLiveRaids.LiveRaid live = RealmLiveRaids.start(realm, raid, level);
+            RealmLiveRaids.raiders(live).forEach(Mob::discard);
+            RealmLiveRaids.tick(level.getServer(), realm, 20);
+            helper.assertTrue(RealmLiveRaids.isLive(raid) && live.wave() == 1, "with no one there, no new wave comes");
         } finally {
             RealmLiveRaids.clearAll();
         }

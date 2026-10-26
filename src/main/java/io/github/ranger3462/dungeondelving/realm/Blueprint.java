@@ -17,6 +17,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.saveddata.SavedData;
 
@@ -25,8 +26,8 @@ import net.minecraft.world.level.saveddata.SavedData;
  * (one data file per town). Raids break the blocks it holds and rebuilding puts them back, so a hand-built town is never
  * lost for good. Re-saving it (when the town's builds change on purpose) replaces it.
  * <p>
- * The order raids break blocks in: the outside first (walls, palisades: nearest the box's edge), and higher before lower
- * (roofs before floors). Rebuilding goes bottom up, so nothing is placed without what holds it up.
+ * The order raids break blocks in: scattered, but leaning to the outside first (walls, palisades: nearest the box's edge),
+ * and higher before lower (roofs before floors). Rebuilding goes bottom up, so nothing is placed without what holds it up.
  */
 public final class Blueprint extends SavedData {
     private BlockPos origin = BlockPos.ZERO;
@@ -109,13 +110,25 @@ public final class Blueprint extends SavedData {
                 && local.getZ() < size.getZ();
     }
 
-    /** The positions with a block, outside first, then higher first. */
+    /**
+     * The positions with a block, scattered: each gets a score (its distance in from the edge, less half its height,
+     * plus a fixed random amount up to {@link #SCATTER}), lowest first. So the outside and the tops still go first on the
+     * whole, without breaking in straight lines.
+     */
     public int[] breakOrder() {
         if (breakOrder == null) {
-            breakOrder = IntStream.range(0, blocks.length).filter(i -> blocks[i] >= 0).boxed().sorted(Comparator.<Integer>comparingInt(this::edgeDistance)
-                    .thenComparing(Comparator.<Integer>comparingInt(i -> i / (size.getX() * size.getZ())).reversed())).mapToInt(Integer::intValue).toArray();
+            breakOrder = IntStream.range(0, blocks.length).filter(i -> blocks[i] >= 0).boxed().sorted(Comparator.<Integer>comparingInt(this::breakScore)
+                    .thenComparingInt(Mth::murmurHash3Mixer)).mapToInt(Integer::intValue).toArray();
         }
         return breakOrder;
+    }
+
+    /** How much the break order is shuffled: a block's score gets up to this much added at random. */
+    public static final int SCATTER = 12;
+
+    private int breakScore(int i) {
+        int y = i / (size.getX() * size.getZ());
+        return edgeDistance(i) * 2 - y / 2 + Math.floorMod(Mth.murmurHash3Mixer(i * 31 + 7), SCATTER);
     }
 
     /** How far index {@code i} is from the box's nearest side, across (not up). */

@@ -39,6 +39,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * raids. {@code info}, {@code damage <id> <points>} (as a sacking would), {@code repair <id>} (all of it, now) (DD-97).</li>
  * <li>{@code /realm raid <town>}: the strongest stronghold bordering a town raids it, in 10 seconds: fought if you're
  * there, rolled if not (DD-98).</li>
+ * <li>{@code /realm side town|raiders}: which side you fight for in the raid you're at (the town's, unless you say).</li>
  * </ul>
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
@@ -62,6 +63,8 @@ public final class RealmCommands {
                 .then(Commands.literal("info").then(node("id").executes(RealmCommands::info)))
                 .then(Commands.literal("clock").executes(RealmCommands::clock))
                 .then(Commands.literal("raid").then(node("town").executes(RealmCommands::raid)))
+                .then(Commands.literal("side").then(Commands.literal("town").executes(context -> side(context, false)))
+                        .then(Commands.literal("raiders").executes(context -> side(context, true))))
                 .then(Commands.literal("blueprint")
                         .then(Commands.literal("save").then(node("id").then(Commands.argument("radius", IntegerArgumentType.integer(1, 48))
                                 .executes(context -> saveBlueprint(context, 8, 24))
@@ -340,6 +343,18 @@ public final class RealmCommands {
         RealmTurns.tellNews(context.getSource().getServer(), realm);
         Feedback.tell(context.getSource(), "The " + raid.get().nation() + " raid " + town + " in 10 seconds. Be within "
                 + io.github.ranger3462.dungeondelving.realm.RealmLiveRaids.PRESENCE + " blocks of it to fight it.");
+        return 1;
+    }
+
+    private static int side(CommandContext<CommandSourceStack> context, boolean raiders) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        net.minecraft.server.level.ServerPlayer player = context.getSource().getPlayerOrException();
+        var live = io.github.ranger3462.dungeondelving.realm.RealmLiveRaids.near(player);
+        if (live.isEmpty()) {
+            Feedback.fail(context.getSource(), "There's no raid being fought near you.");
+            return 0;
+        }
+        io.github.ranger3462.dungeondelving.realm.RealmLiveRaids.side(live.get(), player.getUUID(), raiders);
+        Feedback.tell(context.getSource(), raiders ? "You fight for the raiders. The kingdom will remember." : "You fight for the town.");
         return 1;
     }
 

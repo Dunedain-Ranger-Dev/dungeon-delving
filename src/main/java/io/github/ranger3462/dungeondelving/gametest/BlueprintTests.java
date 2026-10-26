@@ -36,11 +36,25 @@ public class BlueprintTests {
 
             BlockPos glass = origin.offset(3, 2, 3);
             level.setBlock(glass, Blocks.GLASS.defaultBlockState(), Block.UPDATE_CLIENTS); // Placed after: not in the blueprint.
-            int first = blueprint.breakOrder()[0];
-            BlockPos firstPos = blueprint.pos(first).subtract(origin);
-            helper.assertTrue(firstPos.getX() == 0 || firstPos.getZ() == 0 || firstPos.getX() == 6 || firstPos.getZ() == 6,
-                    "raids break the outside first");
-            helper.assertTrue(firstPos.getY() == 4, "and the top before the bottom");
+            int[] order = blueprint.breakOrder();
+            int firstOuter = 0;
+            int firstHeight = 0;
+            int lastHeight = 0;
+            for (int n = 0; n < 24; n++) {
+                BlockPos at = blueprint.pos(order[n]).subtract(origin);
+                firstOuter += at.getX() == 0 || at.getZ() == 0 || at.getX() == 6 || at.getZ() == 6 ? 1 : 0;
+                firstHeight += at.getY();
+                lastHeight += blueprint.pos(order[order.length - 1 - n]).subtract(origin).getY();
+            }
+            helper.assertTrue(firstOuter >= 18, "raids break mostly the outside first: " + firstOuter + " of 24");
+            helper.assertTrue(firstHeight > lastHeight, "and the top before the bottom, on the whole");
+            BlockPos a = blueprint.pos(order[0]).subtract(origin);
+            boolean inLine = true;
+            for (int n = 1; n < 8; n++) {
+                BlockPos at = blueprint.pos(order[n]).subtract(origin);
+                inLine &= at.getY() == a.getY() && (at.getX() == a.getX() || at.getZ() == a.getZ());
+            }
+            helper.assertFalse(inLine, "but scattered, not along one line");
 
             helper.assertTrue(RealmDamage.breakBlocks(level, blueprint, 10) == 10, "ten blocks are broken");
             RealmDamage.breakBlocks(level, blueprint, 100_000);

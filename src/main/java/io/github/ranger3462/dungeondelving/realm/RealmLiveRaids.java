@@ -29,7 +29,9 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingChangeTargetEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
@@ -40,9 +42,12 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * <p>
  * The damage each side does decides it: what the raiders deal to guards, villagers and players, plus what's left of
  * them when time runs out, against what they take. Beat every wave and the town holds; run out the clock behind, and it's
- * sacked, as a rolled raid would be (with block damage by the margin). A player can fight for either side: hurting the
- * guards counts for the raiders (and is noted: standing will cost them, later). If every player leaves, the raid is
- * rolled after all.
+ * sacked, as a rolled raid would be (with block damage by the margin); let every guard fall, and it's sacked at once.
+ * <p>
+ * Players fight for the town unless they declare for the raiders ({@code /realm side raiders}, noted: standing will cost
+ * them, later). There's no friendly fire: the town's side can't hurt its guards and villagers, the raiders' side can't hurt
+ * raiders, and the raiders leave their own side alone. If every player leaves, the fight waits (no new waves) and, after
+ * {@link #ALONE_LIMIT}, is rolled after all.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class RealmLiveRaids {
@@ -71,11 +76,14 @@ public final class RealmLiveRaids {
         int wave;
         final Set<UUID> raiders = new HashSet<>();
         final Set<UUID> guards = new HashSet<>();
+        /** Players who declared for the raiders. */
         final Set<UUID> turncoats = new HashSet<>();
         float attackScore;
         float defenseScore;
         int age;
         int alone;
+        /** For tests: count a player as there (fake players aren't in the level's player list). */
+        boolean pretendPresent;
 
         LiveRaid(Realm.Raid raid, ServerLevel level, BlockPos center, int tier, int waveSize) {
             this.raid = raid;
@@ -100,6 +108,10 @@ public final class RealmLiveRaids {
         public Set<UUID> raiders() {
             return raiders;
         }
+
+        public Set<UUID> turncoats() {
+            return turncoats;
+        }
     }
 
     private RealmLiveRaids() {}
@@ -111,6 +123,30 @@ public final class RealmLiveRaids {
 
     public static Optional<LiveRaid> live(String town) {
         return Optional.ofNullable(ACTIVE.get(town));
+    }
+
+    /** The fight a player is near enough to take part in, if any. */
+    public static Optional<LiveRaid> near(ServerPlayer player) {
+        return ACTIVE.values().stream().filter(live -> live.level == player.level() && player.blockPosition().closerThan(live.center, ABANDON)).findFirst();
+    }
+
+    /** Puts a player on the raiders' side of a fight ({@code true}) or back on the town's. */
+    public static void side(LiveRaid live, UUID player, boolean raiders) {
+        if (raiders) {
+            live.turncoats.add(player);
+        } else {
+            live.turncoats.remove(player);
+        }
+        for (UUID id : live.raiders) {
+            if (live.level.getEntity(id) instanceof Mob mob && mob.getTarget() != null && mob.getTarget().getUUID().equals(player) && raiders) {
+                mob.setTarget(null);
+            }
+        }
+        for (UUID id : live.guards) {
+            if (live.level.getEntity(id) instanceof Mob mob && mob.getTarget() != null && mob.getTarget().getUUID().equals(player) && !raiders) {
+                mob.setTarget(null);
+            }
+        }
     }
 
     /** Whether a player is near enough to a town to fight its raid. */
@@ -180,8 +216,14 @@ public final class RealmLiveRaids {
         for (Iterator<LiveRaid> it = ACTIVE.values().iterator(); it.hasNext();) {
             LiveRaid live = it.next();
             live.age += ticks;
-            live.alone = playerAt(live.level, live.center, ABANDON) ? 0 : live.alone + ticks;
+            live.alone = live.pretendPresent || playerAt(live.level, live.center, ABANDON) ? 0 : live.alone + ticks;
             int standing = 0;
+            int guards = 0;
+            for (UUID id : live.guards) {
+                if (live.level.getEntity(id) instanceof LivingEntity guard && guard.isAlive()) {
+                    guards++;
+                }
+            }
             for (UUID id : live.raiders) {
                 if (live.level.getEntity(id) instanceof Mob mob && mob.isAlive()) {
                     standing++;
@@ -195,24 +237,35 @@ public final class RealmLiveRaids {
                 it.remove();
                 realm.record("Everyone left " + live.raid.town() + "'s fight: it was decided by the odds.");
                 RealmRaids.resolve(realm, live.raid, 1 + live.level.getRandom().nextInt(20), 1 + live.level.getRandom().nextInt(20));
+            } else if (live.alone > 0) {
+                // No one's there: the fight waits (its mobs may not even be loaded, so they can't be counted).
+            } else if (guards == 0 && standing > 0) {
+                it.remove();
+                finish(realm, live, standing, true);
             } else if (standing == 0 && live.wave < WAVES) {
                 nextWave(realm, live);
             } else if (standing == 0 || live.age >= TIME_LIMIT) {
                 it.remove();
-                finish(realm, live, standing);
+                finish(realm, live, standing, false);
             }
         }
         RealmTurns.tellNews(server, realm);
     }
 
-    /** A fight is over: weigh the scores like a rolled raid's numbers, and clear the field. */
-    static void finish(Realm realm, LiveRaid live, int raidersLeft) {
+    /**
+     * A fight is over: weigh the scores like a rolled raid's numbers, and clear the field. Every wave beaten, the town
+     * holds; every guard fallen ({@code overrun}), it's sacked.
+     */
+    static void finish(Realm realm, LiveRaid live, int raidersLeft, boolean overrun) {
         float attack = live.attackScore + raidersLeft * 10;
         clear(live);
         int scaledAttack = Math.round(attack / SCORE_SCALE);
         int scaledDefense = Math.round(live.defenseScore / SCORE_SCALE);
         if (raidersLeft == 0) {
-            scaledAttack = Math.min(scaledAttack, scaledDefense); // Every wave beaten: the town holds.
+            scaledAttack = Math.min(scaledAttack, scaledDefense);
+        } else if (overrun) {
+            realm.news("The guards of " + realm.node(live.raid.town()).map(RealmNode::name).orElse(live.raid.town()) + " have fallen!");
+            scaledAttack = Math.max(scaledAttack, scaledDefense + 1);
         }
         RealmRaids.decide(realm, live.raid, scaledAttack, scaledDefense, true);
         if (!live.turncoats.isEmpty()) {
@@ -236,7 +289,59 @@ public final class RealmLiveRaids {
         }
     }
 
-    /** Counts damage for a fight: raiders hurt (the town's side), and raiders or turncoats hurting guards, villagers and players. */
+    /** No friendly fire: each side's hits on its own side are cancelled, from players and mobs alike. */
+    @SubscribeEvent
+    public static void onIncomingDamage(LivingIncomingDamageEvent event) {
+        if (ACTIVE.isEmpty() || event.getSource().getEntity() == null) {
+            return;
+        }
+        Entity attacker = event.getSource().getEntity();
+        for (LiveRaid live : ACTIVE.values()) {
+            Boolean attackerRaids = side(live, attacker);
+            Boolean victimRaids = side(live, event.getEntity());
+            if (attackerRaids != null && attackerRaids.equals(victimRaids) && attacker != event.getEntity()) {
+                event.setCanceled(true);
+                return;
+            }
+        }
+    }
+
+    /** The raiders leave their own side's players alone, and the guards leave the town's. */
+    @SubscribeEvent
+    public static void onChangeTarget(LivingChangeTargetEvent event) {
+        if (ACTIVE.isEmpty() || event.getNewAboutToBeSetTarget() == null) {
+            return;
+        }
+        for (LiveRaid live : ACTIVE.values()) {
+            Boolean mobRaids = side(live, event.getEntity());
+            if (mobRaids != null && mobRaids.equals(side(live, event.getNewAboutToBeSetTarget()))) {
+                event.setCanceled(true);
+                return;
+            }
+        }
+    }
+
+    /**
+     * Which side of a fight an entity is on: {@code true} for the raiders (their mobs, and players who declared for
+     * them), {@code false} for the town (its guards, villagers near it, and every other player near it), null if neither.
+     */
+    static Boolean side(LiveRaid live, Entity entity) {
+        if (entity.level() != live.level) {
+            return null;
+        }
+        if (live.raiders.contains(entity.getUUID()) || live.turncoats.contains(entity.getUUID())) {
+            return true;
+        }
+        if (live.guards.contains(entity.getUUID())) {
+            return false;
+        }
+        if ((entity instanceof ServerPlayer || entity instanceof AbstractVillager) && entity.blockPosition().closerThan(live.center, ABANDON)) {
+            return false;
+        }
+        return null;
+    }
+
+    /** Counts damage for a fight: what the raiders' side takes is the town's score, and what the town's side takes is the raiders'. */
     @SubscribeEvent
     public static void onDamage(LivingDamageEvent.Post event) {
         if (ACTIVE.isEmpty()) {
@@ -246,25 +351,29 @@ public final class RealmLiveRaids {
         Entity attacker = event.getSource().getEntity();
         float damage = event.getNewDamage();
         for (LiveRaid live : ACTIVE.values()) {
-            if (live.raiders.contains(victim.getUUID())) {
+            Boolean victimRaids = side(live, victim);
+            if (Boolean.TRUE.equals(victimRaids) && live.raiders.contains(victim.getUUID())) {
                 live.defenseScore += damage;
-            } else if (attacker != null && live.raiders.contains(attacker.getUUID()) && defender(live, victim)) {
+            } else if (Boolean.FALSE.equals(victimRaids) && attacker != null && Boolean.TRUE.equals(side(live, attacker))) {
                 live.attackScore += damage;
-            } else if (attacker instanceof ServerPlayer player && live.guards.contains(victim.getUUID())) {
-                live.attackScore += damage;
-                live.turncoats.add(player.getUUID());
             }
         }
-    }
-
-    private static boolean defender(LiveRaid live, LivingEntity entity) {
-        return live.guards.contains(entity.getUUID()) || entity instanceof ServerPlayer || entity instanceof AbstractVillager;
     }
 
     /** Counts damage as if it were dealt in a fight, for tests. */
     public static void score(LiveRaid live, float attack, float defense) {
         live.attackScore += attack;
         live.defenseScore += defense;
+    }
+
+    /** Counts a player as at the fight, for tests. */
+    public static void pretendPresent(LiveRaid live, boolean present) {
+        live.pretendPresent = present;
+    }
+
+    /** The live raid's guards, for tests. */
+    public static List<Mob> guards(LiveRaid live) {
+        return live.guards.stream().map(live.level::getEntity).filter(entity -> entity instanceof Mob).map(entity -> (Mob) entity).toList();
     }
 
     /** Ends every fight at once, for tests. */
