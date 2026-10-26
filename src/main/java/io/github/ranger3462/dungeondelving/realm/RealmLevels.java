@@ -50,6 +50,9 @@ public final class RealmLevels {
     public static final int SAFE_RADIUS = 64;
     public static final int STEP = 150;
     public static final int STRONGHOLD_REACH = 240;
+    /** A nation's capital is always dangerous: at least this many levels at its heart, fading out to its reach. */
+    public static final int CAPITAL_FLOOR = 6;
+    public static final int CAPITAL_REACH = 360;
     /** A stronghold adds a level per this much military, at its heart. */
     public static final int MILITARY_PER_LEVEL = 8;
     /** Per level: +15% health, +10% damage, +0.5 armor. */
@@ -79,6 +82,9 @@ public final class RealmLevels {
                 nearestKingdom = Math.min(nearestKingdom, distance);
             } else if (node.monsters() && node.type == RealmNode.Type.STRONGHOLD && distance < STRONGHOLD_REACH) {
                 strongholdBonus = Math.max(strongholdBonus, (double) node.stat("military") / MILITARY_PER_LEVEL * (1 - distance / STRONGHOLD_REACH));
+            } else if (node.monsters() && node.type == RealmNode.Type.CAPITAL && distance < CAPITAL_REACH) {
+                double heart = Math.max(CAPITAL_FLOOR, (double) node.stat("military") / MILITARY_PER_LEVEL);
+                strongholdBonus = Math.max(strongholdBonus, heart * (1 - distance / CAPITAL_REACH));
             }
         }
         if (!anyNode) {

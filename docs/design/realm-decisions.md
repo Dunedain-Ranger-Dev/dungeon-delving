@@ -41,6 +41,21 @@ So a nation weaker than its target mostly builds up. Once it outmatches the targ
 bigger its lead: 15 military over the target's defense makes raid weight 6 against build 3 and fortify 1-2.
 Fortification currently only counts toward this choice; it will matter once the kingdom can attack strongholds.
 
+## Capitals
+
+Each nation can have a **capital** (a `capital` node). It can never be taken or cleared, and the land around it stays
+dangerous: at least danger 6 at its heart, fading out over 360 blocks (`RealmCapitals`).
+
+- While the nation holds any stronghold, its capital just waits.
+- Once it has lost them all, it's **pushed back**. Building military now goes to the capital, and each turn the
+  capital **rallies**. Every 3 turns of rallying, its **champion** marches on the nearest kingdom town as a raid. The
+  champion is one of the nation's dungeon bosses, tier 1 plus 1 per 20 of the capital's military, up to 4. A rolled
+  champion raid gets +10 attack; a fought one brings the champion with the last wave.
+- Players can call the champion out at the capital with `/challenge` (within 48 blocks of it, once the nation is
+  pushed back, one champion at a time).
+- **Killing the champion** costs the capital a third of its military and resets its rally. A champion that sacks a
+  town, or kills its challenger, adds 5 military.
+
 ## Raids
 
 At dusk a raid is fought if a player is within 48 blocks of the town. Otherwise it's rolled:
@@ -68,4 +83,4 @@ Players affect these choices only through the numbers the factions read:
 
 - Nations don't yet expand, take kingdom nodes, or work together.
 - The kingdom doesn't yet attack strongholds itself; for now that's the players' job.
-- Home bases are planned: nation capitals that can't be taken, and send raid bosses once a nation is pushed back.
+- Nations don't yet retake strongholds from their capital.

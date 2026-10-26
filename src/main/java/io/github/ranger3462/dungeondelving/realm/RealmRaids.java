@@ -79,7 +79,8 @@ public final class RealmRaids {
     public static boolean resolve(Realm realm, Realm.Raid raid, int attackRoll, int defenseRoll) {
         Optional<RealmNode> town = realm.node(raid.town());
         Optional<RealmNode> stronghold = realm.node(raid.stronghold());
-        int attack = stronghold.map(node -> node.stat("military")).orElse(0) + attackRoll;
+        int attack = stronghold.map(node -> node.stat("military") + (node.type == RealmNode.Type.CAPITAL ? RealmCapitals.CHAMPION_BONUS : 0)).orElse(0)
+                + attackRoll;
         int defense = town.map(node -> defense(realm, node)).orElse(0) + defenseRoll;
         return decide(realm, raid, attack, defense, false);
     }
@@ -112,6 +113,9 @@ public final class RealmRaids {
             realm.addStat(attacker, "military", -Math.min(attacker.stat("military"), 1));
             realm.news("The " + raid.nation() + " of " + attacker.name() + " sacked " + target.name() + how + " (" + attack + " against " + defense
                     + "): it lost " + defenseLost + " defense, " + wealthLost + " wealth and " + moraleLost + " morale.");
+            if (attacker.type == RealmNode.Type.CAPITAL) {
+                RealmCapitals.championRaidDecided(realm, attacker, true);
+            }
             int tier = RealmTiers.tier(target);
             if (margin >= TIER_LOSS_MARGIN && tier > 1) {
                 realm.setStat(target, "tier", tier - 1);

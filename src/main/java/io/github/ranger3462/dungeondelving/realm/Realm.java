@@ -73,7 +73,7 @@ public final class Realm extends SavedData {
     public static Optional<String> defaultOwner(RealmNode.Type type) {
         return switch (type) {
             case TOWN -> Optional.of(RealmNode.KINGDOM);
-            case STRONGHOLD -> Optional.empty();
+            case STRONGHOLD, CAPITAL -> Optional.empty();
             default -> Optional.of(RealmNode.NONE);
         };
     }
@@ -93,6 +93,9 @@ public final class Realm extends SavedData {
         }
         if (type == RealmNode.Type.TOWN && !RealmNode.KINGDOM.equals(owner)) {
             return Optional.of("Towns are always the kingdom's.");
+        }
+        if (type == RealmNode.Type.CAPITAL && (RealmNode.KINGDOM.equals(owner) || RealmNode.NONE.equals(owner))) {
+            return Optional.of("A capital is a monster nation's home, and can't be taken (" + String.join(", ", DungeonFactions.ids()) + ").");
         }
         if (founding && type == RealmNode.Type.STRONGHOLD && (RealmNode.KINGDOM.equals(owner) || RealmNode.NONE.equals(owner))) {
             return Optional.of("A stronghold belongs to a monster nation (" + String.join(", ", DungeonFactions.ids()) + ").");
@@ -292,7 +295,8 @@ public final class Realm extends SavedData {
 
     /** The monster nations that hold a stronghold: the ones that take turns. */
     public List<String> nations() {
-        return nodes.values().stream().filter(node -> node.type == RealmNode.Type.STRONGHOLD && node.monsters()).map(RealmNode::owner).distinct().toList();
+        return nodes.values().stream().filter(node -> (node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.CAPITAL) && node.monsters())
+                .map(RealmNode::owner).distinct().toList();
     }
 
     // --- Saving ---

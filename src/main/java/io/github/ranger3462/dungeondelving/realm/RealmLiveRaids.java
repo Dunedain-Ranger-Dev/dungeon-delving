@@ -240,6 +240,16 @@ public final class RealmLiveRaids {
                 live.raiders.add(mob.getUUID());
             }
         }
+        if (live.wave == WAVES) {
+            realm.node(live.raid.stronghold()).filter(node -> node.type == RealmNode.Type.CAPITAL).ifPresent(capital -> {
+                float angle = random.nextFloat() * Mth.TWO_PI;
+                BlockPos at = surface(live.level, live.center.offset((int) (Mth.cos(angle) * RING), 0, (int) (Mth.sin(angle) * RING)), 2, random);
+                Mob champion = RealmCapitals.spawnChampion(live.level, at, capital);
+                champion.getPersistentData().putString(RAIDER, live.raid.town());
+                live.raiders.add(champion.getUUID());
+                realm.news("The champion of the " + capital.owner() + " leads the last wave!");
+            });
+        }
         realm.news("Wave " + live.wave + " of " + WAVES + " comes for " + realm.node(live.raid.town()).map(RealmNode::name).orElse(live.raid.town()) + ".");
     }
 

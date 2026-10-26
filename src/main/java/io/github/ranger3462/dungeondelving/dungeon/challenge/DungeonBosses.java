@@ -213,6 +213,27 @@ public final class DungeonBosses {
         return mob;
     }
 
+    /**
+     * Spawns a boss outside the dungeons, as a nation's realm champion (DD-101): its faction's boss for the tier (or the
+     * Barrow King), tagged as a boss (for its loot and boss bar) with no dungeon region, persistent, with its retinue.
+     */
+    public static Mob spawnChampion(ServerLevel level, BlockPos pos, int tier, String faction) {
+        BossType type = TYPES.getOrDefault(pick(tier, faction, level.getRandom()), TYPES.get(BARROW_KING));
+        Mob mob = type.spawner().create(level, pos, tier);
+        mob.setPersistenceRequired();
+        CompoundTag tag = new CompoundTag();
+        tag.putString("id", type.id());
+        tag.putInt("tier", tier);
+        tag.putInt("region", NO_REGION);
+        mob.getPersistentData().put(BOSS_TAG, tag);
+        level.addFreshEntity(mob);
+        RETINUES.getOrDefault(type.id(), List.of()).forEach(retinue -> retinue.spawn(level, pos, tier));
+        return mob;
+    }
+
+    /** A boss's region when it isn't in a dungeon (a realm champion). */
+    public static final int NO_REGION = -1;
+
     /** The Barrow King: a big, buffed wither skeleton in a gold crown, with his court (see {@link #addRetinue}). */
     private static Mob createBarrowKing(ServerLevel level, BlockPos pos, int tier) {
         WitherSkeleton king = EntityType.WITHER_SKELETON.create(level);
@@ -270,6 +291,9 @@ public final class DungeonBosses {
             ItemEntity drop = new ItemEntity(level, boss.getX(), boss.getY() + 0.5, boss.getZ(), stack);
             drop.setUnlimitedLifetime();
             event.getDrops().add(drop);
+        }
+        if (tag.getInt("region") == NO_REGION) {
+            return; // A realm champion: no dungeon to tell, clear or open.
         }
         DungeonChallenges.tellRegion(level, tag.getInt("region"),
                 Component.translatable("message.dungeondelving.boss_defeated", boss.getDisplayName()).withStyle(ChatFormatting.GOLD));

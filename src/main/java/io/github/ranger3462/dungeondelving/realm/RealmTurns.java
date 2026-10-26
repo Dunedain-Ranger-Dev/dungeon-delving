@@ -114,6 +114,7 @@ public final class RealmTurns {
         for (String nation : realm.nations()) {
             nationAct(realm, nation, pick(nationWeights(realm, nation), random), time);
         }
+        RealmCapitals.rally(realm, time);
     }
 
     // --- The kingdom ---
@@ -200,6 +201,14 @@ public final class RealmTurns {
         List<RealmNode> strongholds = strongholds(realm, nation);
         switch (action) {
             case BUILD_MILITARY -> {
+                if (strongholds.isEmpty()) {
+                    // Pushed back: the nation rebuilds at its capital.
+                    RealmCapitals.capital(realm, nation).ifPresent(capital -> {
+                        realm.addStat(capital, "military", 2);
+                        realm.record("The " + nation + " gathered strength at " + capital.name() + ".");
+                    });
+                    return;
+                }
                 strongholds.forEach(node -> realm.addStat(node, "military", 2));
                 realm.record("The " + nation + " built up their military: " + names(strongholds) + " each gained 2.");
             }

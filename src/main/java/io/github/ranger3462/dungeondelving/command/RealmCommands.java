@@ -39,6 +39,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * raids. {@code info}, {@code damage <id> <points>} (as a sacking would), {@code repair <id>} (all of it, now) (DD-97).</li>
  * <li>{@code /realm raid <town>}: the strongest stronghold bordering a town raids it, in 10 seconds: fought if you're
  * there, rolled if not (DD-98).</li>
+ * <li>{@code /challenge} (anyone, see RealmCapitals): call a pushed-back nation's champion out at its capital (DD-101).</li>
  * <li>{@code /realm danger}: the danger level where you stand, and why (DD-100).</li>
  * <li>{@code /realm side town|raiders}: which side you fight for in the raid you're at (the town's, unless you say).</li>
  * <li>{@code /realm guards <town>}: how its guards look. {@code skin set|mixed|<name>} (our guard set, the game's built-in
