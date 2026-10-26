@@ -9,6 +9,9 @@ import java.util.Optional;
 
 import io.github.ranger3462.dungeondelving.Config;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RandomSource;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -27,7 +30,8 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * <li>A monster nation: build its military, raid the weakest town its strongholds border, or fortify its strongholds.
  * The stronger it is against its targets, the likelier a raid; it raids one town at a time.</li>
  * </ul>
- * Raids are declared here, and resolved later (DD-96). What each side did goes in the realm log.
+ * Raids are declared here and resolved half a turn later, at dusk ({@link RealmRaids}). What each side did goes in the
+ * realm log; raids are news, told to every player online.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class RealmTurns {
@@ -40,7 +44,19 @@ public final class RealmTurns {
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
         if (event.getServer().getTickCount() % 20 == 0) {
-            catchUp(Realm.get(event.getServer()), System.currentTimeMillis(), event.getServer().overworld().getRandom());
+            Realm realm = Realm.get(event.getServer());
+            long now = System.currentTimeMillis();
+            RandomSource random = event.getServer().overworld().getRandom();
+            catchUp(realm, now, random);
+            RealmRaids.resolveDue(realm, now, random);
+            tellNews(event.getServer(), realm);
+        }
+    }
+
+    /** Tells every player online the realm's news (raids declared and resolved). */
+    public static void tellNews(MinecraftServer server, Realm realm) {
+        for (Realm.LogEntry entry : realm.takeNews()) {
+            server.getPlayerList().broadcastSystemMessage(Component.literal(entry.text()).withStyle(ChatFormatting.RED), false);
         }
     }
 
@@ -75,8 +91,10 @@ public final class RealmTurns {
             due = Math.max(1, cap);
         }
         for (int i = 0; i < due; i++) {
-            takeTurn(realm, random);
-            realm.lastTurnMillis += length;
+            long turnTime = realm.lastTurnMillis + length;
+            RealmRaids.resolveDue(realm, turnTime, random); // Raids from the turn before resolve before this one starts.
+            takeTurn(realm, random, turnTime);
+            realm.lastTurnMillis = turnTime;
         }
         realm.setDirty();
         return (int) due;
@@ -87,12 +105,12 @@ public final class RealmTurns {
         return realm.lastTurnMillis == 0 ? turnMillis() : Math.max(0, realm.lastTurnMillis + turnMillis() - now);
     }
 
-    /** One turn: the kingdom acts, then each monster nation. */
-    public static void takeTurn(Realm realm, RandomSource random) {
+    /** One turn at real time {@code time}: the kingdom acts, then each monster nation. */
+    public static void takeTurn(Realm realm, RandomSource random, long time) {
         realm.turn++;
         kingdomAct(realm, pick(kingdomWeights(realm), random));
         for (String nation : realm.nations()) {
-            nationAct(realm, nation, pick(nationWeights(realm, nation), random));
+            nationAct(realm, nation, pick(nationWeights(realm, nation), random), time);
         }
     }
 
@@ -175,7 +193,8 @@ public final class RealmTurns {
         return weights;
     }
 
-    public static void nationAct(Realm realm, String nation, NationAction action) {
+    /** A nation's action on the turn at real time {@code time}: a raid declared then resolves half a turn later. */
+    public static void nationAct(Realm realm, String nation, NationAction action, long time) {
         List<RealmNode> strongholds = strongholds(realm, nation);
         switch (action) {
             case BUILD_MILITARY -> {
@@ -187,8 +206,8 @@ public final class RealmTurns {
                 realm.record("The " + nation + " fortified " + names(strongholds) + ".");
             }
             case RAID -> raidTarget(realm, nation).ifPresent(target -> {
-                realm.raids.add(new Realm.Raid(nation, target.getKey().id, target.getValue().id, realm.turn));
-                realm.record("The " + nation + " of " + target.getKey().name() + " will raid " + target.getValue().name() + " at dusk!");
+                realm.raids.add(new Realm.Raid(nation, target.getKey().id, target.getValue().id, realm.turn, time + turnMillis() / 2));
+                realm.news("The " + nation + " of " + target.getKey().name() + " will raid " + target.getValue().name() + " at dusk!");
             });
         }
     }

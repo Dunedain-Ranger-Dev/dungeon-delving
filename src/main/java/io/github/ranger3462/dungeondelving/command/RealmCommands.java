@@ -253,8 +253,9 @@ public final class RealmCommands {
             Feedback.detail(context.getSource(), "The " + nation + ": military " + RealmTurns.military(realm, nation));
         }
         for (Realm.Raid raid : realm.raids()) {
+            long left = Math.max(0, raid.resolveAt() - System.currentTimeMillis()) / 1000;
             Feedback.detail(context.getSource(), "Raid declared on turn " + raid.declared() + ": the " + raid.nation() + " of " + raid.stronghold() + " on "
-                    + raid.town() + ".");
+                    + raid.town() + ", at dusk in " + left / 60 + ":" + String.format("%02d", left % 60) + ".");
         }
         return realm.turn();
     }
@@ -262,9 +263,13 @@ public final class RealmCommands {
     private static int turn(CommandContext<CommandSourceStack> context, int count) {
         Realm realm = realm(context);
         int from = realm.turn();
+        var random = context.getSource().getLevel().getRandom();
         for (int i = 0; i < count; i++) {
-            RealmTurns.takeTurn(realm, context.getSource().getLevel().getRandom());
+            // Forced turns don't wait for dusk: each one's raids resolve before the next.
+            RealmTurns.takeTurn(realm, random, System.currentTimeMillis());
+            io.github.ranger3462.dungeondelving.realm.RealmRaids.resolveDue(realm, Long.MAX_VALUE, random);
         }
+        RealmTurns.tellNews(context.getSource().getServer(), realm);
         Feedback.tell(context.getSource(), "Took " + count + (count == 1 ? " turn" : " turns") + " (now turn " + realm.turn() + "):");
         // What these turns did, the latest dozen at most.
         List<Realm.LogEntry> taken = realm.log().stream().filter(entry -> entry.turn() > from).toList();

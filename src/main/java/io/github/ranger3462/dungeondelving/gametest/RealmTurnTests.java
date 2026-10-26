@@ -5,6 +5,7 @@ import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.realm.Realm;
 import io.github.ranger3462.dungeondelving.realm.RealmNode;
+import io.github.ranger3462.dungeondelving.realm.RealmRaids;
 import io.github.ranger3462.dungeondelving.realm.RealmTurns;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
@@ -57,12 +58,12 @@ public class RealmTurnTests {
         RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.GATHER_WEALTH);
         helper.assertTrue(realm.kingdomStat("treasury") == 13 && riverhold.stat("wealth") == 11, "gathering wealth fills the treasury and the towns");
 
-        RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.BUILD_MILITARY);
+        RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.BUILD_MILITARY, 0L);
         helper.assertTrue(warren.stat("military") == 12, "building military strengthens the strongholds");
         realm.setStat(realm.node("millbrook").orElseThrow(), "defense", 8);
         helper.assertTrue(RealmTurns.raidTarget(realm, DungeonFactions.GOBLINS).orElseThrow().getValue().id.equals("millbrook"),
                 "the goblins would raid the weaker town (millbrook, 8 defense against riverhold's 12)");
-        RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.RAID);
+        RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.RAID, 0L);
         helper.assertTrue(realm.raids().size() == 1 && realm.raids().get(0).town().equals("millbrook"), "a raid is declared");
         helper.assertTrue(RealmTurns.nationWeights(realm, DungeonFactions.GOBLINS).get(RealmTurns.NationAction.RAID) == 0,
                 "and no second raid while one is pending");
@@ -75,9 +76,51 @@ public class RealmTurnTests {
         alone.add(node("hermitage", RealmNode.Type.TOWN, RealmNode.KINGDOM, 0));
         helper.assertTrue(RealmTurns.kingdomWeights(alone).get(RealmTurns.KingdomAction.REINFORCE) == 0, "with no border, the kingdom never reinforces");
         for (int i = 0; i < 20; i++) {
-            RealmTurns.takeTurn(alone, RandomSource.create(i));
+            RealmTurns.takeTurn(alone, RandomSource.create(i), 0L);
         }
         helper.assertTrue(alone.turn() == 20 && alone.nations().isEmpty(), "turns run with no monster nation at all");
+        helper.succeed();
+    }
+
+    /** Raids resolve at dusk by a roll (DD-96). */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void raidsResolveAtDuskByARoll(GameTestHelper helper) {
+        Realm realm = frontier();
+        realm.setStat(realm.node("riverhold").orElseThrow(), "defense", 30); // So millbrook is the one raided.
+        RealmNode millbrook = realm.node("millbrook").orElseThrow();
+        RealmNode warren = realm.node("warren").orElseThrow();
+        long length = RealmTurns.turnMillis();
+        RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.RAID, 1000L);
+        Realm.Raid raid = realm.raids().get(0);
+        helper.assertTrue(raid.resolveAt() == 1000L + length / 2, "a raid resolves half a turn after its dawn");
+        helper.assertTrue(realm.takeNews().size() == 1, "and its declaring is news");
+        helper.assertTrue(RealmRaids.resolveDue(realm, raid.resolveAt() - 1, RandomSource.create(1)) == 0 && realm.raids().size() == 1,
+                "not resolved before dusk");
+
+        // Defense: millbrook's 10 plus a quarter of the army's 10 (2) = 12. The warren's military is 10.
+        helper.assertTrue(RealmRaids.defense(realm, millbrook) == 12, "a town's defense counts a quarter of the army");
+        helper.assertTrue(RealmRaids.resolve(realm, raid, 20, 1), "30 against 13: the goblins win");
+        helper.assertTrue(millbrook.stat("defense") == 6 && millbrook.stat("wealth") == 4 && millbrook.stat("morale") == 8 && millbrook.stat("damage") == 17,
+                "the town loses defense (17/4), wealth (2 + 17/4) and morale (2), and is owed 17 damage; got " + millbrook.stats());
+        helper.assertTrue(warren.stat("military") == 9 && realm.raids().isEmpty(), "the attackers lose a little, and the raid is over");
+        helper.assertTrue(realm.takeNews().get(0).text().contains("sacked"), "and players hear it");
+
+        RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.RAID, 2000L);
+        helper.assertFalse(RealmRaids.resolve(realm, realm.raids().get(0), 1, 20), "10 against 26: the town holds");
+        helper.assertTrue(warren.stat("military") == 3 && millbrook.stat("morale") == 9, "the goblins lose 2 + 16/4, and the town takes heart");
+
+        realm.setStat(warren, "military", 30);
+        RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.RAID, 3000L);
+        realm.remove("millbrook");
+        helper.assertTrue(RealmRaids.resolveDue(realm, Long.MAX_VALUE, RandomSource.create(2)) == 1 && realm.raids().isEmpty(),
+                "a raid on a town that's gone comes to nothing");
+
+        Realm caught = frontier();
+        RealmTurns.catchUp(caught, 10_000L, RandomSource.create(3));
+        caught.setStat(caught.node("warren").orElseThrow(), "military", 200);
+        RealmTurns.catchUp(caught, 10_000L + length * 6, RandomSource.create(4));
+        helper.assertTrue(caught.raids().stream().allMatch(r -> r.resolveAt() > 10_000L + length * 5),
+                "catching up resolves each turn's raids before the next turn; only the last turn's can still be waiting");
         helper.succeed();
     }
 

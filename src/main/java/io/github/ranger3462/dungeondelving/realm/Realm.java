@@ -51,11 +51,14 @@ public final class Realm extends SavedData {
     final java.util.Deque<LogEntry> log = new java.util.ArrayDeque<>();
     static final int LOG_SIZE = 100;
 
-    /** A monster nation's raid on a town, from one of its strongholds, declared on a turn. */
-    public record Raid(String nation, String stronghold, String town, int declared) {}
+    /** A monster nation's raid on a town, from one of its strongholds, declared on a turn and resolved at dusk ({@code resolveAt}, real time). */
+    public record Raid(String nation, String stronghold, String town, int declared, long resolveAt) {}
 
-    /** Something that happened on a turn. */
-    public record LogEntry(int turn, String text) {}
+    /** Something that happened on a turn. News is told to the players too. */
+    public record LogEntry(int turn, String text, boolean news) {}
+
+    /** News not yet told to the players (not saved: told once, while the server runs). */
+    final List<LogEntry> untold = new ArrayList<>();
 
     public static Realm get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(Realm::new, Realm::load, null), NAME);
@@ -236,11 +239,31 @@ public final class Realm extends SavedData {
     }
 
     void record(String text) {
-        log.addLast(new LogEntry(turn, text));
+        record(text, false);
+    }
+
+    /** Records something the players should hear about too. */
+    void news(String text) {
+        record(text, true);
+    }
+
+    private void record(String text, boolean news) {
+        LogEntry entry = new LogEntry(turn, text, news);
+        log.addLast(entry);
         while (log.size() > LOG_SIZE) {
             log.removeFirst();
         }
+        if (news) {
+            untold.add(entry);
+        }
         setDirty();
+    }
+
+    /** Takes the news not yet told to players. */
+    public List<LogEntry> takeNews() {
+        List<LogEntry> news = List.copyOf(untold);
+        untold.clear();
+        return news;
     }
 
     /** The monster nations that hold a stronghold: the ones that take turns. */
@@ -270,6 +293,7 @@ public final class Realm extends SavedData {
             raidTag.putString("stronghold", raid.stronghold());
             raidTag.putString("town", raid.town());
             raidTag.putInt("declared", raid.declared());
+            raidTag.putLong("resolve_at", raid.resolveAt());
             raidList.add(raidTag);
         }
         tag.put("raids", raidList);
@@ -278,6 +302,7 @@ public final class Realm extends SavedData {
             CompoundTag entryTag = new CompoundTag();
             entryTag.putInt("turn", entry.turn());
             entryTag.putString("text", entry.text());
+            entryTag.putBoolean("news", entry.news());
             logList.add(entryTag);
         }
         tag.put("log", logList);
@@ -303,11 +328,12 @@ public final class Realm extends SavedData {
         }
         for (Tag entry : tag.getList("raids", Tag.TAG_COMPOUND)) {
             CompoundTag raid = (CompoundTag) entry;
-            realm.raids.add(new Raid(raid.getString("nation"), raid.getString("stronghold"), raid.getString("town"), raid.getInt("declared")));
+            realm.raids.add(new Raid(raid.getString("nation"), raid.getString("stronghold"), raid.getString("town"), raid.getInt("declared"),
+                    raid.getLong("resolve_at")));
         }
         for (Tag entry : tag.getList("log", Tag.TAG_COMPOUND)) {
             CompoundTag logged = (CompoundTag) entry;
-            realm.log.addLast(new LogEntry(logged.getInt("turn"), logged.getString("text")));
+            realm.log.addLast(new LogEntry(logged.getInt("turn"), logged.getString("text"), logged.getBoolean("news")));
         }
         return realm;
     }
