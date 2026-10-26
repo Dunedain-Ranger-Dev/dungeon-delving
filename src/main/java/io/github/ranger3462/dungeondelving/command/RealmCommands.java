@@ -35,6 +35,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * <li>{@code /realm link <a> <b>} and {@code /realm unlink <a> <b>}: the links that make borders.</li>
  * <li>{@code /realm clock}: the turn, the kingdom's army and treasury, raids declared, and the time to the next turn.
  * {@code /realm turn [count]}: take turns now. {@code /realm log [count]}: what's happened lately (DD-95).</li>
+ * <li>{@code /realm blueprint save <id> <radius> [down] [up]}: snapshot the blocks around a node, to rebuild it from after
+ * raids. {@code info}, {@code damage <id> <points>} (as a sacking would), {@code repair <id>} (all of it, now) (DD-97).</li>
  * </ul>
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
@@ -57,6 +59,17 @@ public final class RealmCommands {
                                 .executes(context -> list(context, StringArgumentType.getString(context, "type")))))
                 .then(Commands.literal("info").then(node("id").executes(RealmCommands::info)))
                 .then(Commands.literal("clock").executes(RealmCommands::clock))
+                .then(Commands.literal("blueprint")
+                        .then(Commands.literal("save").then(node("id").then(Commands.argument("radius", IntegerArgumentType.integer(1, 48))
+                                .executes(context -> saveBlueprint(context, 8, 24))
+                                .then(Commands.argument("down", IntegerArgumentType.integer(0, 32))
+                                        .executes(context -> saveBlueprint(context, IntegerArgumentType.getInteger(context, "down"), 24))
+                                        .then(Commands.argument("up", IntegerArgumentType.integer(0, 64)).executes(context -> saveBlueprint(context,
+                                                IntegerArgumentType.getInteger(context, "down"), IntegerArgumentType.getInteger(context, "up"))))))))
+                        .then(Commands.literal("info").then(node("id").executes(RealmCommands::blueprintInfo)))
+                        .then(Commands.literal("damage").then(node("id").then(Commands.argument("points", IntegerArgumentType.integer(1, 1000))
+                                .executes(RealmCommands::damage))))
+                        .then(Commands.literal("repair").then(node("id").executes(RealmCommands::repair))))
                 .then(Commands.literal("turn").executes(context -> turn(context, 1))
                         .then(Commands.argument("count", IntegerArgumentType.integer(1, 100))
                                 .executes(context -> turn(context, IntegerArgumentType.getInteger(context, "count")))))
@@ -241,6 +254,76 @@ public final class RealmCommands {
             Feedback.tell(context.getSource(), found.id + "'s " + stat + " is now " + value + ".");
         });
         return node.isPresent() ? 1 : 0;
+    }
+
+    private static int saveBlueprint(CommandContext<CommandSourceStack> context, int down, int up) {
+        Optional<RealmNode> found = find(context, "id");
+        if (found.isEmpty()) {
+            return 0;
+        }
+        RealmNode node = found.get();
+        net.minecraft.server.level.ServerLevel level = context.getSource().getServer().getLevel(node.dimension());
+        int radius = IntegerArgumentType.getInteger(context, "radius");
+        BlockPos origin = node.pos().offset(-radius, -down, -radius);
+        net.minecraft.core.Vec3i size = new net.minecraft.core.Vec3i(radius * 2 + 1, down + up + 1, radius * 2 + 1);
+        if (level == null || !level.hasChunksAt(origin, origin.offset(size.getX() - 1, size.getY() - 1, size.getZ() - 1))) {
+            Feedback.fail(context.getSource(), "Stand near " + node.id + " so all of it is loaded, then save again.");
+            return 0;
+        }
+        var blueprint = io.github.ranger3462.dungeondelving.realm.Blueprint.capture(context.getSource().getServer(), node.id, level, origin, size);
+        Feedback.tell(context.getSource(), "Saved " + node.id + "'s blueprint: " + blueprint.blockCount() + " blocks in a " + size.getX() + "x" + size.getY()
+                + "x" + size.getZ() + " box. Raids can only break, and rebuilding only restores, what's in it.");
+        return blueprint.blockCount();
+    }
+
+    private static int blueprintInfo(CommandContext<CommandSourceStack> context) {
+        Optional<RealmNode> found = find(context, "id");
+        if (found.isEmpty()) {
+            return 0;
+        }
+        RealmNode node = found.get();
+        var blueprint = io.github.ranger3462.dungeondelving.realm.Blueprint.of(context.getSource().getServer(), node.id);
+        if (blueprint.isEmpty()) {
+            Feedback.tell(context.getSource(), node.id + " has no blueprint. /realm blueprint save " + node.id + " <radius> makes one.");
+            return 0;
+        }
+        var size = blueprint.get().size();
+        Feedback.tell(context.getSource(), node.id + "'s blueprint: " + blueprint.get().blockCount() + " blocks, " + size.getX() + "x" + size.getY() + "x"
+                + size.getZ() + " from " + blueprint.get().origin().toShortString() + ".");
+        Feedback.detail(context.getSource(), "Owed damage " + node.stat("damage") + " (x" + io.github.ranger3462.dungeondelving.realm.RealmDamage.BLOCKS_PER_POINT
+                + " blocks), wrecked " + node.stat("wrecked") + " blocks, rebuilding " + node.stat("repair") + ".");
+        return 1;
+    }
+
+    private static int damage(CommandContext<CommandSourceStack> context) {
+        Optional<RealmNode> found = find(context, "id");
+        found.ifPresent(node -> {
+            int points = IntegerArgumentType.getInteger(context, "points");
+            realm(context).setStat(node, "damage", node.stat("damage") + points);
+            Feedback.tell(context.getSource(), node.id + " is owed " + node.stat("damage") + " damage: it's broken when its area is loaded.");
+        });
+        return found.isPresent() ? 1 : 0;
+    }
+
+    private static int repair(CommandContext<CommandSourceStack> context) {
+        Optional<RealmNode> found = find(context, "id");
+        if (found.isEmpty()) {
+            return 0;
+        }
+        RealmNode node = found.get();
+        var blueprint = io.github.ranger3462.dungeondelving.realm.Blueprint.of(context.getSource().getServer(), node.id);
+        net.minecraft.server.level.ServerLevel level = context.getSource().getServer().getLevel(node.dimension());
+        if (blueprint.isEmpty() || level == null) {
+            Feedback.fail(context.getSource(), node.id + " has no blueprint to rebuild from.");
+            return 0;
+        }
+        int rebuilt = io.github.ranger3462.dungeondelving.realm.RealmDamage.rebuild(level, blueprint.get(), Integer.MAX_VALUE);
+        Realm realm = realm(context);
+        realm.setStat(node, "wrecked", 0);
+        realm.setStat(node, "repair", 0);
+        realm.setStat(node, "damage", 0);
+        Feedback.tell(context.getSource(), "Rebuilt " + rebuilt + " blocks of " + node.id + ".");
+        return rebuilt;
     }
 
     private static int clock(CommandContext<CommandSourceStack> context) {
