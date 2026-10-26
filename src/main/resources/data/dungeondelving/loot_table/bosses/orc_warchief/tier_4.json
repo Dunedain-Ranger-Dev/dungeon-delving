@@ -188,6 +188,26 @@
           "weight": 2
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeondelving:platinum_coin",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 3,
+                "max": 6
+              }
+            }
+          ]
+        }
+      ],
+      "__comment": "dungeondelving:coin_pool"
     }
   ]
 }

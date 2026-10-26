@@ -202,6 +202,46 @@
           "weight": 25
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeondelving:copper_coin",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 10,
+                "max": 25
+              }
+            }
+          ]
+        }
+      ],
+      "__comment": "dungeondelving:coin_pool"
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeondelving:silver_coin",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 0,
+                "max": 1
+              }
+            }
+          ]
+        }
+      ],
+      "__comment": "dungeondelving:coin_pool"
     }
   ]
 }

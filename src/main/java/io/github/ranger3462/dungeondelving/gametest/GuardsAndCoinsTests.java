@@ -78,6 +78,54 @@ public class GuardsAndCoinsTests {
     }
 
     @GameTest(template = ANY_TEMPLATE)
+    public static void dungeonLootIsOnEconomyCraftsPriceList(GameTestHelper helper) {
+        if (!Bank.available()) {
+            helper.succeed();
+            return;
+        }
+        com.google.gson.JsonObject world = new com.google.gson.JsonObject();
+        com.google.gson.JsonObject edited = new com.google.gson.JsonObject();
+        edited.addProperty("unit_sell", 999);
+        world.add("dungeondelving:thraggite_ingot", edited);
+        com.google.gson.JsonObject ours = new com.google.gson.JsonObject();
+        ours.add("dungeondelving:thraggite_ingot", new com.google.gson.JsonObject());
+        ours.add("dungeondelving:raw_thraggite", new com.google.gson.JsonObject());
+        int added = io.github.ranger3462.dungeondelving.integration.economycraft.EconomyCraftPrices.merge(world, ours);
+        helper.assertTrue(added == 1 && world.getAsJsonObject("dungeondelving:thraggite_ingot").get("unit_sell").getAsInt() == 999,
+                "only missing prices are added; an admin's edit stays");
+        try {
+            java.nio.file.Path file = com.reazip.economycraft.util.EconomyPaths.configDir(helper.getLevel().getServer()).resolve("prices.json");
+            String text = java.nio.file.Files.readString(file);
+            helper.assertTrue(text.contains("\"dungeondelving:thailite_ingot\"") && text.contains("\"dungeondelving:goblin_chief_staff\""),
+                    "the world's price list has our dungeon loot");
+        } catch (java.io.IOException e) {
+            helper.fail("couldn't read EconomyCraft's prices: " + e);
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void dungeonChestsAndBossesDropCoins(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        var tables = level.getServer().reloadableRegistries();
+        for (String path : List.of("chests/tier_1/room", "chests/tier_4/objective", "bosses/zombie_lord/tier_1")) {
+            var table = tables.getLootTable(net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.LOOT_TABLE,
+                    DungeonDelving.id(path)));
+            long worth = 0;
+            for (int roll = 0; roll < 20 && worth == 0; roll++) {
+                var params = new net.minecraft.world.level.storage.loot.LootParams.Builder(level)
+                        .withParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.ORIGIN, helper.absoluteVec(net.minecraft.world.phys.Vec3.ZERO))
+                        .create(net.minecraft.world.level.storage.loot.parameters.LootContextParamSets.CHEST);
+                for (ItemStack stack : table.getRandomItems(params)) {
+                    worth += Coins.worth(stack);
+                }
+            }
+            helper.assertTrue(worth > 0, path + " drops coins");
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
     public static void coinsMakeChangeAndBank(GameTestHelper helper) {
         List<ItemStack> change = Coins.change(1234);
         helper.assertTrue(change.size() == 4 && change.get(0).is(Coins.PLATINUM.get()) && change.get(1).getCount() == 2

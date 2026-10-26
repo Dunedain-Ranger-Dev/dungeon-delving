@@ -158,6 +158,26 @@
           "weight": 1
         }
       ]
+    },
+    {
+      "rolls": 1,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "dungeondelving:gold_coin",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": {
+                "type": "minecraft:uniform",
+                "min": 2,
+                "max": 4
+              }
+            }
+          ]
+        }
+      ],
+      "__comment": "dungeondelving:coin_pool"
     }
   ],
   "neoforge:conditions": [

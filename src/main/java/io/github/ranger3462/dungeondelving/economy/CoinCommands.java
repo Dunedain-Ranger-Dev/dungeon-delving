@@ -15,7 +15,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
 /**
- * {@code /coins}, when there's a bank (EconomyCraft):
+ * {@code /coins}, when there's a bank (EconomyCraft), and our dungeon loot's place on its price list:
  * <ul>
  * <li>{@code /coins deposit}: every coin you carry goes into your balance.</li>
  * <li>{@code /coins withdraw <amount>}: that much comes out of your balance as the fewest coins.</li>
@@ -24,6 +24,14 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class CoinCommands {
     private CoinCommands() {}
+
+    /** Dungeon loot goes on EconomyCraft's price list once the server (and EconomyCraft) has started. */
+    @SubscribeEvent(priority = net.neoforged.bus.api.EventPriority.LOWEST)
+    public static void onServerStarted(net.neoforged.neoforge.event.server.ServerStartedEvent event) {
+        if (Bank.available()) {
+            io.github.ranger3462.dungeondelving.integration.economycraft.EconomyCraftPrices.addMissing(event.getServer());
+        }
+    }
 
     @SubscribeEvent
     public static void onRegisterCommands(RegisterCommandsEvent event) {

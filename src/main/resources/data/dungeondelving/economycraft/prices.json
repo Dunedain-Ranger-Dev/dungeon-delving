@@ -1,0 +1,308 @@
+{
+  "dungeondelving:arcane_dust": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 10
+  },
+  "dungeondelving:barrow_iron_block": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 63
+  },
+  "dungeondelving:barrow_iron_ingot": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 7
+  },
+  "dungeondelving:barrowmoss": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 4
+  },
+  "dungeondelving:borax": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 2
+  },
+  "dungeondelving:brigandine_boots": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 20
+  },
+  "dungeondelving:brigandine_chestplate": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 40
+  },
+  "dungeondelving:brigandine_helmet": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 25
+  },
+  "dungeondelving:brigandine_leggings": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 35
+  },
+  "dungeondelving:emberroot": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 6
+  },
+  "dungeondelving:emberstone_block": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 495
+  },
+  "dungeondelving:emberstone_ingot": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 55
+  },
+  "dungeondelving:forged_axe": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 40
+  },
+  "dungeondelving:forged_sword": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 40
+  },
+  "dungeondelving:gilded_boots": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 40
+  },
+  "dungeondelving:gilded_chestplate": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 80
+  },
+  "dungeondelving:gilded_helmet": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 50
+  },
+  "dungeondelving:gilded_leggings": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 70
+  },
+  "dungeondelving:gilded_sword": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 60
+  },
+  "dungeondelving:goblin_bow": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 8
+  },
+  "dungeondelving:goblin_chief_staff": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 150
+  },
+  "dungeondelving:goblin_spear": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 6
+  },
+  "dungeondelving:goblin_totem_staff": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 40
+  },
+  "dungeondelving:gold_amulet": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 100
+  },
+  "dungeondelving:gold_ring": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 80
+  },
+  "dungeondelving:hauberk_boots": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 32
+  },
+  "dungeondelving:hauberk_chestplate": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 64
+  },
+  "dungeondelving:hauberk_helmet": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 40
+  },
+  "dungeondelving:hauberk_leggings": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 56
+  },
+  "dungeondelving:leather_scraps": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 1
+  },
+  "dungeondelving:plate_boots": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 48
+  },
+  "dungeondelving:plate_chestplate": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 96
+  },
+  "dungeondelving:plate_helmet": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 60
+  },
+  "dungeondelving:plate_leggings": {
+    "category": "dungeon",
+    "stack": 1,
+    "unit_buy": 0,
+    "unit_sell": 84
+  },
+  "dungeondelving:raw_barrow_iron": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 4
+  },
+  "dungeondelving:raw_emberstone": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 30
+  },
+  "dungeondelving:raw_thailite": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 60
+  },
+  "dungeondelving:raw_thraggite": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 8
+  },
+  "dungeondelving:raw_wardsilver": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 15
+  },
+  "dungeondelving:relic_shard": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 3
+  },
+  "dungeondelving:riftstone": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 1
+  },
+  "dungeondelving:runic_shard_1": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 25
+  },
+  "dungeondelving:runic_shard_2": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 60
+  },
+  "dungeondelving:runic_shard_3": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 150
+  },
+  "dungeondelving:spider_silk": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 3
+  },
+  "dungeondelving:thailite_block": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 990
+  },
+  "dungeondelving:thailite_ingot": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 110
+  },
+  "dungeondelving:thraggite_block": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 126
+  },
+  "dungeondelving:thraggite_ingot": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 14
+  },
+  "dungeondelving:wardsilver_block": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 252
+  },
+  "dungeondelving:wardsilver_ingot": {
+    "category": "dungeon",
+    "stack": 64,
+    "unit_buy": 0,
+    "unit_sell": 28
+  }
+}
