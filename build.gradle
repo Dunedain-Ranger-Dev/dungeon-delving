@@ -194,6 +194,7 @@ dependencies {
     // Optional integration: Ars Nouveau mana, for the Tester's Charm. Only used when Ars Nouveau is installed.
     compileOnly "curse.maven:ars-nouveau-401955:9052154"                // 5.13.3
     compileOnly "curse.maven:puffish-skills-835091:9101377"                     // Pufferfish's Skills 0.19.2
+    compileOnly "curse.maven:economycraft-mp-1321557:9212860"                   // EconomyCraft 1.11.0: coins deposit to its balances
     compileOnly "curse.maven:better-combat-by-daedelus-639842:8430183"              // 2.4.0+1.21.1-neoforge
     compileOnly "curse.maven:spell-engine-807653:9011566"               // 1.10.9+1.21.1-neoforge
     compileOnly "curse.maven:spell-power-771265:8634104"                // 1.6.0+1.21.1-neoforge
@@ -315,10 +316,9 @@ dependencies {
         localRuntime "curse.maven:cosmetic-armor-reworked-forked-1434118:7685857"  // 1.21.1-0.0.4
         // Human villagers: replaces the villager look with human models, keeping their trades (on trial)
         localRuntime "curse.maven:villagers-reborn-1361000:8585406"  // 1.0.9b
-        // Land claims, coins and shops, and buying or renting claimed land with coins (on trial, for the realm)
+        // Land claims (on trial, for the realm), and EconomyCraft: balances, a server shop for selling loot, auctions
         localRuntime "curse.maven:ftb-chunks-forge-314906:8791113"  // 2101.1.22
-        localRuntime "curse.maven:lightmans-currency-472521:9048585"  // 1.21-2.3.0.6
-        localRuntime "curse.maven:lcompat-1267119:7942926"  // 1.21-0.1.2a
+        localRuntime "curse.maven:economycraft-mp-1321557:9212860"  // 1.11.0
     }
 
     // For more info:

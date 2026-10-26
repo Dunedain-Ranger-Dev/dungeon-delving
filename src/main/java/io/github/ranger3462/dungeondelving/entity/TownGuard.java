@@ -42,11 +42,12 @@ import net.minecraft.world.level.Level;
  * {@code textures/entity/town_guard/guard_<n>.png}, at random; or the game's built-in player faces; or one named skin,
  * which a resource pack can add to that folder), and a color, which dyes leather, trims metal armor and paints shields.
  * <p>
- * A town kits its guards out by its stats ({@link #equip}): better armor and weapons for a wealthier town, tougher and
+ * Most guards fight with sword and shield; crossbowmen ({@link #setCrossbowman}) hold back and shoot
+ * ({@link GuardCrossbowGoal}). A town kits its guards out by its stats ({@link #equip}): better armor and weapons for a wealthier town, tougher and
  * harder-hitting guards for a better-defended one. How many turn out goes by morale (see {@code RealmLiveRaids}). Guards
  * aren't saved with the world: they're there for a fight, and gone when it's over or its ground unloads.
  */
-public class TownGuard extends PathfinderMob {
+public class TownGuard extends PathfinderMob implements io.github.ranger3462.dungeondelving.realm.RealmGuard, CrossbowWielder {
     /** The game's built-in player skins (textures/entity/player/wide/), for towns whose guards wear a mix of faces. */
     public static final String[] BUILT_IN_SKINS = { "steve", "alex", "ari", "efe", "kai", "makena", "noor", "sunny", "zuri" };
     /** How many skins our guard set has: textures/entity/town_guard/guard_1.png and up. */
@@ -55,6 +56,8 @@ public class TownGuard extends PathfinderMob {
     public static final String SKIN_SET = "set";
     public static final String SKIN_MIXED = "mixed";
     private static final EntityDataAccessor<String> SKIN = SynchedEntityData.defineId(TownGuard.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<Boolean> CROSSBOWMAN = SynchedEntityData.defineId(TownGuard.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> CHARGING = SynchedEntityData.defineId(TownGuard.class, EntityDataSerializers.BOOLEAN);
 
     public TownGuard(EntityType<? extends TownGuard> type, Level level) {
         super(type, level);
@@ -78,8 +81,27 @@ public class TownGuard extends PathfinderMob {
         return setting;
     }
 
+    @Override
     public void setSkin(String skin) {
         entityData.set(SKIN, skin);
+    }
+
+    /** Makes it a crossbowman (before {@link #equip}, which hands it a crossbow instead of a sword and shield). */
+    public void setCrossbowman(boolean crossbowman) {
+        entityData.set(CROSSBOWMAN, crossbowman);
+    }
+
+    public boolean isCrossbowman() {
+        return entityData.get(CROSSBOWMAN);
+    }
+
+    @Override
+    public boolean isChargingCrossbow() {
+        return entityData.get(CHARGING);
+    }
+
+    public void setChargingCrossbow(boolean charging) {
+        entityData.set(CHARGING, charging);
     }
 
     public String skinName() {
@@ -95,12 +117,20 @@ public class TownGuard extends PathfinderMob {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(SKIN, "guard_1");
+        builder.define(CROSSBOWMAN, false);
+        builder.define(CHARGING, false);
     }
 
     @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new FloatGoal(this));
-        goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.15, true));
+        goalSelector.addGoal(2, new GuardCrossbowGoal(this));
+        goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.15, true) {
+            @Override
+            public boolean canUse() {
+                return !isCrossbowman() && super.canUse();
+            }
+        });
         goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0f));
         goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
@@ -143,11 +173,12 @@ public class TownGuard extends PathfinderMob {
      * defense and tier, and the town's color, if it has one: leather dyed, metal armor trimmed, the shield painted.
      * Named for its town. Its level ("Lv" on its nameplate) is worked out from all that, so it rises with the town.
      */
+    @Override
     public void equip(String townName, int wealth, int defense, int tier, java.util.Optional<DyeColor> color) {
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(health(defense, tier));
         getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(attack(defense, tier));
         setHealth(getMaxHealth());
-        setCustomName(net.minecraft.network.chat.Component.literal(townName + " Guard"));
+        setCustomName(net.minecraft.network.chat.Component.literal(townName + (isCrossbowman() ? " Crossbowman" : " Guard")));
         Item[][] sets = {
                 { Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS },
                 { Items.CHAINMAIL_HELMET, Items.CHAINMAIL_CHESTPLATE, Items.CHAINMAIL_LEGGINGS, Items.CHAINMAIL_BOOTS },
@@ -158,13 +189,13 @@ public class TownGuard extends PathfinderMob {
         EquipmentSlot[] slots = { EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET };
         for (int i = 0; i < slots.length; i++) {
             ItemStack piece = new ItemStack(sets[gear][i]);
-            color.ifPresent(dye -> colorPiece(piece, dye));
+            color.ifPresent(dye -> colorPiece(level(), piece, dye));
             setItemSlot(slots[i], piece);
             setDropChance(slots[i], 0.0f);
         }
-        setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(weapons[gear]));
+        setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(isCrossbowman() ? Items.CROSSBOW : weapons[gear]));
         setDropChance(EquipmentSlot.MAINHAND, 0.0f);
-        ItemStack shield = gear >= 1 ? new ItemStack(Items.SHIELD) : ItemStack.EMPTY;
+        ItemStack shield = gear >= 1 && !isCrossbowman() ? new ItemStack(Items.SHIELD) : ItemStack.EMPTY;
         color.ifPresent(dye -> shield.set(DataComponents.BASE_COLOR, dye));
         setItemSlot(EquipmentSlot.OFFHAND, shield);
         setDropChance(EquipmentSlot.OFFHAND, 0.0f);
@@ -184,13 +215,13 @@ public class TownGuard extends PathfinderMob {
     }
 
     /** Leather is dyed the color; other armor gets a sentry trim in the nearest trim material. */
-    private void colorPiece(ItemStack piece, DyeColor dye) {
+    public static void colorPiece(Level level, ItemStack piece, DyeColor dye) {
         if (piece.is(net.minecraft.tags.ItemTags.DYEABLE)) {
             piece.set(DataComponents.DYED_COLOR, new DyedItemColor(dye.getTextureDiffuseColor(), false));
             return;
         }
-        var materials = level().registryAccess().registryOrThrow(Registries.TRIM_MATERIAL);
-        var patterns = level().registryAccess().registryOrThrow(Registries.TRIM_PATTERN);
+        var materials = level.registryAccess().registryOrThrow(Registries.TRIM_MATERIAL);
+        var patterns = level.registryAccess().registryOrThrow(Registries.TRIM_PATTERN);
         var material = materials.getHolder(trimMaterial(dye));
         var pattern = patterns.getHolder(TrimPatterns.SENTRY);
         if (material.isPresent() && pattern.isPresent()) {
@@ -232,18 +263,20 @@ public class TownGuard extends PathfinderMob {
 
     @Override
     public boolean canAttack(LivingEntity target) {
-        return !(target instanceof TownGuard) && super.canAttack(target);
+        return !(target instanceof io.github.ranger3462.dungeondelving.realm.RealmGuard) && super.canAttack(target);
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putString("skin", entityData.get(SKIN));
+        tag.putBoolean("crossbowman", isCrossbowman());
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        setCrossbowman(tag.getBoolean("crossbowman"));
         if (tag.contains("skin", net.minecraft.nbt.Tag.TAG_STRING)) {
             entityData.set(SKIN, tag.getString("skin"));
         }

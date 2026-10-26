@@ -253,10 +253,9 @@ public final class RealmCommands {
             Feedback.fail(context.getSource(), problem.get());
             return 0;
         }
-        boolean taken = node.get().type == RealmNode.Type.STRONGHOLD && node.get().monsters() && !DungeonFactions.ids().contains(owner);
         realm(context).setOwner(node.get(), owner);
-        Feedback.tell(context.getSource(), node.get().id + " is now held by " + owner + "."
-                + (taken ? " Its monsters no longer raid from it, and the land around it calms." : ""));
+        Feedback.tell(context.getSource(), node.get().id + " is now held by " + owner + ".");
+        RealmTurns.tellNews(context.getSource().getServer(), realm(context));
         return 1;
     }
 

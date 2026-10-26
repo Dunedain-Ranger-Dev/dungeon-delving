@@ -77,7 +77,8 @@ public final class RealmLiveRaids {
         final int waveSize;
         int wave;
         final Set<UUID> raiders = new HashSet<>();
-        final Set<UUID> guards = new HashSet<>();
+        /** In the order they turned out: swordsmen, crossbowmen, battlemages. */
+        final Set<UUID> guards = new java.util.LinkedHashSet<>();
         /** Players who declared for the raiders. */
         final Set<UUID> turncoats = new HashSet<>();
         float attackScore;
@@ -161,6 +162,13 @@ public final class RealmLiveRaids {
         return Mth.clamp(1 + military / 15, 1, 4);
     }
 
+    /** How a town's guards split: battlemages, then crossbowmen (a third of the rest), then swordsmen. For tests. */
+    public static int[] roles(int guards, int tier) {
+        int mages = mageSpawner != null && tier >= MAGE_TIER ? Math.max(1, guards / 4) : 0;
+        int crossbows = (guards - mages) / 3;
+        return new int[] { guards - mages - crossbows, crossbows, mages };
+    }
+
     /**
      * How many guards a town turns out: its tier, plus 1, plus 1 per 5 morale (a new hamlet at the usual 10 morale sends
      * 4; a city, 8), up to {@link #MAX_GUARDS}.
@@ -170,6 +178,10 @@ public final class RealmLiveRaids {
     }
 
     public static final int MAX_GUARDS = 12;
+    /** Towns from this tier up send battlemages (a quarter of their guards), when Iron's Spells is installed. */
+    public static final int MAGE_TIER = 2;
+    /** Spawns a battlemage at a spot; set by the Iron's Spells integration, null without it. */
+    public static java.util.function.BiFunction<ServerLevel, BlockPos, net.minecraft.world.entity.Mob> mageSpawner;
 
     /** Starts fighting a raid at its town: guards turn out and the first wave comes. */
     public static LiveRaid start(Realm realm, Realm.Raid raid, ServerLevel level) {
@@ -179,14 +191,27 @@ public final class RealmLiveRaids {
         ACTIVE.put(raid.town(), live);
         int tier = RealmTiers.tier(town);
         int guards = guardCount(town.stat("morale"), tier);
+        int[] split = roles(guards, tier);
+        int crossbows = split[1];
+        int mages = split[2];
         java.util.Optional<net.minecraft.world.item.DyeColor> color = java.util.Optional.ofNullable(
                 net.minecraft.world.item.DyeColor.byName(town.guardColor(), null));
         for (int i = 0; i < guards; i++) {
-            TownGuard guard = ModEntities.TOWN_GUARD.get().spawn(level, surface(level, town.pos(), 4, level.getRandom()), MobSpawnType.EVENT);
-            if (guard != null) {
+            BlockPos at = surface(level, town.pos(), 4, level.getRandom());
+            net.minecraft.world.entity.Mob mob;
+            if (i >= guards - mages) {
+                mob = mageSpawner.apply(level, at);
+            } else {
+                TownGuard guard = ModEntities.TOWN_GUARD.get().spawn(level, at, MobSpawnType.EVENT);
+                if (guard != null) {
+                    guard.setCrossbowman(i >= guards - mages - crossbows);
+                }
+                mob = guard;
+            }
+            if (mob instanceof RealmGuard guard) {
                 guard.setSkin(TownGuard.pickSkin(town.guardSkin(), level.getRandom()));
                 guard.equip(town.name(), town.stat("wealth"), RealmRaids.defense(realm, town), tier, color);
-                live.guards.add(guard.getUUID());
+                live.guards.add(mob.getUUID());
             }
         }
         level.playSound(null, town.pos(), net.minecraft.sounds.SoundEvents.BELL_BLOCK, net.minecraft.sounds.SoundSource.BLOCKS, 2.0f, 1.0f);

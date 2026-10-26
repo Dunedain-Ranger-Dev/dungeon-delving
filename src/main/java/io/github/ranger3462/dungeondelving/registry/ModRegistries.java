@@ -197,6 +197,7 @@ public final class ModRegistries {
                         ModEntities.ORC_WARCHIEF_SPAWN_EGG, ModEntities.TOWN_GUARD_SPAWN_EGG)) {
                     output.accept(egg.get());
                 }
+                io.github.ranger3462.dungeondelving.economy.Coins.all().forEach(coin -> output.accept(coin.get()));
                 output.accept(ModEntities.SKELETON_SWORDSMAN_SPAWN_EGG.get());
                 output.accept(ModEntities.SKELETON_KNIGHT_SPAWN_EGG.get());
                 output.accept(ModEntities.SKELETON_LORD_SPAWN_EGG.get());
@@ -252,11 +253,13 @@ public final class ModRegistries {
         CraftingSkills.register(modEventBus);
         Characters.register(modEventBus);
         ModEntities.register(modEventBus);
+        io.github.ranger3462.dungeondelving.economy.Coins.init();
         io.github.ranger3462.dungeondelving.entity.Mending.register(modEventBus);
         if (ModList.get().isLoaded("irons_spellbooks")) {
             IronsGoblins.register(modEventBus);
             IronsSkeletons.register(modEventBus);
             IronsOrcs.register(modEventBus);
+            io.github.ranger3462.dungeondelving.integration.irons.IronsTownMages.register(modEventBus);
         }
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);

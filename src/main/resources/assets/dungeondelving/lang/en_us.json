@@ -1735,5 +1735,11 @@
   "skill.dungeondelving.woodworking": "Woodworking",
   "skill.dungeondelving.weaponsmithing": "Weaponsmithing",
   "skill.dungeondelving.armorsmithing": "Armorsmithing",
-  "skill.dungeondelving.goldsmithing": "Goldsmithing"
+  "skill.dungeondelving.goldsmithing": "Goldsmithing",
+  "item.dungeondelving.copper_coin": "Copper Coin",
+  "item.dungeondelving.silver_coin": "Silver Coin",
+  "item.dungeondelving.gold_coin": "Gold Coin",
+  "item.dungeondelving.platinum_coin": "Platinum Coin",
+  "entity.dungeondelving.town_mage": "Town Battlemage",
+  "item.dungeondelving.town_mage_spawn_egg": "Town Battlemage Spawn Egg"
 }

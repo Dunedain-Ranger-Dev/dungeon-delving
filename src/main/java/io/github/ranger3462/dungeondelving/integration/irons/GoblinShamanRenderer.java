@@ -34,6 +34,7 @@ public class GoblinShamanRenderer extends AbstractSpellCastingMobRenderer {
         event.registerEntityRenderer(IronsSkeletons.SKELETON_MAGE.get(),
                 context -> new GoblinShamanRenderer(context, ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "textures/entity/necromancer.png"), 1.0f));
         UndeadCasterRenderer.register(event);
+        event.registerEntityRenderer(IronsTownMages.TOWN_MAGE.get(), TownMageRenderer::new);
     }
 
     private static final class Model extends AbstractSpellCastingMobModel {
