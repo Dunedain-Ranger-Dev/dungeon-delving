@@ -114,8 +114,9 @@ public class LiveRaidTests {
             helper.assertTrue(guards.size() == 2 && guards.stream().allMatch(guard -> guard instanceof TownGuard),
                     "low morale turns out 2 town guards: " + guards.size());
             Mob guard = guards.get(0);
-            helper.assertTrue(guard.getItemBySlot(EquipmentSlot.CHEST).is(Items.DIAMOND_CHESTPLATE) && guard.getMainHandItem().is(Items.DIAMOND_SWORD),
-                    "a wealthy town arms them in diamond");
+            helper.assertTrue(guard.getItemBySlot(EquipmentSlot.CHEST).is(io.github.ranger3462.dungeondelving.entity.GuardGear.armor(
+                    io.github.ranger3462.dungeondelving.entity.GuardGear.Role.SWORD, 3)[1].getItem()) && guard.getMainHandItem().is(Items.DIAMOND_SWORD),
+                    "a wealthy town arms them in its best armor and diamond swords");
             int defense = RealmRaids.defense(realm, town);
             helper.assertTrue(guard.getMaxHealth() == (float) TownGuard.health(defense, 1) && guard.getMaxHealth() > 20,
                     "a strong defense makes them tougher: " + guard.getMaxHealth());

@@ -44,7 +44,7 @@ import net.minecraft.world.level.Level;
  * <p>
  * Most guards fight with sword and shield; crossbowmen ({@link #setCrossbowman}) hold back and shoot
  * ({@link GuardCrossbowGoal}). A town kits its guards out by its stats ({@link #equip}): better armor and weapons for a wealthier town, tougher and
- * harder-hitting guards for a better-defended one. How many turn out goes by morale (see {@code RealmLiveRaids}). Guards
+ * harder-hitting guards for a better-defended one (in the RPG class armor for their role, see {@link GuardGear}). How many turn out goes by morale (see {@code RealmLiveRaids}). Guards
  * aren't saved with the world: they're there for a fight, and gone when it's over or its ground unloads.
  */
 public class TownGuard extends PathfinderMob implements io.github.ranger3462.dungeondelving.realm.RealmGuard, CrossbowWielder {
@@ -179,16 +179,12 @@ public class TownGuard extends PathfinderMob implements io.github.ranger3462.dun
         getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(attack(defense, tier));
         setHealth(getMaxHealth());
         setCustomName(net.minecraft.network.chat.Component.literal(townName + (isCrossbowman() ? " Crossbowman" : " Guard")));
-        Item[][] sets = {
-                { Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS },
-                { Items.CHAINMAIL_HELMET, Items.CHAINMAIL_CHESTPLATE, Items.CHAINMAIL_LEGGINGS, Items.CHAINMAIL_BOOTS },
-                { Items.IRON_HELMET, Items.IRON_CHESTPLATE, Items.IRON_LEGGINGS, Items.IRON_BOOTS },
-                { Items.DIAMOND_HELMET, Items.DIAMOND_CHESTPLATE, Items.DIAMOND_LEGGINGS, Items.DIAMOND_BOOTS } };
+        ItemStack[] armor = GuardGear.armor(isCrossbowman() ? GuardGear.Role.CROSSBOW : GuardGear.Role.SWORD, gearTier(wealth, tier));
         Item[] weapons = { Items.STONE_SWORD, Items.IRON_SWORD, Items.IRON_SWORD, Items.DIAMOND_SWORD };
         int gear = gearTier(wealth, tier);
         EquipmentSlot[] slots = { EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET };
         for (int i = 0; i < slots.length; i++) {
-            ItemStack piece = new ItemStack(sets[gear][i]);
+            ItemStack piece = armor[i];
             color.ifPresent(dye -> colorPiece(level(), piece, dye));
             setItemSlot(slots[i], piece);
             setDropChance(slots[i], 0.0f);

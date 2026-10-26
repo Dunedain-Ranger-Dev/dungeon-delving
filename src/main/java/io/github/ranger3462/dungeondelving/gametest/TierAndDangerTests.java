@@ -76,7 +76,8 @@ public class TierAndDangerTests {
         helper.runAfterDelay(3, () -> {
           try {
             TownGuard guard = (TownGuard) RealmLiveRaids.guards(live).get(0);
-            helper.assertTrue(guard.getItemBySlot(EquipmentSlot.CHEST).is(Items.DIAMOND_CHESTPLATE), "a city's guards wear diamond, even with no wealth");
+            helper.assertTrue(guard.getItemBySlot(EquipmentSlot.CHEST).is(io.github.ranger3462.dungeondelving.entity.GuardGear.armor(
+                    io.github.ranger3462.dungeondelving.entity.GuardGear.Role.SWORD, 3)[1].getItem()), "a city's guards wear its best armor, even with no wealth");
             helper.assertTrue(guard.getMaxHealth() == (float) TownGuard.health(RealmRaids.defense(realm, town), 5)
                     && guard.getMaxHealth() > TownGuard.health(RealmRaids.defense(realm, town), 1), "and are tougher: " + guard.getMaxHealth());
             int cityLevel = io.github.ranger3462.dungeondelving.character.MobLevels.level(guard);

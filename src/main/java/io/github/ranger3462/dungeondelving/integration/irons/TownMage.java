@@ -42,7 +42,8 @@ import net.minecraft.world.level.Level;
 /**
  * A town battlemage (DD-98): a guard who fights with Iron's Spells, flinging firebolts and lightning at raiders while
  * mending hurt guards, villagers and the players fighting for the town. A quarter of a bigger town's guards (see
- * {@code RealmLiveRaids}). Wears the town's skin setting and color like the other guards (in leather robes); its spells
+ * {@code RealmLiveRaids}). Wears the town's skin setting and color like the other guards (in wizard robes, see
+ * {@code GuardGear}); its spells
  * hit harder the bigger its town. Only exists when Iron's Spells is installed. Not saved with the world.
  */
 public class TownMage extends AbstractSpellCastingMob implements RealmGuard {
@@ -93,7 +94,7 @@ public class TownMage extends AbstractSpellCastingMob implements RealmGuard {
         entityData.set(SKIN, skin);
     }
 
-    /** Health and gear like a guard's (robes rather than metal: leather, dyed the town's color), and spell power by tier. */
+    /** Health and gear like a guard's (robes rather than metal), and spell power by tier. */
     @Override
     public void equip(String townName, int wealth, int defense, int tier, Optional<DyeColor> color) {
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(TownGuard.health(defense, tier) * 0.8);
@@ -103,11 +104,14 @@ public class TownMage extends AbstractSpellCastingMob implements RealmGuard {
             power.addOrReplacePermanentModifier(new AttributeModifier(POWER, 0.15 * (tier - 1), AttributeModifier.Operation.ADD_MULTIPLIED_BASE));
         }
         setCustomName(Component.literal(townName + " Battlemage"));
-        Item[] robes = { Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS };
+        ItemStack[] robes = io.github.ranger3462.dungeondelving.entity.GuardGear.armor(io.github.ranger3462.dungeondelving.entity.GuardGear.Role.MAGE,
+                TownGuard.gearTier(wealth, tier));
         EquipmentSlot[] slots = { EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET };
         for (int i = 0; i < slots.length; i++) {
-            ItemStack piece = new ItemStack(robes[i]);
-            TownGuard.colorPiece(level(), piece, color.orElse(DyeColor.PURPLE));
+            ItemStack piece = robes[i];
+            if (color.isPresent() || piece.is(Items.LEATHER_CHESTPLATE) || piece.is(net.minecraft.tags.ItemTags.DYEABLE)) {
+                TownGuard.colorPiece(level(), piece, color.orElse(DyeColor.PURPLE));
+            }
             setItemSlot(slots[i], piece);
             setDropChance(slots[i], 0.0f);
         }

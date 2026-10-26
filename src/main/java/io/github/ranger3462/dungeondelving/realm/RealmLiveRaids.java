@@ -162,10 +162,13 @@ public final class RealmLiveRaids {
         return Mth.clamp(1 + military / 15, 1, 4);
     }
 
-    /** How a town's guards split: battlemages, then crossbowmen (a third of the rest), then swordsmen. For tests. */
+    /**
+     * How a town's guards split: battlemages (a quarter, from {@link #MAGE_TIER}), crossbowmen (a third of the rest, and
+     * at least one in any squad of two or more), then swordsmen.
+     */
     public static int[] roles(int guards, int tier) {
         int mages = mageSpawner != null && tier >= MAGE_TIER ? Math.max(1, guards / 4) : 0;
-        int crossbows = (guards - mages) / 3;
+        int crossbows = guards - mages >= 2 ? Math.max(1, (guards - mages) / 3) : 0;
         return new int[] { guards - mages - crossbows, crossbows, mages };
     }
 
