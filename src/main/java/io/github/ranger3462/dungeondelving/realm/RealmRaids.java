@@ -12,7 +12,8 @@ import net.minecraft.util.RandomSource;
  * army, plus a d20.
  * <ul>
  * <li>Attackers win: the town loses defense, wealth and morale, more for a bigger margin, and is owed block damage by the
- * margin (its {@code damage} stat, for the blueprints in DD-97). The attackers lose a little military.</li>
+ * margin (its {@code damage} stat, for the blueprints in DD-97). The attackers lose a little military. Sacked by
+ * {@link #TIER_LOSS_MARGIN} or more, a town above tier 1 also falls back a tier.</li>
  * <li>Defenders win: the attackers lose military, more for a bigger margin, and the town's morale rises.</li>
  * </ul>
  * With a player at the town when dusk comes, it's fought instead ({@link RealmLiveRaids}), and the damage each side does
@@ -21,6 +22,8 @@ import net.minecraft.util.RandomSource;
 public final class RealmRaids {
     /** The share of the kingdom's army that turns out for a raided town: a quarter. */
     public static final int ARMY_SHARE = 4;
+    /** A sacking by this much or more knocks a town back a tier (DD-99). */
+    public static final int TIER_LOSS_MARGIN = 10;
 
     private RealmRaids() {}
 
@@ -109,6 +112,11 @@ public final class RealmRaids {
             realm.addStat(attacker, "military", -Math.min(attacker.stat("military"), 1));
             realm.news("The " + raid.nation() + " of " + attacker.name() + " sacked " + target.name() + how + " (" + attack + " against " + defense
                     + "): it lost " + defenseLost + " defense, " + wealthLost + " wealth and " + moraleLost + " morale.");
+            int tier = RealmTiers.tier(target);
+            if (margin >= TIER_LOSS_MARGIN && tier > 1) {
+                realm.setStat(target, "tier", tier - 1);
+                realm.news(target.name() + " was so badly sacked it fell back to a " + RealmTiers.name(tier - 1) + " (tier " + (tier - 1) + ").");
+            }
             return true;
         }
         int losses = Math.min(attacker.stat("military"), 2 + (defense - attack) / 4);

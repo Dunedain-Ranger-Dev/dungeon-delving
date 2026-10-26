@@ -78,15 +78,23 @@ public final class Realm extends SavedData {
         };
     }
 
-    /** Why a node can't have this owner, if it can't: towns are always the kingdom's, strongholds always a nation's. */
+    /** Why a new node can't have this owner, if it can't: towns are always the kingdom's, and strongholds start as a nation's. */
     public static Optional<String> ownerProblem(RealmNode.Type type, String owner) {
+        return ownerProblem(type, owner, true);
+    }
+
+    /**
+     * Why a node can't have this owner, if it can't. Towns are always the kingdom's. A new stronghold ({@code founding})
+     * must be a nation's; an existing one can be taken by the kingdom or cleared (none).
+     */
+    public static Optional<String> ownerProblem(RealmNode.Type type, String owner, boolean founding) {
         if (!validOwner(owner)) {
             return Optional.of("Unknown owner " + owner + ": use kingdom, none, or a monster nation (" + String.join(", ", DungeonFactions.ids()) + ").");
         }
         if (type == RealmNode.Type.TOWN && !RealmNode.KINGDOM.equals(owner)) {
             return Optional.of("Towns are always the kingdom's.");
         }
-        if (type == RealmNode.Type.STRONGHOLD && (RealmNode.KINGDOM.equals(owner) || RealmNode.NONE.equals(owner))) {
+        if (founding && type == RealmNode.Type.STRONGHOLD && (RealmNode.KINGDOM.equals(owner) || RealmNode.NONE.equals(owner))) {
             return Optional.of("A stronghold belongs to a monster nation (" + String.join(", ", DungeonFactions.ids()) + ").");
         }
         return Optional.empty();

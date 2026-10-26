@@ -38,7 +38,7 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 /**
  * Live raids (DD-98, docs/design/realm.md). When a raid's dusk comes and a player is at the town, it isn't rolled: it's
  * fought. The attacking nation's mobs come in {@link #WAVES} waves from all round the town (its dungeon faction's mobs,
- * of a tier by the stronghold's military), against the town's guards ({@link TownGuard}s: more for better morale, better
+ * of a tier by the stronghold's military), against the town's guards ({@link TownGuard}s: more for a bigger town and better morale, better
  * armed for more wealth, tougher for a better defense) and whoever's there. A bell rings and the town's villagers hide
  * indoors until the fight's over.
  * <p>
@@ -161,10 +161,15 @@ public final class RealmLiveRaids {
         return Mth.clamp(1 + military / 15, 1, 4);
     }
 
-    /** How many guards a town turns out: 1, plus 1 per 3 morale (4 at the usual 10), up to 3 more than its tier. */
+    /**
+     * How many guards a town turns out: its tier, plus 1, plus 1 per 5 morale (a new hamlet at the usual 10 morale sends
+     * 4; a city, 8), up to {@link #MAX_GUARDS}.
+     */
     public static int guardCount(int morale, int tier) {
-        return Mth.clamp(1 + morale / 3, 1, 3 + tier);
+        return Mth.clamp(1 + tier + Math.max(0, morale) / 5, 1, MAX_GUARDS);
     }
+
+    public static final int MAX_GUARDS = 12;
 
     /** Starts fighting a raid at its town: guards turn out and the first wave comes. */
     public static LiveRaid start(Realm realm, Realm.Raid raid, ServerLevel level) {

@@ -248,13 +248,15 @@ public final class RealmCommands {
             return 0;
         }
         String owner = StringArgumentType.getString(context, "owner");
-        Optional<String> problem = Realm.ownerProblem(node.get().type, owner);
+        Optional<String> problem = Realm.ownerProblem(node.get().type, owner, false);
         if (problem.isPresent()) {
             Feedback.fail(context.getSource(), problem.get());
             return 0;
         }
+        boolean taken = node.get().type == RealmNode.Type.STRONGHOLD && node.get().monsters() && !DungeonFactions.ids().contains(owner);
         realm(context).setOwner(node.get(), owner);
-        Feedback.tell(context.getSource(), node.get().id + " is now held by " + owner + ".");
+        Feedback.tell(context.getSource(), node.get().id + " is now held by " + owner + "."
+                + (taken ? " Its monsters no longer raid from it, and the land around it calms." : ""));
         return 1;
     }
 

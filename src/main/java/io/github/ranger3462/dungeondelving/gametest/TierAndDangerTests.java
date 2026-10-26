@@ -46,6 +46,17 @@ public class TierAndDangerTests {
             RealmTiers.grow(realm);
         }
         helper.assertTrue(RealmTiers.tier(town) == RealmTiers.MAX_TIER, "it tops out as a city");
+
+        RealmNode warren = new RealmNode("warren", RealmNode.Type.STRONGHOLD, DungeonFactions.GOBLINS, level.dimension(), new BlockPos(200, 0, 0));
+        realm.add(warren);
+        RealmRaids.decide(realm, new Realm.Raid(DungeonFactions.GOBLINS, "warren", "riverhold", 0, 0L), 30, 25, false);
+        helper.assertTrue(RealmTiers.tier(town) == RealmTiers.MAX_TIER, "a narrow sacking doesn't cost a tier");
+        RealmRaids.decide(realm, new Realm.Raid(DungeonFactions.GOBLINS, "warren", "riverhold", 0, 0L), 40, 25, false);
+        helper.assertTrue(RealmTiers.tier(town) == RealmTiers.MAX_TIER - 1, "a bad one knocks it back a tier");
+        helper.assertTrue(realm.log().stream().anyMatch(entry -> entry.text().contains("fell back to a market town")), "with news");
+
+        helper.assertTrue(Realm.ownerProblem(RealmNode.Type.STRONGHOLD, RealmNode.KINGDOM, false).isEmpty()
+                && Realm.ownerProblem(RealmNode.Type.STRONGHOLD, RealmNode.NONE, false).isEmpty(), "a stronghold can be taken or cleared");
         helper.succeed();
     }
 
@@ -71,7 +82,8 @@ public class TierAndDangerTests {
             int cityLevel = io.github.ranger3462.dungeondelving.character.MobLevels.level(guard);
             helper.assertTrue(cityLevel >= 10 && "riverhold Guard".equals(guard.getCustomName().getString()),
                     "a city's guards are well above a villager's level 2: " + cityLevel);
-            helper.assertTrue(RealmLiveRaids.guardCount(30, 5) == 8 && RealmLiveRaids.guardCount(30, 1) == 4, "and more of them can turn out");
+            helper.assertTrue(RealmLiveRaids.guardCount(10, 5) == 8 && RealmLiveRaids.guardCount(10, 1) == 4 && RealmLiveRaids.guardCount(0, 1) == 2
+                    && RealmLiveRaids.guardCount(100, 5) == RealmLiveRaids.MAX_GUARDS, "and more of them turn out: tier + 1 + morale / 5, up to 12");
           } finally {
             RealmLiveRaids.clearAll();
           }
