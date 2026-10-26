@@ -39,7 +39,8 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * Live raids (DD-98, docs/design/realm.md). When a raid's dusk comes and a player is at the town, it isn't rolled: it's
  * fought. The attacking nation's mobs come in {@link #WAVES} waves from all round the town (its dungeon faction's mobs,
  * of a tier by the stronghold's military), against the town's guards ({@link TownGuard}s: more for better morale, better
- * armed for more wealth, tougher for a better defense) and whoever's there.
+ * armed for more wealth, tougher for a better defense) and whoever's there. A bell rings and the town's villagers hide
+ * indoors until the fight's over.
  * <p>
  * The damage each side does decides it: what the raiders deal to guards, villagers and players, plus what's left of
  * them when time runs out, against what they take. Beat every wave and the town holds; run out the clock behind, and it's
@@ -172,13 +173,18 @@ public final class RealmLiveRaids {
         LiveRaid live = new LiveRaid(raid, level, town.pos(), tier(military), Mth.clamp(3 + military / 8, 3, 12));
         ACTIVE.put(raid.town(), live);
         int guards = guardCount(town.stat("morale"));
+        java.util.Optional<net.minecraft.world.item.DyeColor> color = java.util.Optional.ofNullable(
+                net.minecraft.world.item.DyeColor.byName(town.guardColor(), null));
         for (int i = 0; i < guards; i++) {
             TownGuard guard = ModEntities.TOWN_GUARD.get().spawn(level, surface(level, town.pos(), 4, level.getRandom()), MobSpawnType.EVENT);
             if (guard != null) {
-                guard.equip(town.stat("wealth"), RealmRaids.defense(realm, town));
+                guard.setSkin(TownGuard.pickSkin(town.guardSkin(), level.getRandom()));
+                guard.equip(town.stat("wealth"), RealmRaids.defense(realm, town), color);
                 live.guards.add(guard.getUUID());
             }
         }
+        level.playSound(null, town.pos(), net.minecraft.sounds.SoundEvents.BELL_BLOCK, net.minecraft.sounds.SoundSource.BLOCKS, 2.0f, 1.0f);
+        hideVillagers(live);
         realm.news(town.name() + " is under attack by the " + raid.nation() + "! Its guards turn out.");
         nextWave(realm, live);
         return live;
@@ -203,6 +209,18 @@ public final class RealmLiveRaids {
         realm.news("Wave " + live.wave + " of " + WAVES + " comes for " + realm.node(live.raid.town()).map(RealmNode::name).orElse(live.raid.town()) + ".");
     }
 
+    /**
+     * Sends the town's villagers indoors, as a rung bell does, and keeps them there while the fight lasts (the alarm's
+     * renewed each second; once it stops, they come out again a little after).
+     */
+    static void hideVillagers(LiveRaid live) {
+        long now = live.level.getGameTime();
+        for (net.minecraft.world.entity.npc.Villager villager : live.level.getEntitiesOfClass(net.minecraft.world.entity.npc.Villager.class,
+                new net.minecraft.world.phys.AABB(live.center).inflate(PRESENCE))) {
+            villager.getBrain().setMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.HEARD_BELL_TIME, now);
+        }
+    }
+
     /** A standing spot on the ground near {@code around}. */
     private static BlockPos surface(ServerLevel level, BlockPos around, int spread, RandomSource random) {
         int x = around.getX() + random.nextInt(spread * 2 + 1) - spread;
@@ -223,6 +241,7 @@ public final class RealmLiveRaids {
             LiveRaid live = it.next();
             live.age += ticks;
             live.alone = live.pretendPresent || playerAt(live.level, live.center, ABANDON) ? 0 : live.alone + ticks;
+            hideVillagers(live);
             int standing = 0;
             int guards = 0;
             for (UUID id : live.guards) {

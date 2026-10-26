@@ -40,6 +40,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * <li>{@code /realm raid <town>}: the strongest stronghold bordering a town raids it, in 10 seconds: fought if you're
  * there, rolled if not (DD-98).</li>
  * <li>{@code /realm side town|raiders}: which side you fight for in the raid you're at (the town's, unless you say).</li>
+ * <li>{@code /realm guards <town>}: how its guards look. {@code skin set|mixed|<name>} (our guard set, the game's built-in
+ * faces, or one skin from textures/entity/town_guard/), {@code color <dye>|none}.</li>
  * </ul>
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
@@ -50,6 +52,13 @@ public final class RealmCommands {
             Arrays.stream(RealmNode.Type.values()).map(RealmNode.Type::id), builder);
     private static final SuggestionProvider<CommandSourceStack> OWNERS = (context, builder) -> SharedSuggestionProvider.suggest(
             Stream.concat(Stream.of(RealmNode.KINGDOM, RealmNode.NONE), DungeonFactions.ids().stream()), builder);
+
+    private static final SuggestionProvider<CommandSourceStack> GUARD_SKINS = (context, builder) -> SharedSuggestionProvider.suggest(
+            Stream.concat(Stream.of(io.github.ranger3462.dungeondelving.entity.TownGuard.SKIN_SET, io.github.ranger3462.dungeondelving.entity.TownGuard.SKIN_MIXED),
+                    java.util.stream.IntStream.rangeClosed(1, io.github.ranger3462.dungeondelving.entity.TownGuard.GUARD_SKINS).mapToObj(n -> "guard_" + n)),
+            builder);
+    private static final SuggestionProvider<CommandSourceStack> GUARD_COLORS = (context, builder) -> SharedSuggestionProvider.suggest(
+            Stream.concat(Stream.of("none"), Arrays.stream(net.minecraft.world.item.DyeColor.values()).map(net.minecraft.world.item.DyeColor::getName)), builder);
 
     private RealmCommands() {}
 
@@ -63,6 +72,11 @@ public final class RealmCommands {
                 .then(Commands.literal("info").then(node("id").executes(RealmCommands::info)))
                 .then(Commands.literal("clock").executes(RealmCommands::clock))
                 .then(Commands.literal("raid").then(node("town").executes(RealmCommands::raid)))
+                .then(Commands.literal("guards").then(node("town").executes(RealmCommands::guards)
+                        .then(Commands.literal("skin").then(Commands.argument("skin", StringArgumentType.word()).suggests(GUARD_SKINS)
+                                .executes(context -> guardLook(context, StringArgumentType.getString(context, "skin"), null))))
+                        .then(Commands.literal("color").then(Commands.argument("color", StringArgumentType.word()).suggests(GUARD_COLORS)
+                                .executes(context -> guardLook(context, null, StringArgumentType.getString(context, "color")))))))
                 .then(Commands.literal("side").then(Commands.literal("town").executes(context -> side(context, false)))
                         .then(Commands.literal("raiders").executes(context -> side(context, true))))
                 .then(Commands.literal("blueprint")
@@ -344,6 +358,37 @@ public final class RealmCommands {
         Feedback.tell(context.getSource(), "The " + raid.get().nation() + " raid " + town + " in 10 seconds. Be within "
                 + io.github.ranger3462.dungeondelving.realm.RealmLiveRaids.PRESENCE + " blocks of it to fight it.");
         return 1;
+    }
+
+    private static int guards(CommandContext<CommandSourceStack> context) {
+        Optional<RealmNode> town = find(context, "town");
+        town.ifPresent(found -> Feedback.tell(context.getSource(), found.id + "'s guards: skin " + (found.guardSkin().isEmpty() ? "set" : found.guardSkin())
+                + ", color " + (found.guardColor().isEmpty() ? "none" : found.guardColor()) + "."));
+        return town.isPresent() ? 1 : 0;
+    }
+
+    /** Sets a town's guard skin or color (whichever isn't null). */
+    private static int guardLook(CommandContext<CommandSourceStack> context, String skin, String color) {
+        Optional<RealmNode> town = find(context, "town");
+        if (town.isEmpty()) {
+            return 0;
+        }
+        if (town.get().type != RealmNode.Type.TOWN) {
+            Feedback.fail(context.getSource(), town.get().id + " isn't a town.");
+            return 0;
+        }
+        if (skin != null && !skin.matches("[a-z0-9_]+")) {
+            Feedback.fail(context.getSource(), "A skin name is lower case letters, digits and _.");
+            return 0;
+        }
+        if (color != null && !"none".equals(color) && net.minecraft.world.item.DyeColor.byName(color, null) == null) {
+            Feedback.fail(context.getSource(), "No such color: " + color + ".");
+            return 0;
+        }
+        String newSkin = skin != null ? (io.github.ranger3462.dungeondelving.entity.TownGuard.SKIN_SET.equals(skin) ? "" : skin) : town.get().guardSkin();
+        String newColor = color != null ? ("none".equals(color) ? "" : color) : town.get().guardColor();
+        realm(context).setGuardLook(town.get(), newSkin, newColor);
+        return guards(context);
     }
 
     private static int side(CommandContext<CommandSourceStack> context, boolean raiders) throws com.mojang.brigadier.exceptions.CommandSyntaxException {

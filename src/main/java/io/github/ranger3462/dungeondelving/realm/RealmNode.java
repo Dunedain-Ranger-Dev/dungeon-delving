@@ -61,6 +61,9 @@ public final class RealmNode {
     private String name;
     private String owner;
     private String kind = "";
+    /** A town's guard look (/realm guards): skin setting (see TownGuard.pickSkin; blank is our set) and color (blank is none). */
+    private String guardSkin = "";
+    private String guardColor = "";
     private ResourceKey<Level> dimension;
     private BlockPos pos;
     private final Map<String, Integer> stats = new LinkedHashMap<>();
@@ -115,6 +118,19 @@ public final class RealmNode {
         this.kind = kind;
     }
 
+    public String guardSkin() {
+        return guardSkin;
+    }
+
+    public String guardColor() {
+        return guardColor;
+    }
+
+    void setGuardLook(String skin, String color) {
+        this.guardSkin = skin;
+        this.guardColor = color;
+    }
+
     void moveTo(ResourceKey<Level> dimension, BlockPos pos) {
         this.dimension = dimension;
         this.pos = pos.immutable();
@@ -141,6 +157,8 @@ public final class RealmNode {
         tag.putString("name", name);
         tag.putString("owner", owner);
         tag.putString("kind", kind);
+        tag.putString("guard_skin", guardSkin);
+        tag.putString("guard_color", guardColor);
         tag.putString("dimension", dimension.location().toString());
         tag.putLong("pos", pos.asLong());
         CompoundTag statTag = new CompoundTag();
@@ -159,6 +177,8 @@ public final class RealmNode {
                 BlockPos.of(tag.getLong("pos")));
         node.name = tag.getString("name");
         node.kind = tag.getString("kind");
+        node.guardSkin = tag.getString("guard_skin");
+        node.guardColor = tag.getString("guard_color");
         node.stats.clear();
         CompoundTag stats = tag.getCompound("stats");
         for (String stat : stats.getAllKeys()) {

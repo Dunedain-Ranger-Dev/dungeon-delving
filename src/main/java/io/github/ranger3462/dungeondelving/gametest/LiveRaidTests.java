@@ -128,6 +128,37 @@ public class LiveRaidTests {
     }
 
     @GameTest(template = ANY_TEMPLATE, timeoutTicks = 200)
+    public static void guardsWearTheirTownsLookAndVillagersHide(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        Realm realm = frontier(helper);
+        try {
+            RealmNode town = realm.node("riverhold").orElseThrow();
+            realm.setGuardLook(town, "guard_3", "blue");
+            net.minecraft.world.entity.npc.Villager villager = net.minecraft.world.entity.EntityType.VILLAGER.create(level);
+            villager.moveTo(town.pos().getCenter());
+            level.addFreshEntity(villager);
+            Realm.Raid raid = RealmRaids.declare(realm, "riverhold", 0L).orElseThrow();
+            RealmLiveRaids.LiveRaid live = RealmLiveRaids.start(realm, raid, level);
+            TownGuard guard = (TownGuard) RealmLiveRaids.guards(live).get(0);
+            helper.assertTrue("guard_3".equals(guard.skinName()), "the town's named skin: " + guard.skinName());
+            var trim = guard.getItemBySlot(EquipmentSlot.CHEST).get(net.minecraft.core.component.DataComponents.TRIM);
+            helper.assertTrue(trim != null && trim.material().is(net.minecraft.world.item.armortrim.TrimMaterials.LAPIS),
+                    "blue trims the iron armor in lapis");
+            helper.assertTrue(guard.getOffhandItem().get(net.minecraft.core.component.DataComponents.BASE_COLOR) == net.minecraft.world.item.DyeColor.BLUE,
+                    "and paints the shield blue");
+            helper.assertTrue(villager.getBrain().getMemory(net.minecraft.world.entity.ai.memory.MemoryModuleType.HEARD_BELL_TIME).isPresent(),
+                    "the bell sends villagers to hide");
+            villager.discard();
+
+            helper.assertTrue(TownGuard.pickSkin("", level.getRandom()).startsWith("guard_"), "by default, guards wear our set");
+            helper.assertTrue(TownGuard.pickSkin(TownGuard.SKIN_MIXED, level.getRandom()).startsWith("minecraft:"), "or the built-in faces");
+        } finally {
+            RealmLiveRaids.clearAll();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 200)
     public static void whenTheGuardsFallTheTownIsSacked(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Realm realm = frontier(helper);

@@ -14,7 +14,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
-/** Draws town guards with the player body and one of the game's built-in player skins, with their armor. */
+/** Draws town guards with the player body, their skin (falling back to our first if a named one is missing), and their armor. */
 public class TownGuardRenderer extends HumanoidMobRenderer<TownGuard, HumanoidModel<TownGuard>> {
     public TownGuardRenderer(EntityRendererProvider.Context context) {
         super(context, new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER)), 0.5f);
@@ -22,9 +22,12 @@ public class TownGuardRenderer extends HumanoidMobRenderer<TownGuard, HumanoidMo
                 new HumanoidModel<>(context.bakeLayer(ModelLayers.PLAYER_OUTER_ARMOR)), context.getModelManager()));
     }
 
+    private static final ResourceLocation FALLBACK = DungeonDelving.id("textures/entity/town_guard/guard_1.png");
+
     @Override
     public ResourceLocation getTextureLocation(TownGuard guard) {
-        return guard.skin();
+        ResourceLocation skin = guard.skin();
+        return net.minecraft.client.Minecraft.getInstance().getResourceManager().getResource(skin).isPresent() ? skin : FALLBACK;
     }
 
     @EventBusSubscriber(modid = DungeonDelving.MODID, value = Dist.CLIENT)

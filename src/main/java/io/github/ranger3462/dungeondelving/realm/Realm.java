@@ -136,6 +136,12 @@ public final class Realm extends SavedData {
         setDirty();
     }
 
+    /** Sets how a town's guards look: a skin setting and a color (blank for none). */
+    public void setGuardLook(RealmNode node, String skin, String color) {
+        node.setGuardLook(skin, color);
+        setDirty();
+    }
+
     public void move(RealmNode node, ResourceKey<Level> dimension, BlockPos pos) {
         node.moveTo(dimension, pos);
         setDirty();

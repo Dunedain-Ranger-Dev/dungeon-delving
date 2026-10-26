@@ -292,6 +292,8 @@ dependencies {
         localRuntime "curse.maven:farmers-delight-398521:8765184"        // 1.21.1-1.3.4
         // Cosmetic armor slots: wear another armor's look over forged armor (DD-89)
         localRuntime "curse.maven:cosmetic-armor-reworked-forked-1434118:7685857"  // 1.21.1-0.0.4
+        // Human villagers: replaces the villager look with human models, keeping their trades (on trial)
+        localRuntime "curse.maven:villagers-reborn-1361000:8585406"  // 1.0.9b
     }
 
     // For more info:
