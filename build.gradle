@@ -27,6 +27,18 @@ sourceSets.main.resources {
 }
 
 repositories {
+    // MixinSquared: lets this mod cancel a clashing mixin from another mod (see compat/MixinCancels).
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Bawnorton"
+                url = "https://maven.bawnorton.com/releases"
+            }
+        }
+        filter {
+            includeGroup "com.github.bawnorton.mixinsquared"
+        }
+    }
     // CurseMaven: the pack's mods from CurseForge, for dev runs (see dependencies below), as curse.maven:<slug>-<project>:<file>.
     exclusiveContent {
         forRepository {
@@ -145,6 +157,15 @@ def siblingMods = [
 ]
 
 dependencies {
+    // MixinSquared, bundled in the jar: cancels Sensible Survival's anvil-screen mixin, which clashes with Apothic
+    // Enchanting's (both lift the anvil's level cap; whichever loads second crashes the game).
+    compileOnly(annotationProcessor("com.github.bawnorton.mixinsquared:mixinsquared-common:0.3.7"))
+    implementation(jarJar("com.github.bawnorton.mixinsquared:mixinsquared-neoforge:0.3.7")) {
+        version {
+            strictly "[0.3.7,)"
+            prefer "0.3.7"
+        }
+    }
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
     // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
