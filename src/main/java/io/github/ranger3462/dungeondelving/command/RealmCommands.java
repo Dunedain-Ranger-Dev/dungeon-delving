@@ -15,6 +15,7 @@ import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.realm.Realm;
 import io.github.ranger3462.dungeondelving.realm.RealmNode;
+import io.github.ranger3462.dungeondelving.realm.RealmTurns;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -32,6 +33,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * stand), {@code rename}, {@code owner}, {@code kind} (a site's or event's: watchtower, bridge, caravan...), {@code set}
  * (a stat).</li>
  * <li>{@code /realm link <a> <b>} and {@code /realm unlink <a> <b>}: the links that make borders.</li>
+ * <li>{@code /realm clock}: the turn, the kingdom's army and treasury, raids declared, and the time to the next turn.
+ * {@code /realm turn [count]}: take turns now. {@code /realm log [count]}: what's happened lately (DD-95).</li>
  * </ul>
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
@@ -53,6 +56,13 @@ public final class RealmCommands {
                         .then(Commands.argument("type", StringArgumentType.word()).suggests(TYPES)
                                 .executes(context -> list(context, StringArgumentType.getString(context, "type")))))
                 .then(Commands.literal("info").then(node("id").executes(RealmCommands::info)))
+                .then(Commands.literal("clock").executes(RealmCommands::clock))
+                .then(Commands.literal("turn").executes(context -> turn(context, 1))
+                        .then(Commands.argument("count", IntegerArgumentType.integer(1, 100))
+                                .executes(context -> turn(context, IntegerArgumentType.getInteger(context, "count")))))
+                .then(Commands.literal("log").executes(context -> log(context, 10))
+                        .then(Commands.argument("count", IntegerArgumentType.integer(1, 100))
+                                .executes(context -> log(context, IntegerArgumentType.getInteger(context, "count")))))
                 .then(Commands.literal("link").then(node("a").then(node("b").executes(context -> link(context, true)))))
                 .then(Commands.literal("unlink").then(node("a").then(node("b").executes(context -> link(context, false)))))
                 .then(Commands.literal("node")
@@ -231,6 +241,48 @@ public final class RealmCommands {
             Feedback.tell(context.getSource(), found.id + "'s " + stat + " is now " + value + ".");
         });
         return node.isPresent() ? 1 : 0;
+    }
+
+    private static int clock(CommandContext<CommandSourceStack> context) {
+        Realm realm = realm(context);
+        long seconds = RealmTurns.untilNext(realm, System.currentTimeMillis()) / 1000;
+        Feedback.tell(context.getSource(), "Turn " + realm.turn() + ". The next in " + seconds / 60 + ":" + String.format("%02d", seconds % 60) + ".");
+        Feedback.detail(context.getSource(), "The kingdom: " + realm.kingdomStats().entrySet().stream().map(e -> e.getKey() + " " + e.getValue())
+                .collect(Collectors.joining(", ")) + "; the border faces " + RealmTurns.threat(realm) + " monster military.");
+        for (String nation : realm.nations()) {
+            Feedback.detail(context.getSource(), "The " + nation + ": military " + RealmTurns.military(realm, nation));
+        }
+        for (Realm.Raid raid : realm.raids()) {
+            Feedback.detail(context.getSource(), "Raid declared on turn " + raid.declared() + ": the " + raid.nation() + " of " + raid.stronghold() + " on "
+                    + raid.town() + ".");
+        }
+        return realm.turn();
+    }
+
+    private static int turn(CommandContext<CommandSourceStack> context, int count) {
+        Realm realm = realm(context);
+        int from = realm.turn();
+        for (int i = 0; i < count; i++) {
+            RealmTurns.takeTurn(realm, context.getSource().getLevel().getRandom());
+        }
+        Feedback.tell(context.getSource(), "Took " + count + (count == 1 ? " turn" : " turns") + " (now turn " + realm.turn() + "):");
+        // What these turns did, the latest dozen at most.
+        List<Realm.LogEntry> taken = realm.log().stream().filter(entry -> entry.turn() > from).toList();
+        taken.subList(Math.max(0, taken.size() - 12), taken.size())
+                .forEach(entry -> Feedback.detail(context.getSource(), "Turn " + entry.turn() + ": " + entry.text()));
+        return realm.turn();
+    }
+
+    private static int log(CommandContext<CommandSourceStack> context, int count) {
+        List<Realm.LogEntry> log = realm(context).log();
+        if (log.isEmpty()) {
+            Feedback.tell(context.getSource(), "Nothing has happened in the realm yet.");
+            return 0;
+        }
+        Feedback.tell(context.getSource(), "The realm lately:");
+        log.subList(Math.max(0, log.size() - count), log.size())
+                .forEach(entry -> Feedback.detail(context.getSource(), "Turn " + entry.turn() + ": " + entry.text()));
+        return log.size();
     }
 
     private static int link(CommandContext<CommandSourceStack> context, boolean linking) {

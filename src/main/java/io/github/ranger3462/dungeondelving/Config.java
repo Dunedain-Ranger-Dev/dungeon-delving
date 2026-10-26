@@ -108,6 +108,16 @@ public final class Config {
                 .defineList(key, defaults, () -> "minecraft:zombie=1", value -> value instanceof String text && SpawnerMobs.parse(text).isPresent());
     }
 
+    public static final ModConfigSpec.IntValue REALM_TURN_MINUTES = BUILDER
+            .comment("Real minutes between the realm's turns (docs/design/realm.md). 20 is a Minecraft day. Turns keep coming while",
+                    "the server is off, and are caught up when it starts (up to realmCatchUpTurns).")
+            .defineInRange("realmTurnMinutes", 20, 1, 24 * 60);
+
+    public static final ModConfigSpec.IntValue REALM_CATCH_UP_TURNS = BUILDER
+            .comment("The most turns the realm catches up on when the server starts after being off. Any more are skipped, so a long",
+                    "time away doesn't flatten the realm.")
+            .defineInRange("realmCatchUpTurns", 24, 0, 1000);
+
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private Config() {}

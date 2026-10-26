@@ -37,6 +37,26 @@ public final class Realm extends SavedData {
     /** Links, each stored once as "a|b" with a before b. */
     private final Set<String> links = new LinkedHashSet<>();
 
+    // --- Turns (DD-95, see RealmTurns) ---
+
+    /** How many turns the realm has taken. */
+    int turn;
+    /** When the last turn was due, in real time (milliseconds); 0 until the clock first starts. */
+    long lastTurnMillis;
+    /** The kingdom's own stats: its standing army and treasury. */
+    final Map<String, Integer> kingdom = new LinkedHashMap<>(Map.of("army", 10, "treasury", 10));
+    /** Raids declared and not yet resolved. */
+    final List<Raid> raids = new ArrayList<>();
+    /** The most recent happenings, oldest first. */
+    final java.util.Deque<LogEntry> log = new java.util.ArrayDeque<>();
+    static final int LOG_SIZE = 100;
+
+    /** A monster nation's raid on a town, from one of its strongholds, declared on a turn. */
+    public record Raid(String nation, String stronghold, String town, int declared) {}
+
+    /** Something that happened on a turn. */
+    public record LogEntry(int turn, String text) {}
+
     public static Realm get(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(new SavedData.Factory<>(Realm::new, Realm::load, null), NAME);
     }
@@ -179,6 +199,55 @@ public final class Realm extends SavedData {
         return links.size();
     }
 
+    // --- Turns ---
+
+    public int turn() {
+        return turn;
+    }
+
+    public long lastTurnMillis() {
+        return lastTurnMillis;
+    }
+
+    public int kingdomStat(String stat) {
+        return kingdom.getOrDefault(stat, 0);
+    }
+
+    public Map<String, Integer> kingdomStats() {
+        return Collections.unmodifiableMap(kingdom);
+    }
+
+    public List<Raid> raids() {
+        return Collections.unmodifiableList(raids);
+    }
+
+    public List<LogEntry> log() {
+        return List.copyOf(log);
+    }
+
+    void addKingdomStat(String stat, int amount) {
+        kingdom.merge(stat, amount, Integer::sum);
+        setDirty();
+    }
+
+    void addStat(RealmNode node, String stat, int amount) {
+        node.setStat(stat, node.stat(stat) + amount);
+        setDirty();
+    }
+
+    void record(String text) {
+        log.addLast(new LogEntry(turn, text));
+        while (log.size() > LOG_SIZE) {
+            log.removeFirst();
+        }
+        setDirty();
+    }
+
+    /** The monster nations that hold a stronghold: the ones that take turns. */
+    public List<String> nations() {
+        return nodes.values().stream().filter(node -> node.type == RealmNode.Type.STRONGHOLD && node.monsters()).map(RealmNode::owner).distinct().toList();
+    }
+
     // --- Saving ---
 
     @Override
@@ -189,6 +258,29 @@ public final class Realm extends SavedData {
         ListTag linkList = new ListTag();
         links.forEach(link -> linkList.add(StringTag.valueOf(link)));
         tag.put("links", linkList);
+        tag.putInt("turn", turn);
+        tag.putLong("last_turn_millis", lastTurnMillis);
+        CompoundTag kingdomTag = new CompoundTag();
+        kingdom.forEach(kingdomTag::putInt);
+        tag.put("kingdom", kingdomTag);
+        ListTag raidList = new ListTag();
+        for (Raid raid : raids) {
+            CompoundTag raidTag = new CompoundTag();
+            raidTag.putString("nation", raid.nation());
+            raidTag.putString("stronghold", raid.stronghold());
+            raidTag.putString("town", raid.town());
+            raidTag.putInt("declared", raid.declared());
+            raidList.add(raidTag);
+        }
+        tag.put("raids", raidList);
+        ListTag logList = new ListTag();
+        for (LogEntry entry : log) {
+            CompoundTag entryTag = new CompoundTag();
+            entryTag.putInt("turn", entry.turn());
+            entryTag.putString("text", entry.text());
+            logList.add(entryTag);
+        }
+        tag.put("log", logList);
         return tag;
     }
 
@@ -202,6 +294,20 @@ public final class Realm extends SavedData {
             if (ends.length == 2 && realm.nodes.containsKey(ends[0]) && realm.nodes.containsKey(ends[1])) {
                 realm.links.add(key(ends[0], ends[1]));
             }
+        }
+        realm.turn = tag.getInt("turn");
+        realm.lastTurnMillis = tag.getLong("last_turn_millis");
+        CompoundTag kingdomTag = tag.getCompound("kingdom");
+        for (String stat : kingdomTag.getAllKeys()) {
+            realm.kingdom.put(stat, kingdomTag.getInt(stat));
+        }
+        for (Tag entry : tag.getList("raids", Tag.TAG_COMPOUND)) {
+            CompoundTag raid = (CompoundTag) entry;
+            realm.raids.add(new Raid(raid.getString("nation"), raid.getString("stronghold"), raid.getString("town"), raid.getInt("declared")));
+        }
+        for (Tag entry : tag.getList("log", Tag.TAG_COMPOUND)) {
+            CompoundTag logged = (CompoundTag) entry;
+            realm.log.addLast(new LogEntry(logged.getInt("turn"), logged.getString("text")));
         }
         return realm;
     }
