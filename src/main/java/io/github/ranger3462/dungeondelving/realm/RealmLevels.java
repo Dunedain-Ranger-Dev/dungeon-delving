@@ -33,11 +33,14 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * Area danger levels (DD-100, docs/design/realm.md). Where the realm has nodes, hostile mobs that spawn there get a
  * level from the map, which makes them tougher ({@link #apply}):
  * <ul>
- * <li>Within {@link #SAFE_RADIUS} of a kingdom-held node, it's 0: the kingdom keeps its own ground safe.</li>
+ * <li>Within {@link #SAFE_RADIUS} of a kingdom-held node, distance adds nothing: the kingdom keeps its own ground.</li>
  * <li>Further out, it rises by one every {@link #STEP} blocks from the nearest kingdom node.</li>
- * <li>Near a monster stronghold, it rises more, by the stronghold's military, fading out to {@link #STRONGHOLD_REACH}.
- * Once the stronghold is taken it's no longer the monsters', so its area calms down.</li>
+ * <li>Near a monster stronghold, it rises more, by the stronghold's military, fading out to {@link #STRONGHOLD_REACH};
+ * a kingdom outpost beside it doesn't make that ground safe. Once the stronghold is taken it's no longer the
+ * monsters', so its area calms down.</li>
  * </ul>
+ * The danger level is the area's; a mob's own "Lv" (its nameplate, {@code MobLevels}) comes from its stats, so a
+ * levelled mob shows a higher one.
  * Players see the danger change as they cross into an area, and {@code /realm danger} shows it. Worlds and dimensions
  * without realm nodes aren't touched. Raiders (spawned for a raid) and mobs from spawners or commands aren't levelled.
  */
@@ -78,10 +81,10 @@ public final class RealmLevels {
                 strongholdBonus = Math.max(strongholdBonus, (double) node.stat("military") / MILITARY_PER_LEVEL * (1 - distance / STRONGHOLD_REACH));
             }
         }
-        if (!anyNode || nearestKingdom <= SAFE_RADIUS) {
+        if (!anyNode) {
             return 0;
         }
-        double distanceLevels = nearestKingdom == Double.MAX_VALUE ? MAX_LEVEL : (nearestKingdom - SAFE_RADIUS) / STEP;
+        double distanceLevels = nearestKingdom == Double.MAX_VALUE ? MAX_LEVEL : Math.max(0, nearestKingdom - SAFE_RADIUS) / STEP;
         return Mth.clamp((int) Math.floor(distanceLevels + strongholdBonus), 0, MAX_LEVEL);
     }
 
@@ -95,6 +98,7 @@ public final class RealmLevels {
         modify(mob, Attributes.ATTACK_DAMAGE, DAMAGE_PER_LEVEL * level, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
         modify(mob, Attributes.ARMOR, ARMOR_PER_LEVEL * level, AttributeModifier.Operation.ADD_VALUE);
         mob.setHealth(mob.getMaxHealth());
+        io.github.ranger3462.dungeondelving.character.MobLevels.refresh(mob);
     }
 
     private static void modify(Mob mob, Holder<Attribute> attribute, double amount, AttributeModifier.Operation operation) {

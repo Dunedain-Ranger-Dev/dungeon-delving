@@ -6,7 +6,7 @@ import net.minecraft.util.Mth;
  * Town tiers (DD-99, docs/design/realm.md). A kingdom town grows from a hamlet (tier 1) to a city (tier 5): each turn,
  * one with wealth to spare (the tier-up's {@link #cost}, plus {@link #RESERVE} kept back for repairs) and no raid damage
  * still being rebuilt spends it and goes up a tier, gaining {@link #DEFENSE_PER_TIER} defense. Its tier makes its guards
- * stronger (see {@code TownGuard.equip}), lets more of them turn out, and raises their level.
+ * stronger (see {@code TownGuard.equip}), and so higher level, and lets more of them turn out.
  */
 public final class RealmTiers {
     public static final int MAX_TIER = 5;
@@ -29,11 +29,6 @@ public final class RealmTiers {
     /** The wealth it takes to grow from {@code tier} to the next: 10 per tier (10, 20, 30, 40). */
     public static int cost(int tier) {
         return 10 * tier;
-    }
-
-    /** A town guard's level, for its town's tier: above a villager's (2), and one more per tier. */
-    public static int guardLevel(int tier) {
-        return 2 + tier;
     }
 
     /** Lets every kingdom town that can afford it grow a tier. Returns how many grew. */

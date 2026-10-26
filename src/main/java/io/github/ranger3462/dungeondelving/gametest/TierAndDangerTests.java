@@ -60,20 +60,23 @@ public class TierAndDangerTests {
         realm.link("riverhold", "warren");
         realm.setStat(town, "tier", 5);
         realm.setStat(town, "wealth", 0);
-        try {
-            Realm.Raid raid = RealmRaids.declare(realm, "riverhold", 0L).orElseThrow();
-            RealmLiveRaids.LiveRaid live = RealmLiveRaids.start(realm, raid, level);
+        Realm.Raid raid = RealmRaids.declare(realm, "riverhold", 0L).orElseThrow();
+        RealmLiveRaids.LiveRaid live = RealmLiveRaids.start(realm, raid, level);
+        helper.runAfterDelay(3, () -> {
+          try {
             TownGuard guard = (TownGuard) RealmLiveRaids.guards(live).get(0);
             helper.assertTrue(guard.getItemBySlot(EquipmentSlot.CHEST).is(Items.DIAMOND_CHESTPLATE), "a city's guards wear diamond, even with no wealth");
             helper.assertTrue(guard.getMaxHealth() == (float) TownGuard.health(RealmRaids.defense(realm, town), 5)
                     && guard.getMaxHealth() > TownGuard.health(RealmRaids.defense(realm, town), 1), "and are tougher: " + guard.getMaxHealth());
-            helper.assertTrue(guard.getPersistentData().getInt(RealmLevels.LEVEL_TAG) == 7 && guard.getCustomName().getString().contains("Lv 7"),
-                    "a city's guards are level 7 (a villager's 2, plus its tier)");
+            int cityLevel = io.github.ranger3462.dungeondelving.character.MobLevels.level(guard);
+            helper.assertTrue(cityLevel >= 10 && "riverhold Guard".equals(guard.getCustomName().getString()),
+                    "a city's guards are well above a villager's level 2: " + cityLevel);
             helper.assertTrue(RealmLiveRaids.guardCount(30, 5) == 8 && RealmLiveRaids.guardCount(30, 1) == 4, "and more of them can turn out");
-        } finally {
+          } finally {
             RealmLiveRaids.clearAll();
-        }
-        helper.succeed();
+          }
+          helper.succeed();
+        });
     }
 
     @GameTest(template = ANY_TEMPLATE)
@@ -92,6 +95,11 @@ public class TierAndDangerTests {
         helper.assertTrue(west == 3, "600 blocks out, away from the stronghold, it's level 3: " + west);
         int east = RealmLevels.level(realm, dim, new BlockPos(600, 64, 0));
         helper.assertTrue(east == 8, "at the stronghold of military 40, it's 3 + 5: " + east);
+        RealmNode tower = new RealmNode("tower", RealmNode.Type.SITE, RealmNode.KINGDOM, dim, new BlockPos(560, 64, 0));
+        realm.add(tower);
+        int besideTower = RealmLevels.level(realm, dim, new BlockPos(600, 64, 0));
+        helper.assertTrue(besideTower == 5, "a kingdom outpost beside it only takes away the distance part: " + besideTower);
+        realm.remove("tower");
 
         realm.setOwner(warren, RealmNode.KINGDOM);
         int taken = RealmLevels.level(realm, dim, new BlockPos(600, 64, 0));

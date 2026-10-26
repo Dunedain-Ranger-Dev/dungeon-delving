@@ -140,16 +140,14 @@ public class TownGuard extends PathfinderMob {
 
     /**
      * Kits a guard out for its town: armor and weapon by wealth (at least what its tier gives), health and attack by
-     * defense and tier, a level by tier, and the town's color, if it has one: leather dyed, metal armor trimmed, the
-     * shield painted. Named for its town and level, shown when you look at it.
+     * defense and tier, and the town's color, if it has one: leather dyed, metal armor trimmed, the shield painted.
+     * Named for its town. Its level ("Lv" on its nameplate) is worked out from all that, so it rises with the town.
      */
     public void equip(String townName, int wealth, int defense, int tier, java.util.Optional<DyeColor> color) {
         getAttribute(Attributes.MAX_HEALTH).setBaseValue(health(defense, tier));
         getAttribute(Attributes.ATTACK_DAMAGE).setBaseValue(attack(defense, tier));
         setHealth(getMaxHealth());
-        int level = io.github.ranger3462.dungeondelving.realm.RealmTiers.guardLevel(tier);
-        getPersistentData().putInt(io.github.ranger3462.dungeondelving.realm.RealmLevels.LEVEL_TAG, level);
-        setCustomName(net.minecraft.network.chat.Component.literal(townName + " Guard (Lv " + level + ")"));
+        setCustomName(net.minecraft.network.chat.Component.literal(townName + " Guard"));
         Item[][] sets = {
                 { Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS },
                 { Items.CHAINMAIL_HELMET, Items.CHAINMAIL_CHESTPLATE, Items.CHAINMAIL_LEGGINGS, Items.CHAINMAIL_BOOTS },
@@ -170,6 +168,19 @@ public class TownGuard extends PathfinderMob {
         color.ifPresent(dye -> shield.set(DataComponents.BASE_COLOR, dye));
         setItemSlot(EquipmentSlot.OFFHAND, shield);
         setDropChance(EquipmentSlot.OFFHAND, 0.0f);
+        levelDirty = true;
+    }
+
+    /** Set when kitted out: its level is worked out again next tick, once its gear's armor and damage count. */
+    private boolean levelDirty;
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (levelDirty && !level().isClientSide()) {
+            levelDirty = false;
+            io.github.ranger3462.dungeondelving.character.MobLevels.refresh(this);
+        }
     }
 
     /** Leather is dyed the color; other armor gets a sentry trim in the nearest trim material. */

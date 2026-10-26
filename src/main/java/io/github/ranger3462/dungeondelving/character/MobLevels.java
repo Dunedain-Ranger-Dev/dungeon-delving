@@ -81,6 +81,19 @@ public final class MobLevels {
         return gap <= 0 ? 1.0 : Math.max(MIN_MULTIPLIER, 1.0 - gap * FALLOFF_PER_LEVEL);
     }
 
+    /**
+     * Works a mob's level out again from its stats now (after they've been changed: a realm guard kitted out, a monster
+     * levelled by its area), and tells the players who can see it.
+     */
+    public static int refresh(Mob mob) {
+        mob.getPersistentData().remove(LEVEL_TAG);
+        int level = level(mob);
+        if (!mob.level().isClientSide()) {
+            PacketDistributor.sendToPlayersTrackingEntity(mob, new MobLevelPayload(mob.getId(), level));
+        }
+        return level;
+    }
+
     /** Tells a player's client a mob's level when it comes into view, for its nameplate. */
     @SubscribeEvent
     public static void onStartTracking(PlayerEvent.StartTracking event) {
