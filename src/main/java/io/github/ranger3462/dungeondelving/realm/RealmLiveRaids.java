@@ -241,7 +241,7 @@ public final class RealmLiveRaids {
             if (live.alone >= ALONE_LIMIT) {
                 clear(live);
                 it.remove();
-                realm.record("Everyone left " + live.raid.town() + "'s fight: it was decided by the odds.");
+                realm.news("Everyone left " + realm.node(live.raid.town()).map(RealmNode::name).orElse(live.raid.town()) + "'s fight: it was decided by the odds.");
                 RealmRaids.resolve(realm, live.raid, 1 + live.level.getRandom().nextInt(20), 1 + live.level.getRandom().nextInt(20));
             } else if (live.alone > 0) {
                 // No one's there: the fight waits (its mobs may not even be loaded, so they can't be counted).
