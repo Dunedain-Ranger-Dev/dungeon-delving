@@ -156,7 +156,9 @@ public final class RealmMap {
         Optional<RealmNode> threat = realm.neighbors(node.id).stream().filter(other -> other.type == RealmNode.Type.STRONGHOLD && other.monsters())
                 .max(java.util.Comparator.comparingInt(other -> other.stat("military")));
         if (threat.isPresent() && threat.get().stat("military") > defense) {
-            warnings.add("Outmatched: " + threat.get().name() + " has " + threat.get().stat("military") + " military against its " + defense + " defense");
+            int own = RealmRaids.ownDefense(node);
+            warnings.add("Outmatched: " + threat.get().name() + " has " + threat.get().stat("military") + " military against its " + defense + " defense"
+                    + (defense > own ? " (" + own + " its own, " + (defense - own) + " from the kingdom's army)" : ""));
         }
         return warnings;
     }
