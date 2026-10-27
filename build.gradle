@@ -340,6 +340,9 @@ dependencies {
         localRuntime "curse.maven:modernfix-790626:9309399"                  // 5.27.27
         localRuntime "curse.maven:immediatelyfast-686911:9165518"            // 1.6.15
         localRuntime "curse.maven:entityculling-448233:9100286"              // 1.11.3
+        // Newer Minecraft features: the Pale Garden and the Creaking (on trial)
+        localRuntime "curse.maven:vanillabackport-417430:9318571"            // 1.2.2
+        localRuntime "curse.maven:platform-997634:9318519"                   // 1.4.2, its library
     }
 
     // For more info:
