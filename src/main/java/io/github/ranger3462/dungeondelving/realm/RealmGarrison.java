@@ -17,19 +17,24 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
  * Town garrisons: a kingdom town above ruins keeps its guards ({@link RealmLiveRaids#guardCount}, the same as turn out for
  * a raid) standing at their <b>posts</b> whenever a player is near it. The posts are the town's own ({@code /realm guards
- * <town> post add}), or a ring round its middle. A guard leaves its post only to fight a raid on the town, a mob attacking
- * one of its villagers, or whatever hits it, and walks back once that's done (or once it's chased too far).
+ * <town> post add}), or a ring round its middle. A guard leaves its post to fight a raid on the town, a monster that comes
+ * within {@link #AGGRO} blocks of it, one attacking a villager, or whatever hits it, and walks back once that's done (or
+ * once it's chased too far). Monsters go for guards in turn (see {@link #onJoin}).
  * <p>
  * Guards that fall stay fallen until dawn (the town's {@code fallen} stat; the next turn replaces them), so a raid's
  * losses carry over to the next one. Guards that only unloaded, with the town out of range or the server stopping, come
@@ -45,6 +50,8 @@ public final class RealmGarrison {
     public static final int POST_RING = 8;
     /** How far a guard will chase from its post (outside a raid) before it gives up and goes back. */
     public static final int LEASH = 32;
+    /** How near a monster has to come for a guard off alarm to go for it. */
+    public static final int AGGRO = 12;
     /** How near a guard has to be to its post to count as on it. */
     private static final double ON_POST = 2.5;
 
@@ -266,12 +273,21 @@ public final class RealmGarrison {
         }
     }
 
-    /** Whether a garrison guard takes on a target: always in a raid; otherwise only a mob after a villager or after it. */
+    /** Whether a garrison guard takes on a target: always in a raid; otherwise a mob that's close, or after a villager or it. */
     public static boolean mayEngage(Mob guard, LivingEntity target) {
         if (!guard.getPersistentData().contains(GARRISON_TAG) || guard.getPersistentData().getBoolean(ALARM_TAG)) {
             return true;
         }
-        return target instanceof Mob mob && (mob.getTarget() instanceof AbstractVillager || mob.getTarget() == guard);
+        return target.distanceToSqr(guard) <= AGGRO * AGGRO
+                || target instanceof Mob mob && (mob.getTarget() instanceof AbstractVillager || mob.getTarget() == guard);
+    }
+
+    /** Monsters go for town guards they see, as they would a villager. */
+    @SubscribeEvent
+    public static void onJoin(EntityJoinLevelEvent event) {
+        if (event.getEntity() instanceof PathfinderMob mob && mob instanceof Enemy && !(mob instanceof RealmGuard)) {
+            mob.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(mob, LivingEntity.class, 10, true, false, target -> target instanceof RealmGuard));
+        }
     }
 
     /** A villager attacked by a mob: the guards of its town go for the attacker. */

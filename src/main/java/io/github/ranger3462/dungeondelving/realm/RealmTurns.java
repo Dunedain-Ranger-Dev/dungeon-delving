@@ -30,8 +30,9 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * likelier; a small army, mustering; an empty treasury, gathering; an army stronger than the town, marching.</li>
  * <li>A monster nation: build its military, raid, or fortify its strongholds (and its towns' defenses). A raid goes
  * first for the nearest place its strongholds border that it could take (a stronghold or site it doesn't hold, or a
- * town in ruins), and only then the weakest town they border (to sack it). The stronger it is against its target, the
- * likelier a raid; it raids one place at a time. Each town it holds also gains 1 wealth a turn, to grow with.</li>
+ * town in ruins), and only then the weakest town they border (to sack it). It only raids once the raiding stronghold
+ * is at least a match for its target (defense and the kingdom army's share), building up until then; the stronger it
+ * is, the likelier a raid. It raids one place at a time, and a sacking's plunder adds to its military. Each town it holds also gains 1 wealth a turn, to grow with.</li>
  * </ul>
  * A town that's upgrading ({@link RealmTiers#upgrading}) gets none of this.
  * Raids are declared here and resolved half a turn later, at dusk ({@link RealmRaids}). What each side did goes in the
@@ -253,14 +254,14 @@ public final class RealmTurns {
     }
 
     public static Map<NationAction, Integer> nationWeights(Realm realm, String nation) {
-        int military = military(realm, nation);
         Optional<Map.Entry<RealmNode, RealmNode>> target = raidTarget(realm, nation);
         boolean raiding = realm.raids.stream().anyMatch(raid -> raid.nation().equals(nation));
         int fortification = strongholds(realm, nation).stream().mapToInt(node -> node.stat("fortification")).min().orElse(0);
         Map<NationAction, Integer> weights = new LinkedHashMap<>();
-        int targetDefense = target.map(entry -> RealmRaids.ownDefense(entry.getValue())).orElse(0);
-        weights.put(NationAction.BUILD_MILITARY, 3 + (target.isPresent() && military < targetDefense ? 2 : 0));
-        weights.put(NationAction.RAID, target.isEmpty() || raiding ? 0 : 1 + Math.max(0, (military - targetDefense) / 3));
+        // How far the raiding stronghold is ahead of what it would face (before the rolls): no raid until it's a match.
+        int margin = target.map(entry -> entry.getKey().stat("military") - RealmRaids.defense(realm, entry.getValue())).orElse(0);
+        weights.put(NationAction.BUILD_MILITARY, 3 + (target.isPresent() && margin < 0 ? 4 : 0));
+        weights.put(NationAction.RAID, target.isEmpty() || raiding || margin < 0 ? 0 : 1 + margin / 3);
         weights.put(NationAction.FORTIFY, 1 + (fortification < 5 ? 1 : 0));
         return weights;
     }

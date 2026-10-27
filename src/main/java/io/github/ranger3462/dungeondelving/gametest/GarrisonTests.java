@@ -56,11 +56,15 @@ public class GarrisonTests {
         helper.assertTrue(guards.get(0).blockPosition().closerThan(town.posts().get(0), 3) && guards.get(1).blockPosition().closerThan(town.posts().get(1), 3),
                 "each stands at its post, the posts taken in turn");
 
-        // Off duty, a guard leaves a passing monster alone, but not one going for a villager.
+        // Off duty, a guard leaves a far-off monster alone, but not one that comes close or goes for a villager.
         Zombie zombie = EntityType.ZOMBIE.create(level);
         zombie.moveTo(town.pos().offset(0, 0, 3).getCenter());
         level.addFreshEntity(zombie);
-        helper.assertFalse(RealmGarrison.mayEngage(guards.get(0), zombie), "an off-duty guard leaves a passing monster alone");
+        helper.assertTrue(RealmGarrison.mayEngage(guards.get(0), zombie), "a guard goes for a monster that comes close");
+        helper.assertTrue(zombie.targetSelector.getAvailableGoals().size() == EntityType.ZOMBIE.create(level).targetSelector.getAvailableGoals().size() + 1,
+                "and monsters in the world go for guards");
+        zombie.moveTo(town.pos().offset(0, 0, RealmGarrison.AGGRO + 8).getCenter());
+        helper.assertFalse(RealmGarrison.mayEngage(guards.get(0), zombie), "an off-duty guard leaves a far-off monster alone");
         net.minecraft.world.entity.npc.Villager villager = EntityType.VILLAGER.create(level);
         villager.moveTo(town.pos().offset(1, 0, 3).getCenter());
         level.addFreshEntity(villager);

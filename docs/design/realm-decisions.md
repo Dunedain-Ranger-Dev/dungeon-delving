@@ -42,12 +42,12 @@ town's defense, or a stronghold's or site's fortification.)
 
 | Action | Weight | What it does |
 | --- | --- | --- |
-| Build military | 3, plus 2 if its military is below the target's defense | Every stronghold gains 2 military |
-| Raid | 1, plus 1 for every 3 military it has over the target's defense. 0 with no target, or a raid already under way | Declares a raid on the target, from the strongholds linked to it |
+| Build military | 3, plus 4 if the raiding stronghold's military is below the target's defense | Every stronghold gains 2 military |
+| Raid | 1, plus 1 for every 3 military the raiding stronghold has over the target's defense (with the army's quarter). 0 when it's below, with no target, or a raid already under way | Declares a raid on the target, from the strongholds linked to it |
 | Fortify | 1, plus 1 if its weakest stronghold's fortification is under 5 | Every stronghold gains 1 fortification, and every town it holds 1 defense |
 
-So a nation weaker than its target mostly builds up. Once it outmatches the target, raiding grows likelier the
-bigger its lead: 15 military over the target's defense makes raid weight 6 against build 3 and fortify 1-2.
+So a nation weaker than its target only builds up or fortifies. Once it's a match for the target, raiding grows
+likelier the bigger its lead: 15 military over the target's defense makes raid weight 6 against build 3 and fortify 1-2.
 Fortification also defends a stronghold or site when a nation comes to take it.
 
 ## Capitals
@@ -89,7 +89,7 @@ A fought raid uses the damage each side does instead.
 
 | Result | What happens |
 | --- | --- |
-| Attackers win by a margin | The town loses defense (a quarter of the margin, at least 1), wealth (2 + a quarter of the margin) and 2 morale, and takes block damage equal to the margin. A margin of 10 or more also knocks it down a tier (to ruins from a hamlet) and stops any upgrade. The attackers lose 1 military |
+| Attackers win by a margin | The town loses defense (a quarter of the margin, at least 1), wealth (2 + a quarter of the margin) and 2 morale, and takes block damage equal to the margin. A margin of 10 or more also knocks it down a tier (to ruins from a hamlet) and stops any upgrade. The attackers lose 1 military, and a monster nation's gain plunder: 1 + half the wealth taken |
 | Attackers win, against a stronghold, site or ruins | They take it, and move up to 5 military from the attacker (or the army) into it as a garrison: a stronghold's military, a town's defense. News either way |
 | Defenders win | The stronghold loses 2 military, plus a quarter of the margin, and a town gains 1 morale |
 
@@ -100,7 +100,8 @@ A kingdom town above ruins keeps a standing garrison (`RealmGarrison`): as many 
 
 - **Posts:** each guard has one, the town's own in turn (`/realm guards <town> post add` where you stand, `post clear`),
   or a ring 8 blocks round its middle.
-- **Leaving a post:** only for a raid on the town, a mob going for one of its villagers, or whatever attacks the guard.
+- **Leaving a post:** for a raid on the town, a monster within 12 blocks, a mob going for one of its villagers, or
+  whatever attacks the guard. Monsters go for guards they see, as they do villagers.
   Outside a raid it gives up a chase 32 blocks from its post, and walks back.
 - **Raids** are fought by the garrison as it stands; the survivors go back to their posts after.
 - **Losses:** a guard that dies stays dead until the next turn (the town's `fallen` stat), so a raid's losses carry over.

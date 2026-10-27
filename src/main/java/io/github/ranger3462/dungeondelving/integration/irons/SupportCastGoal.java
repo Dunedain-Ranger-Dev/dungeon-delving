@@ -25,8 +25,8 @@ import net.minecraft.world.entity.ai.goal.Goal;
 
 /**
  * A caster that looks after its allies (or itself) first: it mends whoever is hurt worst with {@link Mending} (never an
- * instant heal, so nothing is topped up to full mid-fight), and keeps buffs up on allies
- * who are fighting, walking over to them if they're too far. Its spells are aimed straight at the ally, not wherever
+ * instant heal, so nothing is topped up to full mid-fight; a player only in a fight, as they heal on their own), and
+ * keeps buffs up on allies who are fighting, walking over to them if they're too far. Its spells are aimed straight at the ally, not wherever
  * the caster happens to be looking, so they never land on the player by mistake. Between casts it's free to attack.
  */
 public class SupportCastGoal extends Goal {
@@ -92,7 +92,8 @@ public class SupportCastGoal extends Goal {
         List<LivingEntity> candidates = mob.level().getEntitiesOfClass(LivingEntity.class, mob.getBoundingBox().inflate(searchRange),
                 entity -> entity.isAlive() && allies.test(entity));
         Optional<LivingEntity> hurt = candidates.stream()
-                .filter(entity -> entity.getHealth() < entity.getMaxHealth() * HEAL_BELOW && !entity.hasEffect(Mending.MENDING))
+                .filter(entity -> entity.getHealth() < entity.getMaxHealth() * HEAL_BELOW && !entity.hasEffect(Mending.MENDING)
+                        && (!(entity instanceof net.minecraft.world.entity.player.Player) || fighting(entity) || fighting(mob)))
                 .min(Comparator.comparingDouble(entity -> entity.getHealth() / entity.getMaxHealth()));
         if (hurt.isPresent() && mend != null) {
             ally = hurt.get();
@@ -115,7 +116,9 @@ public class SupportCastGoal extends Goal {
     }
 
     private boolean fighting(LivingEntity entity) {
-        return (entity instanceof Mob other && other.getTarget() != null) || entity.tickCount - entity.getLastHurtByMobTimestamp() < FIGHT_MEMORY;
+        // Hurt by a mob lately (not just new: the hurt timestamp starts at 0, so tickCount alone would call a fresh mob fighting).
+        return (entity instanceof Mob other && other.getTarget() != null)
+                || entity.getLastHurtByMob() != null && entity.tickCount - entity.getLastHurtByMobTimestamp() < FIGHT_MEMORY;
     }
 
     @Override

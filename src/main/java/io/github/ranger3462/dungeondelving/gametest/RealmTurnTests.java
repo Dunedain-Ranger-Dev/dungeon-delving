@@ -60,7 +60,15 @@ public class RealmTurnTests {
 
         RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.BUILD_MILITARY, 0L);
         helper.assertTrue(warren.stat("military") == 12, "building military strengthens the strongholds");
+        realm.setStat(realm.node("millbrook").orElseThrow(), "defense", 30);
+        realm.setStat(riverhold, "defense", 30);
+        helper.assertTrue(RealmTurns.nationWeights(realm, DungeonFactions.GOBLINS).get(RealmTurns.NationAction.RAID) == 0
+                && RealmTurns.nationWeights(realm, DungeonFactions.GOBLINS).get(RealmTurns.NationAction.BUILD_MILITARY) == 7,
+                "outmatched by every town, the goblins build up rather than raid");
+        realm.setStat(riverhold, "defense", 12);
         realm.setStat(realm.node("millbrook").orElseThrow(), "defense", 8);
+        helper.assertTrue(RealmTurns.nationWeights(realm, DungeonFactions.GOBLINS).get(RealmTurns.NationAction.RAID) > 0,
+                "a match for millbrook (12 against 8 and the army's 3), they may raid");
         helper.assertTrue(RealmTurns.raidTarget(realm, DungeonFactions.GOBLINS).orElseThrow().getValue().id.equals("millbrook"),
                 "the goblins would raid the weaker town (millbrook, 8 defense against riverhold's 12)");
         RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.RAID, 0L);
@@ -71,6 +79,13 @@ public class RealmTurnTests {
         Realm reloaded = realm.reloaded(helper.getLevel().registryAccess());
         helper.assertTrue(reloaded.raids().size() == 1 && reloaded.kingdomStat("army") == 13 && !reloaded.log().isEmpty(),
                 "raids, the kingdom's stats and the log are saved");
+
+        RealmNode millbrook = realm.node("millbrook").orElseThrow();
+        int wealth = millbrook.stat("wealth");
+        int taken = Math.min(wealth, 2 + 30 / 4);
+        RealmRaids.decide(realm, realm.raids().get(0), 40, 10, false);
+        helper.assertTrue(warren.stat("military") == 12 - 1 + RealmRaids.plunder(taken),
+                "a sacking's plunder swells the raiders' military: " + warren.stat("military"));
 
         Realm alone = new Realm();
         alone.add(node("hermitage", RealmNode.Type.TOWN, RealmNode.KINGDOM, 0));
@@ -102,9 +117,11 @@ public class RealmTurnTests {
         helper.assertTrue(RealmRaids.resolve(realm, raid, 20, 1), "30 against 13: the goblins win");
         helper.assertTrue(millbrook.stat("defense") == 6 && millbrook.stat("wealth") == 4 && millbrook.stat("morale") == 8 && millbrook.stat("damage") == 17,
                 "the town loses defense (17/4), wealth (2 + 17/4) and morale (2), and is owed 17 damage; got " + millbrook.stats());
-        helper.assertTrue(warren.stat("military") == 9 && realm.raids().isEmpty(), "the attackers lose a little, and the raid is over");
+        helper.assertTrue(warren.stat("military") == 10 - 1 + RealmRaids.plunder(6) && realm.raids().isEmpty(),
+                "the attackers lose a little but carry off plunder (6 wealth), and the raid is over");
         helper.assertTrue(realm.takeNews().get(0).text().contains("sacked"), "and players hear it");
 
+        realm.setStat(warren, "military", 9);
         RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.RAID, 2000L);
         helper.assertFalse(RealmRaids.resolve(realm, realm.raids().get(0), 1, 20), "10 against 26: the town holds");
         helper.assertTrue(warren.stat("military") == 3 && millbrook.stat("morale") == 9, "the goblins lose 2 + 16/4, and the town takes heart");
