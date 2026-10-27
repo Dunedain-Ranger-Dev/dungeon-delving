@@ -24,8 +24,8 @@ public final class RealmNode {
     public static final String NONE = "none";
 
     public enum Type {
-        /** A kingdom settlement: defense, wealth, morale. */
-        TOWN(Map.of("defense", 10, "wealth", 10, "morale", 10, "tier", 1)),
+        /** A settlement: defense, wealth, morale, and its tier (starting as ruins, see RealmTiers). */
+        TOWN(Map.of("defense", 10, "wealth", 10, "morale", 10, "tier", 0)),
         /** A place worth holding: its heat rises the longer it's held. */
         SITE(Map.of("heat", 0)),
         /** A monster nation's base: its military and how fortified it is. */

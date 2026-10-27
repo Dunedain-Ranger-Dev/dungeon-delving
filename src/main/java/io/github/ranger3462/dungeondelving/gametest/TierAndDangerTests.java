@@ -9,6 +9,7 @@ import io.github.ranger3462.dungeondelving.realm.RealmLiveRaids;
 import io.github.ranger3462.dungeondelving.realm.RealmNode;
 import io.github.ranger3462.dungeondelving.realm.RealmRaids;
 import io.github.ranger3462.dungeondelving.realm.RealmTiers;
+import io.github.ranger3462.dungeondelving.realm.RealmTurns;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -32,17 +33,29 @@ public class TierAndDangerTests {
         Realm realm = new Realm();
         RealmNode town = new RealmNode("riverhold", RealmNode.Type.TOWN, RealmNode.KINGDOM, level.dimension(), BlockPos.ZERO);
         realm.add(town);
-        helper.assertTrue(RealmTiers.tier(town) == 1, "towns start as hamlets");
-        helper.assertTrue(RealmTiers.grow(realm) == 0, "a town without wealth to spare doesn't grow");
+        helper.assertTrue(RealmTiers.tier(town) == 0, "towns start as ruins");
+        realm.setStat(town, "wealth", 0);
+        helper.assertTrue(RealmTiers.grow(realm) == 0 && town.stat("upgrading") == RealmTiers.days(1), "ruins start resettling for free, for 2 days");
+        RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.GATHER_WEALTH);
+        helper.assertTrue(town.stat("wealth") == 0, "and get no support while they do");
+        helper.assertTrue(RealmTiers.grow(realm) == 0 && RealmTiers.grow(realm) == 1 && RealmTiers.tier(town) == 1, "two turns later it's a hamlet");
+        helper.assertTrue(realm.log().stream().anyMatch(entry -> entry.text().contains("grown into a hamlet")), "with news");
+        helper.assertTrue(RealmTiers.grow(realm) == 0 && !RealmTiers.upgrading(town), "a town without wealth to spare doesn't grow");
         realm.setStat(town, "wealth", 16);
-        helper.assertTrue(RealmTiers.grow(realm) == 1 && RealmTiers.tier(town) == 2, "with 10 to spend and 5 kept back, it grows");
-        helper.assertTrue(town.stat("wealth") == 6 && town.stat("defense") == 10 + RealmTiers.DEFENSE_PER_TIER, "paying for it, and gaining defense");
-        helper.assertTrue(realm.log().stream().anyMatch(entry -> entry.text().contains("grown into a village")), "with news");
-        realm.setStat(town, "wealth", 100);
+        int defense = town.stat("defense");
+        RealmTiers.grow(realm);
+        helper.assertTrue(town.stat("wealth") == 6 && town.stat("upgrading") == RealmTiers.days(2), "with 10 to spend and 5 kept back, it starts: 4 days to a village");
+        for (int i = 0; i < 3; i++) {
+            RealmTiers.grow(realm);
+        }
+        helper.assertTrue(RealmTiers.tier(town) == 1, "not done yet");
+        helper.assertTrue(RealmTiers.grow(realm) == 1 && RealmTiers.tier(town) == 2 && town.stat("defense") == defense + RealmTiers.DEFENSE_PER_TIER,
+                "on the fourth day it's a village, with more defense");
+        realm.setStat(town, "wealth", 1000);
         realm.setStat(town, "damage", 5);
-        helper.assertTrue(RealmTiers.grow(realm) == 0, "not while it's still rebuilding from a raid");
+        helper.assertTrue(RealmTiers.grow(realm) == 0 && !RealmTiers.upgrading(town), "not while it's still rebuilding from a raid");
         realm.setStat(town, "damage", 0);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 40; i++) {
             RealmTiers.grow(realm);
         }
         helper.assertTrue(RealmTiers.tier(town) == RealmTiers.MAX_TIER, "it tops out as a city");
@@ -55,8 +68,52 @@ public class TierAndDangerTests {
         helper.assertTrue(RealmTiers.tier(town) == RealmTiers.MAX_TIER - 1, "a bad one knocks it back a tier");
         helper.assertTrue(realm.log().stream().anyMatch(entry -> entry.text().contains("fell back to a market town")), "with news");
 
+        realm.setStat(town, "tier", 1);
+        RealmRaids.decide(realm, new Realm.Raid(DungeonFactions.GOBLINS, "warren", "riverhold", 0, 0L), 40, 25, false);
+        helper.assertTrue(RealmTiers.tier(town) == 0 && town.kingdoms(), "a hamlet sacked badly falls to ruins");
+        helper.assertTrue(realm.log().stream().anyMatch(entry -> entry.text().contains("fell to ruins")), "with news");
+        RealmRaids.decide(realm, new Realm.Raid(DungeonFactions.GOBLINS, "warren", "riverhold", 0, 0L), 40, 25, false);
+        helper.assertTrue(DungeonFactions.GOBLINS.equals(town.owner()) && realm.log().stream().anyMatch(entry -> entry.text().contains("goblins have taken riverhold")),
+                "and the next win takes it");
+        RealmTiers.grow(realm);
+        helper.assertTrue(RealmTiers.upgrading(town), "the goblins start resettling it");
+
         helper.assertTrue(Realm.ownerProblem(RealmNode.Type.STRONGHOLD, RealmNode.KINGDOM, false).isEmpty()
                 && Realm.ownerProblem(RealmNode.Type.STRONGHOLD, RealmNode.NONE, false).isEmpty(), "a stronghold can be taken or cleared");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void theKingdomMarchesToTakeBackItsTowns(GameTestHelper helper) {
+        var dim = helper.getLevel().dimension();
+        Realm realm = new Realm();
+        RealmNode home = new RealmNode("riverhold", RealmNode.Type.TOWN, RealmNode.KINGDOM, dim, BlockPos.ZERO);
+        realm.add(home);
+        realm.setStat(home, "tier", 1);
+        RealmNode lost = new RealmNode("millbrook", RealmNode.Type.TOWN, DungeonFactions.GOBLINS, dim, new BlockPos(100, 64, 0));
+        realm.add(lost);
+        realm.link("riverhold", "millbrook");
+        while (realm.kingdomStat("army") < 40) {
+            RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.MUSTER);
+        }
+        helper.assertTrue(RealmTurns.marchTarget(realm).orElseThrow().getValue() == lost, "the kingdom looks to the town the goblins hold");
+        helper.assertTrue(RealmTurns.kingdomWeights(realm).get(RealmTurns.KingdomAction.MARCH) > 1, "and with half its army of 40 or more against 10 defense, is keen to march");
+        RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.MARCH, 0L);
+        Realm.Raid raid = realm.raids().get(0);
+        helper.assertTrue(RealmNode.KINGDOM.equals(raid.nation()) && raid.stronghold().equals("riverhold"), "its army marches from riverhold");
+        helper.assertTrue(RealmTurns.kingdomWeights(realm).get(RealmTurns.KingdomAction.MARCH) == 0, "one march at a time");
+        helper.assertTrue(RealmRaids.declare(realm, "millbrook", 0L).isEmpty(), "and no second raid on it");
+        int army = realm.kingdomStat("army");
+        helper.assertTrue(RealmRaids.decide(realm, raid, 50, 1, false), "the army wins");
+        helper.assertTrue(lost.owner().equals(RealmNode.KINGDOM) && realm.kingdomStat("army") == army - RealmRaids.GARRISON,
+                "the ruins are the kingdom's again, garrisoned from the army: " + realm.kingdomStat("army"));
+        helper.assertTrue(realm.log().stream().anyMatch(entry -> entry.text().contains("millbrook has been taken by the kingdom")), "with news");
+        realm.setOwner(lost, DungeonFactions.GOBLINS);
+        realm.setStat(lost, "tier", 2);
+        Realm.Raid sack = RealmRaids.declare(realm, "millbrook", 0L).orElseThrow();
+        helper.assertTrue(RealmNode.KINGDOM.equals(sack.nation()), "/realm raid on a goblin town sends the kingdom");
+        helper.assertTrue(RealmRaids.decide(realm, sack, 50, 1, false) && lost.owner().equals(DungeonFactions.GOBLINS) && RealmTiers.tier(lost) == 1,
+                "a living town is only sacked, a tier down by a wide margin");
         helper.succeed();
     }
 

@@ -68,7 +68,7 @@ public final class RealmCapitals {
 
     /** The stronghold nearest a capital, in its dimension, that its nation could retake. */
     public static Optional<RealmNode> nearestLostStronghold(Realm realm, RealmNode capital) {
-        return realm.nodes().stream().filter(node -> node.type == RealmNode.Type.STRONGHOLD && RealmRaids.capturable(node)
+        return realm.nodes().stream().filter(node -> node.type == RealmNode.Type.STRONGHOLD && RealmRaids.capturable(node, capital.owner())
                 && node.dimension().equals(capital.dimension())).min(Comparator.comparingDouble(node -> node.pos().distSqr(capital.pos())));
     }
 
@@ -94,7 +94,7 @@ public final class RealmCapitals {
             }
             realm.setStat(capital, "rally", 0);
             realm.raids.add(new Realm.Raid(nation, capital.id, target.get().id, realm.turn, time + RealmTurns.turnMillis() / 2));
-            String goal = RealmRaids.capturable(target.get()) ? "marches to retake " + target.get().name() : "marches on " + target.get().name();
+            String goal = RealmRaids.capturable(target.get(), capital.owner()) ? "marches to retake " + target.get().name() : "marches on " + target.get().name();
             realm.news("The " + nation + " rally at " + capital.name() + ": their champion " + goal + " at dusk!");
             marched++;
         }

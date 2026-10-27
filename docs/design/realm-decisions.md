@@ -8,7 +8,12 @@ code is `RealmTurns` (`kingdomWeights`, `nationWeights`); the log (`/realm log`)
 Before anyone acts, two things happen on their own:
 
 - **Repairs:** any town with raid damage still to rebuild pays 1 wealth and rebuilds 64 blocks (`RealmDamage.fundRepairs`).
-- **Growth:** any kingdom town with 10 × its tier in wealth, plus 5 to spare, and nothing left to rebuild, grows a tier (`RealmTiers.grow`).
+- **Growth:** towns start as **ruins** (tier 0) and grow, whoever holds them (`RealmTiers.grow`). A town with 10 × its
+  tier in wealth, plus 5 to spare, and nothing left to rebuild, pays and starts **upgrading** (ruins start for free,
+  even with damage left). An upgrade takes 2 turns (days) per tier it's growing to: 2 to a hamlet, 4 to a village, up
+  to 10 to a city. Then it goes up a tier and gains 3 defense.
+- **Upgrading towns get no support:** no reinforcing, no wealth, no repairs, no tribute, until the upgrade's done.
+  Ruins have no guards, so a fought raid on them is the raiders against whoever's there.
 
 Raids declared on a turn resolve at its "dusk", half a turn later.
 
@@ -21,23 +26,25 @@ military of every monster stronghold touching the border.
 | --- | --- | --- |
 | Reinforce | 2, plus 4 if the threat is greater than the border's defense (its towns' defense plus the army). 0 if there's no border | Every border town gains 2 defense |
 | Muster | 2, plus 2 if the army is less than half the threat | The army grows by 3 (a quarter of it helps defend any raided town) |
-| Gather wealth | 2, plus 2 if the treasury is under 10 | Every town gains 1 wealth; the treasury gains 1 per town |
+| Gather wealth | 2, plus 2 if the treasury is under 10 | Every kingdom town gains 1 wealth; the treasury gains 1 per town |
+| March | 1, plus 1 for every 3 of half its army over the target's defense. 0 with no target, or a march already under way | Its army raids a monster-held town linked to one of its towns: the nearest in ruins (to take it back), or else the weakest (to sack it) |
 
-So a kingdom under pressure mostly reinforces and musters. A safe one spreads its effort evenly, and its towns slowly
-get richer and grow.
+So a kingdom under pressure mostly reinforces and musters. A safe one spreads its effort evenly, its towns slowly get
+richer and grow, and a strong army goes to win back lost towns.
 
 ## Each monster nation
 
 A nation (goblins, undead, orcs) looks at its **strongholds**, their total **military**, and its **raid target**.
-Taking ground back comes first: the target is the nearest stronghold or site linked to one of its strongholds that
-it doesn't hold. Only if there's none is it the weakest-defended kingdom town linked to them. (A target's defense is a
+Taking ground comes first: the target is the nearest place linked to one of its strongholds that it could take (a
+stronghold or site it doesn't hold, or a town in ruins no nation holds). Only if there's none is it the
+weakest-defended town linked to them, to sack it. Each town a nation holds gains 1 wealth a turn, so it can grow. (A target's defense is a
 town's defense, or a stronghold's or site's fortification.)
 
 | Action | Weight | What it does |
 | --- | --- | --- |
 | Build military | 3, plus 2 if its military is below the target's defense | Every stronghold gains 2 military |
 | Raid | 1, plus 1 for every 3 military it has over the target's defense. 0 with no target, or a raid already under way | Declares a raid on the target, from the strongholds linked to it |
-| Fortify | 1, plus 1 if its weakest stronghold's fortification is under 5 | Every stronghold gains 1 fortification |
+| Fortify | 1, plus 1 if its weakest stronghold's fortification is under 5 | Every stronghold gains 1 fortification, and every town it holds 1 defense |
 
 So a nation weaker than its target mostly builds up. Once it outmatches the target, raiding grows likelier the
 bigger its lead: 15 military over the target's defense makes raid weight 6 against build 3 and fortify 1-2.
@@ -62,10 +69,12 @@ dangerous: at least danger 6 at its heart, fading out over 360 blocks (`RealmCap
 
 ## Raids
 
-A raid's target is a town (to sack) or a stronghold or site the nation doesn't hold (to take). Towns are never
-taken, only sacked. At dusk a raid is fought if a player is within 48 blocks of the target. Otherwise it's rolled:
+A raid's target is a town (to sack), or a place to take: a stronghold or site the nation doesn't hold, or a town
+knocked down to ruins. A town above ruins can only be sacked; a bad sacking knocks it down a tier, so enough of them
+leave it in ruins for the next win to take. The kingdom's marches work the same way on monster-held towns. At dusk a
+nation's raid is fought if a player is within 48 blocks of the target; the kingdom's are always rolled:
 
-- attack = the stronghold's military (+10 for a champion) + d20
+- attack = the stronghold's military (+10 for a champion), or half the kingdom's army, + d20
 - defense = the target's defense (a town's defense, or a stronghold's or site's fortification), plus a quarter of
   the kingdom's army if it's the kingdom's, + d20
 
@@ -75,8 +84,8 @@ A fought raid uses the damage each side does instead.
 
 | Result | What happens |
 | --- | --- |
-| Attackers win by a margin | The town loses defense (a quarter of the margin, at least 1), wealth (2 + a quarter of the margin) and 2 morale, and takes block damage equal to the margin. A margin of 10 or more also knocks it down a tier. The stronghold loses 1 military |
-| Attackers win, against a stronghold or site | The nation takes it, and moves up to 5 military from the attacker into it as a garrison. Its land grows more dangerous (news) |
+| Attackers win by a margin | The town loses defense (a quarter of the margin, at least 1), wealth (2 + a quarter of the margin) and 2 morale, and takes block damage equal to the margin. A margin of 10 or more also knocks it down a tier (to ruins from a hamlet) and stops any upgrade. The attackers lose 1 military |
+| Attackers win, against a stronghold, site or ruins | They take it, and move up to 5 military from the attacker (or the army) into it as a garrison: a stronghold's military, a town's defense. News either way |
 | Defenders win | The stronghold loses 2 military, plus a quarter of the margin, and a town gains 1 morale |
 
 ## What players change
@@ -91,6 +100,6 @@ Players affect these choices only through the numbers the factions read:
 
 ## Not decided yet
 
-- Nations don't yet expand, take kingdom nodes, or work together.
-- The kingdom doesn't yet attack strongholds itself; for now that's the players' job.
-- Nations don't yet retake strongholds from their capital.
+- Nations don't yet found new places, fight each other, or work together.
+- The kingdom doesn't yet attack strongholds itself; for now that's the players' job. It only marches on towns.
+- The mod doesn't spawn villagers yet; a town's tier is only its numbers, guards and growth for now.

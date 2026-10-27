@@ -24,19 +24,22 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * <p>
  * Each turn, the kingdom and each monster nation that holds a stronghold picks one action, weighted by its situation:
  * <ul>
- * <li>The kingdom: reinforce its borders (border towns gain defense), muster (its army grows), or gather wealth (towns
- * grow richer, and the treasury fills). Threatened borders make reinforcing likelier; a small army, mustering; an empty
- * treasury, gathering.</li>
- * <li>A monster nation: build its military, raid, or fortify its strongholds. A raid goes first for the nearest
- * stronghold or site its strongholds border that it doesn't hold (to take it), and only then the weakest town they
- * border (to sack it). The stronger it is against its target, the likelier a raid; it raids one place at a time.</li>
+ * <li>The kingdom: reinforce its borders (border towns gain defense), muster (its army grows), gather wealth (towns
+ * grow richer, and the treasury fills), or march (its army raids a town a monster nation holds, linked to one of its
+ * own: the nearest in ruins, to take it back, or else the weakest, to sack it). Threatened borders make reinforcing
+ * likelier; a small army, mustering; an empty treasury, gathering; an army stronger than the town, marching.</li>
+ * <li>A monster nation: build its military, raid, or fortify its strongholds (and its towns' defenses). A raid goes
+ * first for the nearest place its strongholds border that it could take (a stronghold or site it doesn't hold, or a
+ * town in ruins), and only then the weakest town they border (to sack it). The stronger it is against its target, the
+ * likelier a raid; it raids one place at a time. Each town it holds also gains 1 wealth a turn, to grow with.</li>
  * </ul>
+ * A town that's upgrading ({@link RealmTiers#upgrading}) gets none of this.
  * Raids are declared here and resolved half a turn later, at dusk ({@link RealmRaids}). What each side did goes in the
  * realm log; raids are news, told to every player online.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class RealmTurns {
-    public enum KingdomAction { REINFORCE, MUSTER, GATHER_WEALTH }
+    public enum KingdomAction { REINFORCE, MUSTER, GATHER_WEALTH, MARCH }
 
     public enum NationAction { BUILD_MILITARY, RAID, FORTIFY }
 
@@ -111,7 +114,7 @@ public final class RealmTurns {
         realm.turn++;
         RealmDamage.fundRepairs(realm);
         RealmTiers.grow(realm);
-        kingdomAct(realm, pick(kingdomWeights(realm), random));
+        kingdomAct(realm, pick(kingdomWeights(realm), random), time);
         for (String nation : realm.nations()) {
             nationAct(realm, nation, pick(nationWeights(realm, nation), random), time);
         }
@@ -122,7 +125,28 @@ public final class RealmTurns {
 
     /** The kingdom's towns on the border. */
     public static List<RealmNode> borderTowns(Realm realm) {
-        return realm.nodes().stream().filter(node -> node.type == RealmNode.Type.TOWN && realm.onBorder(node)).toList();
+        return realm.nodes().stream().filter(node -> node.type == RealmNode.Type.TOWN && node.kingdoms() && realm.onBorder(node)).toList();
+    }
+
+    /** The kingdom's towns that can take support this turn: every one not upgrading. */
+    private static List<RealmNode> supported(List<RealmNode> towns) {
+        return towns.stream().filter(town -> !RealmTiers.upgrading(town)).toList();
+    }
+
+    /**
+     * Where the kingdom would march, and from which of its towns: the nearest town in ruins a monster nation holds,
+     * linked to one of its towns (to take it back), or failing that the weakest-defended one (to sack it).
+     */
+    public static Optional<Map.Entry<RealmNode, RealmNode>> marchTarget(Realm realm) {
+        List<Map.Entry<RealmNode, RealmNode>> held = new ArrayList<>();
+        for (RealmNode town : realm.nodes()) {
+            if (town.type == RealmNode.Type.TOWN && town.kingdoms()) {
+                realm.neighbors(town.id).stream().filter(node -> node.type == RealmNode.Type.TOWN && node.monsters()).forEach(node -> held.add(Map.entry(town, node)));
+            }
+        }
+        Optional<Map.Entry<RealmNode, RealmNode>> ruins = held.stream().filter(entry -> RealmRaids.capturable(entry.getValue(), RealmNode.KINGDOM))
+                .min(Comparator.comparingDouble(entry -> entry.getKey().pos().distSqr(entry.getValue().pos())));
+        return ruins.isPresent() ? ruins : held.stream().min(Comparator.comparingInt(entry -> entry.getValue().stat("defense")));
     }
 
     /** The military of every monster stronghold touching the kingdom's border. */
@@ -139,13 +163,23 @@ public final class RealmTurns {
         weights.put(KingdomAction.REINFORCE, border.isEmpty() ? 0 : 2 + (threat > defense ? 4 : 0));
         weights.put(KingdomAction.MUSTER, 2 + (realm.kingdomStat("army") < threat / 2 ? 2 : 0));
         weights.put(KingdomAction.GATHER_WEALTH, 2 + (realm.kingdomStat("treasury") < 10 ? 2 : 0));
+        Optional<Map.Entry<RealmNode, RealmNode>> march = marchTarget(realm);
+        boolean marching = realm.raids.stream().anyMatch(raid -> RealmNode.KINGDOM.equals(raid.nation()));
+        int strength = realm.kingdomStat("army") / 2;
+        weights.put(KingdomAction.MARCH, march.isEmpty() || marching ? 0 : 1 + Math.max(0, (strength - march.get().getValue().stat("defense")) / 3));
         return weights;
     }
 
+    /** The kingdom's action on a turn, as if at real time 0 (a march resolves at once). */
     public static void kingdomAct(Realm realm, KingdomAction action) {
+        kingdomAct(realm, action, 0L);
+    }
+
+    /** The kingdom's action on the turn at real time {@code time}: a march declared then resolves half a turn later. */
+    public static void kingdomAct(Realm realm, KingdomAction action, long time) {
         switch (action) {
             case REINFORCE -> {
-                List<RealmNode> border = borderTowns(realm);
+                List<RealmNode> border = supported(borderTowns(realm));
                 border.forEach(town -> realm.addStat(town, "defense", 2));
                 realm.record("The kingdom reinforced its border: " + names(border) + " each gained 2 defense.");
             }
@@ -154,11 +188,16 @@ public final class RealmTurns {
                 realm.record("The kingdom mustered troops: its army is now " + realm.kingdomStat("army") + ".");
             }
             case GATHER_WEALTH -> {
-                List<RealmNode> towns = realm.nodes().stream().filter(node -> node.type == RealmNode.Type.TOWN).toList();
+                List<RealmNode> towns = supported(realm.nodes().stream().filter(node -> node.type == RealmNode.Type.TOWN && node.kingdoms()).toList());
                 towns.forEach(town -> realm.addStat(town, "wealth", 1));
                 realm.addKingdomStat("treasury", towns.size());
                 realm.record("The kingdom gathered wealth: its treasury is now " + realm.kingdomStat("treasury") + ".");
             }
+            case MARCH -> marchTarget(realm).ifPresent(target -> {
+                Realm.Raid raid = new Realm.Raid(RealmNode.KINGDOM, target.getKey().id, target.getValue().id, realm.turn, time + turnMillis() / 2);
+                realm.raids.add(raid);
+                realm.news(RealmRaids.who(raid, target.getKey()) + " will " + raidVerb(target.getValue(), RealmNode.KINGDOM) + " at dusk!");
+            });
         }
     }
 
@@ -169,6 +208,11 @@ public final class RealmTurns {
         return realm.nodes().stream().filter(node -> node.type == RealmNode.Type.STRONGHOLD && nation.equals(node.owner())).toList();
     }
 
+    /** The towns a nation holds. */
+    public static List<RealmNode> towns(Realm realm, String nation) {
+        return realm.nodes().stream().filter(node -> node.type == RealmNode.Type.TOWN && nation.equals(node.owner())).toList();
+    }
+
     /** A nation's whole military: every stronghold's. */
     public static int military(Realm realm, String nation) {
         return strongholds(realm, nation).stream().mapToInt(node -> node.stat("military")).sum();
@@ -176,16 +220,16 @@ public final class RealmTurns {
 
     /**
      * Where a nation would raid, and from which stronghold: the nearest node its strongholds border that it could
-     * capture (see {@link RealmRaids#capturable}), or failing that the weakest kingdom town they border.
+     * capture (see {@link RealmRaids#capturable}), or failing that the weakest town they border that no nation holds.
      */
     public static Optional<Map.Entry<RealmNode, RealmNode>> raidTarget(Realm realm, String nation) {
         List<Map.Entry<RealmNode, RealmNode>> towns = new ArrayList<>();
         List<Map.Entry<RealmNode, RealmNode>> takeable = new ArrayList<>();
         for (RealmNode stronghold : strongholds(realm, nation)) {
             for (RealmNode node : realm.neighbors(stronghold.id)) {
-                if (RealmRaids.capturable(node)) {
+                if (RealmRaids.capturable(node, nation)) {
                     takeable.add(Map.entry(stronghold, node));
-                } else if (node.type == RealmNode.Type.TOWN) {
+                } else if (node.type == RealmNode.Type.TOWN && !node.monsters()) {
                     towns.add(Map.entry(stronghold, node));
                 }
             }
@@ -195,9 +239,9 @@ public final class RealmTurns {
         return nearest.isPresent() ? nearest : towns.stream().min(Comparator.comparingInt(entry -> entry.getValue().stat("defense")));
     }
 
-    /** What a raid on a node means, for the news: taking it, or raiding it. */
-    static String raidVerb(RealmNode target) {
-        return RealmRaids.capturable(target) ? "march on " + target.name() + " to take it" : "raid " + target.name();
+    /** What a raid by {@code by} on a node means, for the news: taking it, or raiding it. */
+    static String raidVerb(RealmNode target, String by) {
+        return RealmRaids.capturable(target, by) ? "march on " + target.name() + " to take it" : "raid " + target.name();
     }
 
     public static Map<NationAction, Integer> nationWeights(Realm realm, String nation) {
@@ -216,6 +260,8 @@ public final class RealmTurns {
     /** A nation's action on the turn at real time {@code time}: a raid declared then resolves half a turn later. */
     public static void nationAct(Realm realm, String nation, NationAction action, long time) {
         List<RealmNode> strongholds = strongholds(realm, nation);
+        List<RealmNode> towns = supported(towns(realm, nation));
+        towns.forEach(town -> realm.addStat(town, "wealth", 1));
         switch (action) {
             case BUILD_MILITARY -> {
                 if (strongholds.isEmpty()) {
@@ -231,11 +277,12 @@ public final class RealmTurns {
             }
             case FORTIFY -> {
                 strongholds.forEach(node -> realm.addStat(node, "fortification", 1));
-                realm.record("The " + nation + " fortified " + names(strongholds) + ".");
+                towns.forEach(town -> realm.addStat(town, "defense", 1));
+                realm.record("The " + nation + " fortified " + names(java.util.stream.Stream.concat(strongholds.stream(), towns.stream()).toList()) + ".");
             }
             case RAID -> raidTarget(realm, nation).ifPresent(target -> {
                 realm.raids.add(new Realm.Raid(nation, target.getKey().id, target.getValue().id, realm.turn, time + turnMillis() / 2));
-                realm.news("The " + nation + " of " + target.getKey().name() + " will " + raidVerb(target.getValue()) + " at dusk!");
+                realm.news("The " + nation + " of " + target.getKey().name() + " will " + raidVerb(target.getValue(), nation) + " at dusk!");
             });
         }
     }

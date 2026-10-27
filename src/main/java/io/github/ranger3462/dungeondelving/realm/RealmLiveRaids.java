@@ -192,9 +192,9 @@ public final class RealmLiveRaids {
         int military = realm.node(raid.stronghold()).map(node -> node.stat("military")).orElse(10);
         LiveRaid live = new LiveRaid(raid, level, town.pos(), tier(military), Mth.clamp(3 + military / 8, 3, 12));
         ACTIVE.put(raid.town(), live);
-        int tier = RealmTiers.tier(town);
-        // A kingdom-held stronghold's garrison is a small one (no morale); an unheld place has no guards at all.
-        int guards = town.kingdoms() ? guardCount(town.stat("morale"), tier) : 0;
+        int tier = town.type == RealmNode.Type.TOWN ? RealmTiers.tier(town) : 1;
+        // A kingdom-held stronghold's garrison is a small one (no morale); ruins and unheld places have no guards at all.
+        int guards = town.kingdoms() && tier > 0 ? guardCount(town.stat("morale"), tier) : 0;
         int[] split = roles(guards, tier);
         int crossbows = split[1];
         int mages = split[2];

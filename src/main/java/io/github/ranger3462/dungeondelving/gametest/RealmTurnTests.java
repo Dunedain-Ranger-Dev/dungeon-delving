@@ -135,6 +135,7 @@ public class RealmTurnTests {
         realm.link("capital", "millbrook");
         realm.link("riverhold", "warren");
         realm.link("millbrook", "warren");
+        realm.nodes().stream().filter(node -> node.type == RealmNode.Type.TOWN).forEach(town -> realm.setStat(town, "tier", 1));
         return realm;
     }
 

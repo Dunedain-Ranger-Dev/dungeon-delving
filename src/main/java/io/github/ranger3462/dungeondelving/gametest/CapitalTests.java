@@ -43,7 +43,9 @@ public class CapitalTests {
     public static void aPushedBackNationRalliesAndSendsItsChampion(GameTestHelper helper) {
         var dim = helper.getLevel().dimension();
         Realm realm = new Realm();
-        realm.add(new RealmNode("riverhold", RealmNode.Type.TOWN, RealmNode.KINGDOM, dim, BlockPos.ZERO));
+        RealmNode riverhold = new RealmNode("riverhold", RealmNode.Type.TOWN, RealmNode.KINGDOM, dim, BlockPos.ZERO);
+        realm.add(riverhold);
+        realm.setStat(riverhold, "tier", 1);
         RealmNode capital = new RealmNode("grimhold", RealmNode.Type.CAPITAL, DungeonFactions.ORCS, dim, new BlockPos(400, 64, 0));
         realm.add(capital);
         RealmNode camp = new RealmNode("camp", RealmNode.Type.STRONGHOLD, DungeonFactions.ORCS, dim, new BlockPos(200, 64, 0));
@@ -81,7 +83,7 @@ public class CapitalTests {
         }
         helper.assertTrue(realm.raids().size() == 1 && realm.raids().get(0).town().equals("riverhold"), "with no stronghold left to retake, it marches on the nearest town");
         RealmRaids.resolve(realm, realm.raids().get(0), 20, 1);
-        helper.assertTrue(realm.node("riverhold").orElseThrow().owner().equals(RealmNode.KINGDOM), "towns are sacked, never taken");
+        helper.assertTrue(realm.node("riverhold").orElseThrow().owner().equals(RealmNode.KINGDOM), "a town above ruins is sacked, not taken");
         helper.succeed();
     }
 

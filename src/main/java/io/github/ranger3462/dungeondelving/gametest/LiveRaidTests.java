@@ -216,7 +216,9 @@ public class LiveRaidTests {
     private static Realm frontier(GameTestHelper helper) {
         Realm realm = new Realm();
         BlockPos at = helper.absolutePos(new BlockPos(1, 2, 1));
-        realm.add(new RealmNode("riverhold", RealmNode.Type.TOWN, RealmNode.KINGDOM, helper.getLevel().dimension(), at));
+        RealmNode town = new RealmNode("riverhold", RealmNode.Type.TOWN, RealmNode.KINGDOM, helper.getLevel().dimension(), at);
+        realm.add(town);
+        realm.setStat(town, "tier", 1);
         realm.add(new RealmNode("warren", RealmNode.Type.STRONGHOLD, DungeonFactions.GOBLINS, helper.getLevel().dimension(), at.offset(200, 0, 0)));
         realm.link("riverhold", "warren");
         return realm;

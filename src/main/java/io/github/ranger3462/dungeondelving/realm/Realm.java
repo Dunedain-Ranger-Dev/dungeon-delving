@@ -78,21 +78,18 @@ public final class Realm extends SavedData {
         };
     }
 
-    /** Why a new node can't have this owner, if it can't: towns are always the kingdom's, and strongholds start as a nation's. */
+    /** Why a new node can't have this owner, if it can't: strongholds start as a nation's. */
     public static Optional<String> ownerProblem(RealmNode.Type type, String owner) {
         return ownerProblem(type, owner, true);
     }
 
     /**
-     * Why a node can't have this owner, if it can't. Towns are always the kingdom's. A new stronghold ({@code founding})
-     * must be a nation's; an existing one can be taken by the kingdom or cleared (none).
+     * Why a node can't have this owner, if it can't. A town can be anyone's. A new stronghold ({@code founding}) must
+     * be a nation's; an existing one can be taken by the kingdom or cleared (none).
      */
     public static Optional<String> ownerProblem(RealmNode.Type type, String owner, boolean founding) {
         if (!validOwner(owner)) {
             return Optional.of("Unknown owner " + owner + ": use kingdom, none, or a monster nation (" + String.join(", ", DungeonFactions.ids()) + ").");
-        }
-        if (type == RealmNode.Type.TOWN && !RealmNode.KINGDOM.equals(owner)) {
-            return Optional.of("Towns are always the kingdom's.");
         }
         if (type == RealmNode.Type.CAPITAL && (RealmNode.KINGDOM.equals(owner) || RealmNode.NONE.equals(owner))) {
             return Optional.of("A capital is a monster nation's home, and can't be taken (" + String.join(", ", DungeonFactions.ids()) + ").");
@@ -138,13 +135,13 @@ public final class Realm extends SavedData {
     }
 
     /**
-     * Gives a node to an owner. A stronghold changing hands is news: monsters taking one make the land around it more
+     * Gives a node to an owner. A stronghold, site or town changing hands is news: monsters taking one make the land around it more
      * dangerous (see RealmLevels); losing one calms it.
      */
     public void setOwner(RealmNode node, String owner) {
         boolean wasMonsters = node.monsters();
         node.setOwner(owner);
-        boolean holdable = node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.SITE;
+        boolean holdable = node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.SITE || node.type == RealmNode.Type.TOWN;
         if (holdable && !wasMonsters && node.monsters()) {
             news("The " + owner + " have taken " + node.name() + ": the land around it grows more dangerous.");
         } else if (holdable && wasMonsters && !node.monsters()) {

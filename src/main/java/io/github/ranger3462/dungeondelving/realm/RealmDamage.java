@@ -66,10 +66,10 @@ public final class RealmDamage {
         }
     }
 
-    /** Each turn: wrecked towns with wealth pay to rebuild (DD-97). */
+    /** Each turn: wrecked towns with wealth pay to rebuild (DD-97), unless they're upgrading. */
     public static void fundRepairs(Realm realm) {
         for (RealmNode node : realm.nodes()) {
-            if (node.stat("wrecked") > 0 && node.stat("wealth") > 0 && node.stat("repair") < node.stat("wrecked")) {
+            if (!RealmTiers.upgrading(node) && node.stat("wrecked") > 0 && node.stat("wealth") > 0 && node.stat("repair") < node.stat("wrecked")) {
                 realm.addStat(node, "wealth", -1);
                 realm.addStat(node, "repair", REPAIR_PER_TURN);
                 realm.record(node.name() + " paid to rebuild.");

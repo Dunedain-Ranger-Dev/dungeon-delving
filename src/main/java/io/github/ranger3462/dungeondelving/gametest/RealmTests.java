@@ -48,7 +48,7 @@ public class RealmTests {
 
     @GameTest(template = ANY_TEMPLATE)
     public static void ownersFollowTheRules(GameTestHelper helper) {
-        helper.assertTrue(Realm.ownerProblem(RealmNode.Type.TOWN, DungeonFactions.ORCS).isPresent(), "towns are the kingdom's");
+        helper.assertTrue(Realm.ownerProblem(RealmNode.Type.TOWN, DungeonFactions.ORCS).isEmpty(), "a nation can hold a town");
         helper.assertTrue(Realm.ownerProblem(RealmNode.Type.STRONGHOLD, RealmNode.KINGDOM).isPresent(), "strongholds are a nation's");
         helper.assertTrue(Realm.ownerProblem(RealmNode.Type.STRONGHOLD, DungeonFactions.UNDEAD).isEmpty(), "undead can hold a stronghold");
         helper.assertTrue(Realm.ownerProblem(RealmNode.Type.SITE, "dragons").isPresent(), "an unknown nation can't hold anything");
