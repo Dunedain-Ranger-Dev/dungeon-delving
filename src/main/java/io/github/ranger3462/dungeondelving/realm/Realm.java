@@ -202,6 +202,11 @@ public final class Realm extends SavedData {
         return links.contains(key(a, b));
     }
 
+    /** Every link, as the two node ids it joins. */
+    public List<String[]> links() {
+        return links.stream().map(Realm::ends).toList();
+    }
+
     /** The nodes linked to one. */
     public List<RealmNode> neighbors(String id) {
         List<RealmNode> neighbors = new ArrayList<>();

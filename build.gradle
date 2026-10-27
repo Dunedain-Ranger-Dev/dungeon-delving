@@ -194,6 +194,7 @@ dependencies {
     // Optional integration: Ars Nouveau mana, for the Tester's Charm. Only used when Ars Nouveau is installed.
     compileOnly "curse.maven:ars-nouveau-401955:9052154"                // 5.13.3
     compileOnly "curse.maven:puffish-skills-835091:9101377"                     // Pufferfish's Skills 0.19.2
+    compileOnly "curse.maven:ftb-chunks-forge-314906:8791113"                  // 2101.1.22: realm places as map waypoints
     compileOnly "curse.maven:economycraft-mp-1321557:9212860"                   // EconomyCraft 1.11.0: coins deposit to its balances
     compileOnly "curse.maven:better-combat-by-daedelus-639842:8430183"              // 2.4.0+1.21.1-neoforge
     compileOnly "curse.maven:spell-engine-807653:9011566"               // 1.10.9+1.21.1-neoforge
@@ -241,6 +242,8 @@ dependencies {
         localRuntime "curse.maven:ftb-library-forge-404465:9008089"
         localRuntime "curse.maven:ftb-teams-forge-404468:8724782"
         localRuntime "curse.maven:architectury-api-419699:5786327"
+        // FTB Chunks, whose map shows the realm's places as waypoints
+        localRuntime "curse.maven:ftb-chunks-forge-314906:8791113"     // 2101.1.22
         // Lootr, so world loot chests are per player
         localRuntime "curse.maven:lootr-361276:8968561"                 // 1.21.1-1.11.38.127
         // Sophisticated Backpacks, for storage

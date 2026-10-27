@@ -284,6 +284,8 @@
   "attribute.dungeondelving.wisdom.description": "Each point over 10: +0.25 healing and holy spell power, +2% mana regen.",
   "attribute.dungeondelving.charisma.description": "Each point over 10: +0.1 luck. Trading and faction standing come later.",
   "key.dungeondelving.character": "Character Stats",
+  "key.dungeondelving.realm": "Realm Map",
+  "screen.dungeondelving.realm": "The Realm",
   "key.categories.dungeondelving": "Dungeon Delving",
   "screen.dungeondelving.character": "Character",
   "screen.dungeondelving.character.level": "Character Level %s",
