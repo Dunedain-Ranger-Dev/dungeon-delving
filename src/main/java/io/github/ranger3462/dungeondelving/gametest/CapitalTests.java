@@ -72,6 +72,9 @@ public class CapitalTests {
                 .anyMatch(entry -> entry.news() && entry.text().contains("orcs have taken camp")), "back in the field, with news");
 
         realm.setOwner(camp, RealmNode.KINGDOM);
+        Realm.Raid declared = RealmRaids.declare(realm, "camp", 0L).orElseThrow();
+        helper.assertTrue(declared.stronghold().equals("grimhold"), "a lost stronghold with no neighbour to attack it can be raided by the capital");
+        RealmRaids.decide(realm, declared, 0, 100, false);
         realm.remove("camp");
         for (int turn = 0; turn < RealmCapitals.RALLY_TURNS; turn++) {
             RealmCapitals.rally(realm, 0L);

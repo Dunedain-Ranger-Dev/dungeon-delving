@@ -57,22 +57,27 @@ public final class RealmRaids {
     }
 
     /**
-     * Declares a raid on a town by the strongest monster stronghold linked to it, at dusk {@code resolveAt} (real time).
-     * Empty if no stronghold borders the town, or one's already raiding it.
+     * Declares a raid on a town, or on a stronghold or site to take it, at dusk {@code resolveAt} (real time): by the
+     * strongest monster stronghold linked to it, or for a lost stronghold with none, the nearest pushed-back capital's
+     * champion. Empty if nothing can attack it, or a raid's already on it.
      */
-    public static Optional<Realm.Raid> declare(Realm realm, String townId, long resolveAt) {
-        Optional<RealmNode> town = realm.node(townId).filter(node -> node.type == RealmNode.Type.TOWN);
-        if (town.isEmpty() || realm.raids.stream().anyMatch(raid -> raid.town().equals(townId))) {
+    public static Optional<Realm.Raid> declare(Realm realm, String targetId, long resolveAt) {
+        Optional<RealmNode> target = realm.node(targetId).filter(node -> node.type == RealmNode.Type.TOWN || capturable(node));
+        if (target.isEmpty() || realm.raids.stream().anyMatch(raid -> raid.town().equals(targetId))) {
             return Optional.empty();
         }
-        Optional<RealmNode> stronghold = realm.neighbors(townId).stream().filter(node -> node.type == RealmNode.Type.STRONGHOLD && node.monsters())
+        Optional<RealmNode> attacker = realm.neighbors(targetId).stream().filter(node -> node.type == RealmNode.Type.STRONGHOLD && node.monsters())
                 .max(java.util.Comparator.comparingInt(node -> node.stat("military")));
-        if (stronghold.isEmpty()) {
+        if (attacker.isEmpty() && target.get().type == RealmNode.Type.STRONGHOLD) {
+            attacker = realm.nodes().stream().filter(node -> node.type == RealmNode.Type.CAPITAL && RealmCapitals.pushedBack(realm, node.owner())
+                    && node.dimension().equals(target.get().dimension())).min(java.util.Comparator.comparingDouble(node -> node.pos().distSqr(target.get().pos())));
+        }
+        if (attacker.isEmpty()) {
             return Optional.empty();
         }
-        Realm.Raid raid = new Realm.Raid(stronghold.get().owner(), stronghold.get().id, townId, realm.turn, resolveAt);
+        Realm.Raid raid = new Realm.Raid(attacker.get().owner(), attacker.get().id, targetId, realm.turn, resolveAt);
         realm.raids.add(raid);
-        realm.news("The " + raid.nation() + " of " + stronghold.get().name() + " will raid " + town.get().name() + " at dusk!");
+        realm.news("The " + raid.nation() + " of " + attacker.get().name() + " will " + RealmTurns.raidVerb(target.get()) + " at dusk!");
         return Optional.of(raid);
     }
 
