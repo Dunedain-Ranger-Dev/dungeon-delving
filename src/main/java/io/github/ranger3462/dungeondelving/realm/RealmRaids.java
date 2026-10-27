@@ -73,14 +73,14 @@ public final class RealmRaids {
             return Optional.empty();
         }
         if (target.get().type == RealmNode.Type.TOWN && target.get().monsters()) {
-            Optional<RealmNode> from = realm.neighbors(targetId).stream().filter(node -> node.type == RealmNode.Type.TOWN && node.kingdoms())
+            Optional<RealmNode> from = realm.neighbors(targetId).stream().filter(RealmTurns::kingdomSettlement)
                     .max(java.util.Comparator.comparingInt(node -> node.stat("defense")));
             if (from.isEmpty()) {
                 return Optional.empty();
             }
             Realm.Raid raid = new Realm.Raid(RealmNode.KINGDOM, from.get().id, targetId, realm.turn, resolveAt);
             realm.raids.add(raid);
-            realm.news(who(raid, from.get()) + " will " + RealmTurns.raidVerb(target.get(), RealmNode.KINGDOM) + " at dusk!");
+            realm.news(who(realm, raid, from.get()) + " will " + RealmTurns.raidVerb(target.get(), RealmNode.KINGDOM) + " at dusk!");
             return Optional.of(raid);
         }
         Optional<RealmNode> attacker = realm.neighbors(targetId).stream().filter(node -> node.type == RealmNode.Type.STRONGHOLD && node.monsters())
@@ -94,13 +94,16 @@ public final class RealmRaids {
         }
         Realm.Raid raid = new Realm.Raid(attacker.get().owner(), attacker.get().id, targetId, realm.turn, resolveAt);
         realm.raids.add(raid);
-        realm.news(who(raid, attacker.get()) + " will " + RealmTurns.raidVerb(target.get(), raid.nation()) + " at dusk!");
+        realm.news(who(realm, raid, attacker.get()) + " will " + RealmTurns.raidVerb(target.get(), raid.nation()) + " at dusk!");
         return Optional.of(raid);
     }
 
-    /** Who's attacking, for the news: "The goblins of warren", or "The kingdom's army from riverhold". */
-    static String who(Realm.Raid raid, RealmNode attacker) {
-        return RealmNode.KINGDOM.equals(raid.nation()) ? "The kingdom's army from " + attacker.name() : "The " + raid.nation() + " of " + attacker.name();
+    /** Who's attacking, for the news: "The goblins of warren", or "The kingdom's army from riverhold" (led by its champion, with a capital). */
+    static String who(Realm realm, Realm.Raid raid, RealmNode attacker) {
+        if (RealmNode.KINGDOM.equals(raid.nation())) {
+            return "The kingdom's army from " + attacker.name() + (RealmCapitals.kingdomChampion(realm) ? ", led by its champion," : "");
+        }
+        return "The " + raid.nation() + " of " + attacker.name();
     }
 
     /**
@@ -136,12 +139,17 @@ public final class RealmRaids {
         return decide(realm, raid, attack, defense, false);
     }
 
-    /** A raid's attack, before its roll: the stronghold's military (+ the champion's bonus from a capital), or half the kingdom's army. */
+    /** A raid's attack, before its roll: the stronghold's military (+ the champion's bonus from a capital), or half the kingdom's army (+ its champion's). */
     public static int attack(Realm realm, Realm.Raid raid, RealmNode attacker) {
         if (RealmNode.KINGDOM.equals(raid.nation())) {
-            return realm.kingdomStat("army") / 2;
+            return kingdomAttack(realm);
         }
         return attacker.stat("military") + (attacker.type == RealmNode.Type.CAPITAL ? RealmCapitals.CHAMPION_BONUS : 0);
+    }
+
+    /** What the kingdom's marches attack with: half its army, plus its champion's bonus if it has a capital. */
+    public static int kingdomAttack(Realm realm) {
+        return realm.kingdomStat("army") / 2 + (RealmCapitals.kingdomChampion(realm) ? RealmCapitals.CHAMPION_BONUS : 0);
     }
 
     /** Takes up to {@code amount} military from a raid's attackers (the kingdom's army, for its raids); returns how much. */
@@ -174,7 +182,7 @@ public final class RealmRaids {
         String how = fought ? " in a pitched fight" : "";
         if (attack > defense && capturable(target, raid.nation())) {
             int garrison = lose(realm, raid, attacker, GARRISON);
-            realm.news(who(raid, attacker) + " stormed " + target.name() + how + " (" + attack + " against " + defense + ").");
+            realm.news(who(realm, raid, attacker) + " stormed " + target.name() + how + " (" + attack + " against " + defense + ").");
             realm.setOwner(target, raid.nation());
             if (target.type == RealmNode.Type.TOWN) {
                 realm.setStat(target, "upgrading", 0);
@@ -197,7 +205,7 @@ public final class RealmRaids {
             realm.addStat(target, "morale", -moraleLost);
             realm.addStat(target, "damage", margin);
             lose(realm, raid, attacker, 1);
-            realm.news(who(raid, attacker) + " sacked " + target.name() + how + " (" + attack + " against " + defense
+            realm.news(who(realm, raid, attacker) + " sacked " + target.name() + how + " (" + attack + " against " + defense
                     + "): it lost " + defenseLost + " defense, " + wealthLost + " wealth and " + moraleLost + " morale.");
             if (attacker.type == RealmNode.Type.CAPITAL) {
                 RealmCapitals.championRaidDecided(realm, attacker, true);
@@ -215,7 +223,7 @@ public final class RealmRaids {
         if (target.type == RealmNode.Type.TOWN) {
             realm.addStat(target, "morale", 1);
         }
-        realm.news(target.name() + " drove off " + who(raid, attacker).replaceFirst("^The", "the") + how + " (" + defense + " against " + attack + "): they lost "
+        realm.news(target.name() + " drove off " + who(realm, raid, attacker).replaceFirst("^The", "the") + how + " (" + defense + " against " + attack + "): they lost "
                 + losses + " military.");
         return false;
     }

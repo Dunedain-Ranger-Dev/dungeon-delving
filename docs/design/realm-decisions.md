@@ -27,7 +27,7 @@ military of every monster stronghold touching the border.
 | Reinforce | 2, plus 4 if the threat is greater than the border's defense (its towns' defense plus the army). 0 if there's no border | Every border town gains 2 defense |
 | Muster | 2, plus 2 if the army is less than half the threat | The army grows by 3 (a quarter of it helps defend any raided town) |
 | Gather wealth | 2, plus 2 if the treasury is under 10 | Every kingdom town gains 1 wealth; the treasury gains 1 per town |
-| March | 1, plus 1 for every 3 of half its army over the target's defense. 0 with no target, or a march already under way | Its army raids a monster-held town linked to one of its towns: the nearest in ruins (to take it back), or else the weakest (to sack it) |
+| March | 1, plus 1 for every 3 its attack (half its army, +10 with a capital) is over the target's defense. 0 when it isn't stronger, with no target, or with a march already under way | Its army raids a town linked to one of its towns or its capital: the nearest in ruins that isn't its own (to take it), or else the weakest monster-held one (to sack it) |
 
 So a kingdom under pressure mostly reinforces and musters. A safe one spreads its effort evenly, its towns slowly get
 richer and grow, and a strong army goes to win back lost towns.
@@ -67,6 +67,11 @@ dangerous: at least danger 6 at its heart, fading out over 360 blocks (`RealmCap
 - **Killing the champion** costs the capital a third of its military and resets its rally. A champion that wins its
   raid, or kills its challenger, adds 5 military.
 
+**The kingdom's capital.** The kingdom can have one capital too (made with the kingdom as owner; it can't be taken
+or cleared after that). It's never raided and never rallies. Its army can march out from it like from any kingdom
+town, its champion leads every march (+10 attack, rolled like all the kingdom's marches; it has no name yet), and it
+pays 1 into the treasury when the kingdom gathers wealth.
+
 ## Raids
 
 A raid's target is a town (to sack), or a place to take: a stronghold or site the nation doesn't hold, or a town
@@ -74,7 +79,7 @@ knocked down to ruins. A town above ruins can only be sacked; a bad sacking knoc
 leave it in ruins for the next win to take. The kingdom's marches work the same way on monster-held towns. At dusk a
 nation's raid is fought if a player is within 48 blocks of the target; the kingdom's are always rolled:
 
-- attack = the stronghold's military (+10 for a champion), or half the kingdom's army, + d20
+- attack = the stronghold's military (+10 for a champion), or half the kingdom's army (+10 for its champion, with a capital), + d20
 - defense = the target's defense (a town's defense, or a stronghold's or site's fortification), plus a quarter of
   the kingdom's army if it's the kingdom's, + d20
 

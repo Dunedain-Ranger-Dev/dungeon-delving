@@ -32,7 +32,7 @@ import org.lwjgl.glfw.GLFW;
  * scroll to zoom. The data comes from the server ({@link RealmMap}).
  */
 public class RealmScreen extends Screen {
-    public static final KeyMapping OPEN = new KeyMapping("key.dungeondelving.realm", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K,
+    public static final KeyMapping OPEN = new KeyMapping("key.dungeondelving.realm", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_N,
             "key.categories.dungeondelving");
     private static final int PANEL_WIDTH = 200;
     private static final int MARGIN = 8;
@@ -346,7 +346,7 @@ public class RealmScreen extends Screen {
     }
 
     /** "Town, kingdom, tier 2 (village)", "Stronghold, goblins", and so on. */
-    private static String describe(RealmMapClient.Node node) {
+    public static String describe(RealmMapClient.Node node) {
         String type = Character.toUpperCase(node.type().charAt(0)) + node.type().substring(1);
         String kind = node.kind().isEmpty() ? "" : " (" + node.kind() + ")";
         String tier = "town".equals(node.type()) ? ", tier " + node.stat("tier") + " (" + TIERS[Mth.clamp(node.stat("tier"), 0, TIERS.length - 1)] + ")" : "";

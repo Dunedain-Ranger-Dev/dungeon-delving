@@ -139,14 +139,20 @@ public final class RealmTurns {
      */
     public static Optional<Map.Entry<RealmNode, RealmNode>> marchTarget(Realm realm) {
         List<Map.Entry<RealmNode, RealmNode>> held = new ArrayList<>();
-        for (RealmNode town : realm.nodes()) {
-            if (town.type == RealmNode.Type.TOWN && town.kingdoms()) {
-                realm.neighbors(town.id).stream().filter(node -> node.type == RealmNode.Type.TOWN && node.monsters()).forEach(node -> held.add(Map.entry(town, node)));
+        for (RealmNode from : realm.nodes()) {
+            if (kingdomSettlement(from)) {
+                realm.neighbors(from.id).stream().filter(node -> node.type == RealmNode.Type.TOWN && !node.kingdoms()).forEach(node -> held.add(Map.entry(from, node)));
             }
         }
         Optional<Map.Entry<RealmNode, RealmNode>> ruins = held.stream().filter(entry -> RealmRaids.capturable(entry.getValue(), RealmNode.KINGDOM))
                 .min(Comparator.comparingDouble(entry -> entry.getKey().pos().distSqr(entry.getValue().pos())));
-        return ruins.isPresent() ? ruins : held.stream().min(Comparator.comparingInt(entry -> entry.getValue().stat("defense")));
+        return ruins.isPresent() ? ruins
+                : held.stream().filter(entry -> entry.getValue().monsters()).min(Comparator.comparingInt(entry -> entry.getValue().stat("defense")));
+    }
+
+    /** Where the kingdom's army can march from: its towns and its capital. */
+    public static boolean kingdomSettlement(RealmNode node) {
+        return (node.type == RealmNode.Type.TOWN || node.type == RealmNode.Type.CAPITAL) && node.kingdoms();
     }
 
     /** The military of every monster stronghold touching the kingdom's border. */
@@ -165,8 +171,9 @@ public final class RealmTurns {
         weights.put(KingdomAction.GATHER_WEALTH, 2 + (realm.kingdomStat("treasury") < 10 ? 2 : 0));
         Optional<Map.Entry<RealmNode, RealmNode>> march = marchTarget(realm);
         boolean marching = realm.raids.stream().anyMatch(raid -> RealmNode.KINGDOM.equals(raid.nation()));
-        int strength = realm.kingdomStat("army") / 2;
-        weights.put(KingdomAction.MARCH, march.isEmpty() || marching ? 0 : 1 + Math.max(0, (strength - march.get().getValue().stat("defense")) / 3));
+        // Only when it's strong enough to win: the keener the more it outmatches the target.
+        int margin = march.map(target -> RealmRaids.kingdomAttack(realm) - RealmRaids.defense(realm, target.getValue())).orElse(0);
+        weights.put(KingdomAction.MARCH, march.isEmpty() || marching || margin <= 0 ? 0 : 1 + margin / 3);
         return weights;
     }
 
@@ -190,13 +197,13 @@ public final class RealmTurns {
             case GATHER_WEALTH -> {
                 List<RealmNode> towns = supported(realm.nodes().stream().filter(node -> node.type == RealmNode.Type.TOWN && node.kingdoms()).toList());
                 towns.forEach(town -> realm.addStat(town, "wealth", 1));
-                realm.addKingdomStat("treasury", towns.size());
+                realm.addKingdomStat("treasury", towns.size() + (RealmCapitals.kingdomChampion(realm) ? 1 : 0));
                 realm.record("The kingdom gathered wealth: its treasury is now " + realm.kingdomStat("treasury") + ".");
             }
             case MARCH -> marchTarget(realm).ifPresent(target -> {
                 Realm.Raid raid = new Realm.Raid(RealmNode.KINGDOM, target.getKey().id, target.getValue().id, realm.turn, time + turnMillis() / 2);
                 realm.raids.add(raid);
-                realm.news(RealmRaids.who(raid, target.getKey()) + " will " + raidVerb(target.getValue(), RealmNode.KINGDOM) + " at dusk!");
+                realm.news(RealmRaids.who(realm, raid, target.getKey()) + " will " + raidVerb(target.getValue(), RealmNode.KINGDOM) + " at dusk!");
             });
         }
     }

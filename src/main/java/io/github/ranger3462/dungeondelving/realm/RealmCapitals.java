@@ -31,6 +31,9 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
  * the last wave). Retaking a stronghold ends the rally: the nation is back in the field. Players can also go to the capital and call the
  * champion out ({@code /challenge}). Killing the champion sets the nation back (a third of the capital's military);
  * a champion that wins, or kills its challenger, lets it rebuild faster.
+ * <p>
+ * The kingdom can have a capital too: it's never lost or raided, its army can march out from it, and while it stands
+ * the kingdom's champion leads every march ({@link #CHAMPION_BONUS} to its attack).
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class RealmCapitals {
@@ -50,9 +53,14 @@ public final class RealmCapitals {
         return realm.nodes().stream().filter(node -> node.type == RealmNode.Type.CAPITAL && nation.equals(node.owner())).findFirst();
     }
 
-    /** Whether a nation has lost every stronghold and fights from its capital. */
+    /** Whether a monster nation has lost every stronghold and fights from its capital. */
     public static boolean pushedBack(Realm realm, String nation) {
-        return capital(realm, nation).isPresent() && RealmTurns.strongholds(realm, nation).isEmpty();
+        return !RealmNode.KINGDOM.equals(nation) && capital(realm, nation).isPresent() && RealmTurns.strongholds(realm, nation).isEmpty();
+    }
+
+    /** Whether the kingdom has a capital, and so a champion to lead its marches. */
+    public static boolean kingdomChampion(Realm realm) {
+        return capital(realm, RealmNode.KINGDOM).isPresent();
     }
 
     /** A capital's champion tier: 1, plus 1 per 20 military, up to 4. */
@@ -157,7 +165,7 @@ public final class RealmCapitals {
             ServerLevel level = player.serverLevel();
             Realm realm = Realm.get(level.getServer());
             Optional<RealmNode> capital = realm.nodes().stream()
-                    .filter(node -> node.type == RealmNode.Type.CAPITAL && node.dimension().equals(level.dimension())
+                    .filter(node -> node.type == RealmNode.Type.CAPITAL && node.monsters() && node.dimension().equals(level.dimension())
                             && node.pos().closerThan(player.blockPosition(), CHALLENGE_RANGE))
                     .findFirst();
             String problem = challengeProblem(realm, level, capital);

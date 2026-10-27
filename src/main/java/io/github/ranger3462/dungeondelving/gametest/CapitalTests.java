@@ -8,6 +8,7 @@ import io.github.ranger3462.dungeondelving.realm.RealmCapitals;
 import io.github.ranger3462.dungeondelving.realm.RealmLevels;
 import io.github.ranger3462.dungeondelving.realm.RealmNode;
 import io.github.ranger3462.dungeondelving.realm.RealmRaids;
+import io.github.ranger3462.dungeondelving.realm.RealmTurns;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -36,6 +37,38 @@ public class CapitalTests {
         int level = RealmLevels.level(realm, dim, new BlockPos(150, 64, 0));
         helper.assertTrue(level >= RealmLevels.CAPITAL_FLOOR, "even with no military, a capital's heart is dangerous: " + level);
         helper.assertTrue(realm.nations().contains(DungeonFactions.ORCS), "a nation with only its capital still acts");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void theKingdomsCapitalMarchesOnTheRuinsAroundIt(GameTestHelper helper) {
+        var dim = helper.getLevel().dimension();
+        helper.assertTrue(Realm.ownerProblem(RealmNode.Type.CAPITAL, RealmNode.KINGDOM, true).isEmpty(), "the kingdom can found a capital");
+        Realm realm = new Realm();
+        RealmNode capital = new RealmNode("crownhold", RealmNode.Type.CAPITAL, RealmNode.KINGDOM, dim, BlockPos.ZERO);
+        realm.add(capital);
+        RealmNode ruins = new RealmNode("ashford", RealmNode.Type.TOWN, RealmNode.NONE, dim, new BlockPos(100, 64, 0));
+        realm.add(ruins);
+        realm.link("crownhold", "ashford");
+        realm.setStat(ruins, "defense", 30);
+        helper.assertTrue(!RealmCapitals.pushedBack(realm, RealmNode.KINGDOM) && !realm.nations().contains(RealmNode.KINGDOM),
+                "the kingdom's capital never rallies like a nation's");
+        helper.assertTrue(RealmTurns.marchTarget(realm).orElseThrow().getValue() == ruins, "with only its capital, the kingdom looks to the ruins beside it");
+        helper.assertTrue(RealmTurns.kingdomWeights(realm).get(RealmTurns.KingdomAction.MARCH) == 0,
+                "but while it's outmatched (" + RealmRaids.kingdomAttack(realm) + " against " + RealmRaids.defense(realm, ruins) + "), it doesn't march");
+        while (RealmRaids.kingdomAttack(realm) <= 30) {
+            RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.MUSTER);
+        }
+        helper.assertTrue(RealmRaids.kingdomAttack(realm) == realm.kingdomStat("army") / 2 + RealmCapitals.CHAMPION_BONUS, "its champion leads the march");
+        helper.assertTrue(RealmTurns.kingdomWeights(realm).get(RealmTurns.KingdomAction.MARCH) > 0, "once it's strong enough, it marches");
+        RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.MARCH, 0L);
+        Realm.Raid raid = realm.raids().get(0);
+        helper.assertTrue(raid.stronghold().equals("crownhold") && realm.log().stream().anyMatch(entry -> entry.text().contains("led by its champion")),
+                "from its capital, led by its champion");
+        helper.assertTrue(RealmRaids.decide(realm, raid, 50, 1, false) && ruins.kingdoms(), "and takes the ruins");
+        int treasury = realm.kingdomStat("treasury");
+        RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.GATHER_WEALTH);
+        helper.assertTrue(realm.kingdomStat("treasury") == treasury + 2, "the capital pays into the treasury as well as the town");
         helper.succeed();
     }
 

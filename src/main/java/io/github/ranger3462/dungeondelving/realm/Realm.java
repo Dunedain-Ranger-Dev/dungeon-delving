@@ -85,14 +85,15 @@ public final class Realm extends SavedData {
 
     /**
      * Why a node can't have this owner, if it can't. A town can be anyone's. A new stronghold ({@code founding}) must
-     * be a nation's; an existing one can be taken by the kingdom or cleared (none).
+     * be a nation's; an existing one can be taken by the kingdom or cleared (none). A capital is a nation's, or the
+     * kingdom's when it's founded, and is never cleared.
      */
     public static Optional<String> ownerProblem(RealmNode.Type type, String owner, boolean founding) {
         if (!validOwner(owner)) {
             return Optional.of("Unknown owner " + owner + ": use kingdom, none, or a monster nation (" + String.join(", ", DungeonFactions.ids()) + ").");
         }
-        if (type == RealmNode.Type.CAPITAL && (RealmNode.KINGDOM.equals(owner) || RealmNode.NONE.equals(owner))) {
-            return Optional.of("A capital is a monster nation's home, and can't be taken (" + String.join(", ", DungeonFactions.ids()) + ").");
+        if (type == RealmNode.Type.CAPITAL && (RealmNode.NONE.equals(owner) || (!founding && RealmNode.KINGDOM.equals(owner)))) {
+            return Optional.of("A capital is a nation's home, or the kingdom's, and can't be taken (" + String.join(", ", DungeonFactions.ids()) + ", or kingdom when it's made).");
         }
         if (founding && type == RealmNode.Type.STRONGHOLD && (RealmNode.KINGDOM.equals(owner) || RealmNode.NONE.equals(owner))) {
             return Optional.of("A stronghold belongs to a monster nation (" + String.join(", ", DungeonFactions.ids()) + ").");

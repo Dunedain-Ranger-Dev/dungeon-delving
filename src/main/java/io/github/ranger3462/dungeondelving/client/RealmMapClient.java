@@ -15,7 +15,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
-/** The realm as last sent by the server (realm.RealmMap), for the realm menu and the map's waypoints. */
+/** The realm as last sent by the server (realm.RealmMap), for the realm menu and FTB Chunks' map. */
 public final class RealmMapClient {
     public record Node(String id, String name, String type, String owner, String kind, String dim, int x, int y, int z, Map<String, Integer> stats,
             List<String> warnings, List<String> notes) {
@@ -107,7 +107,7 @@ public final class RealmMapClient {
         return values;
     }
 
-    /** Puts the realm's places on FTB Chunks' map, when it's installed and ready (otherwise tries again shortly). */
+    /** Puts the realm on FTB Chunks' map, when it's installed and ready (otherwise tries again shortly). */
     private static void updateWaypoints() {
         if (!waypointsPending || latest == null || Minecraft.getInstance().level == null) {
             return;
@@ -116,7 +116,7 @@ public final class RealmMapClient {
             waypointsPending = false;
             return;
         }
-        waypointsPending = !io.github.ranger3462.dungeondelving.integration.ftbchunks.RealmWaypoints.update(latest);
+        waypointsPending = !io.github.ranger3462.dungeondelving.integration.ftbchunks.RealmMapIcons.update(latest);
     }
 
     /** A colour for an owner, as 0xRRGGBB: the kingdom blue, each nation its own, no one grey. */
