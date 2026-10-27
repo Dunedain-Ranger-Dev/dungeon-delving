@@ -309,7 +309,8 @@ public final class RealmLiveRaids {
                 RealmRaids.resolve(realm, live.raid, 1 + live.level.getRandom().nextInt(20), 1 + live.level.getRandom().nextInt(20));
             } else if (live.alone > 0) {
                 // No one's there: the fight waits (its mobs may not even be loaded, so they can't be counted).
-            } else if (guards == 0 && standing > 0) {
+            } else if (!live.guards.isEmpty() && guards == 0 && standing > 0) {
+                // Every guard down: overrun. A place that had none (ruins, an unheld stronghold) fights on with whoever's there.
                 it.remove();
                 finish(realm, live, standing, true);
             } else if (standing == 0 && live.wave < WAVES) {

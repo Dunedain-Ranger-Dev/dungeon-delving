@@ -180,6 +180,24 @@ public class LiveRaidTests {
     }
 
     @GameTest(template = ANY_TEMPLATE, timeoutTicks = 200)
+    public static void ruinsWithNoGuardsAreFoughtByWhoeversThere(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        Realm realm = frontier(helper);
+        realm.setStat(realm.node("riverhold").orElseThrow(), "tier", 0);
+        try {
+            Realm.Raid raid = RealmRaids.declare(realm, "riverhold", 0L).orElseThrow();
+            RealmLiveRaids.LiveRaid live = RealmLiveRaids.start(realm, raid, level);
+            RealmLiveRaids.pretendPresent(live, true);
+            helper.assertTrue(RealmLiveRaids.guards(live).isEmpty(), "ruins have no guards");
+            RealmLiveRaids.tick(level.getServer(), realm, 20);
+            helper.assertTrue(RealmLiveRaids.isLive(raid), "but with a player there, the fight goes on");
+        } finally {
+            RealmLiveRaids.clearAll();
+        }
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 200)
     public static void aFightWithNoOneThereWaitsThenIsRolled(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Realm realm = frontier(helper);
