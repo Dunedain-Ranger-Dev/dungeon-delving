@@ -149,6 +149,8 @@ public final class Crafts {
     public static final DeferredItem<StarredItem> FINE_GOLD = starred("fine_gold");
     /** Fine gold chased into shape: what gilded gear and jewelry are made from. */
     public static final DeferredItem<StarredItem> GOLD_FITTINGS = starred("gold_fittings");
+    /** Goldsmithing's part for forged staves and wands (DD-92): gold fittings set with amethyst. */
+    public static final DeferredItem<StarredItem> ARCANE_FOCUS = starred("arcane_focus");
     public static final DeferredItem<JewelryItem> GOLD_RING = ModRegistries.ITEMS.registerItem("gold_ring",
             properties -> new JewelryItem(properties, JewelryItem.Kind.RING), new Item.Properties());
     public static final DeferredItem<JewelryItem> GOLD_AMULET = ModRegistries.ITEMS.registerItem("gold_amulet",
@@ -214,6 +216,6 @@ public final class Crafts {
                 WHEAT_SIZING, SILK_SIZING, ARCANE_SIZING, SPIDER_SILK, ARCANE_DUST, CLOTH_PANEL, BOWSTRING, STAFF_WRAP, WOOD_LATHE_ITEM,
                 TREADLE_LATHE_ITEM, BOWYERS_BENCH_ITEM, SEASONED_BILLET, CURED_BILLET, STAVE, STOCK, HAFT, STAFF_SHAFT, WAND_CORE, BOW_LIMBS,
                 LINSEED_OIL, HEARTWOOD_RESIN, SYLVAN_SAP, CRUCIBLE_ITEM, GREAT_CRUCIBLE_ITEM, JEWELERS_BENCH_ITEM, JEWELERS_LOUPE_ITEM, BONE_ASH,
-                ASSAY_SALT, SUNSALT, FINE_GOLD, GOLD_FITTINGS, GOLD_RING, GOLD_AMULET);
+                ASSAY_SALT, SUNSALT, FINE_GOLD, GOLD_FITTINGS, ARCANE_FOCUS, GOLD_RING, GOLD_AMULET);
     }
 }

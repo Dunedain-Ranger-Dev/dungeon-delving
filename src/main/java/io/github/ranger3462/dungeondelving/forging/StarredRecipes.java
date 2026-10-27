@@ -55,6 +55,55 @@ public final class StarredRecipes {
         return result;
     }
 
+    /**
+     * Fits straps to a forged sword or axe as a grip (DD-92): the weapon keeps everything (its ★, wear and enchantments)
+     * and gains {@link Forging#GRIP} at the straps' ★. One grip per weapon.
+     */
+    public static class Grip extends net.minecraft.world.item.crafting.CustomRecipe {
+        public Grip(CraftingBookCategory category) {
+            super(category);
+        }
+
+        @Override
+        public boolean matches(CraftingInput input, net.minecraft.world.level.Level level) {
+            return !assemble(input, level.registryAccess()).isEmpty();
+        }
+
+        @Override
+        public ItemStack assemble(CraftingInput input, HolderLookup.Provider registries) {
+            ItemStack weapon = ItemStack.EMPTY;
+            ItemStack straps = ItemStack.EMPTY;
+            for (ItemStack stack : input.items()) {
+                if (stack.isEmpty()) {
+                    continue;
+                }
+                if (ForgedGear.takesGrip(stack) && weapon.isEmpty()) {
+                    weapon = stack;
+                } else if (stack.is(Crafts.STRAPS.get()) && straps.isEmpty()) {
+                    straps = stack;
+                } else {
+                    return ItemStack.EMPTY;
+                }
+            }
+            if (weapon.isEmpty() || straps.isEmpty()) {
+                return ItemStack.EMPTY;
+            }
+            ItemStack gripped = weapon.copyWithCount(1);
+            gripped.set(Forging.GRIP.get(), Forging.stars(straps));
+            return gripped;
+        }
+
+        @Override
+        public boolean canCraftInDimensions(int width, int height) {
+            return width * height >= 2;
+        }
+
+        @Override
+        public RecipeSerializer<?> getSerializer() {
+            return Forging.WEAPON_GRIP.get();
+        }
+    }
+
     public static class Shaped extends ShapedRecipe {
         public Shaped(String group, CraftingBookCategory category, ShapedRecipePattern pattern, ItemStack result, boolean showNotification) {
             super(group, category, pattern, result, showNotification);

@@ -37,6 +37,9 @@ public final class CraftingXp {
                 case GILDED -> CraftSkill.GOLDSMITHING;
             };
         }
+        if (gear.getItem() instanceof ForgedGear.Staff || gear.getItem() instanceof ForgedGear.Wand) {
+            return CraftSkill.WOODWORKING;
+        }
         return ForgedGear.isGilded(gear) || gear.getItem() instanceof JewelryItem ? CraftSkill.GOLDSMITHING : CraftSkill.WEAPONSMITHING;
     }
 
@@ -51,6 +54,8 @@ public final class CraftingXp {
             return Optional.of(CraftSkill.ARMORSMITHING);
         } else if (Forging.isWeaponPart(crafted)) {
             return Optional.of(CraftSkill.WEAPONSMITHING);
+        } else if (crafted.is(Crafts.ARCANE_FOCUS.get())) {
+            return Optional.of(CraftSkill.GOLDSMITHING);
         }
         return Optional.empty();
     }
@@ -72,6 +77,8 @@ public final class CraftingXp {
         } else if (crafted.has(Forging.STARS.get()) && (crafted.is(net.minecraft.world.item.Items.BOW) || crafted.is(net.minecraft.world.item.Items.CROSSBOW))) {
             // A bow or crossbow from parts (the plain recipes give no stars).
             CraftingSkills.addXp(event.getEntity(), CraftSkill.WOODWORKING, GEAR_XP_PER_STAR * stars);
+        } else if (crafted.is(Crafts.ARCANE_FOCUS.get())) {
+            CraftingSkills.addXp(event.getEntity(), CraftSkill.GOLDSMITHING, PART_XP_PER_STAR * stars);
         } else if (crafted.is(Crafts.STOCK.get())) {
             CraftingSkills.addXp(event.getEntity(), CraftSkill.WOODWORKING, MATERIAL_XP);
         }

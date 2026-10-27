@@ -47,6 +47,9 @@ public final class Forging {
     /** A tempered piece's ★, or on hot and quenched metal, the ★ it's being worked towards. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> STARS = ModRegistries.COMPONENTS.registerComponentType("stars",
             builder -> builder.persistent(Codec.intRange(1, MAX_STARS)).networkSynchronized(ByteBufCodecs.VAR_INT));
+    /** A forged weapon's strapped grip (DD-92): the ★ of the straps fitted to it, for a little attack speed. */
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GRIP = ModRegistries.COMPONENTS.registerComponentType("grip",
+            builder -> builder.persistent(Codec.intRange(1, MAX_STARS)).networkSynchronized(ByteBufCodecs.VAR_INT));
     /** The game time hot metal started cooling. Missing until it first leaves the furnace. */
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> HEATED_AT = ModRegistries.COMPONENTS.registerComponentType("heated_at",
             builder -> builder.persistent(Codec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG));
@@ -172,6 +175,11 @@ public final class Forging {
     /** Goldsmithing's sword: gold fittings over a stick. */
     public static final DeferredItem<ForgedGear.Sword> GILDED_SWORD = ModRegistries.ITEMS.registerItem("gilded_sword",
             properties -> new ForgedGear.Sword(net.minecraft.world.item.Tiers.GOLD, properties), new Item.Properties());
+    /** Woodworking's caster gear (DD-92): a staff (shaft, wrap, focus) and a wand (core, focus). */
+    public static final DeferredItem<ForgedGear.Staff> FORGED_STAFF = ModRegistries.ITEMS.registerItem("forged_staff", ForgedGear.Staff::new,
+            new Item.Properties());
+    public static final DeferredItem<ForgedGear.Wand> FORGED_WAND = ModRegistries.ITEMS.registerItem("forged_wand", ForgedGear.Wand::new,
+            new Item.Properties());
 
     private static DeferredItem<FluxItem> flux(String name, int maxStars) {
         return ModRegistries.ITEMS.registerItem(name, properties -> new FluxItem(properties, maxStars), new Item.Properties());
@@ -197,6 +205,8 @@ public final class Forging {
         gear.add(FORGED_SWORD.get());
         gear.add(FORGED_AXE.get());
         gear.add(GILDED_SWORD.get());
+        gear.add(FORGED_STAFF.get());
+        gear.add(FORGED_WAND.get());
         return gear;
     }
 
@@ -210,6 +220,8 @@ public final class Forging {
             SERIALIZERS.register("starred_shapeless", StarredRecipes.ShapelessSerializer::new);
     public static final DeferredHolder<RecipeSerializer<?>, StarredRecipes.SmithingSerializer> STARRED_SMITHING =
             SERIALIZERS.register("starred_smithing", StarredRecipes.SmithingSerializer::new);
+    public static final DeferredHolder<RecipeSerializer<?>, net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer<StarredRecipes.Grip>> WEAPON_GRIP =
+            SERIALIZERS.register("weapon_grip", () -> new net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer<>(StarredRecipes.Grip::new));
     public static final DeferredHolder<RecipeSerializer<?>, RecipeSerializer<HeatingRecipe.Blasting>> HEATING_BLASTING =
             SERIALIZERS.register("heating_blasting", () -> HeatingRecipe.serializer(HeatingRecipe.Blasting::new, 50));
 

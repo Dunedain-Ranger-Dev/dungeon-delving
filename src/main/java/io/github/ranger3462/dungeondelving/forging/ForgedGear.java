@@ -62,6 +62,15 @@ public final class ForgedGear {
     /** A forged sword's attack damage, by ★ (iron is 6, diamond 7, netherite 8). The axe hits 2 harder, slower. */
     public static final double[] SWORD_DAMAGE = { 6.5, 6.8, 7.1, 7.5, 7.9, 8.2, 8.6 };
     public static final int[] WEAPON_DURABILITY = { 400, 700, 1000, 1400, 1800, 2100, 2400 };
+    /** A forged staff's melee damage by ★ (a quarterstaff: under a sword), and with Iron's Spells its spell power and mana. */
+    public static final double[] STAFF_DAMAGE = { 4.0, 4.3, 4.6, 5.0, 5.3, 5.6, 6.0 };
+    public static final double STAFF_SPELL_POWER_PER_STAR = 0.05;
+    public static final double STAFF_MANA_PER_STAR = 25;
+    /** A forged wand's spell power, cooldown and cast time cuts per ★ (with Iron's Spells): less power than a staff, quicker casting. */
+    public static final double WAND_SPELL_POWER_PER_STAR = 0.03;
+    public static final double WAND_QUICKNESS_PER_STAR = 0.03;
+    /** A strapped grip's attack speed per ★ of its straps. */
+    public static final double GRIP_SPEED_PER_STAR = 0.04;
     /** Heavy armor slows you this much per piece (a full set: 5%). */
     public static final double HEAVY_SLOW = -0.0125;
 
@@ -112,8 +121,10 @@ public final class ForgedGear {
         int stars = Forging.stars(stack);
         if (stack.getItem() instanceof Armor armor) {
             stack.set(DataComponents.MAX_DAMAGE, armorDurability(armor.getType(), stars));
-        } else if (stack.getItem() instanceof Sword || stack.getItem() instanceof Axe) {
+        } else if (stack.getItem() instanceof Sword || stack.getItem() instanceof Axe || stack.getItem() instanceof Staff) {
             stack.set(DataComponents.MAX_DAMAGE, WEAPON_DURABILITY[index(stars)]);
+        } else if (stack.getItem() instanceof Wand) {
+            return; // Never used up.
         } else {
             Quality.applyDurability(stack);
         }
@@ -150,7 +161,13 @@ public final class ForgedGear {
     }
 
     public static boolean isGear(ItemStack stack) {
-        return stack.getItem() instanceof Armor || stack.getItem() instanceof Sword || stack.getItem() instanceof Axe;
+        return stack.getItem() instanceof Armor || stack.getItem() instanceof Sword || stack.getItem() instanceof Axe
+                || stack.getItem() instanceof Staff || stack.getItem() instanceof Wand;
+    }
+
+    /** Whether straps can be fitted to it as a grip ({@link Forging#GRIP}): a forged sword or axe that hasn't one yet. */
+    public static boolean takesGrip(ItemStack stack) {
+        return (stack.getItem() instanceof Sword || stack.getItem() instanceof Axe) && !stack.has(Forging.GRIP.get());
     }
 
     /** Whether {@code repair} can repair {@code gear}: a tempered ingot of the same ★ or better. */
@@ -230,7 +247,12 @@ public final class ForgedGear {
 
         @Override
         public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
-            return weapon(SWORD_DAMAGE[index(Forging.stars(stack))], -2.4);
+            return weapon(SWORD_DAMAGE[index(Forging.stars(stack))], -2.4 + gripSpeed(stack));
+        }
+
+        @Override
+        public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+            gripText(stack, tooltip);
         }
 
         @Override
@@ -252,7 +274,12 @@ public final class ForgedGear {
 
         @Override
         public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
-            return weapon(SWORD_DAMAGE[index(Forging.stars(stack))] + 2.0, -3.0);
+            return weapon(SWORD_DAMAGE[index(Forging.stars(stack))] + 2.0, -3.0 + gripSpeed(stack));
+        }
+
+        @Override
+        public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, net.minecraft.world.item.TooltipFlag flag) {
+            gripText(stack, tooltip);
         }
 
         @Override
@@ -266,14 +293,99 @@ public final class ForgedGear {
         }
     }
 
+    /** The attack speed a weapon's strapped grip adds: by its straps' ★. */
+    static double gripSpeed(ItemStack stack) {
+        Integer grip = stack.get(Forging.GRIP.get());
+        return grip == null ? 0.0 : Math.round(grip * GRIP_SPEED_PER_STAR * 100.0) / 100.0;
+    }
+
+    private static void gripText(ItemStack stack, List<Component> tooltip) {
+        Integer grip = stack.get(Forging.GRIP.get());
+        if (grip != null) {
+            tooltip.add(Component.literal("Strapped grip ").append(StarredItem.starsText(grip)).withStyle(net.minecraft.ChatFormatting.GRAY));
+        }
+    }
+
+    /**
+     * The forged staff: shaft, wrap and an arcane focus. A quarterstaff in melee; with Iron's Spells, held in the main
+     * hand, it adds spell power and mana by its ★, as Iron's own staves do.
+     */
+    public static class Staff extends SwordItem {
+        public Staff(Item.Properties properties) {
+            super(Tiers.WOOD, properties.durability(WEAPON_DURABILITY[0]));
+        }
+
+        @Override
+        public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
+            int stars = index(Forging.stars(stack)) + 1;
+            ItemAttributeModifiers.Builder builder = weaponBuilder(STAFF_DAMAGE[stars - 1], -3.0);
+            ResourceLocation id = DungeonDelving.id("forged_staff");
+            ironsAttribute("spell_power").ifPresent(attribute -> builder.add(attribute,
+                    new AttributeModifier(id, STAFF_SPELL_POWER_PER_STAR * stars, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.MAINHAND));
+            ironsAttribute("max_mana").ifPresent(attribute -> builder.add(attribute,
+                    new AttributeModifier(id, STAFF_MANA_PER_STAR * stars, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND));
+            return builder.build();
+        }
+
+        @Override
+        public boolean isValidRepairItem(ItemStack gear, ItemStack repair) {
+            return repair.is(Crafts.STAFF_SHAFT.get()) && Forging.stars(repair) >= Forging.stars(gear);
+        }
+
+        @Override
+        public Component getName(ItemStack stack) {
+            return nameWithStars(super.getName(stack), stack);
+        }
+    }
+
+    /** The forged wand: a wand core and an arcane focus. No weapon; with Iron's Spells it casts quicker and a little stronger. */
+    public static class Wand extends Item {
+        public Wand(Item.Properties properties) {
+            super(properties.stacksTo(1));
+        }
+
+        @Override
+        public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
+            int stars = index(Forging.stars(stack)) + 1;
+            ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.builder();
+            ResourceLocation id = DungeonDelving.id("forged_wand");
+            ironsAttribute("spell_power").ifPresent(attribute -> builder.add(attribute,
+                    new AttributeModifier(id, WAND_SPELL_POWER_PER_STAR * stars, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.MAINHAND));
+            for (String quickness : List.of("cooldown_reduction", "cast_time_reduction")) {
+                ironsAttribute(quickness).ifPresent(attribute -> builder.add(attribute, new AttributeModifier(DungeonDelving.id("forged_wand." + quickness),
+                        WAND_QUICKNESS_PER_STAR * stars, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.MAINHAND));
+            }
+            return builder.build();
+        }
+
+        @Override
+        public ItemAttributeModifiers getDefaultAttributeModifiers() {
+            return ItemAttributeModifiers.EMPTY; // Always read per stack, above.
+        }
+
+        @Override
+        public Component getName(ItemStack stack) {
+            return nameWithStars(super.getName(stack), stack);
+        }
+    }
+
+    /** One of Iron's Spells' attributes, when it's installed. */
+    static java.util.Optional<Holder<net.minecraft.world.entity.ai.attributes.Attribute>> ironsAttribute(String name) {
+        return net.minecraft.core.registries.BuiltInRegistries.ATTRIBUTE.getHolder(ResourceLocation.fromNamespaceAndPath("irons_spellbooks", name))
+                .map(holder -> holder);
+    }
+
     /** Attack damage (counting the player's own 1) and speed modifiers, like vanilla weapons'. */
     private static ItemAttributeModifiers weapon(double damage, double speed) {
+        return weaponBuilder(damage, speed).build();
+    }
+
+    private static ItemAttributeModifiers.Builder weaponBuilder(double damage, double speed) {
         return ItemAttributeModifiers.builder()
                 .add(Attributes.ATTACK_DAMAGE, new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, damage - 1.0, AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.MAINHAND)
                 .add(Attributes.ATTACK_SPEED, new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, speed, AttributeModifier.Operation.ADD_VALUE),
-                        EquipmentSlotGroup.MAINHAND)
-                .build();
+                        EquipmentSlotGroup.MAINHAND);
     }
 
     private static double round(double value) {

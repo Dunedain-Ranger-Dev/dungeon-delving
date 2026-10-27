@@ -162,7 +162,7 @@ public class ProfessionTests {
         var recipes = helper.getLevel().getRecipeManager();
         for (String id : List.of("seasoned_billet", "bow_from_parts", "crossbow_from_parts", "straps", "hardened_leather", "leather_base",
                 "gambeson_base", "bowstring", "staff_wrap", "stock", "bow_limbs", "haft", "staff_shaft", "wand_core", "shaping_rack", "spinning_wheel",
-                "wood_lathe")) {
+                "wood_lathe", "arcane_focus", "forged_staff", "forged_wand", "weapon_grip")) {
             helper.assertTrue(recipes.byKey(DungeonDelving.id(id)).isPresent(), "the " + id + " recipe loads");
         }
         if (net.neoforged.fml.ModList.get().isLoaded("farmersdelight")) {

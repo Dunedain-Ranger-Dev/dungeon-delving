@@ -9,6 +9,17 @@
       "recipe": "dungeondelving:forged_sword",
       "recipe2": "dungeondelving:forged_axe",
       "text": "Two plates over a stick."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "dungeondelving:forged_staff",
+      "recipe2": "dungeondelving:forged_wand",
+      "text": "An arcane focus (gold fittings set with amethyst) on a wrapped shaft makes a staff, or on a wand core a wand. A staff adds spell power and mana; a wand casts quicker. Both by their $(#d4a017)★$()."
+    },
+    {
+      "type": "patchouli:text",
+      "title": "Grips",
+      "text": "Craft straps with a forged sword or axe to fit a strapped grip: the weapon keeps its $(#d4a017)★$(), wear and enchantments, and swings a little faster for the straps' $(#d4a017)★$(). One grip per weapon."
     }
   ]
 }

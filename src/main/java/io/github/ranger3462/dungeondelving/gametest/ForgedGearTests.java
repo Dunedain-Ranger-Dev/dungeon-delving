@@ -205,6 +205,46 @@ public class ForgedGearTests {
         return stack;
     }
 
+    /** DD-92: staves and wands from their parts (★ the lowest part's), Iron's Spells stats by ★, and straps fitted as a grip. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void stavesWandsAndGripsAreMadeFromTheirParts(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        ItemStack focus = craft(level, ItemStack.EMPTY, new ItemStack(Items.AMETHYST_SHARD), ItemStack.EMPTY, new ItemStack(Items.AMETHYST_SHARD),
+                part(io.github.ranger3462.dungeondelving.forging.Crafts.GOLD_FITTINGS.get(), 5), new ItemStack(Items.AMETHYST_SHARD), ItemStack.EMPTY,
+                new ItemStack(Items.AMETHYST_SHARD));
+        helper.assertTrue(focus.is(io.github.ranger3462.dungeondelving.forging.Crafts.ARCANE_FOCUS.get()) && Forging.stars(focus) == 5,
+                "gold fittings set with amethyst make a ★5 focus: " + focus);
+        ItemStack staff = craft(level, part(io.github.ranger3462.dungeondelving.forging.Crafts.ARCANE_FOCUS.get(), 3), ItemStack.EMPTY, ItemStack.EMPTY,
+                part(io.github.ranger3462.dungeondelving.forging.Crafts.STAFF_WRAP.get(), 5), ItemStack.EMPTY, ItemStack.EMPTY,
+                part(io.github.ranger3462.dungeondelving.forging.Crafts.STAFF_SHAFT.get(), 4));
+        helper.assertTrue(staff.is(Forging.FORGED_STAFF.get()) && Forging.stars(staff) == 3 && staff.getMaxDamage() == ForgedGear.WEAPON_DURABILITY[2],
+                "focus, wrap and shaft make a staff of the lowest part's ★: " + staff);
+        ItemStack wand = craft(level, part(io.github.ranger3462.dungeondelving.forging.Crafts.ARCANE_FOCUS.get(), 6), ItemStack.EMPTY, ItemStack.EMPTY,
+                part(io.github.ranger3462.dungeondelving.forging.Crafts.WAND_CORE.get(), 6));
+        helper.assertTrue(wand.is(Forging.FORGED_WAND.get()) && Forging.stars(wand) == 6, "focus and core make a wand: " + wand);
+        helper.assertTrue(CraftingXp.skillFor(staff) == CraftSkill.WOODWORKING, "staves and wands are Woodworking's");
+        if (net.neoforged.fml.ModList.get().isLoaded("irons_spellbooks")) {
+            double power = staff.getAttributeModifiers().modifiers().stream()
+                    .filter(entry -> entry.attribute().is(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "spell_power")))
+                    .mapToDouble(entry -> entry.modifier().amount()).sum();
+            helper.assertTrue(Math.abs(power - 3 * ForgedGear.STAFF_SPELL_POWER_PER_STAR) < 1e-6, "a ★3 staff adds 15% spell power: " + power);
+            helper.assertTrue(wand.getAttributeModifiers().modifiers().stream()
+                    .anyMatch(entry -> entry.attribute().is(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "cooldown_reduction"))),
+                    "a wand cuts cooldowns");
+        }
+
+        ItemStack sword = starred(Forging.FORGED_SWORD.get(), 4);
+        sword.setDamageValue(50);
+        ItemStack gripped = craft(level, sword, part(io.github.ranger3462.dungeondelving.forging.Crafts.STRAPS.get(), 2));
+        helper.assertTrue(gripped.is(Forging.FORGED_SWORD.get()) && Forging.stars(gripped) == 4 && gripped.get(Forging.GRIP.get()) == 2
+                && gripped.getDamageValue() == 50, "straps fit a grip of their ★, and the sword keeps its own ★ and wear: " + gripped);
+        double speed = gripped.getAttributeModifiers().modifiers().stream().filter(entry -> entry.attribute().equals(Attributes.ATTACK_SPEED))
+                .mapToDouble(entry -> entry.modifier().amount()).sum();
+        helper.assertTrue(Math.abs(speed - (-2.4 + 2 * ForgedGear.GRIP_SPEED_PER_STAR)) < 1e-6, "and swings a little faster: " + speed);
+        helper.assertTrue(craft(level, gripped, part(io.github.ranger3462.dungeondelving.forging.Crafts.STRAPS.get(), 5)).isEmpty(), "one grip per weapon");
+        helper.succeed();
+    }
+
     private static ItemStack starred(Item item, int stars) {
         ItemStack stack = part(item, stars);
         ForgedGear.applyStats(stack);
