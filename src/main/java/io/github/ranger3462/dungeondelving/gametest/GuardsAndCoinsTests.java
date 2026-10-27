@@ -87,17 +87,33 @@ public class GuardsAndCoinsTests {
         com.google.gson.JsonObject edited = new com.google.gson.JsonObject();
         edited.addProperty("unit_sell", 999);
         world.add("dungeondelving:thraggite_ingot", edited);
+        com.google.gson.JsonObject placeholder = new com.google.gson.JsonObject();
+        placeholder.addProperty("unit_buy", 0);
+        placeholder.addProperty("unit_sell", 0);
+        world.add("dungeondelving:barrow_iron_ingot", placeholder);
         com.google.gson.JsonObject ours = new com.google.gson.JsonObject();
-        ours.add("dungeondelving:thraggite_ingot", new com.google.gson.JsonObject());
-        ours.add("dungeondelving:raw_thraggite", new com.google.gson.JsonObject());
-        int added = io.github.ranger3462.dungeondelving.integration.economycraft.EconomyCraftPrices.merge(world, ours);
-        helper.assertTrue(added == 1 && world.getAsJsonObject("dungeondelving:thraggite_ingot").get("unit_sell").getAsInt() == 999,
-                "only missing prices are added; an admin's edit stays");
+        com.google.gson.JsonObject price = new com.google.gson.JsonObject();
+        price.addProperty("unit_buy", 0);
+        price.addProperty("unit_sell", 7);
+        ours.add("dungeondelving:thraggite_ingot", price);
+        ours.add("dungeondelving:raw_thraggite", price);
+        ours.add("dungeondelving:barrow_iron_ingot", price);
+        java.util.Set<String> filled = new java.util.HashSet<>();
+        int added = io.github.ranger3462.dungeondelving.integration.economycraft.EconomyCraftPrices.merge(world, ours, filled);
+        helper.assertTrue(added == 2 && world.getAsJsonObject("dungeondelving:thraggite_ingot").get("unit_sell").getAsInt() == 999,
+                "missing prices are added; an admin's edit stays");
+        helper.assertTrue(world.getAsJsonObject("dungeondelving:barrow_iron_ingot").get("unit_sell").getAsInt() == 7,
+                "EconomyCraft's price-0 placeholders are filled in");
+        world.getAsJsonObject("dungeondelving:barrow_iron_ingot").addProperty("unit_sell", 0);
+        helper.assertTrue(io.github.ranger3462.dungeondelving.integration.economycraft.EconomyCraftPrices.merge(world, ours, filled) == 0,
+                "but only once: an admin zeroing a price later keeps it zeroed");
         try {
             java.nio.file.Path file = com.reazip.economycraft.util.EconomyPaths.configDir(helper.getLevel().getServer()).resolve("prices.json");
             String text = java.nio.file.Files.readString(file);
-            helper.assertTrue(text.contains("\"dungeondelving:thailite_ingot\"") && text.contains("\"dungeondelving:goblin_chief_staff\""),
-                    "the world's price list has our dungeon loot");
+            com.google.gson.JsonObject prices = com.google.gson.JsonParser.parseString(text).getAsJsonObject();
+            helper.assertTrue(prices.has("dungeondelving:thailite_ingot") && prices.has("dungeondelving:goblin_chief_staff")
+                    && prices.getAsJsonObject("dungeondelving:thailite_ingot").get("unit_sell").getAsLong() > 0,
+                    "the world's price list sells our dungeon loot");
         } catch (java.io.IOException e) {
             helper.fail("couldn't read EconomyCraft's prices: " + e);
         }

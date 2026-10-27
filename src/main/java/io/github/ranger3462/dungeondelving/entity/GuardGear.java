@@ -10,27 +10,34 @@ import net.minecraft.world.item.Items;
 
 /**
  * The armor town guards wear, by role and gear tier (0 to 3, from {@link TownGuard#gearTier}). With the pack's RPG class
- * mods installed, each role wears its class's sets: swordsmen the warrior line (Rogues & Warriors), crossbowmen the
- * archer line (Archers), battlemages the wizard line (Wizards); tiers 0-1 the first set, 2 the second, 3 its netherite
- * version. Without them, vanilla armor: leather, chainmail, iron, diamond (battlemages always leather robes).
+ * mods installed, each role wears its class's sets: swordsmen the paladin line (Paladins & Priests), crossbowmen the
+ * archer line (Archers); tiers 0-1 the first set, 2 the second, 3 its netherite version. Battlemages wear Iron's Spells'
+ * own mage armor (wandering magician, archevoker, netherite mage), since their renderer can't draw the Wizards robes.
+ * Without them, vanilla armor: leather, chainmail, iron, diamond (battlemages always leather robes).
  */
 public final class GuardGear {
     /** A guard's role, and the RPG sets it wears, worst to best. */
     public enum Role {
-        SWORD("rogues", "warrior_armor", "berserker_armor", "netherite_berserker_armor"),
-        CROSSBOW("archers", "archer_armor", "ranger_armor", "netherite_ranger_armor"),
-        MAGE("wizards", "wizard_robe", "arcane_robe", "netherite_arcane_robe");
+        SWORD("paladins", Pieces.RPG, "paladin_armor", "crusader_armor", "netherite_crusader_armor"),
+        CROSSBOW("archers", Pieces.RPG, "archer_armor", "ranger_armor", "netherite_ranger_armor"),
+        MAGE("irons_spellbooks", Pieces.IRONS, "wandering_magician", "archevoker", "netherite_mage");
 
         final String namespace;
+        final String[] pieces;
         final String[] sets;
 
-        Role(String namespace, String... sets) {
+        Role(String namespace, String[] pieces, String... sets) {
             this.namespace = namespace;
+            this.pieces = pieces;
             this.sets = sets;
         }
     }
 
-    private static final String[] PIECES = { "head", "chest", "legs", "feet" };
+    /** How each mod names head, chest, legs and feet. */
+    private static final class Pieces {
+        static final String[] RPG = { "head", "chest", "legs", "feet" };
+        static final String[] IRONS = { "helmet", "chestplate", "leggings", "boots" };
+    }
     private static final Item[][] VANILLA = {
             { Items.LEATHER_HELMET, Items.LEATHER_CHESTPLATE, Items.LEATHER_LEGGINGS, Items.LEATHER_BOOTS },
             { Items.CHAINMAIL_HELMET, Items.CHAINMAIL_CHESTPLATE, Items.CHAINMAIL_LEGGINGS, Items.CHAINMAIL_BOOTS },
@@ -53,9 +60,9 @@ public final class GuardGear {
     /** The role's RPG set for a gear tier, if its mod is installed. */
     public static Optional<Item[]> rpgSet(Role role, int gear) {
         String set = role.sets[gear <= 1 ? 0 : gear == 2 ? 1 : 2];
-        Item[] items = new Item[PIECES.length];
-        for (int i = 0; i < PIECES.length; i++) {
-            Optional<Item> item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.fromNamespaceAndPath(role.namespace, set + "_" + PIECES[i]));
+        Item[] items = new Item[role.pieces.length];
+        for (int i = 0; i < role.pieces.length; i++) {
+            Optional<Item> item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.fromNamespaceAndPath(role.namespace, set + "_" + role.pieces[i]));
             if (item.isEmpty()) {
                 return Optional.empty();
             }
