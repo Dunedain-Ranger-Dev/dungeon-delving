@@ -250,7 +250,8 @@ dependencies {
         localRuntime "curse.maven:lootr-361276:8968561"                 // 1.21.1-1.11.38.127
         // Sophisticated Backpacks, for storage
         localRuntime "curse.maven:sophisticated-backpacks-422301:9154769" // 1.21.1-3.26.12.2208
-        localRuntime "curse.maven:sophisticated-core-618298:9201381"    // 1.21.1-1.5.13.2404
+        localRuntime "curse.maven:sophisticated-core-618298:9341397"    // 1.21.1-1.5.19.2434
+        localRuntime "curse.maven:sophisticated-storage-619320:9341485" // 1.21.1-1.6.10.2206
         // Inventory quick-moves: Mouse Tweaks (shift-drag over slots) and Inventory Essentials (move all, sorting)
         localRuntime "curse.maven:mouse-tweaks-60089:5637846"          // 1.21-2.26.1-neoforge
         localRuntime "curse.maven:inventory-essentials-368825:9035078"  // 21.1.20+neoforge-1.21.1
@@ -324,6 +325,21 @@ dependencies {
         // Land claims (on trial, for the realm), and EconomyCraft: balances, a server shop for selling loot, auctions
         localRuntime "curse.maven:ftb-chunks-forge-314906:8791113"  // 2101.1.22
         localRuntime "curse.maven:economycraft-mp-1321557:9212860"  // 1.11.0
+        // Building and travel: connected glass, lanterns on walls, waystones
+        localRuntime "curse.maven:connected-glass-383129:6811960"            // 1.1.14
+        localRuntime "curse.maven:supermartijn642s-core-lib-454372:9083552"  // 1.1.25
+        localRuntime "curse.maven:fusion-connected-textures-854949:9070353"  // 1.3.16
+        localRuntime "curse.maven:lanterns-bow-596474:8915454"               // 3.3
+        localRuntime "curse.maven:waystones-245755:8969751"                  // 21.1.46
+        // Entity Model/Texture Features, to run the Fresh Animations resource pack
+        localRuntime "curse.maven:entity-model-features-844662:9188526"      // 3.3.12
+        localRuntime "curse.maven:entity-texture-features-fabric-568563:9188408" // 7.2.6
+        // Frame rate and memory (on trial)
+        localRuntime "curse.maven:sodium-394468:8756580"                     // 0.8.13
+        localRuntime "curse.maven:ferritecore-429235:7524151"                // 7.0.3
+        localRuntime "curse.maven:modernfix-790626:9309399"                  // 5.27.27
+        localRuntime "curse.maven:immediatelyfast-686911:9165518"            // 1.6.15
+        localRuntime "curse.maven:entityculling-448233:9100286"              // 1.11.3
     }
 
     // For more info:
