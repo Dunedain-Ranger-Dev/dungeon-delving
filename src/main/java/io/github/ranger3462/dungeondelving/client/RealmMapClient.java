@@ -18,7 +18,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 /** The realm as last sent by the server (realm.RealmMap), for the realm menu and FTB Chunks' map. */
 public final class RealmMapClient {
     public record Node(String id, String name, String type, String owner, String kind, String dim, int x, int y, int z, Map<String, Integer> stats,
-            List<String> warnings, List<String> notes) {
+            List<String> warnings, List<String> notes, List<Fact> facts) {
         public int stat(String stat) {
             return stats.getOrDefault(stat, 0);
         }
@@ -32,12 +32,19 @@ public final class RealmMapClient {
         }
     }
 
-    public record Nation(String id, int military, int strongholds, int towns, boolean pushedBack) {}
+    /** A line of a place's stats: "Defense: 34", and what it means. */
+    public record Fact(String label, String value, String hint) {}
+
+    public record Nation(String id, int military, int strongholds, int towns, boolean pushedBack, String name, String leader, String champion,
+            String capital, String about, boolean marching) {}
+
+    /** A realm log entry: its kind is one of Realm.LogKind's names. */
+    public record Entry(int turn, String text, boolean news, String kind, String who) {}
 
     public record Raid(String nation, String from, String to, long resolveAt) {}
 
-    public record Data(Map<String, Node> nodes, List<String[]> links, Map<String, Integer> kingdom, List<Nation> nations, List<Raid> raids, int turn,
-            long lastTurn, long turnLength, long serverNow, long receivedAt) {
+    public record Data(Map<String, Node> nodes, List<String[]> links, Map<String, Integer> kingdom, List<Nation> nations, List<Raid> raids,
+            List<Entry> log, String kingdomAbout, int turn, long lastTurn, long turnLength, long serverNow, long receivedAt) {
         /** The server's clock now, by how long it's been since this came. */
         public long serverTime() {
             return serverNow + (System.currentTimeMillis() - receivedAt);
@@ -75,7 +82,7 @@ public final class RealmMapClient {
             statTag.getAllKeys().forEach(key -> stats.put(key, statTag.getInt(key)));
             nodes.put(node.getString("id"), new Node(node.getString("id"), node.getString("name"), node.getString("type"), node.getString("owner"),
                     node.getString("kind"), node.getString("dim"), node.getInt("x"), node.getInt("y"), node.getInt("z"), stats,
-                    strings(node, "warnings"), strings(node, "notes")));
+                    strings(node, "warnings"), strings(node, "notes"), facts(node)));
         }
         List<String[]> links = new ArrayList<>();
         for (Tag entry : tag.getList("links", Tag.TAG_COMPOUND)) {
@@ -88,17 +95,32 @@ public final class RealmMapClient {
         for (Tag entry : tag.getList("nations", Tag.TAG_COMPOUND)) {
             CompoundTag nation = (CompoundTag) entry;
             nations.add(new Nation(nation.getString("id"), nation.getInt("military"), nation.getInt("strongholds"), nation.getInt("towns"),
-                    nation.getBoolean("pushedBack")));
+                    nation.getBoolean("pushedBack"), nation.getString("name"), nation.getString("leader"), nation.getString("champion"),
+                    nation.getString("capital"), nation.getString("about"), nation.getBoolean("marching")));
         }
         List<Raid> raids = new ArrayList<>();
         for (Tag entry : tag.getList("raids", Tag.TAG_COMPOUND)) {
             CompoundTag raid = (CompoundTag) entry;
             raids.add(new Raid(raid.getString("nation"), raid.getString("from"), raid.getString("to"), raid.getLong("resolveAt")));
         }
-        latest = new Data(nodes, links, kingdom, nations, raids, tag.getInt("turn"), tag.getLong("lastTurn"), tag.getLong("turnLength"),
+        List<Entry> log = new ArrayList<>();
+        for (Tag entry : tag.getList("log", Tag.TAG_COMPOUND)) {
+            CompoundTag logged = (CompoundTag) entry;
+            log.add(new Entry(logged.getInt("turn"), logged.getString("text"), logged.getBoolean("news"), logged.getString("kind"), logged.getString("who")));
+        }
+        latest = new Data(nodes, links, kingdom, nations, raids, log, tag.getString("kingdomAbout"), tag.getInt("turn"), tag.getLong("lastTurn"), tag.getLong("turnLength"),
                 tag.getLong("now"), System.currentTimeMillis());
         waypointsPending = true;
         updateWaypoints();
+    }
+
+    private static List<Fact> facts(CompoundTag node) {
+        List<Fact> facts = new ArrayList<>();
+        for (Tag entry : node.getList("facts", Tag.TAG_COMPOUND)) {
+            CompoundTag fact = (CompoundTag) entry;
+            facts.add(new Fact(fact.getString("label"), fact.getString("value"), fact.getString("hint")));
+        }
+        return facts;
     }
 
     private static List<String> strings(CompoundTag tag, String key) {

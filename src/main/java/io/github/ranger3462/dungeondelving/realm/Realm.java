@@ -53,8 +53,27 @@ public final class Realm extends SavedData {
     /** A monster nation's raid on a town, from one of its strongholds, declared on a turn and resolved at dusk ({@code resolveAt}, real time). */
     public record Raid(String nation, String stronghold, String town, int declared, long resolveAt) {}
 
-    /** Something that happened on a turn. News is told to the players too. */
-    public record LogEntry(int turn, String text, boolean news) {}
+    /** What sort of thing a log entry is, for the realm menu's news to colour and filter by. */
+    public enum LogKind {
+        /** Building up, fortifying, mustering: the routine of a turn. */
+        PREPARE,
+        /** A raid or march declared, a rally, a nation falling back. */
+        MARCH,
+        /** A fight and how it went. */
+        BATTLE,
+        /** A place changing hands. */
+        CAPTURE,
+        /** A town growing, rebuilding or falling to ruin. */
+        TOWN,
+        OTHER
+    }
+
+    /** Something that happened on a turn, of a {@code kind}, about a faction ({@code who}, or empty). News is told to the players too. */
+    public record LogEntry(int turn, String text, boolean news, LogKind kind, String who) {
+        public LogEntry(int turn, String text, boolean news) {
+            this(turn, text, news, LogKind.OTHER, "");
+        }
+    }
 
     /** News not yet told to the players (not saved: told once, while the server runs). */
     final List<LogEntry> untold = new ArrayList<>();
@@ -148,11 +167,11 @@ public final class Realm extends SavedData {
         }
         boolean holdable = node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.SITE || node.type == RealmNode.Type.TOWN;
         if (holdable && wasMonsters && node.monsters() && !was.equals(owner)) {
-            news("The " + RealmFactions.get(owner).displayName() + " have taken " + node.name() + " from the " + RealmFactions.get(was).displayName() + ".");
+            news(LogKind.CAPTURE, owner, "The " + RealmFactions.get(owner).displayName() + " have taken " + node.name() + " from the " + RealmFactions.get(was).displayName() + ".");
         } else if (holdable && !wasMonsters && node.monsters()) {
-            news("The " + RealmFactions.get(owner).displayName() + " have taken " + node.name() + ": the land around it grows more dangerous.");
+            news(LogKind.CAPTURE, owner, "The " + RealmFactions.get(owner).displayName() + " have taken " + node.name() + ": the land around it grows more dangerous.");
         } else if (holdable && wasMonsters && !node.monsters()) {
-            news(node.name() + (node.kingdoms() ? " has been taken by the kingdom" : " has been cleared") + ": the land around it calms.");
+            news(LogKind.CAPTURE, owner, node.name() + (node.kingdoms() ? " has been taken by the kingdom" : " has been cleared") + ": the land around it calms.");
         }
         setDirty();
     }
@@ -288,16 +307,24 @@ public final class Realm extends SavedData {
     }
 
     void record(String text) {
-        record(text, false);
+        record(LogKind.OTHER, "", text);
+    }
+
+    void record(LogKind kind, String who, String text) {
+        record(text, false, kind, who);
     }
 
     /** Records something the players should hear about too. */
     void news(String text) {
-        record(text, true);
+        news(LogKind.OTHER, "", text);
     }
 
-    private void record(String text, boolean news) {
-        LogEntry entry = new LogEntry(turn, text, news);
+    void news(LogKind kind, String who, String text) {
+        record(text, true, kind, who);
+    }
+
+    private void record(String text, boolean news, LogKind kind, String who) {
+        LogEntry entry = new LogEntry(turn, text, news, kind, who);
         log.addLast(entry);
         while (log.size() > LOG_SIZE) {
             log.removeFirst();
@@ -353,6 +380,8 @@ public final class Realm extends SavedData {
             entryTag.putInt("turn", entry.turn());
             entryTag.putString("text", entry.text());
             entryTag.putBoolean("news", entry.news());
+            entryTag.putString("kind", entry.kind().name());
+            entryTag.putString("who", entry.who());
             logList.add(entryTag);
         }
         tag.put("log", logList);
@@ -383,9 +412,18 @@ public final class Realm extends SavedData {
         }
         for (Tag entry : tag.getList("log", Tag.TAG_COMPOUND)) {
             CompoundTag logged = (CompoundTag) entry;
-            realm.log.addLast(new LogEntry(logged.getInt("turn"), logged.getString("text"), logged.getBoolean("news")));
+            realm.log.addLast(new LogEntry(logged.getInt("turn"), logged.getString("text"), logged.getBoolean("news"), logKind(logged.getString("kind")),
+                    logged.getString("who")));
         }
         return realm;
+    }
+
+    static LogKind logKind(String name) {
+        try {
+            return LogKind.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return LogKind.OTHER; // Saved before kinds were.
+        }
     }
 
     /** A copy through saving and loading, for tests. */

@@ -15,6 +15,8 @@ import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.realm.Realm;
 import io.github.ranger3462.dungeondelving.realm.RealmNode;
 import io.github.ranger3462.dungeondelving.realm.RealmTurns;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
@@ -499,9 +501,31 @@ public final class RealmCommands {
             Feedback.tell(context.getSource(), "Nothing has happened in the realm yet.");
             return 0;
         }
-        Feedback.tell(context.getSource(), "The realm lately:");
-        log.subList(Math.max(0, log.size() - count), log.size())
-                .forEach(entry -> Feedback.detail(context.getSource(), "Turn " + entry.turn() + ": " + entry.text()));
+        Feedback.tell(context.getSource(), "The realm lately (the N menu's News tab shows it all):");
+        int shownTurn = Integer.MIN_VALUE;
+        for (Realm.LogEntry entry : log.subList(Math.max(0, log.size() - count), log.size())) {
+            if (entry.turn() != shownTurn) {
+                shownTurn = entry.turn();
+                Feedback.send(context.getSource(), Component.literal("Turn " + entry.turn()).withStyle(ChatFormatting.YELLOW));
+            }
+            ChatFormatting color = switch (entry.kind()) {
+                case BATTLE -> ChatFormatting.RED;
+                case CAPTURE -> ChatFormatting.GOLD;
+                case MARCH -> ChatFormatting.LIGHT_PURPLE;
+                case TOWN -> ChatFormatting.GREEN;
+                default -> ChatFormatting.GRAY;
+            };
+            String tag = switch (entry.kind()) {
+                case BATTLE -> "Battle";
+                case CAPTURE -> "Taken";
+                case MARCH -> "March";
+                case TOWN -> "Town";
+                case PREPARE -> "Routine";
+                case OTHER -> "";
+            };
+            Feedback.send(context.getSource(), Component.literal("  " + (tag.isEmpty() ? "" : tag + "  ")).withStyle(color)
+                    .append(Component.literal(entry.text()).withStyle(entry.kind() == Realm.LogKind.PREPARE ? ChatFormatting.DARK_GRAY : ChatFormatting.WHITE)));
+        }
         return log.size();
     }
 

@@ -225,7 +225,7 @@ public final class RealmLiveRaids {
         }
         level.playSound(null, town.pos(), net.minecraft.sounds.SoundEvents.BELL_BLOCK, net.minecraft.sounds.SoundSource.BLOCKS, 2.0f, 1.0f);
         hideVillagers(live);
-        realm.news(town.name() + " is under attack by the " + RealmFactions.get(raid.nation()).displayName() + "! Its guards turn out.");
+        realm.news(Realm.LogKind.BATTLE, raid.nation(), town.name() + " is under attack by the " + RealmFactions.get(raid.nation()).displayName() + "! Its guards turn out.");
         nextWave(realm, live);
         return live;
     }
@@ -254,11 +254,11 @@ public final class RealmLiveRaids {
                 champion.getPersistentData().putString(RAIDER, live.raid.town());
                 live.raiders.add(champion.getUUID());
                 String name = RealmFactions.get(capital.owner()).champion();
-                realm.news((name.isEmpty() ? "The champion of the " + capital.owner() : name + ", champion of the " + RealmFactions.get(capital.owner()).displayName())
+                realm.news(Realm.LogKind.BATTLE, capital.owner(), (name.isEmpty() ? "The champion of the " + capital.owner() : name + ", champion of the " + RealmFactions.get(capital.owner()).displayName())
                         + ", leads the last wave!");
             });
         }
-        realm.news("Wave " + live.wave + " of " + WAVES + " comes for " + realm.node(live.raid.town()).map(RealmNode::name).orElse(live.raid.town()) + ".");
+        realm.news(Realm.LogKind.BATTLE, live.raid.nation(), "Wave " + live.wave + " of " + WAVES + " comes for " + realm.node(live.raid.town()).map(RealmNode::name).orElse(live.raid.town()) + ".");
     }
 
     /**
@@ -312,7 +312,7 @@ public final class RealmLiveRaids {
             if (live.alone >= ALONE_LIMIT) {
                 clear(live);
                 it.remove();
-                realm.news("Everyone left " + realm.node(live.raid.town()).map(RealmNode::name).orElse(live.raid.town()) + "'s fight: it was decided by the odds.");
+                realm.news(Realm.LogKind.BATTLE, live.raid.nation(), "Everyone left " + realm.node(live.raid.town()).map(RealmNode::name).orElse(live.raid.town()) + "'s fight: it was decided by the odds.");
                 RealmRaids.resolve(realm, live.raid, 1 + live.level.getRandom().nextInt(20), 1 + live.level.getRandom().nextInt(20));
             } else if (live.alone > 0) {
                 // No one's there: the fight waits (its mobs may not even be loaded, so they can't be counted).
@@ -342,12 +342,12 @@ public final class RealmLiveRaids {
         if (raidersLeft == 0) {
             scaledAttack = Math.min(scaledAttack, scaledDefense);
         } else if (overrun) {
-            realm.news("The guards of " + realm.node(live.raid.town()).map(RealmNode::name).orElse(live.raid.town()) + " have fallen!");
+            realm.news(Realm.LogKind.BATTLE, live.raid.nation(), "The guards of " + realm.node(live.raid.town()).map(RealmNode::name).orElse(live.raid.town()) + " have fallen!");
             scaledAttack = Math.max(scaledAttack, scaledDefense + 1);
         }
         RealmRaids.decide(realm, live.raid, scaledAttack, scaledDefense, true);
         if (!live.turncoats.isEmpty()) {
-            realm.news(live.turncoats.size() + (live.turncoats.size() == 1 ? " adventurer" : " adventurers") + " fought for the " + live.raid.nation()
+            realm.news(Realm.LogKind.BATTLE, live.raid.nation(), live.turncoats.size() + (live.turncoats.size() == 1 ? " adventurer" : " adventurers") + " fought for the " + live.raid.nation()
                     + ". The kingdom won't forget.");
         }
     }

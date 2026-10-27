@@ -89,7 +89,7 @@ public final class RealmRaids {
             }
             Realm.Raid raid = new Realm.Raid(RealmNode.KINGDOM, from.get().id, targetId, realm.turn, resolveAt);
             realm.raids.add(raid);
-            realm.news(who(realm, raid, from.get()) + " will " + RealmTurns.raidVerb(target.get(), RealmNode.KINGDOM) + " at dusk!");
+            realm.news(Realm.LogKind.MARCH, RealmNode.KINGDOM, who(realm, raid, from.get()) + " will " + RealmTurns.raidVerb(target.get(), RealmNode.KINGDOM) + " at dusk!");
             return Optional.of(raid);
         }
         Optional<RealmNode> attacker = realm.neighbors(targetId).stream().filter(node -> node.type == RealmNode.Type.STRONGHOLD && node.monsters())
@@ -103,7 +103,7 @@ public final class RealmRaids {
         }
         Realm.Raid raid = new Realm.Raid(attacker.get().owner(), attacker.get().id, targetId, realm.turn, resolveAt);
         realm.raids.add(raid);
-        realm.news(who(realm, raid, attacker.get()) + " will " + RealmTurns.raidVerb(target.get(), raid.nation()) + " at dusk!");
+        realm.news(Realm.LogKind.MARCH, raid.nation(), who(realm, raid, attacker.get()) + " will " + RealmTurns.raidVerb(target.get(), raid.nation()) + " at dusk!");
         return Optional.of(raid);
     }
 
@@ -192,7 +192,7 @@ public final class RealmRaids {
         Optional<RealmNode> town = realm.node(raid.town());
         Optional<RealmNode> stronghold = realm.node(raid.stronghold());
         if (town.isEmpty() || stronghold.isEmpty()) {
-            realm.record("The " + raid.nation() + "' raid on " + raid.town() + " came to nothing.");
+            realm.record(Realm.LogKind.MARCH, raid.nation(), "The " + raid.nation() + "' raid on " + raid.town() + " came to nothing.");
             realm.setDirty();
             return false;
         }
@@ -218,7 +218,7 @@ public final class RealmRaids {
             return;
         }
         realm.addStat(node, node.type == RealmNode.Type.TOWN ? "defense" : "military", raised);
-        realm.news("The " + RealmFactions.get(side).displayName() + " raise " + raised + " of the fallen at " + node.name() + ".");
+        realm.news(Realm.LogKind.BATTLE, side, "The " + RealmFactions.get(side).displayName() + " raise " + raised + " of the fallen at " + node.name() + ".");
     }
 
     private static Outcome settle(Realm realm, Realm.Raid raid, RealmNode target, RealmNode attacker, int attack, int defense, boolean fought) {
@@ -226,7 +226,7 @@ public final class RealmRaids {
         if (attack > defense && capturable(target, raid.nation())) {
             int fallen = ownDefense(target); // The defenders, to the last.
             int garrison = lose(realm, raid, attacker, GARRISON);
-            realm.news(who(realm, raid, attacker) + " stormed " + target.name() + how + " (" + attack + " against " + defense + ").");
+            realm.news(Realm.LogKind.BATTLE, raid.nation(), who(realm, raid, attacker) + " stormed " + target.name() + how + " (" + attack + " against " + defense + ").");
             realm.setOwner(target, raid.nation());
             if (RealmFactions.get(raid.nation()).fortifyAfterCapture()) {
                 realm.setStat(target, "securing", SECURING_TURNS);
@@ -258,7 +258,7 @@ public final class RealmRaids {
                 realm.addStat(attacker, "military", gained);
                 spoils = " The plunder swelled their ranks by " + gained + ".";
             }
-            realm.news(who(realm, raid, attacker) + " sacked " + target.name() + how + " (" + attack + " against " + defense
+            realm.news(Realm.LogKind.BATTLE, raid.nation(), who(realm, raid, attacker) + " sacked " + target.name() + how + " (" + attack + " against " + defense
                     + "): it lost " + defenseLost + " defense, " + wealthLost + " wealth and " + moraleLost + " morale." + spoils);
             if (attacker.type == RealmNode.Type.CAPITAL) {
                 RealmCapitals.championRaidDecided(realm, attacker, true);
@@ -267,7 +267,7 @@ public final class RealmRaids {
             if (margin >= TIER_LOSS_MARGIN && tier > 0) {
                 realm.setStat(target, "tier", tier - 1);
                 realm.setStat(target, "upgrading", 0);
-                realm.news(tier == 1 ? target.name() + " was so badly sacked it fell to ruins: whoever beats its defenders next can take it."
+                realm.news(Realm.LogKind.BATTLE, raid.nation(), tier == 1 ? target.name() + " was so badly sacked it fell to ruins: whoever beats its defenders next can take it."
                         : target.name() + " was so badly sacked it fell back to a " + RealmTiers.name(tier - 1) + " (tier " + (tier - 1) + ").");
             }
             return new Outcome(true, fallen);
@@ -276,7 +276,7 @@ public final class RealmRaids {
         if (target.type == RealmNode.Type.TOWN) {
             realm.addStat(target, "morale", 1);
         }
-        realm.news(target.name() + " drove off " + who(realm, raid, attacker).replaceFirst("^The", "the") + how + " (" + defense + " against " + attack + "): they lost "
+        realm.news(Realm.LogKind.BATTLE, raid.nation(), target.name() + " drove off " + who(realm, raid, attacker).replaceFirst("^The", "the") + how + " (" + defense + " against " + attack + "): they lost "
                 + losses + " military.");
         return new Outcome(false, losses);
     }

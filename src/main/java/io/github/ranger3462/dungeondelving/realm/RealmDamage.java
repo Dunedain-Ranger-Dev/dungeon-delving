@@ -72,7 +72,7 @@ public final class RealmDamage {
             if (!RealmTiers.upgrading(node) && node.stat("wrecked") > 0 && node.stat("wealth") > 0 && node.stat("repair") < node.stat("wrecked")) {
                 realm.addStat(node, "wealth", -1);
                 realm.addStat(node, "repair", REPAIR_PER_TURN);
-                realm.record(node.name() + " paid to rebuild.");
+                realm.record(Realm.LogKind.TOWN, node.owner(), node.name() + " paid to rebuild.");
             }
         }
     }

@@ -86,6 +86,15 @@ public final class RealmMap {
             entry.put("stats", stats);
             entry.put("warnings", strings(warnings(realm, node)));
             entry.put("notes", strings(notes(realm, node)));
+            ListTag facts = new ListTag();
+            for (Fact fact : facts(realm, node)) {
+                CompoundTag factTag = new CompoundTag();
+                factTag.putString("label", fact.label());
+                factTag.putString("value", fact.value());
+                factTag.putString("hint", fact.hint());
+                facts.add(factTag);
+            }
+            entry.put("facts", facts);
             nodes.add(entry);
         }
         tag.put("nodes", nodes);
@@ -108,6 +117,13 @@ public final class RealmMap {
             entry.putInt("strongholds", RealmTurns.strongholds(realm, nation).size());
             entry.putInt("towns", RealmTurns.towns(realm, nation).size());
             entry.putBoolean("pushedBack", RealmCapitals.pushedBack(realm, nation));
+            RealmFactions.Traits traits = RealmFactions.get(nation);
+            entry.putString("name", traits.displayName());
+            entry.putString("leader", traits.leader());
+            entry.putString("champion", traits.champion());
+            entry.putString("capital", traits.capital());
+            entry.putString("about", about(traits));
+            entry.putBoolean("marching", realm.nodes().stream().anyMatch(node -> nation.equals(node.owner()) && node.stat("bursting") > 0));
             nations.add(entry);
         }
         tag.put("nations", nations);
@@ -121,10 +137,112 @@ public final class RealmMap {
             raids.add(entry);
         }
         tag.put("raids", raids);
+        ListTag log = new ListTag();
+        for (Realm.LogEntry logged : realm.log()) {
+            CompoundTag entry = new CompoundTag();
+            entry.putInt("turn", logged.turn());
+            entry.putString("text", logged.text());
+            entry.putBoolean("news", logged.news());
+            entry.putString("kind", logged.kind().name());
+            entry.putString("who", logged.who());
+            log.add(entry);
+        }
+        tag.put("log", log);
+        tag.putString("kingdomAbout", about(RealmFactions.get(RealmNode.KINGDOM)));
         tag.putInt("turn", realm.turn());
         tag.putLong("lastTurn", realm.lastTurnMillis());
         tag.putLong("turnLength", RealmTurns.turnMillis());
         return tag;
+    }
+
+    /** A line of a place's stats as the menu shows it: "Defense: 34", with what it means ("20 its own, 14 from the army"). */
+    public record Fact(String label, String value, String hint) {}
+
+    /** Stats the facts already cover, or that are bookkeeping no one needs to see. */
+    private static final java.util.Set<String> COVERED = java.util.Set.of("tier", "military", "fortification", "defense", "morale", "wealth",
+            "upgrading", "damage", "repair", "wrecked", "rally", "securing", "blight", "bursting", "heat", "fallen");
+
+    /** A place's stats in plain words, the most telling first. */
+    public static List<Fact> facts(Realm realm, RealmNode node) {
+        List<Fact> facts = new ArrayList<>();
+        if (node.type == RealmNode.Type.TOWN) {
+            int tier = RealmTiers.tier(node);
+            facts.add(new Fact("Size", RealmTiers.name(tier), tier == 0 ? "the next raid that wins takes it" : "tier " + tier + " of 5"));
+        }
+        int own = RealmRaids.ownDefense(node);
+        int defense = RealmRaids.defense(realm, node);
+        if (node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.CAPITAL || node.stat("military") > 0) {
+            facts.add(new Fact("Troops", String.valueOf(node.stat("military")), node.monsters() ? "what it raids with" : "its garrison"));
+        }
+        facts.add(new Fact("Defense", String.valueOf(defense),
+                defense > own ? own + " its own, " + (defense - own) + " from the kingdom's army" : "what attackers must beat"));
+        if (node.type == RealmNode.Type.TOWN) {
+            int morale = node.stat("morale");
+            facts.add(new Fact("Morale", String.valueOf(morale), morale < LOW_MORALE ? "low: its people may give up" : "how its people hold up"));
+        }
+        if (node.stat("wealth") > 0) {
+            facts.add(new Fact("Wealth", String.valueOf(node.stat("wealth")), "lost when it's sacked"));
+        }
+        if (node.stat("upgrading") > 0) {
+            facts.add(new Fact("Growing", node.stat("upgrading") + (node.stat("upgrading") == 1 ? " day" : " days") + " left", "no support until then"));
+        }
+        if (node.stat("damage") > 0 || node.stat("wrecked") > node.stat("repair")) {
+            facts.add(new Fact("Damage", node.stat("repair") + " of " + node.stat("wrecked") + " rebuilt", "still rebuilding"));
+        }
+        if (node.stat("securing") > 0) {
+            facts.add(new Fact("Securing", node.stat("securing") + (node.stat("securing") == 1 ? " turn" : " turns"), "fortifying it before raiding again"));
+        }
+        if (node.stat("blight") > 0) {
+            facts.add(new Fact("Blight", node.stat("blight") + " of " + RealmLevels.MAX_BLIGHT, "the land around it grows more dangerous"));
+        }
+        if (node.stat("bursting") > 0) {
+            facts.add(new Fact("On the march", "yes", "raiding until the odds turn"));
+        }
+        if (node.type == RealmNode.Type.CAPITAL && node.stat("rally") > 0) {
+            facts.add(new Fact("Rallying", node.stat("rally") + " of " + RealmCapitals.RALLY_TURNS, "turns until it's back in the field"));
+        }
+        facts.add(new Fact("Danger nearby", "level " + RealmLevels.level(realm, node.dimension(), node.pos()), "how tough the monsters around it are"));
+        node.stats().forEach((stat, value) -> {
+            if (!COVERED.contains(stat) && value != 0) {
+                facts.add(new Fact(Character.toUpperCase(stat.charAt(0)) + stat.substring(1).replace('_', ' '), String.valueOf(value), ""));
+            }
+        });
+        return facts;
+    }
+
+    /** How a faction plays, in a line: "Grows fast. Attacks at 45%+ odds, the kingdom first. Secures what it takes." */
+    public static String about(RealmFactions.Traits traits) {
+        List<String> parts = new ArrayList<>();
+        String grows = traits.growth() >= 1.2 ? "Grows fast" : traits.growth() <= 0.85 ? "Grows slowly" : "Grows steadily";
+        parts.add(grows + ".");
+        String whom = switch (traits.targets()) {
+            case ANYONE -> "anyone";
+            case KINGDOM -> "only the kingdom";
+            case KINGDOM_FIRST -> "the kingdom first, other monsters when they're weak";
+            case MONSTERS -> "the monster nations";
+        };
+        String keen = traits.aggression() >= 1.5 ? "Eager to fight: " : traits.aggression() <= 0.8 ? "Cautious: " : "";
+        parts.add(keen + "attacks " + whom + " at " + Math.round(traits.attackBar() * 100) + "%+ odds.");
+        if (traits.militaryBonus() > 0) {
+            parts.add("Hits " + Math.round(traits.militaryBonus() * 100) + "% harder.");
+        }
+        if (traits.fortifyAfterCapture()) {
+            parts.add("Secures what it takes before moving on.");
+        }
+        if (traits.homeRadius() > 0) {
+            parts.add("Stays within " + traits.homeRadius() + " links of home.");
+        }
+        if (traits.burstRatio() > 0) {
+            parts.add("Waits at its capital until it's " + (traits.burstRatio() == 2.0 ? "twice" : traits.burstRatio() + "x") + " as strong, then strikes.");
+        }
+        if (traits.raiseDead() > 0) {
+            parts.add("Raises " + (traits.raiseDead() > 0.3 && traits.raiseDead() < 0.35 ? "a third" : Math.round(traits.raiseDead() * 100) + "%")
+                    + " of the fallen after every battle.");
+        }
+        if (traits.blight() > 0) {
+            parts.add("Blights the land it holds.");
+        }
+        return String.join(" ", parts);
     }
 
     /** What's bad for the kingdom at a node. */

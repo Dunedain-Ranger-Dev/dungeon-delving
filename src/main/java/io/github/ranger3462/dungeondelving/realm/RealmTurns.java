@@ -192,22 +192,22 @@ public final class RealmTurns {
             case REINFORCE -> {
                 List<RealmNode> border = supported(borderTowns(realm));
                 border.forEach(town -> realm.addStat(town, "defense", 2));
-                realm.record("The kingdom reinforced its border: " + names(border) + " each gained 2 defense.");
+                realm.record(Realm.LogKind.PREPARE, RealmNode.KINGDOM, "The kingdom reinforced its border: " + names(border) + " each gained 2 defense.");
             }
             case MUSTER -> {
                 realm.addKingdomStat("army", 3);
-                realm.record("The kingdom mustered troops: its army is now " + realm.kingdomStat("army") + ".");
+                realm.record(Realm.LogKind.PREPARE, RealmNode.KINGDOM, "The kingdom mustered troops: its army is now " + realm.kingdomStat("army") + ".");
             }
             case GATHER_WEALTH -> {
                 List<RealmNode> towns = supported(realm.nodes().stream().filter(node -> node.type == RealmNode.Type.TOWN && node.kingdoms()).toList());
                 towns.forEach(town -> realm.addStat(town, "wealth", 1));
                 realm.addKingdomStat("treasury", towns.size() + (RealmCapitals.kingdomChampion(realm) ? 1 : 0));
-                realm.record("The kingdom gathered wealth: its treasury is now " + realm.kingdomStat("treasury") + ".");
+                realm.record(Realm.LogKind.PREPARE, RealmNode.KINGDOM, "The kingdom gathered wealth: its treasury is now " + realm.kingdomStat("treasury") + ".");
             }
             case MARCH -> marchTarget(realm).ifPresent(target -> {
                 Realm.Raid raid = new Realm.Raid(RealmNode.KINGDOM, target.getKey().id, target.getValue().id, realm.turn, time + turnMillis() / 2);
                 realm.raids.add(raid);
-                realm.news(RealmRaids.who(realm, raid, target.getKey()) + " will " + raidVerb(target.getValue(), RealmNode.KINGDOM) + " at dusk!");
+                realm.news(Realm.LogKind.MARCH, RealmNode.KINGDOM, RealmRaids.who(realm, raid, target.getKey()) + " will " + raidVerb(target.getValue(), RealmNode.KINGDOM) + " at dusk!");
             });
         }
     }
@@ -374,7 +374,7 @@ public final class RealmTurns {
         Optional<RealmNode> capital = RealmCapitals.capital(realm, nation);
         if (action != NationAction.RAID && traits.burstRatio() > 0 && capital.isPresent() && capital.get().stat("bursting") > 0) {
             realm.setStat(capital.get(), "bursting", 0);
-            realm.news("The " + name + " fall back to " + capital.get().name() + " to gather their strength.");
+            realm.news(Realm.LogKind.MARCH, nation, "The " + name + " fall back to " + capital.get().name() + " to gather their strength.");
         }
         switch (action) {
             case BUILD_MILITARY -> {
@@ -383,27 +383,27 @@ public final class RealmTurns {
                     // Pushed back: the nation rebuilds at its capital.
                     capital.ifPresent(home -> {
                         realm.addStat(home, "military", gained);
-                        realm.record("The " + name + " gathered strength at " + home.name() + ".");
+                        realm.record(Realm.LogKind.PREPARE, nation, "The " + name + " gathered strength at " + home.name() + ".");
                     });
                     return;
                 }
                 strongholds.forEach(node -> realm.addStat(node, "military", gained));
-                realm.record("The " + name + " built up their military: " + names(strongholds) + " each gained " + gained + ".");
+                realm.record(Realm.LogKind.PREPARE, nation, "The " + name + " built up their military: " + names(strongholds) + " each gained " + gained + ".");
             }
             case FORTIFY -> {
                 int gained = points(nation, 1);
                 strongholds.forEach(node -> realm.addStat(node, "fortification", gained));
                 towns.forEach(town -> realm.addStat(town, "defense", gained));
-                realm.record("The " + name + " fortified " + names(java.util.stream.Stream.concat(strongholds.stream(), towns.stream()).toList()) + ".");
+                realm.record(Realm.LogKind.PREPARE, nation, "The " + name + " fortified " + names(java.util.stream.Stream.concat(strongholds.stream(), towns.stream()).toList()) + ".");
             }
             case RAID -> raidPlan(realm, nation).ifPresent(plan -> {
                 if (traits.burstRatio() > 0 && capital.isPresent() && capital.get().stat("bursting") == 0) {
                     realm.setStat(capital.get(), "bursting", 1);
-                    realm.news("Storms gather over " + capital.get().name() + ": the " + name + " are on the march!");
+                    realm.news(Realm.LogKind.MARCH, nation, "Storms gather over " + capital.get().name() + ": the " + name + " are on the march!");
                 }
                 Realm.Raid raid = new Realm.Raid(nation, plan.from().id, plan.target().id, realm.turn, time + turnMillis() / 2);
                 realm.raids.add(raid);
-                realm.news(RealmRaids.who(realm, raid, plan.from()) + " will " + raidVerb(plan.target(), nation) + " at dusk!");
+                realm.news(Realm.LogKind.MARCH, nation, RealmRaids.who(realm, raid, plan.from()) + " will " + raidVerb(plan.target(), nation) + " at dusk!");
             });
         }
     }

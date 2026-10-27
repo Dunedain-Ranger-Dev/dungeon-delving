@@ -26,10 +26,12 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 /**
- * The realm menu (K by default): a map of the realm's places in your dimension, coloured by owner, with their links
- * (red where they cross a border) and a red "!" on any in trouble; and a side panel with how the kingdom and each
- * nation stand, the raids under way, and either the places in trouble or the one you've clicked. Drag to move the map,
- * scroll to zoom. The data comes from the server ({@link RealmMap}).
+ * The realm menu (N by default), in three tabs. <b>Map</b>: the realm's places in your dimension, coloured by owner,
+ * with their links (red where they cross a border) and a red "!" on any in trouble; and a side panel with how the
+ * kingdom and each nation stand, the raids under way, and either the places in trouble or the one you've clicked, its
+ * stats in plain words. Drag to move the map, scroll to zoom. <b>News</b>: the realm's log by turn, newest first,
+ * coloured by who and what, and filterable. <b>Nations</b>: a card for the kingdom and each nation, with its leaders,
+ * strength and how it plays. The data comes from the server ({@link RealmMap}).
  */
 public class RealmScreen extends Screen {
     public static final KeyMapping OPEN = new KeyMapping("key.dungeondelving.realm", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_N,
@@ -52,6 +54,31 @@ public class RealmScreen extends Screen {
     private boolean dragged;
     /** The panel's clickable rows this frame: a node id each, by top y. */
     private final List<Object[]> rows = new ArrayList<>();
+    /** The tabs' and filters' buttons this frame: what each does, and where it is. */
+    private final List<Button> buttons = new ArrayList<>();
+    private Tab tab = Tab.MAP;
+    /** How far the news or nations list is scrolled, and how tall it was last frame. */
+    private int scroll;
+    private int contentHeight;
+    private boolean everything;
+    /** The faction the news is filtered to, or null for all. */
+    private String newsOf;
+
+    private enum Tab {
+        MAP("Map"), NEWS("News"), NATIONS("Nations");
+
+        final String label;
+
+        Tab(String label) {
+            this.label = label;
+        }
+    }
+
+    private record Button(Runnable action, int x0, int y0, int x1, int y1) {
+        boolean contains(double x, double y) {
+            return x >= x0 && x < x1 && y >= y0 && y < y1;
+        }
+    }
 
     public RealmScreen() {
         super(Component.translatable("screen.dungeondelving.realm"));
@@ -152,17 +179,311 @@ public class RealmScreen extends Screen {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
         super.render(graphics, mouseX, mouseY, partialTick);
+        buttons.clear();
         graphics.drawString(font, title, MARGIN, 8, GOLD);
+        int tabX = MARGIN + font.width(title) + 12;
+        for (Tab each : Tab.values()) {
+            tabX += button(graphics, each.label, tabX, 5, each == tab, mouseX, mouseY, () -> {
+                tab = each;
+                scroll = 0;
+            }) + 4;
+        }
         RealmMapClient.Data data = RealmMapClient.latest();
         if (data == null) {
             graphics.drawCenteredString(font, Component.literal("Waiting for the realm..."), width / 2, height / 2, GREY);
             return;
         }
-        if (scale < 0) {
-            fit(data);
+        String turn = "Turn " + data.turn() + "   next in " + clock(data.untilNextTurn());
+        graphics.drawString(font, turn, width - MARGIN - font.width(turn), 8, GREY);
+        switch (tab) {
+            case MAP -> {
+                if (scale < 0) {
+                    fit(data);
+                }
+                renderMap(graphics, data, mouseX, mouseY);
+                renderPanel(graphics, data, mouseX, mouseY);
+            }
+            case NEWS -> renderNews(graphics, data, mouseX, mouseY);
+            case NATIONS -> renderNations(graphics, data);
         }
-        renderMap(graphics, data, mouseX, mouseY);
-        renderPanel(graphics, data, mouseX, mouseY);
+    }
+
+    /** A clickable chip, lit when {@code on}; returns its width. */
+    private int button(GuiGraphics graphics, String label, int x, int y, boolean on, int mouseX, int mouseY, Runnable action) {
+        int w = font.width(label) + 10;
+        Button button = new Button(action, x, y, x + w, y + 14);
+        graphics.fill(x, y, x + w, y + 14, on ? 0xFF6A5A30 : button.contains(mouseX, mouseY) ? 0xFF3A3A3A : 0xFF262626);
+        graphics.fill(x, y + 13, x + w, y + 14, on ? 0xFFE0A040 : 0xFF505050);
+        graphics.drawString(font, label, x + 5, y + 3, on ? 0xFFFFFF : 0xC0C0C0);
+        buttons.add(button);
+        return w;
+    }
+
+    private static String clock(long millis) {
+        long seconds = millis / 1000;
+        return seconds / 60 + ":" + String.format("%02d", seconds % 60);
+    }
+
+    /** A faction's name for people: "the kingdom", a nation's own name, or its id. */
+    static String ownerName(RealmMapClient.Data data, String owner) {
+        if ("kingdom".equals(owner)) {
+            return "the kingdom";
+        }
+        if ("none".equals(owner) || owner.isEmpty()) {
+            return "no one";
+        }
+        return data.nations().stream().filter(nation -> nation.id().equals(owner) && !nation.name().isEmpty()).findFirst()
+                .map(RealmMapClient.Nation::name).orElse(owner);
+    }
+
+    private static String capitalised(String text) {
+        return text.isEmpty() ? text : Character.toUpperCase(text.charAt(0)) + text.substring(1);
+    }
+
+    private int listTop() {
+        return TOP + 20;
+    }
+
+    private int listBottom() {
+        return height - MARGIN;
+    }
+
+    /** A filled box with a border, for the news and nations lists. */
+    private void frame(GuiGraphics graphics, int x0, int y0, int x1, int y1) {
+        graphics.fill(x0 - 1, y0 - 1, x1 + 1, y1 + 1, 0xFF505050);
+        graphics.fill(x0, y0, x1, y1, 0xF0181818);
+    }
+
+    private static final String[][] KINDS = { { "PREPARE", "Routine", "909090" }, { "MARCH", "March", "F0A040" }, { "BATTLE", "Battle", "FF6060" },
+            { "CAPTURE", "Taken", "FFD040" }, { "TOWN", "Town", "80E080" }, { "OTHER", "", "C0C0C0" } };
+
+    private static String[] kind(String name) {
+        for (String[] kind : KINDS) {
+            if (kind[0].equals(name)) {
+                return kind;
+            }
+        }
+        return KINDS[KINDS.length - 1];
+    }
+
+    private boolean shows(RealmMapClient.Entry entry) {
+        if (newsOf != null && !newsOf.equals(entry.who())) {
+            return false;
+        }
+        return everything || entry.news() || !("PREPARE".equals(entry.kind()) || "OTHER".equals(entry.kind()));
+    }
+
+    /** The News tab: the realm's log by turn, newest first, each entry tagged with what it was and coloured by whom. */
+    private void renderNews(GuiGraphics graphics, RealmMapClient.Data data, int mouseX, int mouseY) {
+        int x = MARGIN;
+        int y = TOP;
+        x += button(graphics, "Important", x, y, !everything, mouseX, mouseY, () -> {
+            everything = false;
+            scroll = 0;
+        }) + 4;
+        x += button(graphics, "Everything", x, y, everything, mouseX, mouseY, () -> {
+            everything = true;
+            scroll = 0;
+        }) + 12;
+        Set<String> factions = new LinkedHashSet<>();
+        factions.add("kingdom");
+        data.nations().forEach(nation -> factions.add(nation.id()));
+        data.log().forEach(entry -> {
+            if (!entry.who().isEmpty() && !"none".equals(entry.who())) {
+                factions.add(entry.who());
+            }
+        });
+        x += button(graphics, "All", x, y, newsOf == null, mouseX, mouseY, () -> {
+            newsOf = null;
+            scroll = 0;
+        }) + 4;
+        for (String faction : factions) {
+            String name = capitalised(ownerName(data, faction));
+            int w = font.width(name) + 10;
+            if (x + w > width - MARGIN) {
+                break;
+            }
+            button(graphics, name, x, y, faction.equals(newsOf), mouseX, mouseY, () -> {
+                newsOf = faction;
+                scroll = 0;
+            });
+            graphics.fill(x + 1, y + 1, x + 3, y + 13, 0xFF000000 | RealmMapClient.color(faction));
+            x += w + 4;
+        }
+
+        int x0 = MARGIN, x1 = width - MARGIN, y0 = listTop(), y1 = listBottom();
+        frame(graphics, x0, y0, x1, y1);
+        graphics.enableScissor(x0, y0, x1, y1);
+        int tagWidth = 0;
+        for (String[] kind : KINDS) {
+            tagWidth = Math.max(tagWidth, font.width(kind[1]));
+        }
+        int textX = x0 + 10 + tagWidth + 8, textWidth = x1 - textX - 8;
+        int top = y0 + 6 - scroll;
+        int[] row = { top };
+        List<RealmMapClient.Entry> log = new ArrayList<>(data.log());
+        java.util.Collections.reverse(log);
+        int shownTurn = Integer.MIN_VALUE;
+        boolean any = false;
+        for (RealmMapClient.Entry entry : log) {
+            if (!shows(entry)) {
+                continue;
+            }
+            any = true;
+            if (entry.turn() != shownTurn) {
+                shownTurn = entry.turn();
+                if (row[0] > top) {
+                    row[0] += 4;
+                }
+                String header = entry.turn() == data.turn() ? "Turn " + entry.turn() + " (this turn)" : "Turn " + entry.turn();
+                graphics.drawString(font, header, x0 + 6, row[0], GOLD);
+                graphics.fill(x0 + 10 + font.width(header), row[0] + 4, x1 - 8, row[0] + 5, 0xFF404040);
+                row[0] += LINE + 3;
+            }
+            String[] kind = kind(entry.kind());
+            int color = entry.who().isEmpty() ? 0xC0C0C0 : RealmMapClient.color(entry.who());
+            List<FormattedCharSequence> lines = font.split(Component.literal(entry.text()), textWidth);
+            graphics.fill(x0 + 6, row[0] - 1, x0 + 8, row[0] + lines.size() * LINE - 2, 0xFF000000 | color);
+            graphics.drawString(font, kind[1], x0 + 12, row[0], Integer.parseInt(kind[2], 16));
+            int textColor = "PREPARE".equals(entry.kind()) ? 0xA8A8A8 : 0xF0F0F0;
+            for (FormattedCharSequence line : lines) {
+                graphics.drawString(font, line, textX, row[0], textColor);
+                row[0] += LINE;
+            }
+            row[0] += 2;
+        }
+        if (!any) {
+            graphics.drawString(font, data.log().isEmpty() ? "Nothing has happened in the realm yet." : "Nothing to show with these filters.", x0 + 6,
+                    row[0], GREY);
+            row[0] += LINE;
+        }
+        contentHeight = row[0] - top + 6;
+        graphics.disableScissor();
+        scrollbar(graphics, x1, y0, y1);
+    }
+
+    /** The Nations tab: a card for the kingdom and each nation in the field. */
+    private void renderNations(GuiGraphics graphics, RealmMapClient.Data data) {
+        int x0 = MARGIN, x1 = width - MARGIN, y0 = TOP, y1 = listBottom();
+        frame(graphics, x0, y0, x1, y1);
+        graphics.enableScissor(x0, y0, x1, y1);
+        int columns = x1 - x0 >= 520 ? 2 : 1;
+        int cardWidth = (x1 - x0 - 12 - (columns - 1) * 8) / columns;
+        int top = y0 + 6 - scroll;
+        int[] columnY = new int[columns];
+        java.util.Arrays.fill(columnY, top);
+        Collection<RealmMapClient.Node> nodes = data.nodes().values();
+        List<Object[]> cards = new ArrayList<>();
+        long towns = nodes.stream().filter(node -> "town".equals(node.type())).count();
+        long held = nodes.stream().filter(node -> "town".equals(node.type()) && node.kingdoms()).count();
+        long strongholds = nodes.stream().filter(node -> "stronghold".equals(node.type()) && node.kingdoms()).count();
+        long troubled = nodes.stream().filter(node -> !node.warnings().isEmpty()).count();
+        List<String> kingdomStatus = new ArrayList<>();
+        kingdomStatus.add(troubled == 0 ? "All quiet" : troubled + (troubled == 1 ? " place" : " places") + " in trouble");
+        data.raids().stream().filter(raid -> "kingdom".equals(raid.nation()))
+                .forEach(raid -> kingdomStatus.add("Marching on " + data.name(raid.to()) + " (" + clock(data.until(raid)) + ")"));
+        cards.add(new Object[] { "kingdom", "The Kingdom", "",
+                "Army " + data.kingdom().getOrDefault("army", 0) + "    Treasury " + data.kingdom().getOrDefault("treasury", 0)
+                        + "    Towns " + held + " of " + towns + "    Strongholds " + strongholds,
+                kingdomStatus, data.kingdomAbout() });
+        for (RealmMapClient.Nation nation : data.nations()) {
+            List<String> leaders = new ArrayList<>();
+            if (!nation.leader().isEmpty()) {
+                leaders.add("Led by " + nation.leader());
+            }
+            if (!nation.capital().isEmpty()) {
+                leaders.add("from " + nation.capital());
+            }
+            if (!nation.champion().isEmpty()) {
+                leaders.add("champion " + nation.champion());
+            }
+            List<String> status = new ArrayList<>();
+            if (nation.pushedBack()) {
+                status.add("Pushed back: rallying at home");
+            }
+            if (nation.marching()) {
+                status.add("On the march");
+            }
+            data.raids().stream().filter(raid -> raid.nation().equals(nation.id()))
+                    .forEach(raid -> status.add("Raiding " + data.name(raid.to()) + " (" + clock(data.until(raid)) + ")"));
+            if (status.isEmpty()) {
+                status.add("Biding its time");
+            }
+            cards.add(new Object[] { nation.id(), capitalised(nation.name().isEmpty() ? nation.id() : nation.name()), String.join(", ", leaders),
+                    "Troops " + nation.military() + "    Strongholds " + nation.strongholds() + (nation.towns() > 0 ? "    Towns " + nation.towns() : ""),
+                    status, nation.about() });
+        }
+        if (data.nations().isEmpty()) {
+            cards.add(new Object[] { "none", "No nations in the field", "", "", List.of(), "Monster nations take turns once they hold a stronghold." });
+        }
+        for (Object[] card : cards) {
+            int column = 0;
+            for (int i = 1; i < columns; i++) {
+                if (columnY[i] < columnY[column]) {
+                    column = i;
+                }
+            }
+            int cx = x0 + 6 + column * (cardWidth + 8);
+            columnY[column] = card(graphics, card, cx, columnY[column], cardWidth) + 8;
+        }
+        int bottom = top;
+        for (int y : columnY) {
+            bottom = Math.max(bottom, y);
+        }
+        contentHeight = bottom - top + 6;
+        graphics.disableScissor();
+        scrollbar(graphics, x1, y0, y1);
+    }
+
+    /** Draws one nation's card; returns its bottom. */
+    @SuppressWarnings("unchecked")
+    private int card(GuiGraphics graphics, Object[] card, int x, int y, int w) {
+        String faction = (String) card[0];
+        int color = RealmMapClient.color(faction);
+        int inner = w - 14;
+        int height = 6 + LINE + 2;
+        List<FormattedCharSequence> leaders = ((String) card[2]).isEmpty() ? List.of() : font.split(Component.literal((String) card[2]), inner);
+        List<FormattedCharSequence> about = font.split(Component.literal((String) card[5]), inner);
+        List<String> status = (List<String>) card[4];
+        height += leaders.size() * LINE + (((String) card[3]).isEmpty() ? 0 : LINE + 2) + status.size() * LINE + 3 + about.size() * LINE + 4;
+        graphics.fill(x, y, x + w, y + height, 0xFF222222);
+        graphics.fill(x, y, x + 3, y + height, 0xFF000000 | color);
+        int tx = x + 9;
+        int[] row = { y + 6 };
+        graphics.drawString(font, Component.literal((String) card[1]).withStyle(ChatFormatting.BOLD), tx, row[0], color);
+        row[0] += LINE + 2;
+        for (FormattedCharSequence line : leaders) {
+            graphics.drawString(font, line, tx, row[0], GREY);
+            row[0] += LINE;
+        }
+        if (!((String) card[3]).isEmpty()) {
+            graphics.drawString(font, (String) card[3], tx, row[0], 0xFFFFFF);
+            row[0] += LINE + 2;
+        }
+        for (String line : status) {
+            boolean bad = line.startsWith("Raiding") || line.startsWith("On the march") || line.contains("in trouble");
+            graphics.drawString(font, line, tx, row[0], bad ? YELLOW : 0x80FF80);
+            row[0] += LINE;
+        }
+        row[0] += 3;
+        for (FormattedCharSequence line : about) {
+            graphics.drawString(font, line, tx, row[0], 0xB8B8B8);
+            row[0] += LINE;
+        }
+        return y + height;
+    }
+
+    /** A scrollbar on the list's right edge, when it's taller than its box. */
+    private void scrollbar(GuiGraphics graphics, int x1, int y0, int y1) {
+        int view = y1 - y0;
+        scroll = Mth.clamp(scroll, 0, Math.max(0, contentHeight - view));
+        if (contentHeight <= view) {
+            return;
+        }
+        int barHeight = Math.max(12, view * view / contentHeight);
+        int barTop = y0 + (view - barHeight) * scroll / Math.max(1, contentHeight - view);
+        graphics.fill(x1 - 4, y0, x1 - 1, y1, 0xFF2A2A2A);
+        graphics.fill(x1 - 4, barTop, x1 - 1, barTop + barHeight, 0xFF8A8A8A);
     }
 
     private void renderMap(GuiGraphics graphics, RealmMapClient.Data data, int mouseX, int mouseY) {
@@ -221,9 +542,10 @@ public class RealmScreen extends Screen {
         owners.add("kingdom");
         data.nodes().values().forEach(node -> owners.add(node.owner()));
         for (String owner : owners) {
+            String name = capitalised(ownerName(data, owner));
             graphics.fill(x, y + 1, x + 6, y + 7, 0xFF000000 | RealmMapClient.color(owner));
-            graphics.drawString(font, Component.literal(owner), x + 9, y, GREY);
-            x += 14 + font.width(owner);
+            graphics.drawString(font, Component.literal(name), x + 9, y, GREY);
+            x += 14 + font.width(name);
         }
         graphics.drawString(font, Component.literal("! in trouble").withStyle(ChatFormatting.BOLD), x, y, RED);
         x += 6 + font.width("! in trouble");
@@ -239,8 +561,6 @@ public class RealmScreen extends Screen {
         int x = x0 + 6, w = PANEL_WIDTH - 12;
         int[] y = { TOP + 6 };
         text(graphics, "The Kingdom", x, y, GOLD);
-        long next = data.untilNextTurn() / 1000;
-        text(graphics, "Turn " + data.turn() + " - next in " + next / 60 + ":" + String.format("%02d", next % 60), x, y, 0xFFFFFF);
         text(graphics, "Army " + data.kingdom().getOrDefault("army", 0) + "   Treasury " + data.kingdom().getOrDefault("treasury", 0), x, y, 0xFFFFFF);
         Collection<RealmMapClient.Node> nodes = data.nodes().values();
         long towns = nodes.stream().filter(node -> "town".equals(node.type())).count();
@@ -256,8 +576,9 @@ public class RealmScreen extends Screen {
             text(graphics, "None in the field", x, y, GREY);
         }
         for (RealmMapClient.Nation nation : data.nations()) {
-            String line = nation.id() + ": " + nation.military() + " military, " + nation.strongholds() + " strongholds"
-                    + (nation.towns() > 0 ? ", " + nation.towns() + " towns" : "") + (nation.pushedBack() ? " (pushed back)" : "");
+            String line = capitalised(ownerName(data, nation.id())) + ": " + nation.military() + " troops, " + nation.strongholds()
+                    + (nation.strongholds() == 1 ? " stronghold" : " strongholds") + (nation.towns() > 0 ? ", " + nation.towns() + " towns" : "")
+                    + (nation.pushedBack() ? " (pushed back)" : nation.marching() ? " (on the march)" : "");
             wrapped(graphics, line, x, y, w, RealmMapClient.color(nation.id()));
         }
         if (!data.raids().isEmpty()) {
@@ -265,7 +586,7 @@ public class RealmScreen extends Screen {
             text(graphics, "Raids at dusk", x, y, GOLD);
             for (RealmMapClient.Raid raid : data.raids()) {
                 long left = data.until(raid) / 1000;
-                String who = "kingdom".equals(raid.nation()) ? "Kingdom's army" : raid.nation();
+                String who = "kingdom".equals(raid.nation()) ? "Kingdom's army" : capitalised(ownerName(data, raid.nation()));
                 row(graphics, raid.to(), who + " -> " + data.name(raid.to()) + " (" + left / 60 + ":" + String.format("%02d", left % 60) + ")", x, y, w,
                         "kingdom".equals(raid.nation()) ? 0x80C0FF : RED, mouseX, mouseY);
             }
@@ -275,19 +596,25 @@ public class RealmScreen extends Screen {
         RealmMapClient.Node node = selected == null ? null : data.nodes().get(selected);
         if (node != null) {
             text(graphics, node.name(), x, y, GOLD);
-            wrapped(graphics, describe(node), x, y, w, GREY);
+            wrapped(graphics, describe(node, ownerName(data, node.owner())), x, y, w, GREY);
             if (!node.dim().equals(shownDim)) {
                 wrapped(graphics, "In " + dimName(node.dim()), x, y, w, GREY);
             }
             node.warnings().forEach(warning -> wrapped(graphics, "! " + warning, x, y, w, RED));
             node.notes().forEach(note -> wrapped(graphics, note, x, y, w, YELLOW));
-            StringBuilder stats = new StringBuilder();
-            node.stats().forEach((stat, value) -> {
-                if (!stat.equals("tier") && !(value == 0 && Set.of("upgrading", "damage", "repair", "wrecked", "rally", "heat").contains(stat))) {
-                    stats.append(stats.isEmpty() ? "" : ", ").append(stat).append(" ").append(value);
+            y[0] += 2;
+            for (RealmMapClient.Fact fact : node.facts()) {
+                String label = fact.label() + ": ";
+                graphics.drawString(font, label, x, y[0], GREY);
+                graphics.drawString(font, fact.value(), x + font.width(label), y[0], 0xFFFFFF);
+                y[0] += LINE;
+                if (!fact.hint().isEmpty()) {
+                    for (FormattedCharSequence line : font.split(Component.literal(fact.hint()), w - 8)) {
+                        graphics.drawString(font, line, x + 8, y[0], 0x808080);
+                        y[0] += LINE;
+                    }
                 }
-            });
-            wrapped(graphics, stats.toString(), x, y, w, 0xFFFFFF);
+            }
             List<String> links = new ArrayList<>();
             for (String[] link : data.links()) {
                 if (link[0].equals(node.id()) || link[1].equals(node.id())) {
@@ -298,7 +625,7 @@ public class RealmScreen extends Screen {
             text(graphics, links.isEmpty() ? "No links" : "Links", x, y, GOLD);
             for (String other : links) {
                 RealmMapClient.Node linked = data.nodes().get(other);
-                row(graphics, other, "- " + data.name(other) + (linked == null ? "" : " (" + linked.owner() + ")"), x, y, w,
+                row(graphics, other, "- " + data.name(other) + (linked == null ? "" : " (" + ownerName(data, linked.owner()) + ")"), x, y, w,
                         linked == null ? GREY : RealmMapClient.color(linked.owner()), mouseX, mouseY);
             }
             y[0] += 2;
@@ -346,10 +673,16 @@ public class RealmScreen extends Screen {
 
     /** "Town, kingdom, tier 2 (village)", "Stronghold, goblins", and so on. */
     public static String describe(RealmMapClient.Node node) {
-        String type = Character.toUpperCase(node.type().charAt(0)) + node.type().substring(1);
+        return describe(node, node.owner());
+    }
+
+    /** "A village of the kingdom", "A stronghold of the Redfang goblins", and so on. */
+    static String describe(RealmMapClient.Node node, String ownerName) {
+        String type = "town".equals(node.type()) ? TIERS[Mth.clamp(node.stat("tier"), 0, TIERS.length - 1)] : node.type();
         String kind = node.kind().isEmpty() ? "" : " (" + node.kind() + ")";
-        String tier = "town".equals(node.type()) ? ", tier " + node.stat("tier") + " (" + TIERS[Mth.clamp(node.stat("tier"), 0, TIERS.length - 1)] + ")" : "";
-        return type + kind + ", " + node.owner() + tier;
+        String article = "town".equals(node.type()) && node.stat("tier") == 0 ? "" : "aeiou".indexOf(type.charAt(0)) >= 0 ? "An " : "A ";
+        String what = article.isEmpty() ? capitalised(type) : article + type;
+        return what + kind + (node.monsters() || node.kingdoms() ? " held by " + ownerName : ", held by no one");
     }
 
     private static final String[] TIERS = { "ruins", "hamlet", "village", "town", "market town", "city" };
@@ -381,7 +714,15 @@ public class RealmScreen extends Screen {
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
         RealmMapClient.Data data = RealmMapClient.latest();
-        if (button == 0 && !dragged && data != null) {
+        if (button == 0 && !dragged) {
+            for (Button each : List.copyOf(buttons)) {
+                if (each.contains(mouseX, mouseY)) {
+                    each.action().run();
+                    return true;
+                }
+            }
+        }
+        if (button == 0 && !dragged && data != null && tab == Tab.MAP) {
             for (Object[] row : rows) {
                 if (mouseX >= (int) row[1] && mouseX < (int) row[3] && mouseY >= (int) row[2] && mouseY < (int) row[4]) {
                     select(data, (String) row[0], true);
@@ -416,7 +757,7 @@ public class RealmScreen extends Screen {
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (button == 0 && inMap(mouseX, mouseY) && scale > 0) {
+        if (button == 0 && tab == Tab.MAP && inMap(mouseX, mouseY) && scale > 0) {
             dragged = dragged || Math.abs(dragX) + Math.abs(dragY) > 0;
             centerX -= dragX / scale;
             centerZ -= dragY / scale;
@@ -427,6 +768,10 @@ public class RealmScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (tab != Tab.MAP && scrollY != 0) {
+            scroll -= (int) Math.round(scrollY * LINE * 3);
+            return true;
+        }
         if (inMap(mouseX, mouseY) && scale > 0 && scrollY != 0) {
             // Zoom about the mouse: the block under it stays under it.
             double worldX = centerX + (mouseX - (mapLeft() + mapRight()) / 2.0) / scale;

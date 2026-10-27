@@ -62,7 +62,7 @@ public final class RealmTiers {
                 if (!upgrading(town)) {
                     realm.setStat(town, "tier", tier + 1);
                     realm.addStat(town, "defense", DEFENSE_PER_TIER);
-                    realm.news(town.name() + " has grown into a " + name(tier + 1) + " (tier " + (tier + 1) + ")"
+                    realm.news(Realm.LogKind.TOWN, town.owner(), town.name() + " has grown into a " + name(tier + 1) + " (tier " + (tier + 1) + ")"
                             + (tier == 0 ? ": people are living there again." : ": its guards grow stronger."));
                     grown++;
                 }
@@ -74,7 +74,7 @@ public final class RealmTiers {
             }
             realm.addStat(town, "wealth", -cost(tier));
             realm.setStat(town, "upgrading", days(tier + 1));
-            realm.news(town.name() + " has begun " + (tier == 0 ? "resettling" : "growing") + " into a " + name(tier + 1) + ": it'll take "
+            realm.news(Realm.LogKind.TOWN, town.owner(), town.name() + " has begun " + (tier == 0 ? "resettling" : "growing") + " into a " + name(tier + 1) + ": it'll take "
                     + days(tier + 1) + " days, and it can't be helped until then.");
         }
         return grown;

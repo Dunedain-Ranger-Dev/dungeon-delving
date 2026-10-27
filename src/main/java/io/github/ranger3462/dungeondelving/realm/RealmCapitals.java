@@ -103,7 +103,7 @@ public final class RealmCapitals {
             realm.setStat(capital, "rally", 0);
             realm.raids.add(new Realm.Raid(nation, capital.id, target.get().id, realm.turn, time + RealmTurns.turnMillis() / 2));
             String goal = RealmRaids.capturable(target.get(), capital.owner()) ? "marches to retake " + target.get().name() : "marches on " + target.get().name();
-            realm.news("The " + nation + " rally at " + capital.name() + ": their champion " + goal + " at dusk!");
+            realm.news(Realm.LogKind.MARCH, nation, "The " + nation + " rally at " + capital.name() + ": their champion " + goal + " at dusk!");
             marched++;
         }
         return marched;
@@ -128,7 +128,7 @@ public final class RealmCapitals {
     static void championRaidDecided(Realm realm, RealmNode capital, boolean attackersWon) {
         if (attackersWon) {
             realm.addStat(capital, "military", VICTORY_MILITARY);
-            realm.news("Emboldened, the " + capital.owner() + " of " + capital.name() + " rebuild faster.");
+            realm.news(Realm.LogKind.PREPARE, capital.owner(), "Emboldened, the " + capital.owner() + " of " + capital.name() + " rebuild faster.");
         }
     }
 
@@ -146,13 +146,13 @@ public final class RealmCapitals {
                 realm.setStat(capital, "rally", 0);
                 Entity killer = event.getSource().getEntity();
                 String who = killer instanceof ServerPlayer player ? player.getName().getString() : "The kingdom";
-                realm.news(who + " slew the champion of the " + capital.owner() + ": " + capital.name() + " loses " + lost + " military.");
+                realm.news(Realm.LogKind.BATTLE, capital.owner(), who + " slew the champion of the " + capital.owner() + ": " + capital.name() + " loses " + lost + " military.");
             });
         } else if (event.getEntity() instanceof ServerPlayer && event.getSource().getEntity() != null
                 && event.getSource().getEntity().getPersistentData().contains(CHAMPION_TAG)) {
             realm.node(event.getSource().getEntity().getPersistentData().getString(CHAMPION_TAG)).ifPresent(capital -> {
                 realm.addStat(capital, "military", VICTORY_MILITARY);
-                realm.news("The champion of the " + capital.owner() + " has slain a challenger. " + capital.name() + " grows bolder.");
+                realm.news(Realm.LogKind.BATTLE, capital.owner(), "The champion of the " + capital.owner() + " has slain a challenger. " + capital.name() + " grows bolder.");
             });
         }
         RealmTurns.tellNews(level.getServer(), realm);
@@ -176,7 +176,7 @@ public final class RealmCapitals {
             }
             BlockPos at = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, capital.get().pos());
             spawnChampion(level, at, capital.get());
-            realm.news(player.getName().getString() + " has challenged the " + capital.get().owner() + " at " + capital.get().name() + ". Their champion answers!");
+            realm.news(Realm.LogKind.BATTLE, capital.get().owner(), player.getName().getString() + " has challenged the " + capital.get().owner() + " at " + capital.get().name() + ". Their champion answers!");
             RealmTurns.tellNews(level.getServer(), realm);
             return 1;
         }));

@@ -58,4 +58,34 @@ public class RealmMapTests {
         helper.assertTrue(RealmMap.build(realm).equals(tag), "two builds of an unchanged realm match, so it's only re-sent on a change");
         helper.succeed();
     }
+
+    /** The menu shows stats in plain words, says how each nation plays, and its news keeps what kind of thing each entry was. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void theMenuSpeaksPlainly(GameTestHelper helper) {
+        Realm realm = new Realm();
+        RealmNode hamlet = new RealmNode("hamlet", RealmNode.Type.TOWN, RealmNode.KINGDOM, net.minecraft.world.level.Level.OVERWORLD, new BlockPos(0, 64, 0));
+        RealmNode warren = new RealmNode("warren", RealmNode.Type.STRONGHOLD, DungeonFactions.GOBLINS, net.minecraft.world.level.Level.OVERWORLD,
+                new BlockPos(100, 64, 0));
+        realm.add(hamlet);
+        realm.add(warren);
+        realm.link("hamlet", "warren");
+        realm.setStat(hamlet, "tier", 1);
+        realm.setStat(hamlet, "defense", 10);
+        realm.setStat(warren, "securing", 2);
+        java.util.List<RealmMap.Fact> facts = RealmMap.facts(realm, hamlet);
+        helper.assertTrue(facts.get(0).label().equals("Size") && facts.stream().anyMatch(fact -> fact.label().equals("Defense") && fact.hint().startsWith("10 its own")),
+                "a town's facts lead with its size and show its defense: " + facts);
+        helper.assertTrue(RealmMap.facts(realm, warren).stream().anyMatch(fact -> fact.label().equals("Securing") && fact.value().equals("2 turns")),
+                "a stronghold says it's securing");
+        String goblins = RealmMap.about(io.github.ranger3462.dungeondelving.realm.RealmFactions.get(DungeonFactions.GOBLINS));
+        helper.assertTrue(goblins.contains("Grows fast") && goblins.contains("45%+") && goblins.contains("Secures what it takes"), "goblins: " + goblins);
+        CompoundTag nation = realm.nations().isEmpty() ? new CompoundTag() : RealmMap.build(realm).getList("nations", Tag.TAG_COMPOUND).getCompound(0);
+        helper.assertTrue(nation.getString("about").equals(goblins) && !nation.getString("leader").isEmpty(), "the nation's card carries it: " + nation);
+        realm.setOwner(hamlet, DungeonFactions.GOBLINS);
+        Realm.LogEntry taken = realm.reloaded(helper.getLevel().registryAccess()).log().getLast();
+        helper.assertTrue(taken.kind() == Realm.LogKind.CAPTURE && taken.who().equals(DungeonFactions.GOBLINS) && taken.news(),
+                "a capture is logged as one, by whom, and kept through a save: " + taken);
+        helper.assertTrue(RealmMap.build(realm).getList("log", Tag.TAG_COMPOUND).getCompound(0).getString("kind").equals("CAPTURE"), "and sent to the menu");
+        helper.succeed();
+    }
 }
