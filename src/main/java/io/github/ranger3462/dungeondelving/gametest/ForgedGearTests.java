@@ -205,7 +205,7 @@ public class ForgedGearTests {
         return stack;
     }
 
-    /** DD-92: staves and wands from their parts (★ the lowest part's), Iron's Spells stats by ★, and straps fitted as a grip. */
+    /** DD-92: staves and wands from their parts (★ the lowest part's), bound spells and spell power by ★, and straps fitted as a grip. */
     @GameTest(template = ANY_TEMPLATE)
     public static void stavesWandsAndGripsAreMadeFromTheirParts(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
@@ -223,14 +223,15 @@ public class ForgedGearTests {
                 part(io.github.ranger3462.dungeondelving.forging.Crafts.WAND_CORE.get(), 6));
         helper.assertTrue(wand.is(Forging.FORGED_WAND.get()) && Forging.stars(wand) == 6, "focus and core make a wand: " + wand);
         helper.assertTrue(CraftingXp.skillFor(staff) == CraftSkill.WOODWORKING, "staves and wands are Woodworking's");
-        if (net.neoforged.fml.ModList.get().isLoaded("irons_spellbooks")) {
-            double power = staff.getAttributeModifiers().modifiers().stream()
-                    .filter(entry -> entry.attribute().is(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "spell_power")))
-                    .mapToDouble(entry -> entry.modifier().amount()).sum();
-            helper.assertTrue(Math.abs(power - 3 * ForgedGear.STAFF_SPELL_POWER_PER_STAR) < 1e-6, "a ★3 staff adds 15% spell power: " + power);
-            helper.assertTrue(wand.getAttributeModifiers().modifiers().stream()
-                    .anyMatch(entry -> entry.attribute().is(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "cooldown_reduction"))),
-                    "a wand cuts cooldowns");
+        if (net.neoforged.fml.ModList.get().isLoaded("spell_engine") && net.neoforged.fml.ModList.get().isLoaded("wizards")) {
+            helper.assertTrue(io.github.ranger3462.dungeondelving.integration.spellengine.ForgedCasting.choicePool(staff).equals("dungeondelving:weapon/forged_staff"),
+                    "a new staff offers a choice of spells");
+            helper.assertTrue(spellPower(staff, "fire") == ForgedGear.STAFF_SPELL_POWER[2] && spellPower(staff, "frost") == ForgedGear.STAFF_SPELL_POWER[2],
+                    "before the choice, a ★3 staff gives each school it could bind " + ForgedGear.STAFF_SPELL_POWER[2] + " spell power");
+            io.github.ranger3462.dungeondelving.integration.spellengine.ForgedCasting.bind(wand, "wizards:fireball");
+            helper.assertTrue(spellPower(wand, "fire") == ForgedGear.WAND_SPELL_POWER[5] && spellPower(wand, "frost") == 0
+                    && io.github.ranger3462.dungeondelving.integration.spellengine.ForgedCasting.choicePool(wand).isEmpty(),
+                    "bound to Fireball, a ★6 wand gives fire spell power only");
         }
 
         ItemStack sword = starred(Forging.FORGED_SWORD.get(), 4);
@@ -243,6 +244,12 @@ public class ForgedGearTests {
         helper.assertTrue(Math.abs(speed - (-2.4 + 2 * ForgedGear.GRIP_SPEED_PER_STAR)) < 1e-6, "and swings a little faster: " + speed);
         helper.assertTrue(craft(level, gripped, part(io.github.ranger3462.dungeondelving.forging.Crafts.STRAPS.get(), 5)).isEmpty(), "one grip per weapon");
         helper.succeed();
+    }
+
+    private static double spellPower(ItemStack stack, String school) {
+        return stack.getAttributeModifiers().modifiers().stream()
+                .filter(entry -> entry.attribute().is(net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("spell_power", school)))
+                .mapToDouble(entry -> entry.modifier().amount()).sum();
     }
 
     private static ItemStack starred(Item item, int stars) {

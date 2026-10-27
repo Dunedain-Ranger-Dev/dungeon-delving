@@ -62,13 +62,19 @@ public final class ForgedGear {
     /** A forged sword's attack damage, by ★ (iron is 6, diamond 7, netherite 8). The axe hits 2 harder, slower. */
     public static final double[] SWORD_DAMAGE = { 6.5, 6.8, 7.1, 7.5, 7.9, 8.2, 8.6 };
     public static final int[] WEAPON_DURABILITY = { 400, 700, 1000, 1400, 1800, 2100, 2400 };
-    /** A forged staff's melee damage by ★ (a quarterstaff: under a sword), and with Iron's Spells its spell power and mana. */
+    /** A forged staff's melee damage by ★ (a quarterstaff: under a sword). */
     public static final double[] STAFF_DAMAGE = { 4.0, 4.3, 4.6, 5.0, 5.3, 5.6, 6.0 };
-    public static final double STAFF_SPELL_POWER_PER_STAR = 0.05;
-    public static final double STAFF_MANA_PER_STAR = 25;
-    /** A forged wand's spell power, cooldown and cast time cuts per ★ (with Iron's Spells): less power than a staff, quicker casting. */
-    public static final double WAND_SPELL_POWER_PER_STAR = 0.03;
-    public static final double WAND_QUICKNESS_PER_STAR = 0.03;
+    /**
+     * Spell power (the RPG Series' flat kind) a forged staff and wand give their school, by ★: from a wooden RPG staff's
+     * (★1) to past a tier 4 one's (★7). A wand's is less, as the RPG Series' wands' is.
+     */
+    public static final double[] STAFF_SPELL_POWER = { 4.0, 4.5, 5.0, 6.0, 7.0, 8.0, 9.0 };
+    public static final double[] WAND_SPELL_POWER = { 2.5, 3.0, 4.0, 5.0, 5.5, 6.5, 8.0 };
+    /**
+     * The spell schools a staff or wand gives power to (by their spell power attributes' paths): set by the Spell Engine
+     * integration ({@code ForgedCasting}), and none without it.
+     */
+    public static java.util.function.Function<ItemStack, List<String>> spellSchools = stack -> List.of();
     /** A strapped grip's attack speed per ★ of its straps. */
     public static final double GRIP_SPEED_PER_STAR = 0.04;
     /** Heavy armor slows you this much per piece (a full set: 5%). */
@@ -307,8 +313,8 @@ public final class ForgedGear {
     }
 
     /**
-     * The forged staff: shaft, wrap and an arcane focus. A quarterstaff in melee; with Iron's Spells, held in the main
-     * hand, it adds spell power and mana by its ★, as Iron's own staves do.
+     * The forged staff: shaft, wrap and an arcane focus. A quarterstaff in melee; with Spell Engine, an RPG Series staff
+     * with a choice of spells to bind, and spell power by its ★ (see {@code ForgedCasting}).
      */
     public static class Staff extends SwordItem {
         public Staff(Item.Properties properties) {
@@ -317,13 +323,9 @@ public final class ForgedGear {
 
         @Override
         public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
-            int stars = index(Forging.stars(stack)) + 1;
-            ItemAttributeModifiers.Builder builder = weaponBuilder(STAFF_DAMAGE[stars - 1], -3.0);
-            ResourceLocation id = DungeonDelving.id("forged_staff");
-            ironsAttribute("spell_power").ifPresent(attribute -> builder.add(attribute,
-                    new AttributeModifier(id, STAFF_SPELL_POWER_PER_STAR * stars, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.MAINHAND));
-            ironsAttribute("max_mana").ifPresent(attribute -> builder.add(attribute,
-                    new AttributeModifier(id, STAFF_MANA_PER_STAR * stars, AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND));
+            int i = index(Forging.stars(stack));
+            ItemAttributeModifiers.Builder builder = weaponBuilder(STAFF_DAMAGE[i], -3.0);
+            addSpellPower(builder, stack, "forged_staff", STAFF_SPELL_POWER[i]);
             return builder.build();
         }
 
@@ -338,7 +340,7 @@ public final class ForgedGear {
         }
     }
 
-    /** The forged wand: a wand core and an arcane focus. No weapon; with Iron's Spells it casts quicker and a little stronger. */
+    /** The forged wand: a wand core and an arcane focus. No weapon; with Spell Engine, an RPG Series wand like the staff, with less power. */
     public static class Wand extends Item {
         public Wand(Item.Properties properties) {
             super(properties.stacksTo(1));
@@ -346,15 +348,8 @@ public final class ForgedGear {
 
         @Override
         public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
-            int stars = index(Forging.stars(stack)) + 1;
             ItemAttributeModifiers.Builder builder = ItemAttributeModifiers.builder();
-            ResourceLocation id = DungeonDelving.id("forged_wand");
-            ironsAttribute("spell_power").ifPresent(attribute -> builder.add(attribute,
-                    new AttributeModifier(id, WAND_SPELL_POWER_PER_STAR * stars, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.MAINHAND));
-            for (String quickness : List.of("cooldown_reduction", "cast_time_reduction")) {
-                ironsAttribute(quickness).ifPresent(attribute -> builder.add(attribute, new AttributeModifier(DungeonDelving.id("forged_wand." + quickness),
-                        WAND_QUICKNESS_PER_STAR * stars, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.MAINHAND));
-            }
+            addSpellPower(builder, stack, "forged_wand", WAND_SPELL_POWER[index(Forging.stars(stack))]);
             return builder.build();
         }
 
@@ -369,10 +364,13 @@ public final class ForgedGear {
         }
     }
 
-    /** One of Iron's Spells' attributes, when it's installed. */
-    static java.util.Optional<Holder<net.minecraft.world.entity.ai.attributes.Attribute>> ironsAttribute(String name) {
-        return net.minecraft.core.registries.BuiltInRegistries.ATTRIBUTE.getHolder(ResourceLocation.fromNamespaceAndPath("irons_spellbooks", name))
-                .map(holder -> holder);
+    /** Flat spell power to each of the staff's or wand's schools ({@link #spellSchools}), in the main hand. */
+    private static void addSpellPower(ItemAttributeModifiers.Builder builder, ItemStack stack, String name, double power) {
+        for (String school : spellSchools.apply(stack)) {
+            net.minecraft.core.registries.BuiltInRegistries.ATTRIBUTE.getHolder(ResourceLocation.fromNamespaceAndPath("spell_power", school))
+                    .ifPresent(attribute -> builder.add(attribute, new AttributeModifier(DungeonDelving.id(name + "." + school), power,
+                            AttributeModifier.Operation.ADD_VALUE), EquipmentSlotGroup.MAINHAND));
+        }
     }
 
     /** Attack damage (counting the player's own 1) and speed modifiers, like vanilla weapons'. */

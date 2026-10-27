@@ -37,6 +37,7 @@ public class DungeonDelving {
         }
         if (ModList.get().isLoaded("spell_engine")) {
             SpellEngineMagic.register();
+            io.github.ranger3462.dungeondelving.integration.spellengine.ForgedCasting.register(modEventBus);
         }
         if (ModList.get().isLoaded("curios")) {
             CuriosLoot.register();

@@ -1,0 +1,28 @@
+{
+  "values": [
+    {
+      "id": "wizards:arcane_blast",
+      "required": false
+    },
+    {
+      "id": "wizards:fire_blast",
+      "required": false
+    },
+    {
+      "id": "wizards:frostbolt",
+      "required": false
+    },
+    {
+      "id": "elemental_wizards_rpg:aqua_water_whip",
+      "required": false
+    },
+    {
+      "id": "elemental_wizards_rpg:terra_stone_spear",
+      "required": false
+    },
+    {
+      "id": "elemental_wizards_rpg:wind_air_cutter",
+      "required": false
+    }
+  ]
+}

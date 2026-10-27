@@ -1,0 +1,16 @@
+{
+  "values": [
+    {
+      "id": "wizards:arcane_bolt",
+      "required": false
+    },
+    {
+      "id": "wizards:fireball",
+      "required": false
+    },
+    {
+      "id": "wizards:frost_shard",
+      "required": false
+    }
+  ]
+}
