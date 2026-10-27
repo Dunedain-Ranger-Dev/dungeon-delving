@@ -134,7 +134,8 @@ public class TownGuard extends PathfinderMob implements io.github.ranger3462.dun
         goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0f));
         goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Mob.class, 5, true, false, mob -> mob instanceof Enemy));
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Mob.class, 5, true, false,
+                mob -> mob instanceof Enemy && io.github.ranger3462.dungeondelving.realm.RealmGarrison.mayEngage(this, mob)));
     }
 
     /** The skin's texture: a built-in face, or one in our town_guard folder. */

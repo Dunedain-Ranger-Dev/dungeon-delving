@@ -180,7 +180,6 @@ public class RealmScreen extends Screen {
             boolean border = (a.kingdoms() && b.monsters()) || (a.monsters() && b.kingdoms());
             line(graphics, screenX(a.x()), screenY(a.z()), screenX(b.x()), screenY(b.z()), border ? 0xFFC04040 : 0xFF606870);
         }
-        boolean blink = (System.currentTimeMillis() / 500) % 2 == 0;
         for (RealmMapClient.Node node : shown(data)) {
             int sx = screenX(node.x()), sy = screenY(node.z()), half = size(node) / 2;
             int outline = node.id().equals(selected) ? 0xFFFFFFFF : "capital".equals(node.type()) ? 0xFFE0C060 : 0xFF000000;
@@ -193,7 +192,7 @@ public class RealmScreen extends Screen {
                 graphics.fill(sx - half, sy, sx + half + 1, sy + 1, 0xFF000000); // Ruins: a crack across.
             }
             graphics.drawCenteredString(font, Component.literal(node.name()), sx, sy + half + 3, 0xD0D0D0);
-            if (!node.warnings().isEmpty() && blink) {
+            if (!node.warnings().isEmpty()) {
                 graphics.drawString(font, Component.literal("!").withStyle(ChatFormatting.BOLD), sx + half + 2, sy - half - 6, RED);
             }
         }

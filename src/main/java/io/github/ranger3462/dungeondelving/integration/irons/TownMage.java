@@ -81,7 +81,8 @@ public class TownMage extends AbstractSpellCastingMob implements RealmGuard {
         goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0f));
         goalSelector.addGoal(8, new RandomLookAroundGoal(this));
         targetSelector.addGoal(1, new HurtByTargetGoal(this));
-        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Mob.class, 5, true, false, mob -> mob instanceof Enemy));
+        targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Mob.class, 5, true, false,
+                mob -> mob instanceof Enemy && io.github.ranger3462.dungeondelving.realm.RealmGarrison.mayEngage(this, mob)));
     }
 
     /** Who it looks after: guards, villagers and players (the raid's sides keep turncoats from being targeted by the town). */

@@ -162,6 +162,18 @@ public final class Realm extends SavedData {
         setDirty();
     }
 
+    /** Adds a post for a town's garrison (see RealmGarrison). */
+    public void addPost(RealmNode node, BlockPos post) {
+        node.addPost(post);
+        setDirty();
+    }
+
+    /** Clears a town's posts: its garrison stands in a ring round its middle again. */
+    public void clearPosts(RealmNode node) {
+        node.clearPosts();
+        setDirty();
+    }
+
     public void move(RealmNode node, ResourceKey<Level> dimension, BlockPos pos) {
         node.moveTo(dimension, pos);
         setDirty();

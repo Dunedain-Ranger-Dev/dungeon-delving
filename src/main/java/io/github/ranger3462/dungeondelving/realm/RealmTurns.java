@@ -112,6 +112,7 @@ public final class RealmTurns {
     /** One turn at real time {@code time}: the kingdom acts, then each monster nation. */
     public static void takeTurn(Realm realm, RandomSource random, long time) {
         realm.turn++;
+        RealmGarrison.newDay(realm);
         RealmDamage.fundRepairs(realm);
         RealmTiers.grow(realm);
         kingdomAct(realm, pick(kingdomWeights(realm), random), time);

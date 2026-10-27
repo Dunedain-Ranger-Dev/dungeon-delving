@@ -93,6 +93,20 @@ A fought raid uses the damage each side does instead.
 | Attackers win, against a stronghold, site or ruins | They take it, and move up to 5 military from the attacker (or the army) into it as a garrison: a stronghold's military, a town's defense. News either way |
 | Defenders win | The stronghold loses 2 military, plus a quarter of the margin, and a town gains 1 morale |
 
+## Town guards
+
+A kingdom town above ruins keeps a standing garrison (`RealmGarrison`): as many guards as it would turn out for a raid
+(tier + 1 + morale / 5, up to 12), standing whenever a player is within 48 blocks of it.
+
+- **Posts:** each guard has one, the town's own in turn (`/realm guards <town> post add` where you stand, `post clear`),
+  or a ring 8 blocks round its middle.
+- **Leaving a post:** only for a raid on the town, a mob going for one of its villagers, or whatever attacks the guard.
+  Outside a raid it gives up a chase 32 blocks from its post, and walks back.
+- **Raids** are fought by the garrison as it stands; the survivors go back to their posts after.
+- **Losses:** a guard that dies stays dead until the next turn (the town's `fallen` stat), so a raid's losses carry over.
+  Guards that just unloaded come back when a player does.
+- A town that's lost, falls to ruins or loses morale sends home the guards it can no longer keep.
+
 ## What players change
 
 Players affect these choices only through the numbers the factions read:

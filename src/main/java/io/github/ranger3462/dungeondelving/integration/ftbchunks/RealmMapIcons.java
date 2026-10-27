@@ -33,7 +33,7 @@ import net.minecraft.world.phys.Vec3;
 
 /**
  * The realm on FTB Chunks' minimap and large map (client only; only loaded with FTB Chunks installed): an icon for
- * every town, stronghold, capital and site in its owner's colour, with a blinking red mark on any in trouble (pinned to
+ * every town, stronghold, capital and site in its owner's colour, with a steady red mark on any in trouble (pinned to
  * the minimap's edge when it's off it) and its details on hover; and under the minimap, a line for each raid or march at
  * dusk with its countdown. The "[Realm]" waypoints an earlier version made are cleared away.
  */
@@ -138,7 +138,7 @@ public final class RealmMapIcons {
             if (!"town".equals(node.type()) && w >= 6) {
                 graphics.fill(x + w / 2 - 1, y + h / 2 - 1, x + w / 2 + 1, y + h / 2 + 1, a | 0x101010);
             }
-            if (!node.warnings().isEmpty() && (System.currentTimeMillis() / 500) % 2 == 0) {
+            if (!node.warnings().isEmpty()) {
                 Font font = Minecraft.getInstance().font;
                 graphics.drawString(font, "!", x + w - 2, y - 4, a | 0xFF4040, true);
             }

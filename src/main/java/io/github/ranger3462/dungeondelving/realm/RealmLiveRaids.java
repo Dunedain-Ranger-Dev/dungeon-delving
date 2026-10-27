@@ -39,7 +39,8 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * Live raids (DD-98, docs/design/realm.md). When a raid's dusk comes and a player is at the town, it isn't rolled: it's
  * fought. The attacking nation's mobs come in {@link #WAVES} waves from all round the town (its dungeon faction's mobs,
  * of a tier by the stronghold's military), against the town's guards ({@link TownGuard}s: more for a bigger town and better morale, better
- * armed for more wealth, tougher for a better defense) and whoever's there. A bell rings and the town's villagers hide
+ * armed for more wealth, tougher for a better defense; a town's are its standing garrison, see {@link RealmGarrison}, and
+ * go back to their posts after) and whoever's there. A bell rings and the town's villagers hide
  * indoors until the fight's over.
  * <p>
  * The damage each side does decides it: what the raiders deal to guards, villagers and players, plus what's left of
@@ -193,8 +194,12 @@ public final class RealmLiveRaids {
         LiveRaid live = new LiveRaid(raid, level, town.pos(), tier(military), Mth.clamp(3 + military / 8, 3, 12));
         ACTIVE.put(raid.town(), live);
         int tier = town.type == RealmNode.Type.TOWN ? RealmTiers.tier(town) : 1;
-        // A kingdom-held stronghold's garrison is a small one (no morale); ruins and unheld places have no guards at all.
-        int guards = town.kingdoms() && tier > 0 ? guardCount(town.stat("morale"), tier) : 0;
+        // A town fights with its standing garrison (fewer if some fell since dawn). A kingdom-held stronghold's is a small
+        // one, turned out just for the raid; ruins and unheld places have no guards at all.
+        if (town.type == RealmNode.Type.TOWN) {
+            RealmGarrison.turnOut(level, realm, town).forEach(mob -> live.guards.add(mob.getUUID()));
+        }
+        int guards = town.type != RealmNode.Type.TOWN && town.kingdoms() ? guardCount(town.stat("morale"), tier) : 0;
         int[] split = roles(guards, tier);
         int crossbows = split[1];
         int mages = split[2];
@@ -345,7 +350,13 @@ public final class RealmLiveRaids {
         }
     }
 
+    /** Clears the field: the raiders go, and so do guards turned out just for the raid; a town's garrison goes back to its posts. */
     private static void clear(LiveRaid live) {
+        clear(live, false);
+    }
+
+    /** As {@link #clear(LiveRaid)}, sending the town's garrison home too if {@code everyone}. */
+    private static void clear(LiveRaid live, boolean everyone) {
         for (UUID id : live.raiders) {
             Entity entity = live.level.getEntity(id);
             if (entity != null) {
@@ -354,10 +365,11 @@ public final class RealmLiveRaids {
         }
         for (UUID id : live.guards) {
             Entity entity = live.level.getEntity(id);
-            if (entity != null) {
+            if (entity != null && (everyone || !entity.getPersistentData().contains(RealmGarrison.GARRISON_TAG))) {
                 entity.discard();
             }
         }
+        RealmGarrison.standDown(live.raid.town(), live.level);
     }
 
     /** No friendly fire: each side's hits on its own side are cancelled, from players and mobs alike. */
@@ -449,7 +461,7 @@ public final class RealmLiveRaids {
 
     /** Ends every fight at once, for tests. */
     public static void clearAll() {
-        ACTIVE.values().forEach(RealmLiveRaids::clear);
+        ACTIVE.values().forEach(live -> clear(live, true));
         ACTIVE.clear();
     }
 

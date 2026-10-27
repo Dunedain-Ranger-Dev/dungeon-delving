@@ -43,7 +43,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * <li>{@code /realm danger}: the danger level where you stand, and why (DD-100).</li>
  * <li>{@code /realm side town|raiders}: which side you fight for in the raid you're at (the town's, unless you say).</li>
  * <li>{@code /realm guards <town>}: how its guards look. {@code skin set|mixed|<name>} (our guard set, the game's built-in
- * faces, or one skin from textures/entity/town_guard/), {@code color <dye>|none}.</li>
+ * faces, or one skin from textures/entity/town_guard/), {@code color <dye>|none}, {@code post add} (where you stand) and
+ * {@code post clear} (its garrison's posts, see RealmGarrison).</li>
  * </ul>
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
@@ -79,7 +80,9 @@ public final class RealmCommands {
                         .then(Commands.literal("skin").then(Commands.argument("skin", StringArgumentType.word()).suggests(GUARD_SKINS)
                                 .executes(context -> guardLook(context, StringArgumentType.getString(context, "skin"), null))))
                         .then(Commands.literal("color").then(Commands.argument("color", StringArgumentType.word()).suggests(GUARD_COLORS)
-                                .executes(context -> guardLook(context, null, StringArgumentType.getString(context, "color")))))))
+                                .executes(context -> guardLook(context, null, StringArgumentType.getString(context, "color")))))
+                        .then(Commands.literal("post").then(Commands.literal("add").executes(context -> post(context, true)))
+                                .then(Commands.literal("clear").executes(context -> post(context, false))))))
                 .then(Commands.literal("side").then(Commands.literal("town").executes(context -> side(context, false)))
                         .then(Commands.literal("raiders").executes(context -> side(context, true))))
                 .then(Commands.literal("blueprint")
@@ -385,8 +388,39 @@ public final class RealmCommands {
     private static int guards(CommandContext<CommandSourceStack> context) {
         Optional<RealmNode> town = find(context, "town");
         town.ifPresent(found -> Feedback.tell(context.getSource(), found.id + "'s guards: skin " + (found.guardSkin().isEmpty() ? "set" : found.guardSkin())
-                + ", color " + (found.guardColor().isEmpty() ? "none" : found.guardColor()) + "."));
+                + ", color " + (found.guardColor().isEmpty() ? "none" : found.guardColor()) + "; "
+                + io.github.ranger3462.dungeondelving.realm.RealmGarrison.strength(found) + " of "
+                + io.github.ranger3462.dungeondelving.realm.RealmGarrison.fullStrength(found) + " standing ("
+                + found.stat("fallen") + " fallen since dawn), at " + (found.posts().isEmpty() ? "a ring round its middle" : found.posts().size() + " posts") + "."));
         return town.isPresent() ? 1 : 0;
+    }
+
+    /** Adds a post where you stand to a town's garrison, or clears them all. */
+    private static int post(CommandContext<CommandSourceStack> context, boolean add) {
+        Optional<RealmNode> town = find(context, "town");
+        if (town.isEmpty()) {
+            return 0;
+        }
+        if (town.get().type != RealmNode.Type.TOWN) {
+            Feedback.fail(context.getSource(), town.get().id + " isn't a town.");
+            return 0;
+        }
+        Realm realm = Realm.get(context.getSource().getServer());
+        if (add) {
+            // On the ground under you: a guard can't walk to a post in the air.
+            BlockPos at = BlockPos.containing(context.getSource().getPosition());
+            net.minecraft.server.level.ServerLevel level = context.getSource().getLevel();
+            while (at.getY() > level.getMinBuildHeight() && level.getBlockState(at.below()).getCollisionShape(level, at.below()).isEmpty()) {
+                at = at.below();
+            }
+            realm.addPost(town.get(), at);
+            Feedback.tell(context.getSource(), "Added a post for " + town.get().id + "'s guards at " + at.toShortString() + " (" + town.get().posts().size()
+                    + " now; guards take them in turn).");
+        } else {
+            realm.clearPosts(town.get());
+            Feedback.tell(context.getSource(), town.get().id + "'s guards stand in a ring round its middle again.");
+        }
+        return 1;
     }
 
     /** Sets a town's guard skin or color (whichever isn't null). */
