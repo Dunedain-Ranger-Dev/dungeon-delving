@@ -59,12 +59,55 @@ public class CapitalTests {
         }
         helper.assertTrue(marched == 1 && realm.raids().size() == 1, "after " + RealmCapitals.RALLY_TURNS + " turns rallying, its champion marches");
         Realm.Raid raid = realm.raids().get(0);
-        helper.assertTrue(raid.town().equals("riverhold") && RealmCapitals.isChampionRaid(realm, raid), "on the nearest town");
+        helper.assertTrue(raid.town().equals("camp") && RealmCapitals.isChampionRaid(realm, raid), "to retake its nearest stronghold: " + raid.town());
         helper.assertTrue(RealmCapitals.rally(realm, 0L) == 0, "one champion at a time");
 
         int before = capital.stat("military");
-        RealmRaids.resolve(realm, raid, 20, 1);
-        helper.assertTrue(capital.stat("military") >= before - 1 + RealmCapitals.VICTORY_MILITARY - 1, "a winning champion lets it rebuild faster");
+        helper.assertTrue(RealmRaids.resolve(realm, raid, 20, 1), "the champion wins");
+        helper.assertTrue(DungeonFactions.ORCS.equals(camp.owner()) && camp.stat("military") == RealmRaids.GARRISON,
+                "and the orcs hold the stronghold again, garrisoned: " + camp.owner() + " " + camp.stat("military"));
+        helper.assertTrue(capital.stat("military") == before - RealmRaids.GARRISON + RealmCapitals.VICTORY_MILITARY,
+                "the garrison comes from the capital, and the win lets it rebuild faster: " + capital.stat("military"));
+        helper.assertTrue(!RealmCapitals.pushedBack(realm, DungeonFactions.ORCS) && realm.log().stream()
+                .anyMatch(entry -> entry.news() && entry.text().contains("orcs have taken camp")), "back in the field, with news");
+
+        realm.setOwner(camp, RealmNode.KINGDOM);
+        realm.remove("camp");
+        for (int turn = 0; turn < RealmCapitals.RALLY_TURNS; turn++) {
+            RealmCapitals.rally(realm, 0L);
+        }
+        helper.assertTrue(realm.raids().size() == 1 && realm.raids().get(0).town().equals("riverhold"), "with no stronghold left to retake, it marches on the nearest town");
+        RealmRaids.resolve(realm, realm.raids().get(0), 20, 1);
+        helper.assertTrue(realm.node("riverhold").orElseThrow().owner().equals(RealmNode.KINGDOM), "towns are sacked, never taken");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void nationsTakeBackWhatBordersThemBeforeRaidingTowns(GameTestHelper helper) {
+        var dim = helper.getLevel().dimension();
+        Realm realm = new Realm();
+        RealmNode town = new RealmNode("riverhold", RealmNode.Type.TOWN, RealmNode.KINGDOM, dim, BlockPos.ZERO);
+        realm.add(town);
+        RealmNode warren = new RealmNode("warren", RealmNode.Type.STRONGHOLD, DungeonFactions.GOBLINS, dim, new BlockPos(300, 64, 0));
+        realm.add(warren);
+        RealmNode fort = new RealmNode("old_fort", RealmNode.Type.STRONGHOLD, RealmNode.KINGDOM, dim, new BlockPos(200, 64, 0));
+        realm.add(fort);
+        RealmNode mine = new RealmNode("mine", RealmNode.Type.SITE, RealmNode.KINGDOM, dim, new BlockPos(250, 64, 0));
+        realm.add(mine);
+        realm.link("warren", "riverhold");
+        realm.link("warren", "old_fort");
+        realm.link("warren", "mine");
+        var target = io.github.ranger3462.dungeondelving.realm.RealmTurns.raidTarget(realm, DungeonFactions.GOBLINS).orElseThrow();
+        helper.assertTrue(target.getValue().id.equals("mine"), "the nearest place to take comes before the town: " + target.getValue().id);
+
+        realm.setStat(mine, "fortification", 3);
+        Realm.Raid raid = new Realm.Raid(DungeonFactions.GOBLINS, "warren", "mine", 0, 0L);
+        helper.assertTrue(RealmRaids.defense(realm, mine) == 3 + realm.kingdomStat("army") / RealmRaids.ARMY_SHARE, "a held site defends with its fortification and the army");
+        helper.assertFalse(RealmRaids.decide(realm, raid, 1, 50, false), "driven off");
+        helper.assertTrue(mine.owner().equals(RealmNode.KINGDOM), "it stays the kingdom's");
+        helper.assertTrue(RealmRaids.decide(realm, raid, 50, 1, false) && mine.owner().equals(DungeonFactions.GOBLINS), "a win takes it");
+        helper.assertTrue(io.github.ranger3462.dungeondelving.realm.RealmTurns.raidTarget(realm, DungeonFactions.GOBLINS).orElseThrow().getValue().id
+                .equals("old_fort"), "then the next nearest");
         helper.succeed();
     }
 

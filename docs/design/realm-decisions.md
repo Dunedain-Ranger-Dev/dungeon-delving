@@ -28,8 +28,10 @@ get richer and grow.
 
 ## Each monster nation
 
-A nation (goblins, undead, orcs) looks at its **strongholds**, their total **military**, and its **raid target**:
-the weakest-defended kingdom town linked to any of its strongholds.
+A nation (goblins, undead, orcs) looks at its **strongholds**, their total **military**, and its **raid target**.
+Taking ground back comes first: the target is the nearest stronghold or site linked to one of its strongholds that
+it doesn't hold. Only if there's none is it the weakest-defended kingdom town linked to them. (A target's defense is a
+town's defense, or a stronghold's or site's fortification.)
 
 | Action | Weight | What it does |
 | --- | --- | --- |
@@ -39,7 +41,7 @@ the weakest-defended kingdom town linked to any of its strongholds.
 
 So a nation weaker than its target mostly builds up. Once it outmatches the target, raiding grows likelier the
 bigger its lead: 15 military over the target's defense makes raid weight 6 against build 3 and fortify 1-2.
-Fortification currently only counts toward this choice; it will matter once the kingdom can attack strongholds.
+Fortification also defends a stronghold or site when a nation comes to take it.
 
 ## Capitals
 
@@ -48,27 +50,34 @@ dangerous: at least danger 6 at its heart, fading out over 360 blocks (`RealmCap
 
 - While the nation holds any stronghold, its capital just waits.
 - Once it has lost them all, it's **pushed back**. Building military now goes to the capital, and each turn the
-  capital **rallies**. Every 3 turns of rallying, its **champion** marches on the nearest kingdom town as a raid. The
+  capital **rallies**. Every 3 turns of rallying, its **champion** marches to retake the nearest stronghold the
+  nation doesn't hold. With none left to retake, it marches on the nearest kingdom town instead. The
   champion is one of the nation's dungeon bosses, tier 1 plus 1 per 20 of the capital's military, up to 4. A rolled
-  champion raid gets +10 attack; a fought one brings the champion with the last wave.
+  champion raid gets +10 attack; a fought one brings the champion with the last wave. Retaking a stronghold ends
+  the rally: the nation is back in the field and takes normal turns again.
 - Players can call the champion out at the capital with `/challenge` (within 48 blocks of it, once the nation is
   pushed back, one champion at a time).
-- **Killing the champion** costs the capital a third of its military and resets its rally. A champion that sacks a
-  town, or kills its challenger, adds 5 military.
+- **Killing the champion** costs the capital a third of its military and resets its rally. A champion that wins its
+  raid, or kills its challenger, adds 5 military.
 
 ## Raids
 
-At dusk a raid is fought if a player is within 48 blocks of the town. Otherwise it's rolled:
+A raid's target is a town (to sack) or a stronghold or site the nation doesn't hold (to take). Towns are never
+taken, only sacked. At dusk a raid is fought if a player is within 48 blocks of the target. Otherwise it's rolled:
 
-- attack = the stronghold's military + d20
-- defense = the town's defense + a quarter of the kingdom's army + d20
+- attack = the stronghold's military (+10 for a champion) + d20
+- defense = the target's defense (a town's defense, or a stronghold's or site's fortification), plus a quarter of
+  the kingdom's army if it's the kingdom's, + d20
+
+A fought raid on a kingdom-held stronghold or site is defended by a small garrison of guards. An unheld one has none.
 
 A fought raid uses the damage each side does instead.
 
 | Result | What happens |
 | --- | --- |
 | Attackers win by a margin | The town loses defense (a quarter of the margin, at least 1), wealth (2 + a quarter of the margin) and 2 morale, and takes block damage equal to the margin. A margin of 10 or more also knocks it down a tier. The stronghold loses 1 military |
-| Defenders win | The stronghold loses 2 military, plus a quarter of the margin, and the town gains 1 morale |
+| Attackers win, against a stronghold or site | The nation takes it, and moves up to 5 military from the attacker into it as a garrison. Its land grows more dangerous (news) |
+| Defenders win | The stronghold loses 2 military, plus a quarter of the margin, and a town gains 1 morale |
 
 ## What players change
 
@@ -76,7 +85,8 @@ Players affect these choices only through the numbers the factions read:
 
 - Fighting raids changes their outcome: more defense, morale and wealth for the town, less military for the nation.
 - Taking or clearing a stronghold (`/realm node owner`, for now) removes it from its nation. Its land calms, and the
-  nation loses that much military and those border links.
+  nation loses that much military and those border links. The nation will try to take it back: from a neighbouring
+  stronghold if it has one, or with its champion once it's pushed back.
 - Admins can set any stat (`/realm node set`) to steer a world.
 
 ## Not decided yet

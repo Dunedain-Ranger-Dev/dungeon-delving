@@ -26,8 +26,9 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
  * <p>
  * While a nation holds strongholds, its capital stays behind them. Once it's <b>pushed back</b> (every stronghold lost),
  * the capital <b>rallies</b>: every {@link #RALLY_TURNS} turns it sends its <b>champion</b>, one of the nation's dungeon
- * bosses (tier by the capital's military), against the nearest kingdom town, as a raid fought or rolled like any other
- * ({@link RealmLiveRaids} brings the champion with the last wave). Players can also go to the capital and call the
+ * bosses (tier by the capital's military), to retake the nearest stronghold it doesn't hold, or if there's none, against
+ * the nearest kingdom town, as a raid fought or rolled like any other ({@link RealmLiveRaids} brings the champion with
+ * the last wave). Retaking a stronghold ends the rally: the nation is back in the field. Players can also go to the capital and call the
  * champion out ({@code /challenge}). Killing the champion sets the nation back (a third of the capital's military);
  * a champion that wins, or kills its challenger, lets it rebuild faster.
  */
@@ -65,6 +66,18 @@ public final class RealmCapitals {
                 .min(Comparator.comparingDouble(node -> node.pos().distSqr(capital.pos())));
     }
 
+    /** The stronghold nearest a capital, in its dimension, that its nation could retake. */
+    public static Optional<RealmNode> nearestLostStronghold(Realm realm, RealmNode capital) {
+        return realm.nodes().stream().filter(node -> node.type == RealmNode.Type.STRONGHOLD && RealmRaids.capturable(node)
+                && node.dimension().equals(capital.dimension())).min(Comparator.comparingDouble(node -> node.pos().distSqr(capital.pos())));
+    }
+
+    /** Where a capital's champion marches: the nearest stronghold to retake, else the nearest town. */
+    public static Optional<RealmNode> championTarget(Realm realm, RealmNode capital) {
+        Optional<RealmNode> stronghold = nearestLostStronghold(realm, capital);
+        return stronghold.isPresent() ? stronghold : nearestTown(realm, capital);
+    }
+
     /** Each turn: pushed-back capitals rally, and every {@link #RALLY_TURNS} send their champion. Returns how many marched. */
     public static int rally(Realm realm, long time) {
         int marched = 0;
@@ -75,13 +88,14 @@ public final class RealmCapitals {
                 continue;
             }
             realm.addStat(capital, "rally", 1);
-            Optional<RealmNode> town = nearestTown(realm, capital);
-            if (capital.stat("rally") < RALLY_TURNS || town.isEmpty()) {
+            Optional<RealmNode> target = championTarget(realm, capital);
+            if (capital.stat("rally") < RALLY_TURNS || target.isEmpty()) {
                 continue;
             }
             realm.setStat(capital, "rally", 0);
-            realm.raids.add(new Realm.Raid(nation, capital.id, town.get().id, realm.turn, time + RealmTurns.turnMillis() / 2));
-            realm.news("The " + nation + " rally at " + capital.name() + ": their champion marches on " + town.get().name() + " at dusk!");
+            realm.raids.add(new Realm.Raid(nation, capital.id, target.get().id, realm.turn, time + RealmTurns.turnMillis() / 2));
+            String goal = RealmRaids.capturable(target.get()) ? "marches to retake " + target.get().name() : "marches on " + target.get().name();
+            realm.news("The " + nation + " rally at " + capital.name() + ": their champion " + goal + " at dusk!");
             marched++;
         }
         return marched;

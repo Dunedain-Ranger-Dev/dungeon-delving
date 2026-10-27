@@ -144,9 +144,10 @@ public final class Realm extends SavedData {
     public void setOwner(RealmNode node, String owner) {
         boolean wasMonsters = node.monsters();
         node.setOwner(owner);
-        if (node.type == RealmNode.Type.STRONGHOLD && !wasMonsters && node.monsters()) {
+        boolean holdable = node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.SITE;
+        if (holdable && !wasMonsters && node.monsters()) {
             news("The " + owner + " have taken " + node.name() + ": the land around it grows more dangerous.");
-        } else if (node.type == RealmNode.Type.STRONGHOLD && wasMonsters && !node.monsters()) {
+        } else if (holdable && wasMonsters && !node.monsters()) {
             news(node.name() + (node.kingdoms() ? " has been taken by the kingdom" : " has been cleared") + ": the land around it calms.");
         }
         setDirty();

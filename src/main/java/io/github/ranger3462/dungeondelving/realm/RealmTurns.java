@@ -27,8 +27,9 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
  * <li>The kingdom: reinforce its borders (border towns gain defense), muster (its army grows), or gather wealth (towns
  * grow richer, and the treasury fills). Threatened borders make reinforcing likelier; a small army, mustering; an empty
  * treasury, gathering.</li>
- * <li>A monster nation: build its military, raid the weakest town its strongholds border, or fortify its strongholds.
- * The stronger it is against its targets, the likelier a raid; it raids one town at a time.</li>
+ * <li>A monster nation: build its military, raid, or fortify its strongholds. A raid goes first for the nearest
+ * stronghold or site its strongholds border that it doesn't hold (to take it), and only then the weakest town they
+ * border (to sack it). The stronger it is against its target, the likelier a raid; it raids one place at a time.</li>
  * </ul>
  * Raids are declared here and resolved half a turn later, at dusk ({@link RealmRaids}). What each side did goes in the
  * realm log; raids are news, told to every player online.
@@ -173,14 +174,30 @@ public final class RealmTurns {
         return strongholds(realm, nation).stream().mapToInt(node -> node.stat("military")).sum();
     }
 
-    /** The town a nation would raid: the weakest kingdom town one of its strongholds borders, and from which stronghold. */
+    /**
+     * Where a nation would raid, and from which stronghold: the nearest node its strongholds border that it could
+     * capture (see {@link RealmRaids#capturable}), or failing that the weakest kingdom town they border.
+     */
     public static Optional<Map.Entry<RealmNode, RealmNode>> raidTarget(Realm realm, String nation) {
-        List<Map.Entry<RealmNode, RealmNode>> targets = new ArrayList<>();
+        List<Map.Entry<RealmNode, RealmNode>> towns = new ArrayList<>();
+        List<Map.Entry<RealmNode, RealmNode>> takeable = new ArrayList<>();
         for (RealmNode stronghold : strongholds(realm, nation)) {
-            realm.neighbors(stronghold.id).stream().filter(node -> node.type == RealmNode.Type.TOWN)
-                    .forEach(town -> targets.add(Map.entry(stronghold, town)));
+            for (RealmNode node : realm.neighbors(stronghold.id)) {
+                if (RealmRaids.capturable(node)) {
+                    takeable.add(Map.entry(stronghold, node));
+                } else if (node.type == RealmNode.Type.TOWN) {
+                    towns.add(Map.entry(stronghold, node));
+                }
+            }
         }
-        return targets.stream().min(Comparator.comparingInt(entry -> entry.getValue().stat("defense")));
+        Optional<Map.Entry<RealmNode, RealmNode>> nearest = takeable.stream()
+                .min(Comparator.comparingDouble(entry -> entry.getKey().pos().distSqr(entry.getValue().pos())));
+        return nearest.isPresent() ? nearest : towns.stream().min(Comparator.comparingInt(entry -> entry.getValue().stat("defense")));
+    }
+
+    /** What a raid on a node means, for the news: taking it, or raiding it. */
+    static String raidVerb(RealmNode target) {
+        return RealmRaids.capturable(target) ? "march on " + target.name() + " to take it" : "raid " + target.name();
     }
 
     public static Map<NationAction, Integer> nationWeights(Realm realm, String nation) {
@@ -189,7 +206,7 @@ public final class RealmTurns {
         boolean raiding = realm.raids.stream().anyMatch(raid -> raid.nation().equals(nation));
         int fortification = strongholds(realm, nation).stream().mapToInt(node -> node.stat("fortification")).min().orElse(0);
         Map<NationAction, Integer> weights = new LinkedHashMap<>();
-        int targetDefense = target.map(entry -> entry.getValue().stat("defense")).orElse(0);
+        int targetDefense = target.map(entry -> RealmRaids.ownDefense(entry.getValue())).orElse(0);
         weights.put(NationAction.BUILD_MILITARY, 3 + (target.isPresent() && military < targetDefense ? 2 : 0));
         weights.put(NationAction.RAID, target.isEmpty() || raiding ? 0 : 1 + Math.max(0, (military - targetDefense) / 3));
         weights.put(NationAction.FORTIFY, 1 + (fortification < 5 ? 1 : 0));
@@ -218,7 +235,7 @@ public final class RealmTurns {
             }
             case RAID -> raidTarget(realm, nation).ifPresent(target -> {
                 realm.raids.add(new Realm.Raid(nation, target.getKey().id, target.getValue().id, realm.turn, time + turnMillis() / 2));
-                realm.news("The " + nation + " of " + target.getKey().name() + " will raid " + target.getValue().name() + " at dusk!");
+                realm.news("The " + nation + " of " + target.getKey().name() + " will " + raidVerb(target.getValue()) + " at dusk!");
             });
         }
     }

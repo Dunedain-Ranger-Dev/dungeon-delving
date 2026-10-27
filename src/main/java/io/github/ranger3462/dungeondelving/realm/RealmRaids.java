@@ -16,14 +16,20 @@ import net.minecraft.util.RandomSource;
  * {@link #TIER_LOSS_MARGIN} or more, a town above tier 1 also falls back a tier.</li>
  * <li>Defenders win: the attackers lose military, more for a bigger margin, and the town's morale rises.</li>
  * </ul>
- * With a player at the town when dusk comes, it's fought instead ({@link RealmLiveRaids}), and the damage each side does
- * decides it the same way.
+ * A raid can also be on a stronghold or site the nation doesn't hold ({@link #capturable}): won, the nation takes it
+ * and leaves a garrison of up to {@link #GARRISON} military there; lost, the attackers lose military as usual. Its
+ * defense is its fortification, plus the army's share if it's the kingdom's.
+ * <p>
+ * With a player at the target when dusk comes, it's fought instead ({@link RealmLiveRaids}), and the damage each side
+ * does decides it the same way.
  */
 public final class RealmRaids {
     /** The share of the kingdom's army that turns out for a raided town: a quarter. */
     public static final int ARMY_SHARE = 4;
     /** A sacking by this much or more knocks a town back a tier (DD-99). */
     public static final int TIER_LOSS_MARGIN = 10;
+    /** The most military a nation leaves to hold a node it captures. */
+    public static final int GARRISON = 5;
 
     private RealmRaids() {}
 
@@ -70,9 +76,19 @@ public final class RealmRaids {
         return Optional.of(raid);
     }
 
-    /** The defense a town puts up against a raid, before its roll. */
-    public static int defense(Realm realm, RealmNode town) {
-        return town.stat("defense") + realm.kingdomStat("army") / ARMY_SHARE;
+    /** Whether a raid can capture a node: a stronghold or site no monster nation holds. Towns are sacked, never taken. */
+    public static boolean capturable(RealmNode node) {
+        return (node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.SITE) && !node.monsters();
+    }
+
+    /** A node's own defense: a town's defense, or anything else's fortification. */
+    public static int ownDefense(RealmNode node) {
+        return node.stat(node.type == RealmNode.Type.TOWN ? "defense" : "fortification");
+    }
+
+    /** The defense a raid's target puts up, before its roll: its own, plus the army's share if it's the kingdom's. */
+    public static int defense(Realm realm, RealmNode target) {
+        return ownDefense(target) + (target.kingdoms() ? realm.kingdomStat("army") / ARMY_SHARE : 0);
     }
 
     /** Resolves one raid with these rolls (a d20 each), and takes it off the list. Returns whether the attackers won. */
@@ -101,6 +117,17 @@ public final class RealmRaids {
         RealmNode target = town.get();
         RealmNode attacker = stronghold.get();
         String how = fought ? " in a pitched fight" : "";
+        if (attack > defense && capturable(target)) {
+            int garrison = Math.min(GARRISON, attacker.stat("military"));
+            realm.addStat(attacker, "military", -garrison);
+            realm.news("The " + raid.nation() + " of " + attacker.name() + " stormed " + target.name() + how + " (" + attack + " against " + defense + ").");
+            realm.setOwner(target, raid.nation());
+            realm.setStat(target, "military", garrison);
+            if (attacker.type == RealmNode.Type.CAPITAL) {
+                RealmCapitals.championRaidDecided(realm, attacker, true);
+            }
+            return true;
+        }
         if (attack > defense) {
             int margin = attack - defense;
             int defenseLost = Math.min(target.stat("defense"), Math.max(1, margin / 4));
@@ -125,7 +152,9 @@ public final class RealmRaids {
         }
         int losses = Math.min(attacker.stat("military"), 2 + (defense - attack) / 4);
         realm.addStat(attacker, "military", -losses);
-        realm.addStat(target, "morale", 1);
+        if (target.type == RealmNode.Type.TOWN) {
+            realm.addStat(target, "morale", 1);
+        }
         realm.news(target.name() + " drove off the " + raid.nation() + " of " + attacker.name() + how + " (" + defense + " against " + attack + "): they lost "
                 + losses + " military.");
         return false;

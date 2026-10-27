@@ -193,7 +193,8 @@ public final class RealmLiveRaids {
         LiveRaid live = new LiveRaid(raid, level, town.pos(), tier(military), Mth.clamp(3 + military / 8, 3, 12));
         ACTIVE.put(raid.town(), live);
         int tier = RealmTiers.tier(town);
-        int guards = guardCount(town.stat("morale"), tier);
+        // A kingdom-held stronghold's garrison is a small one (no morale); an unheld place has no guards at all.
+        int guards = town.kingdoms() ? guardCount(town.stat("morale"), tier) : 0;
         int[] split = roles(guards, tier);
         int crossbows = split[1];
         int mages = split[2];
