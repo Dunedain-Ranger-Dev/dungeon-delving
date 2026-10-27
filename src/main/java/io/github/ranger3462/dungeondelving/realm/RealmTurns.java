@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import io.github.ranger3462.dungeondelving.Config;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
@@ -173,9 +174,10 @@ public final class RealmTurns {
         weights.put(KingdomAction.GATHER_WEALTH, 2 + (realm.kingdomStat("treasury") < 10 ? 2 : 0));
         Optional<Map.Entry<RealmNode, RealmNode>> march = marchTarget(realm);
         boolean marching = realm.raids.stream().anyMatch(raid -> RealmNode.KINGDOM.equals(raid.nation()));
-        // Only when it's strong enough to win: the keener the more it outmatches the target.
+        // Only when it's fairly sure to win (its attack bar, DD-102): the keener the more it outmatches the target.
         int margin = march.map(target -> RealmRaids.kingdomAttack(realm) - RealmRaids.defense(realm, target.getValue())).orElse(0);
-        weights.put(KingdomAction.MARCH, march.isEmpty() || marching || margin <= 0 ? 0 : 1 + margin / 3);
+        boolean confident = RealmFactions.winChance(margin) >= RealmFactions.get(RealmNode.KINGDOM).attackBar();
+        weights.put(KingdomAction.MARCH, march.isEmpty() || marching || !confident ? 0 : 1 + margin / 3);
         return weights;
     }
 
@@ -227,25 +229,82 @@ public final class RealmTurns {
         return strongholds(realm, nation).stream().mapToInt(node -> node.stat("military")).sum();
     }
 
+    /** A raid a nation could make: from where, on what, and its chance of winning (before any champion). */
+    public record RaidPlan(RealmNode from, RealmNode target, double chance) {}
+
+    /** Points an action gives a faction: its base, by the faction's growth (at least 1). */
+    public static int points(String faction, int base) {
+        return Math.max(1, (int) Math.round(base * RealmFactions.get(faction).growth()));
+    }
+
     /**
-     * Where a nation would raid, and from which stronghold: the nearest node its strongholds border that it could
-     * capture (see {@link RealmRaids#capturable}), or failing that the weakest town they border that no nation holds.
+     * Where a nation would raid, by its traits (DD-102): from any of its strongholds (and its capital, for a nation
+     * that attacks in bursts), on a linked place it could take or a town it could sack. Its {@code targets} say whose;
+     * a {@code home_radius} keeps it within that many links of its capital. The best is the likeliest win, ahead of that
+     * places it could take, and ahead of those places it lost (by how keen it is to retake them).
      */
-    public static Optional<Map.Entry<RealmNode, RealmNode>> raidTarget(Realm realm, String nation) {
-        List<Map.Entry<RealmNode, RealmNode>> towns = new ArrayList<>();
-        List<Map.Entry<RealmNode, RealmNode>> takeable = new ArrayList<>();
-        for (RealmNode stronghold : strongholds(realm, nation)) {
-            for (RealmNode node : realm.neighbors(stronghold.id)) {
-                if (RealmRaids.capturable(node, nation)) {
-                    takeable.add(Map.entry(stronghold, node));
-                } else if (node.type == RealmNode.Type.TOWN && !node.monsters()) {
-                    towns.add(Map.entry(stronghold, node));
+    public static Optional<RaidPlan> raidPlan(Realm realm, String nation) {
+        RealmFactions.Traits traits = RealmFactions.get(nation);
+        List<RealmNode> sources = new ArrayList<>(strongholds(realm, nation));
+        Optional<RealmNode> capital = RealmCapitals.capital(realm, nation);
+        if (traits.burstRatio() > 0) {
+            capital.ifPresent(sources::add);
+        }
+        Set<String> home = traits.homeRadius() > 0 && capital.isPresent() ? within(realm, capital.get(), traits.homeRadius()) : null;
+        RaidPlan best = null;
+        double bestScore = Double.NEGATIVE_INFINITY;
+        for (RealmNode from : sources) {
+            for (RealmNode target : realm.neighbors(from.id)) {
+                if (nation.equals(target.owner()) || (home != null && !home.contains(target.id))) {
+                    continue;
+                }
+                boolean takeable = RealmRaids.capturable(target, nation);
+                if (!takeable && target.type != RealmNode.Type.TOWN) {
+                    continue;
+                }
+                double chance = RealmFactions.winChance(RealmRaids.attack(realm, nation, from) - RealmRaids.defense(realm, target));
+                if (!wouldAttack(traits, target, chance)) {
+                    continue;
+                }
+                double score = chance + (takeable ? 0.3 : 0) + (nation.equals(target.lostBy()) ? traits.retake() * 0.5 : 0)
+                        - from.pos().distSqr(target.pos()) * 1e-9;
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = new RaidPlan(from, target, chance);
                 }
             }
         }
-        Optional<Map.Entry<RealmNode, RealmNode>> nearest = takeable.stream()
-                .min(Comparator.comparingDouble(entry -> entry.getKey().pos().distSqr(entry.getValue().pos())));
-        return nearest.isPresent() ? nearest : towns.stream().min(Comparator.comparingInt(entry -> entry.getValue().stat("defense")));
+        return Optional.ofNullable(best);
+    }
+
+    /** Whether a faction's {@code targets} let it attack this node's owner, at this chance. */
+    static boolean wouldAttack(RealmFactions.Traits traits, RealmNode target, double chance) {
+        boolean unheld = !target.kingdoms() && !target.monsters();
+        return switch (traits.targets()) {
+            case ANYONE -> true;
+            case KINGDOM -> target.kingdoms() || unheld;
+            case KINGDOM_FIRST -> target.kingdoms() || unheld || chance >= traits.weakBar();
+            case MONSTERS -> target.monsters();
+        };
+    }
+
+    /** The nodes within {@code links} links of a node, itself included. */
+    private static Set<String> within(Realm realm, RealmNode from, int links) {
+        Set<String> seen = new java.util.HashSet<>(Set.of(from.id));
+        List<RealmNode> edge = List.of(from);
+        for (int i = 0; i < links; i++) {
+            List<RealmNode> next = new ArrayList<>();
+            for (RealmNode node : edge) {
+                realm.neighbors(node.id).stream().filter(other -> seen.add(other.id)).forEach(next::add);
+            }
+            edge = next;
+        }
+        return seen;
+    }
+
+    /** Where a nation would raid, and from which stronghold: {@link #raidPlan}'s places. */
+    public static Optional<Map.Entry<RealmNode, RealmNode>> raidTarget(Realm realm, String nation) {
+        return raidPlan(realm, nation).map(plan -> Map.entry(plan.from(), plan.target()));
     }
 
     /** What a raid by {@code by} on a node means, for the news: taking it, or raiding it. */
@@ -253,45 +312,98 @@ public final class RealmTurns {
         return RealmRaids.capturable(target, by) ? "march on " + target.name() + " to take it" : "raid " + target.name();
     }
 
+    /** Whether a nation is still securing a place it took (it holds one with turns of {@code securing} left). */
+    static boolean securing(Realm realm, String nation) {
+        return RealmFactions.get(nation).fortifyAfterCapture() && realm.nodes().stream().anyMatch(node -> nation.equals(node.owner()) && node.stat("securing") > 0);
+    }
+
+    /**
+     * Whether a nation's best raid is one it would make: its chance is at least its {@code attack_bar}. A nation that
+     * attacks in bursts only starts once its capital's military is {@code burst_ratio} times the target's defense,
+     * then keeps going while its odds hold.
+     */
+    static boolean ready(Realm realm, String nation, Optional<RaidPlan> plan) {
+        RealmFactions.Traits traits = RealmFactions.get(nation);
+        if (plan.isEmpty() || plan.get().chance() < traits.attackBar()) {
+            return false;
+        }
+        if (traits.burstRatio() <= 0) {
+            return true;
+        }
+        Optional<RealmNode> capital = RealmCapitals.capital(realm, nation);
+        return capital.isPresent() && (capital.get().stat("bursting") > 0
+                || capital.get().stat("military") >= traits.burstRatio() * Math.max(1, RealmRaids.defense(realm, plan.get().target())));
+    }
+
     public static Map<NationAction, Integer> nationWeights(Realm realm, String nation) {
-        Optional<Map.Entry<RealmNode, RealmNode>> target = raidTarget(realm, nation);
+        RealmFactions.Traits traits = RealmFactions.get(nation);
+        Optional<RaidPlan> plan = raidPlan(realm, nation);
         boolean raiding = realm.raids.stream().anyMatch(raid -> raid.nation().equals(nation));
+        boolean ready = ready(realm, nation, plan);
+        boolean securing = securing(realm, nation);
         int fortification = strongholds(realm, nation).stream().mapToInt(node -> node.stat("fortification")).min().orElse(0);
         Map<NationAction, Integer> weights = new LinkedHashMap<>();
-        // How far the raiding stronghold is ahead of what it would face (before the rolls): no raid until it's a match.
-        int margin = target.map(entry -> entry.getKey().stat("military") - RealmRaids.defense(realm, entry.getValue())).orElse(0);
-        weights.put(NationAction.BUILD_MILITARY, 3 + (target.isPresent() && margin < 0 ? 4 : 0));
-        weights.put(NationAction.RAID, target.isEmpty() || raiding || margin < 0 ? 0 : 1 + margin / 3);
-        weights.put(NationAction.FORTIFY, 1 + (fortification < 5 ? 1 : 0));
+        weights.put(NationAction.BUILD_MILITARY, 3 + (ready ? 0 : 4));
+        // The better its odds over its bar, the keener; an aggressive nation more so.
+        int keenness = ready ? (int) Math.max(1, Math.round((1 + (plan.get().chance() - traits.attackBar()) * 10) * traits.aggression())) : 0;
+        weights.put(NationAction.RAID, raiding || securing ? 0 : keenness);
+        weights.put(NationAction.FORTIFY, 1 + (fortification < 5 ? 1 : 0) + (securing ? 6 : 0));
         return weights;
     }
 
-    /** A nation's action on the turn at real time {@code time}: a raid declared then resolves half a turn later. */
+    /**
+     * A nation's action on the turn at real time {@code time}: a raid declared then resolves half a turn later. Before
+     * it acts, its places count down their securing, and a blighting nation's land grows more dangerous.
+     */
     public static void nationAct(Realm realm, String nation, NationAction action, long time) {
+        RealmFactions.Traits traits = RealmFactions.get(nation);
+        for (RealmNode node : realm.nodes()) {
+            if (nation.equals(node.owner())) {
+                if (node.stat("securing") > 0) {
+                    realm.addStat(node, "securing", -1);
+                }
+                if (traits.blight() > 0 && node.stat("blight") < RealmLevels.MAX_BLIGHT) {
+                    realm.setStat(node, "blight", Math.min(RealmLevels.MAX_BLIGHT, node.stat("blight") + traits.blight()));
+                }
+            }
+        }
+        String name = traits.displayName();
         List<RealmNode> strongholds = strongholds(realm, nation);
         List<RealmNode> towns = supported(towns(realm, nation));
         towns.forEach(town -> realm.addStat(town, "wealth", 1));
+        Optional<RealmNode> capital = RealmCapitals.capital(realm, nation);
+        if (action != NationAction.RAID && traits.burstRatio() > 0 && capital.isPresent() && capital.get().stat("bursting") > 0) {
+            realm.setStat(capital.get(), "bursting", 0);
+            realm.news("The " + name + " fall back to " + capital.get().name() + " to gather their strength.");
+        }
         switch (action) {
             case BUILD_MILITARY -> {
+                int gained = points(nation, 2);
                 if (strongholds.isEmpty()) {
                     // Pushed back: the nation rebuilds at its capital.
-                    RealmCapitals.capital(realm, nation).ifPresent(capital -> {
-                        realm.addStat(capital, "military", 2);
-                        realm.record("The " + nation + " gathered strength at " + capital.name() + ".");
+                    capital.ifPresent(home -> {
+                        realm.addStat(home, "military", gained);
+                        realm.record("The " + name + " gathered strength at " + home.name() + ".");
                     });
                     return;
                 }
-                strongholds.forEach(node -> realm.addStat(node, "military", 2));
-                realm.record("The " + nation + " built up their military: " + names(strongholds) + " each gained 2.");
+                strongholds.forEach(node -> realm.addStat(node, "military", gained));
+                realm.record("The " + name + " built up their military: " + names(strongholds) + " each gained " + gained + ".");
             }
             case FORTIFY -> {
-                strongholds.forEach(node -> realm.addStat(node, "fortification", 1));
-                towns.forEach(town -> realm.addStat(town, "defense", 1));
-                realm.record("The " + nation + " fortified " + names(java.util.stream.Stream.concat(strongholds.stream(), towns.stream()).toList()) + ".");
+                int gained = points(nation, 1);
+                strongholds.forEach(node -> realm.addStat(node, "fortification", gained));
+                towns.forEach(town -> realm.addStat(town, "defense", gained));
+                realm.record("The " + name + " fortified " + names(java.util.stream.Stream.concat(strongholds.stream(), towns.stream()).toList()) + ".");
             }
-            case RAID -> raidTarget(realm, nation).ifPresent(target -> {
-                realm.raids.add(new Realm.Raid(nation, target.getKey().id, target.getValue().id, realm.turn, time + turnMillis() / 2));
-                realm.news("The " + nation + " of " + target.getKey().name() + " will " + raidVerb(target.getValue(), nation) + " at dusk!");
+            case RAID -> raidPlan(realm, nation).ifPresent(plan -> {
+                if (traits.burstRatio() > 0 && capital.isPresent() && capital.get().stat("bursting") == 0) {
+                    realm.setStat(capital.get(), "bursting", 1);
+                    realm.news("Storms gather over " + capital.get().name() + ": the " + name + " are on the march!");
+                }
+                Realm.Raid raid = new Realm.Raid(nation, plan.from().id, plan.target().id, realm.turn, time + turnMillis() / 2);
+                realm.raids.add(raid);
+                realm.news(RealmRaids.who(realm, raid, plan.from()) + " will " + raidVerb(plan.target(), nation) + " at dusk!");
             });
         }
     }

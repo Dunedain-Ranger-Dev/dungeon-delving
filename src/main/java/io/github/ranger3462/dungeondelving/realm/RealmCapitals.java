@@ -116,9 +116,10 @@ public final class RealmCapitals {
 
     /** Spawns a capital's champion at a spot: one of its nation's bosses for its tier, tagged as the capital's. */
     public static Mob spawnChampion(ServerLevel level, BlockPos pos, RealmNode capital) {
-        Mob champion = DungeonBosses.spawnChampion(level, pos, championTier(capital), capital.owner());
+        Mob champion = DungeonBosses.spawnChampion(level, pos, championTier(capital), RealmFactions.bossFaction(capital.owner()));
         champion.getPersistentData().putString(CHAMPION_TAG, capital.id);
-        champion.setCustomName(Component.literal("Champion of the " + capital.owner()).withStyle(ChatFormatting.DARK_RED));
+        String name = RealmFactions.get(capital.owner()).champion();
+        champion.setCustomName(Component.literal((name.isEmpty() ? "" : name + ", ") + "Champion of the " + capital.owner()).withStyle(ChatFormatting.DARK_RED));
         champion.setCustomNameVisible(true);
         return champion;
     }

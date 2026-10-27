@@ -38,6 +38,9 @@ public final class RealmRaids {
         return 1 + wealthLost / 2;
     }
 
+    /** How many turns a faction that secures what it takes ({@code fortify_after_capture}) spends fortifying before it raids again. */
+    public static final int SECURING_TURNS = 2;
+
     /** The most military a nation leaves to hold a node it captures. */
     public static final int GARRISON = 5;
 
@@ -109,7 +112,11 @@ public final class RealmRaids {
         if (RealmNode.KINGDOM.equals(raid.nation())) {
             return "The kingdom's army from " + attacker.name() + (RealmCapitals.kingdomChampion(realm) ? ", led by its champion," : "");
         }
-        return "The " + raid.nation() + " of " + attacker.name();
+        RealmFactions.Traits traits = RealmFactions.get(raid.nation());
+        if (attacker.type == RealmNode.Type.CAPITAL && !traits.champion().isEmpty()) {
+            return traits.champion() + " and the " + traits.displayName() + " of " + attacker.name();
+        }
+        return "The " + traits.displayName() + " of " + attacker.name();
     }
 
     /**
@@ -120,8 +127,8 @@ public final class RealmRaids {
     public static boolean capturable(RealmNode node, String by) {
         boolean monsters = !RealmNode.KINGDOM.equals(by);
         return switch (node.type) {
-            case STRONGHOLD, SITE -> monsters && !node.monsters();
-            case TOWN -> RealmTiers.tier(node) == 0 && (monsters ? !node.monsters() : !node.kingdoms());
+            case STRONGHOLD, SITE -> monsters && !by.equals(node.owner());
+            case TOWN -> RealmTiers.tier(node) == 0 && !by.equals(node.owner());
             default -> false;
         };
     }
@@ -147,10 +154,16 @@ public final class RealmRaids {
 
     /** A raid's attack, before its roll: the stronghold's military (+ the champion's bonus from a capital), or half the kingdom's army (+ its champion's). */
     public static int attack(Realm realm, Realm.Raid raid, RealmNode attacker) {
-        if (RealmNode.KINGDOM.equals(raid.nation())) {
+        return attack(realm, raid.nation(), attacker)
+                + (attacker.type == RealmNode.Type.CAPITAL && !RealmNode.KINGDOM.equals(raid.nation()) ? RealmCapitals.CHAMPION_BONUS : 0);
+    }
+
+    /** What a nation attacks with from a place, before its roll or a champion: its military, by its {@code military_bonus} (DD-102). */
+    public static int attack(Realm realm, String nation, RealmNode attacker) {
+        if (RealmNode.KINGDOM.equals(nation)) {
             return kingdomAttack(realm);
         }
-        return attacker.stat("military") + (attacker.type == RealmNode.Type.CAPITAL ? RealmCapitals.CHAMPION_BONUS : 0);
+        return (int) Math.round(attacker.stat("military") * (1 + RealmFactions.get(nation).militaryBonus()));
     }
 
     /** What the kingdom's marches attack with: half its army, plus its champion's bonus if it has a capital. */
@@ -185,11 +198,39 @@ public final class RealmRaids {
         }
         RealmNode target = town.get();
         RealmNode attacker = stronghold.get();
+        String defenders = target.owner();
+        Outcome outcome = settle(realm, raid, target, attacker, attack, defense, fought);
+        // The undead raise the fallen of both sides (DD-102): a share of all that fell, to whichever side they're on.
+        raiseDead(realm, raid.nation(), attacker, outcome.fallen());
+        if (!defenders.equals(raid.nation())) {
+            raiseDead(realm, defenders, target, outcome.fallen());
+        }
+        return outcome.attackersWon();
+    }
+
+    /** How a battle went: who won, and how many fell on both sides (military or defense lost to it). */
+    private record Outcome(boolean attackersWon, int fallen) {}
+
+    /** A side that raises the dead gains its share of a battle's losses: on its raiding place, or the place it held. */
+    private static void raiseDead(Realm realm, String side, RealmNode node, int lost) {
+        int raised = (int) Math.round(lost * RealmFactions.get(side).raiseDead());
+        if (raised <= 0 || !side.equals(node.owner())) {
+            return;
+        }
+        realm.addStat(node, node.type == RealmNode.Type.TOWN ? "defense" : "military", raised);
+        realm.news("The " + RealmFactions.get(side).displayName() + " raise " + raised + " of the fallen at " + node.name() + ".");
+    }
+
+    private static Outcome settle(Realm realm, Realm.Raid raid, RealmNode target, RealmNode attacker, int attack, int defense, boolean fought) {
         String how = fought ? " in a pitched fight" : "";
         if (attack > defense && capturable(target, raid.nation())) {
+            int fallen = ownDefense(target); // The defenders, to the last.
             int garrison = lose(realm, raid, attacker, GARRISON);
             realm.news(who(realm, raid, attacker) + " stormed " + target.name() + how + " (" + attack + " against " + defense + ").");
             realm.setOwner(target, raid.nation());
+            if (RealmFactions.get(raid.nation()).fortifyAfterCapture()) {
+                realm.setStat(target, "securing", SECURING_TURNS);
+            }
             if (target.type == RealmNode.Type.TOWN) {
                 realm.setStat(target, "upgrading", 0);
                 realm.addStat(target, "defense", garrison);
@@ -199,7 +240,7 @@ public final class RealmRaids {
             if (attacker.type == RealmNode.Type.CAPITAL) {
                 RealmCapitals.championRaidDecided(realm, attacker, true);
             }
-            return true;
+            return new Outcome(true, fallen);
         }
         if (attack > defense) {
             int margin = attack - defense;
@@ -210,7 +251,7 @@ public final class RealmRaids {
             realm.addStat(target, "wealth", -wealthLost);
             realm.addStat(target, "morale", -moraleLost);
             realm.addStat(target, "damage", margin);
-            lose(realm, raid, attacker, 1);
+            int fallen = defenseLost + lose(realm, raid, attacker, 1);
             String spoils = "";
             if (!RealmNode.KINGDOM.equals(raid.nation())) {
                 int gained = plunder(wealthLost);
@@ -229,7 +270,7 @@ public final class RealmRaids {
                 realm.news(tier == 1 ? target.name() + " was so badly sacked it fell to ruins: whoever beats its defenders next can take it."
                         : target.name() + " was so badly sacked it fell back to a " + RealmTiers.name(tier - 1) + " (tier " + (tier - 1) + ").");
             }
-            return true;
+            return new Outcome(true, fallen);
         }
         int losses = lose(realm, raid, attacker, 2 + (defense - attack) / 4);
         if (target.type == RealmNode.Type.TOWN) {
@@ -237,6 +278,6 @@ public final class RealmRaids {
         }
         realm.news(target.name() + " drove off " + who(realm, raid, attacker).replaceFirst("^The", "the") + how + " (" + defense + " against " + attack + "): they lost "
                 + losses + " military.");
-        return false;
+        return new Outcome(false, losses);
     }
 }

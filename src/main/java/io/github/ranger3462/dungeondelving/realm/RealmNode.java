@@ -63,6 +63,8 @@ public final class RealmNode {
     private String name;
     private String owner;
     private String kind = "";
+    /** Who held it before its owner took it (blank if no one has), so a faction knows what it lost (DD-102). */
+    private String lostBy = "";
     /** A town's guard look (/realm guards): skin setting (see TownGuard.pickSkin; blank is our set) and color (blank is none). */
     private String guardSkin = "";
     private String guardColor = "";
@@ -90,6 +92,10 @@ public final class RealmNode {
         return owner;
     }
 
+    public String lostBy() {
+        return lostBy;
+    }
+
     public String kind() {
         return kind;
     }
@@ -115,6 +121,9 @@ public final class RealmNode {
     }
 
     void setOwner(String owner) {
+        if (!owner.equals(this.owner)) {
+            lostBy = this.owner;
+        }
         this.owner = owner;
     }
 
@@ -173,6 +182,7 @@ public final class RealmNode {
         tag.putString("name", name);
         tag.putString("owner", owner);
         tag.putString("kind", kind);
+        tag.putString("lost_by", lostBy);
         tag.putString("guard_skin", guardSkin);
         tag.putString("guard_color", guardColor);
         if (!posts.isEmpty()) {
@@ -196,6 +206,7 @@ public final class RealmNode {
                 BlockPos.of(tag.getLong("pos")));
         node.name = tag.getString("name");
         node.kind = tag.getString("kind");
+        node.lostBy = tag.getString("lost_by");
         node.guardSkin = tag.getString("guard_skin");
         node.guardColor = tag.getString("guard_color");
         for (long post : tag.getLongArray("posts")) {

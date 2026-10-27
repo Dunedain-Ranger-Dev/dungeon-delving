@@ -127,6 +127,8 @@ public final class RealmMapClient {
             case "goblins" -> 0x6FCF4F;
             case "orcs" -> 0xD0603A;
             case "undead" -> 0xA070E0;
+            case "kobolds" -> 0xC9A227;
+            case "elementals" -> 0x4FD8E8;
             default -> 0x808080 | (owner.hashCode() & 0x7F7F7F);
         };
     }

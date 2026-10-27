@@ -59,7 +59,9 @@ public class RealmTurnTests {
         helper.assertTrue(realm.kingdomStat("treasury") == 13 && riverhold.stat("wealth") == 11, "gathering wealth fills the treasury and the towns");
 
         RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.BUILD_MILITARY, 0L);
-        helper.assertTrue(warren.stat("military") == 12, "building military strengthens the strongholds");
+        helper.assertTrue(warren.stat("military") == 10 + RealmTurns.points(DungeonFactions.GOBLINS, 2) && RealmTurns.points(DungeonFactions.GOBLINS, 2) == 3,
+                "building military strengthens the strongholds, faster for the fast-growing goblins: " + warren.stat("military"));
+        realm.setStat(warren, "military", 12);
         realm.setStat(realm.node("millbrook").orElseThrow(), "defense", 30);
         realm.setStat(riverhold, "defense", 30);
         helper.assertTrue(RealmTurns.nationWeights(realm, DungeonFactions.GOBLINS).get(RealmTurns.NationAction.RAID) == 0

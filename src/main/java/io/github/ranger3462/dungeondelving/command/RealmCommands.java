@@ -12,7 +12,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
-import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.realm.Realm;
 import io.github.ranger3462.dungeondelving.realm.RealmNode;
 import io.github.ranger3462.dungeondelving.realm.RealmTurns;
@@ -54,7 +53,7 @@ public final class RealmCommands {
     private static final SuggestionProvider<CommandSourceStack> TYPES = (context, builder) -> SharedSuggestionProvider.suggest(
             Arrays.stream(RealmNode.Type.values()).map(RealmNode.Type::id), builder);
     private static final SuggestionProvider<CommandSourceStack> OWNERS = (context, builder) -> SharedSuggestionProvider.suggest(
-            Stream.concat(Stream.of(RealmNode.KINGDOM, RealmNode.NONE), DungeonFactions.ids().stream()), builder);
+            Stream.concat(Stream.of(RealmNode.KINGDOM, RealmNode.NONE), io.github.ranger3462.dungeondelving.realm.RealmFactions.nations().stream()), builder);
 
     private static final SuggestionProvider<CommandSourceStack> GUARD_SKINS = (context, builder) -> SharedSuggestionProvider.suggest(
             Stream.concat(Stream.of(io.github.ranger3462.dungeondelving.entity.TownGuard.SKIN_SET, io.github.ranger3462.dungeondelving.entity.TownGuard.SKIN_MIXED),
@@ -200,7 +199,7 @@ public final class RealmCommands {
         }
         Optional<String> owner = ownerArgument != null ? Optional.of(ownerArgument) : Realm.defaultOwner(type.get());
         if (owner.isEmpty()) {
-            Feedback.fail(source, "Say which monster nation holds it: /realm node add " + id + " stronghold <" + String.join("|", DungeonFactions.ids()) + ">");
+            Feedback.fail(source, "Say which monster nation holds it: /realm node add " + id + " stronghold <" + String.join("|", io.github.ranger3462.dungeondelving.realm.RealmFactions.nations()) + ">");
             return 0;
         }
         Optional<String> problem = Realm.ownerProblem(type.get(), owner.get());

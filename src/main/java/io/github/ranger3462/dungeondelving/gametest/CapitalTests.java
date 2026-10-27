@@ -56,7 +56,14 @@ public class CapitalTests {
         helper.assertTrue(RealmTurns.marchTarget(realm).orElseThrow().getValue() == ruins, "with only its capital, the kingdom looks to the ruins beside it");
         helper.assertTrue(RealmTurns.kingdomWeights(realm).get(RealmTurns.KingdomAction.MARCH) == 0,
                 "but while it's outmatched (" + RealmRaids.kingdomAttack(realm) + " against " + RealmRaids.defense(realm, ruins) + "), it doesn't march");
-        while (RealmRaids.kingdomAttack(realm) <= 30) {
+        int marginAtBar = 0;
+        while (io.github.ranger3462.dungeondelving.realm.RealmFactions.winChance(marginAtBar) < io.github.ranger3462.dungeondelving.realm.RealmFactions.get(RealmNode.KINGDOM).attackBar()) {
+            marginAtBar++;
+        }
+        RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.MUSTER);
+        helper.assertTrue(RealmTurns.kingdomWeights(realm).get(RealmTurns.KingdomAction.MARCH) == 0 || RealmRaids.kingdomAttack(realm) - 30 >= marginAtBar,
+                "a bare edge isn't enough: it marches only when fairly sure (" + marginAtBar + " ahead)");
+        while (RealmRaids.kingdomAttack(realm) - 30 < marginAtBar) {
             RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.MUSTER);
         }
         helper.assertTrue(RealmRaids.kingdomAttack(realm) == realm.kingdomStat("army") / 2 + RealmCapitals.CHAMPION_BONUS, "its champion leads the march");

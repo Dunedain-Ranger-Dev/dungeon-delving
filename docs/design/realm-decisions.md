@@ -42,12 +42,21 @@ town's defense, or a stronghold's or site's fortification.)
 
 | Action | Weight | What it does |
 | --- | --- | --- |
-| Build military | 3, plus 4 if the raiding stronghold's military is below the target's defense | Every stronghold gains 2 military |
-| Raid | 1, plus 1 for every 3 military the raiding stronghold has over the target's defense (with the army's quarter). 0 when it's below, with no target, or a raid already under way | Declares a raid on the target, from the strongholds linked to it |
-| Fortify | 1, plus 1 if its weakest stronghold's fortification is under 5 | Every stronghold gains 1 fortification, and every town it holds 1 defense |
+| Build military | 3, plus 4 if it isn't ready to raid | Every stronghold gains 2 military, by the nation's growth (goblins 3, kobolds 1) |
+| Raid | 0 unless it's ready. Then 1, plus 1 for every 10% its chance beats its bar, times its aggression. 0 with a raid already under way, or while securing a new holding | Declares a raid on the target, from the stronghold linked to it |
+| Fortify | 1, plus 1 if its weakest stronghold's fortification is under 5, plus 6 while securing a new holding | Every stronghold gains 1 fortification (by growth), and every town it holds as much defense |
 
-So a nation weaker than its target only builds up or fortifies. Once it's a match for the target, raiding grows
-likelier the bigger its lead: 15 military over the target's defense makes raid weight 6 against build 3 and fortify 1-2.
+Each nation plays by its **traits** (`data/dungeondelving/realm/factions/<nation>.json`, DD-102; see
+`realm-factions.md`). It's **ready** to raid when its chance of winning the roll (`RealmFactions.winChance`: 47.5% at
+even odds, 75% at +7, 90% at +12) is at least its **attack bar**: goblins 45%, orcs and undead 50%, kobolds 90%, the
+kingdom's marches 75%. Its **targets** say whom: goblins and undead go for the kingdom and unheld places, and other
+monsters only where they're weak (a 75% chance); orcs and kobolds anyone; elementals only the kingdom. Kobolds stay
+within 2 links of their capital. Elementals raid from their capital in **bursts**: once it has twice the target's
+defense in military, until the odds turn, then they fall back. Goblins, kobolds, elementals and the kingdom **secure**
+a place they take for 2 turns before raiding again. Orcs hit 20% harder. The undead **raise** a third of a battle's
+fallen (both sides') as their own, and the land they hold gains a level of **blight** danger a turn, up to 5, until
+it's taken from them.
+
 Fortification also defends a stronghold or site when a nation comes to take it.
 
 ## Capitals
@@ -120,6 +129,6 @@ Players affect these choices only through the numbers the factions read:
 
 ## Not decided yet
 
-- Nations don't yet found new places, fight each other, or work together.
+- Nations don't yet found new places or work together (they do fight each other, by their targets).
 - The kingdom doesn't yet attack strongholds itself; for now that's the players' job. It only marches on towns.
 - The mod doesn't spawn villagers yet; a town's tier is only its numbers, guards and growth for now.

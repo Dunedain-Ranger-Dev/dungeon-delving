@@ -1,7 +1,7 @@
 # Realm factions: who they are and how they play (proposal)
 
 From the kingdom behaviour writeup (Zach, 2026-10-27). This is the plan for the next round of realm work. Today's
-rules are in `realm-decisions.md`; this page says what changes. Nothing here is built yet. Questions still open are
+rules are in `realm-decisions.md`; this page says what changes. Phase 1 is built (DD-102); the rest isn't yet. Questions still open are
 at the end.
 
 ## The factions
@@ -30,7 +30,7 @@ exact chance of winning. Each faction attacks only when its chance is above its 
 | Faction | Attacks when | Bar (chance to win) |
 | --- | --- | --- |
 | Goblins | It's a toss-up, but not a long shot | 45% |
-| Orcs | Anything weak enough, not held by orcs | 35%, but only targets weaker than them |
+| Orcs | Anything weak enough, not held by orcs | 50%, and the keenest to raid (aggression 2) |
 | Kobolds | Success is almost guaranteed | 90% |
 | Elementals | Their capital is at least 2x the nearest kingdom node, then keep going until the army is weaker than the next node | Burst rule, see below |
 | Kingdom | It's fairly confident | 75% |
@@ -41,7 +41,8 @@ exact chance of winning. Each faction attacks only when its chance is above its 
 | Trait | What it does | Goblins | Orcs | Kobolds | Elementals | Kingdom |
 | --- | --- | --- | --- | --- | --- | --- |
 | `growth` | Multiplies the points every action gives | 1.4 | 1.0 | 0.7 | 0.7 | 1.0 |
-| `attack_bar` | Lowest chance to win it attacks at (above) | 0.45 | 0.35 | 0.9 | (burst) | 0.75 |
+| `attack_bar` | Lowest chance to win it attacks at (above) | 0.45 | 0.5 | 0.9 | 0.5 in a burst | 0.75 |
+| `aggression` | How keen it is to raid once ready | 1.5 | 2.0 | 0.7 | 1.0 | 1.0 |
 | `targets` | Who it attacks | Kingdom; other monsters only if weakened | Anyone not orc | Anyone near home | Kingdom only | Monsters |
 | `fortify_after_capture` | After taking a place, fortify it before moving on | Yes | No | Yes | Yes | Yes |
 | `retake` | How keen it is to win back what it lost | High | Low | High near home | Low | High |

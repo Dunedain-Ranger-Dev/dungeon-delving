@@ -225,7 +225,7 @@ public final class RealmLiveRaids {
         }
         level.playSound(null, town.pos(), net.minecraft.sounds.SoundEvents.BELL_BLOCK, net.minecraft.sounds.SoundSource.BLOCKS, 2.0f, 1.0f);
         hideVillagers(live);
-        realm.news(town.name() + " is under attack by the " + raid.nation() + "! Its guards turn out.");
+        realm.news(town.name() + " is under attack by the " + RealmFactions.get(raid.nation()).displayName() + "! Its guards turn out.");
         nextWave(realm, live);
         return live;
     }
@@ -234,7 +234,7 @@ public final class RealmLiveRaids {
         live.wave++;
         RandomSource random = live.level.getRandom();
         for (int i = 0; i < live.waveSize; i++) {
-            Optional<net.minecraft.core.Holder<EntityType<?>>> type = SpawnerMobs.pick(live.level, random, live.raid.nation(), live.tier);
+            Optional<net.minecraft.core.Holder<EntityType<?>>> type = SpawnerMobs.pick(live.level, random, RealmFactions.mobs(live.raid.nation()), live.tier);
             if (type.isEmpty()) {
                 continue;
             }
@@ -253,7 +253,9 @@ public final class RealmLiveRaids {
                 Mob champion = RealmCapitals.spawnChampion(live.level, at, capital);
                 champion.getPersistentData().putString(RAIDER, live.raid.town());
                 live.raiders.add(champion.getUUID());
-                realm.news("The champion of the " + capital.owner() + " leads the last wave!");
+                String name = RealmFactions.get(capital.owner()).champion();
+                realm.news((name.isEmpty() ? "The champion of the " + capital.owner() : name + ", champion of the " + RealmFactions.get(capital.owner()).displayName())
+                        + ", leads the last wave!");
             });
         }
         realm.news("Wave " + live.wave + " of " + WAVES + " comes for " + realm.node(live.raid.town()).map(RealmNode::name).orElse(live.raid.town()) + ".");

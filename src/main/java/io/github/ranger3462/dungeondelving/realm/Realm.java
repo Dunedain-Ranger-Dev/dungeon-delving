@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -66,7 +65,7 @@ public final class Realm extends SavedData {
 
     /** Who can own a node: the kingdom, a monster nation (a dungeon faction), or no one. */
     public static boolean validOwner(String owner) {
-        return RealmNode.KINGDOM.equals(owner) || RealmNode.NONE.equals(owner) || DungeonFactions.ids().contains(owner);
+        return RealmNode.KINGDOM.equals(owner) || RealmNode.NONE.equals(owner) || RealmFactions.nations().contains(owner);
     }
 
     /** The owner a new node of a type starts with, when none is given: towns are the kingdom's; strongholds need a nation. */
@@ -90,13 +89,13 @@ public final class Realm extends SavedData {
      */
     public static Optional<String> ownerProblem(RealmNode.Type type, String owner, boolean founding) {
         if (!validOwner(owner)) {
-            return Optional.of("Unknown owner " + owner + ": use kingdom, none, or a monster nation (" + String.join(", ", DungeonFactions.ids()) + ").");
+            return Optional.of("Unknown owner " + owner + ": use kingdom, none, or a monster nation (" + String.join(", ", RealmFactions.nations()) + ").");
         }
         if (type == RealmNode.Type.CAPITAL && (RealmNode.NONE.equals(owner) || (!founding && RealmNode.KINGDOM.equals(owner)))) {
-            return Optional.of("A capital is a nation's home, or the kingdom's, and can't be taken (" + String.join(", ", DungeonFactions.ids()) + ", or kingdom when it's made).");
+            return Optional.of("A capital is a nation's home, or the kingdom's, and can't be taken (" + String.join(", ", RealmFactions.nations()) + ", or kingdom when it's made).");
         }
         if (founding && type == RealmNode.Type.STRONGHOLD && (RealmNode.KINGDOM.equals(owner) || RealmNode.NONE.equals(owner))) {
-            return Optional.of("A stronghold belongs to a monster nation (" + String.join(", ", DungeonFactions.ids()) + ").");
+            return Optional.of("A stronghold belongs to a monster nation (" + String.join(", ", RealmFactions.nations()) + ").");
         }
         return Optional.empty();
     }
@@ -141,10 +140,17 @@ public final class Realm extends SavedData {
      */
     public void setOwner(RealmNode node, String owner) {
         boolean wasMonsters = node.monsters();
+        String was = node.owner();
         node.setOwner(owner);
+        if (!was.equals(owner)) {
+            node.stats().remove("blight"); // A new owner's land starts clean (DD-102).
+            node.stats().remove("securing");
+        }
         boolean holdable = node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.SITE || node.type == RealmNode.Type.TOWN;
-        if (holdable && !wasMonsters && node.monsters()) {
-            news("The " + owner + " have taken " + node.name() + ": the land around it grows more dangerous.");
+        if (holdable && wasMonsters && node.monsters() && !was.equals(owner)) {
+            news("The " + RealmFactions.get(owner).displayName() + " have taken " + node.name() + " from the " + RealmFactions.get(was).displayName() + ".");
+        } else if (holdable && !wasMonsters && node.monsters()) {
+            news("The " + RealmFactions.get(owner).displayName() + " have taken " + node.name() + ": the land around it grows more dangerous.");
         } else if (holdable && wasMonsters && !node.monsters()) {
             news(node.name() + (node.kingdoms() ? " has been taken by the kingdom" : " has been cleared") + ": the land around it calms.");
         }

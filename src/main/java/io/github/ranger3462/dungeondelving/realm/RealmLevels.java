@@ -53,6 +53,8 @@ public final class RealmLevels {
     /** A nation's capital is always dangerous: at least this many levels at its heart, fading out to its reach. */
     public static final int CAPITAL_FLOOR = 6;
     public static final int CAPITAL_REACH = 360;
+    /** The most a blighting nation's land grows in danger, at a place it holds: a level per point on top of the rest, fading out to {@link #STRONGHOLD_REACH}. */
+    public static final int MAX_BLIGHT = 5;
     /** A stronghold adds a level per this much military, at its heart. */
     public static final int MILITARY_PER_LEVEL = 8;
     /** Per level: +15% health, +10% damage, +0.5 armor. */
@@ -71,6 +73,7 @@ public final class RealmLevels {
     public static int level(Realm realm, ResourceKey<Level> dimension, BlockPos pos) {
         double nearestKingdom = Double.MAX_VALUE;
         double strongholdBonus = 0;
+        double blight = 0;
         boolean anyNode = false;
         for (RealmNode node : realm.nodes()) {
             if (!node.dimension().equals(dimension)) {
@@ -78,6 +81,9 @@ public final class RealmLevels {
             }
             anyNode = true;
             double distance = Math.sqrt(node.pos().distSqr(pos));
+            if (node.monsters() && node.stat("blight") > 0 && distance < STRONGHOLD_REACH) {
+                blight = Math.max(blight, node.stat("blight") * (1 - distance / STRONGHOLD_REACH));
+            }
             if (node.kingdoms()) {
                 nearestKingdom = Math.min(nearestKingdom, distance);
             } else if (node.monsters() && node.type == RealmNode.Type.STRONGHOLD && distance < STRONGHOLD_REACH) {
@@ -91,7 +97,7 @@ public final class RealmLevels {
             return 0;
         }
         double distanceLevels = nearestKingdom == Double.MAX_VALUE ? MAX_LEVEL : Math.max(0, nearestKingdom - SAFE_RADIUS) / STEP;
-        return Mth.clamp((int) Math.floor(distanceLevels + strongholdBonus), 0, MAX_LEVEL);
+        return Mth.clamp((int) Math.floor(distanceLevels + strongholdBonus + blight), 0, MAX_LEVEL);
     }
 
     /** Makes a mob tougher for its level: more health (healed to it), damage and armor. */
