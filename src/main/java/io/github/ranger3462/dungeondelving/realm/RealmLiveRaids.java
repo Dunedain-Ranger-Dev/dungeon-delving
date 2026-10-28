@@ -193,13 +193,13 @@ public final class RealmLiveRaids {
         int military = realm.node(raid.stronghold()).map(node -> node.stat("military")).orElse(10);
         LiveRaid live = new LiveRaid(raid, level, town.pos(), tier(military), Mth.clamp(3 + military / 8, 3, 12));
         ACTIVE.put(raid.town(), live);
-        int tier = town.type == RealmNode.Type.TOWN ? RealmTiers.tier(town) : 1;
+        int tier = town.settlement() ? RealmTiers.tier(town) : 1;
         // A town fights with its standing garrison (fewer if some fell since dawn). A kingdom-held stronghold's is a small
         // one, turned out just for the raid; ruins and unheld places have no guards at all.
-        if (town.type == RealmNode.Type.TOWN) {
+        if (town.settlement()) {
             RealmGarrison.turnOut(level, realm, town).forEach(mob -> live.guards.add(mob.getUUID()));
         }
-        int guards = town.type != RealmNode.Type.TOWN && town.kingdoms() ? guardCount(town.stat("morale"), tier) : 0;
+        int guards = !town.settlement() && town.kingdoms() ? guardCount(town.stat("morale"), tier) : 0;
         int[] split = roles(guards, tier);
         int crossbows = split[1];
         int mages = split[2];

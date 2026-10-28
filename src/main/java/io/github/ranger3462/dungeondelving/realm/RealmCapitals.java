@@ -32,12 +32,18 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
  * champion out ({@code /challenge}). Killing the champion sets the nation back (a third of the capital's military);
  * a champion that wins, or kills its challenger, lets it rebuild faster.
  * <p>
- * The kingdom can have a capital too: it's never lost or raided, its army can march out from it, and while it stands
- * the kingdom's champion leads every march ({@link #CHAMPION_BONUS} to its attack).
+ * The kingdom can have a capital too: its army can march out from it, and while it stands the kingdom's champion leads
+ * every march ({@link #CHAMPION_BONUS} to its attack).
+ * <p>
+ * Every capital is a city (DD-104): it has a town's defense, wealth and morale, and can be sacked but never taken
+ * ({@link RealmRaids#CAPITAL_DEFENSE}). A nation's new troops muster there until its garrison is back to {@link #GARRISON},
+ * and the survivors of a stronghold it loses fall back to it.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class RealmCapitals {
     public static final int RALLY_TURNS = 3;
+    /** The garrison a nation keeps at home: its new troops muster there until it's this strong. */
+    public static final int GARRISON = 30;
     /** A champion adds this to a rolled raid's attack. */
     public static final int CHAMPION_BONUS = 10;
     /** What a champion's win, or a challenger's death, adds to its capital's military. */

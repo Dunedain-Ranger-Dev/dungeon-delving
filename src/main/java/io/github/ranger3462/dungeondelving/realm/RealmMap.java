@@ -183,6 +183,8 @@ public final class RealmMap {
         if (node.type == RealmNode.Type.TOWN) {
             int tier = RealmTiers.tier(node);
             facts.add(new Fact("Size", RealmTiers.name(tier), tier == 0 ? "the next raid that wins takes it" : "tier " + tier + " of 5"));
+        } else if (node.type == RealmNode.Type.CAPITAL) {
+            facts.add(new Fact("Size", "capital city", "can be sacked, never taken"));
         }
         RealmEconomy.kind(node).ifPresent(kind -> facts.add(new Fact("Gives", kind.gives, "to whoever holds it")));
         if (node.type == RealmNode.Type.RESOURCE && RealmEconomy.kind(node).isEmpty()) {
@@ -192,7 +194,8 @@ public final class RealmMap {
         int defense = RealmRaids.defense(realm, node);
         int mines = RealmEconomy.mineDefense(realm, node);
         if (node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.CAPITAL || node.stat("military") > 0) {
-            facts.add(new Fact("Troops", String.valueOf(node.stat("military")), node.monsters() ? "what it raids with" : "its garrison"));
+            facts.add(new Fact("Troops", String.valueOf(node.stat("military")),
+                    node.type == RealmNode.Type.CAPITAL && node.monsters() ? "its garrison: half adds to its defense" : node.monsters() ? "what it raids with" : "its garrison"));
         }
         List<String> from = new ArrayList<>();
         if (defense - own - mines > 0) {
@@ -201,8 +204,12 @@ public final class RealmMap {
         if (mines > 0) {
             from.add(mines + " from its mines");
         }
-        facts.add(new Fact("Defense", String.valueOf(defense), from.isEmpty() ? "what attackers must beat" : own + " its own, " + String.join(", ", from)));
-        if (node.type == RealmNode.Type.TOWN) {
+        if (node.type == RealmNode.Type.CAPITAL) {
+            facts.add(new Fact("Defense", String.valueOf(defense), "doubled: a capital's defenders fight twice as hard"));
+        } else {
+            facts.add(new Fact("Defense", String.valueOf(defense), from.isEmpty() ? "what attackers must beat" : own + " its own, " + String.join(", ", from)));
+        }
+        if (node.settlement()) {
             int morale = node.stat("morale");
             facts.add(new Fact("Morale", String.valueOf(morale), morale < LOW_MORALE ? "low: its people may give up" : "how its people hold up"));
         }

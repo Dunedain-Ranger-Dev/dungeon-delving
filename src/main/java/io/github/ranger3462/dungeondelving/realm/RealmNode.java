@@ -32,8 +32,11 @@ public final class RealmNode {
         STRONGHOLD(Map.of("military", 10, "fortification", 5)),
         /** Land that gives its holder food, trade or more each turn, by its kind (RealmEconomy.Kind): anyone can take it. */
         RESOURCE(Map.of("fortification", 3)),
-        /** A monster nation's home base: never taken; sends its champion once the nation is pushed back (DD-101). */
-        CAPITAL(Map.of("military", 30, "rally", 0)),
+        /**
+         * A faction's home (DD-101, DD-104): a city with a town's defense, wealth and morale, and a garrison (its military).
+         * It can be sacked but never taken, and sends its champion once its nation is pushed back.
+         */
+        CAPITAL(Map.of("military", 30, "rally", 0, "defense", 20, "wealth", 20, "morale", 10, "tier", RealmTiers.MAX_TIER)),
         /** A raid or attack in progress (made by the turns, later). */
         BATTLE(Map.of()),
         /** A caravan, plague, festival and the like (later). */
@@ -88,6 +91,11 @@ public final class RealmNode {
 
     public String name() {
         return name;
+    }
+
+    /** Whether people live here, with a town's defense, wealth and morale: a town or a capital. */
+    public boolean settlement() {
+        return type == Type.TOWN || type == Type.CAPITAL;
     }
 
     public String owner() {
@@ -218,6 +226,9 @@ public final class RealmNode {
         CompoundTag stats = tag.getCompound("stats");
         for (String stat : stats.getAllKeys()) {
             node.stats.put(stat, stats.getInt(stat));
+        }
+        if (type.get() == Type.CAPITAL) {
+            Type.CAPITAL.defaults.forEach(node.stats::putIfAbsent); // Capitals made before DD-104 become cities.
         }
         return Optional.of(node);
     }

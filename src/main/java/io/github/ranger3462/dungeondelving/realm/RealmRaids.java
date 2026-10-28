@@ -17,6 +17,9 @@ import net.minecraft.util.RandomSource;
  * {@link #TIER_LOSS_MARGIN} or more, a town also falls back a tier, down to ruins (tier 0).</li>
  * <li>Defenders win: the attackers lose military, more for a bigger margin, and the town's morale rises.</li>
  * </ul>
+ * A capital (DD-104) is sacked like a town, but never taken or knocked down a tier; its defense is doubled
+ * ({@link #CAPITAL_DEFENSE}), a monster capital's garrison adds to it, and a sacking costs it troops too.
+ * <p>
  * A raid can also be to take a place ({@link #capturable}): a stronghold or site the nation doesn't hold, or a town
  * that's been knocked down to ruins. Won, the attackers take it and leave a garrison of up to {@link #GARRISON} there
  * (a stronghold's military, a town's defense); lost, they lose military as usual. A stronghold's or site's defense is
@@ -40,6 +43,11 @@ public final class RealmRaids {
 
     /** How many turns a faction that secures what it takes ({@code fortify_after_capture}) spends fortifying before it raids again. */
     public static final int SECURING_TURNS = 2;
+
+    /** A capital's defenders fight twice as hard (DD-104), so only a much stronger army tries. */
+    public static final int CAPITAL_DEFENSE = 2;
+    /** The odds anyone wants before attacking a capital. */
+    public static final double CAPITAL_ODDS = 0.85;
 
     /** The most military a nation leaves to hold a node it captures. */
     public static final int GARRISON = 5;
@@ -77,11 +85,13 @@ public final class RealmRaids {
      * Empty if nothing can attack it, or a raid's already on it.
      */
     public static Optional<Realm.Raid> declare(Realm realm, String targetId, long resolveAt) {
-        Optional<RealmNode> target = realm.node(targetId).filter(node -> node.type == RealmNode.Type.TOWN || node.type == RealmNode.Type.RESOURCE || ((node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.SITE) && !node.monsters()));
+        Optional<RealmNode> target = realm.node(targetId).filter(node -> node.type == RealmNode.Type.TOWN || node.type == RealmNode.Type.RESOURCE
+                || (node.type == RealmNode.Type.CAPITAL && !RealmNode.NONE.equals(node.owner()))
+                || ((node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.SITE) && !node.monsters()));
         if (target.isEmpty() || realm.raids.stream().anyMatch(raid -> raid.town().equals(targetId))) {
             return Optional.empty();
         }
-        if ((target.get().type == RealmNode.Type.TOWN || target.get().type == RealmNode.Type.RESOURCE) && target.get().monsters()) {
+        if ((target.get().settlement() || target.get().type == RealmNode.Type.RESOURCE) && target.get().monsters()) {
             Optional<RealmNode> from = realm.neighbors(targetId).stream().filter(RealmTurns::kingdomSettlement)
                     .max(java.util.Comparator.comparingInt(node -> node.stat("defense")));
             if (from.isEmpty()) {
@@ -134,14 +144,18 @@ public final class RealmRaids {
         };
     }
 
-    /** A node's own defense: a town's defense, or anything else's fortification. */
+    /** A node's own defense: a town's defense (and a monster capital's garrison, half its military), or anything else's fortification. */
     public static int ownDefense(RealmNode node) {
+        if (node.type == RealmNode.Type.CAPITAL) {
+            return node.stat("defense") + (node.monsters() ? node.stat("military") / 2 : 0);
+        }
         return node.stat(node.type == RealmNode.Type.TOWN ? "defense" : "fortification");
     }
 
-    /** The defense a raid's target puts up, before its roll: its own, plus the army's share if it's the kingdom's. */
+    /** The defense a raid's target puts up, before its roll: its own, plus the army's share if it's the kingdom's, and its mines'; a capital's doubled. */
     public static int defense(Realm realm, RealmNode target) {
-        return ownDefense(target) + (target.kingdoms() ? realm.kingdomStat("army") / ARMY_SHARE : 0) + RealmEconomy.mineDefense(realm, target);
+        int defense = ownDefense(target) + (target.kingdoms() ? realm.kingdomStat("army") / ARMY_SHARE : 0) + RealmEconomy.mineDefense(realm, target);
+        return target.type == RealmNode.Type.CAPITAL ? defense * CAPITAL_DEFENSE : defense;
     }
 
     /** Resolves one raid with these rolls (a d20 each), and takes it off the list. Returns whether the attackers won. */
@@ -253,8 +267,14 @@ public final class RealmRaids {
             realm.addStat(target, "defense", -defenseLost);
             realm.addStat(target, "wealth", -wealthLost);
             realm.addStat(target, "morale", -moraleLost);
-            realm.addStat(target, "damage", margin);
-            int fallen = defenseLost + lose(realm, raid, attacker, 1);
+            int garrisonLost = 0;
+            if (target.type == RealmNode.Type.TOWN) {
+                realm.addStat(target, "damage", margin);
+            } else if (target.type == RealmNode.Type.CAPITAL && target.monsters()) {
+                garrisonLost = Math.min(target.stat("military"), Math.max(1, margin / 4));
+                realm.addStat(target, "military", -garrisonLost);
+            }
+            int fallen = defenseLost + garrisonLost + lose(realm, raid, attacker, 1);
             String spoils = "";
             if (!RealmNode.KINGDOM.equals(raid.nation())) {
                 int gained = plunder(wealthLost);
@@ -266,12 +286,12 @@ public final class RealmRaids {
                 spoils += " They carried off " + coin + " trade.";
             }
             realm.news(Realm.LogKind.BATTLE, raid.nation(), who(realm, raid, attacker) + " sacked " + target.name() + how + " (" + attack + " against " + defense
-                    + "): it lost " + defenseLost + " defense, " + wealthLost + " wealth and " + moraleLost + " morale." + spoils);
+                    + "): it lost " + defenseLost + " defense, " + (garrisonLost > 0 ? garrisonLost + " troops, " : "") + wealthLost + " wealth and " + moraleLost + " morale." + spoils);
             if (attacker.type == RealmNode.Type.CAPITAL) {
                 RealmCapitals.championRaidDecided(realm, attacker, true);
             }
             int tier = RealmTiers.tier(target);
-            if (margin >= TIER_LOSS_MARGIN && tier > 0) {
+            if (margin >= TIER_LOSS_MARGIN && tier > 0 && target.type == RealmNode.Type.TOWN) {
                 realm.setStat(target, "tier", tier - 1);
                 realm.setStat(target, "upgrading", 0);
                 realm.news(Realm.LogKind.BATTLE, raid.nation(), tier == 1 ? target.name() + " was so badly sacked it fell to ruins: whoever beats its defenders next can take it."
@@ -280,7 +300,7 @@ public final class RealmRaids {
             return new Outcome(true, fallen);
         }
         int losses = lose(realm, raid, attacker, 2 + (defense - attack) / 4);
-        if (target.type == RealmNode.Type.TOWN) {
+        if (target.settlement()) {
             realm.addStat(target, "morale", 1);
         }
         realm.news(Realm.LogKind.BATTLE, raid.nation(), target.name() + " drove off " + who(realm, raid, attacker).replaceFirst("^The", "the") + how + " (" + defense + " against " + attack + "): they lost "

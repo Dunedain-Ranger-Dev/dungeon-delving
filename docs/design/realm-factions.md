@@ -161,3 +161,17 @@ The kobolds and elementals can join the realm in phase 1 with stand-in mobs, or 
 
 Still to come: `tithe` (needs wealth moving between places) and real troop upkeep and gear (phase 4).
 
+
+## Built in phase 3 (DD-104)
+
+- **Capitals are cities:** every capital has a town's defense (20), wealth (20) and morale (10) at city tier, plus its
+  garrison (its military, 30 to start). Capitals made before this become cities when the world loads.
+- **Sacked, never taken:** a raid that beats a capital sacks it like a town (defense, wealth, morale and trade lost,
+  and for a monster capital some of its garrison), but it never changes hands or drops a tier.
+- **Hard to beat:** a capital's defense is doubled, and a monster capital's garrison adds half its military to it
+  first. Nobody attacks a capital below 85% odds. The kingdom marches on a linked monster capital only then; a nation
+  sacks Landfall from a stronghold linked to it.
+- **Home:** a nation's new troops muster at its capital until its garrison is back to 30, and half the troops of a
+  stronghold it loses fall back there. Capitals gain wealth each turn and are fortified with the rest of its holdings;
+  the kingdom's capital is reinforced with its border towns and turns out a garrison of guards like a town.
+- Still to come: building capitals in each nation's style (blueprints).

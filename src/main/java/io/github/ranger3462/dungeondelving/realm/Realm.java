@@ -171,6 +171,14 @@ public final class Realm extends SavedData {
         if (!was.equals(owner)) {
             node.stats().remove("blight"); // A new owner's land starts clean (DD-102).
             node.stats().remove("securing");
+            Optional<RealmNode> home = node.type == RealmNode.Type.STRONGHOLD && wasMonsters ? RealmCapitals.capital(this, was) : Optional.empty();
+            int survivors = node.stat("military") / 2;
+            if (home.isPresent() && survivors > 0) {
+                // The survivors of a lost stronghold fall back to their capital (DD-104).
+                home.get().stats().merge("military", survivors, Integer::sum);
+                node.stats().put("military", 0);
+                news(LogKind.MARCH, was, "The survivors of " + node.name() + ", " + survivors + " strong, fall back to " + home.get().name() + ".");
+            }
         }
         boolean holdable = node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.SITE || node.type == RealmNode.Type.TOWN;
         if (holdable && wasMonsters && node.monsters() && !was.equals(owner)) {
@@ -313,7 +321,7 @@ public final class Realm extends SavedData {
         return List.copyOf(log);
     }
 
-    void addKingdomStat(String stat, int amount) {
+    public void addKingdomStat(String stat, int amount) {
         kingdom.merge(stat, amount, Integer::sum);
         setDirty();
     }

@@ -75,7 +75,7 @@ public final class RealmGarrison {
     /** How many guards a town turns out in full: its raid turnout if it's a kingdom town above ruins, else none. */
     public static int fullStrength(RealmNode town) {
         int tier = RealmTiers.tier(town);
-        return town.type == RealmNode.Type.TOWN && town.kingdoms() && tier > 0 ? RealmLiveRaids.guardCount(town.stat("morale"), tier) : 0;
+        return town.settlement() && town.kingdoms() && tier > 0 ? RealmLiveRaids.guardCount(town.stat("morale"), tier) : 0;
     }
 
     /** How many it keeps now: its full strength, less those fallen since dawn. */
@@ -122,7 +122,7 @@ public final class RealmGarrison {
     /** Keeps every town's garrison in a level: counts the fallen, sends home extras, fills empty posts where {@code present}, and steers guards back to their posts. */
     public static void tick(ServerLevel level, Realm realm, Predicate<RealmNode> present) {
         for (RealmNode town : realm.nodes()) {
-            if (town.type == RealmNode.Type.TOWN && town.dimension().equals(level.dimension())) {
+            if (town.settlement() && town.dimension().equals(level.dimension())) {
                 keep(level, realm, town, present.test(town) && level.isLoaded(town.pos()));
             }
         }
