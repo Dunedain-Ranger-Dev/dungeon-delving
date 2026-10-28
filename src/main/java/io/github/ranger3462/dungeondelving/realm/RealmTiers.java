@@ -5,7 +5,7 @@ import net.minecraft.util.Mth;
 /**
  * Town tiers (DD-99, docs/design/realm.md). A town starts as ruins (tier 0) and grows to a city (tier 5), whoever holds
  * it. Each turn, a held town with wealth to spare (the tier-up's {@link #cost}, plus {@link #RESERVE} kept back for
- * repairs; ruins need nothing) and no raid damage still being rebuilt spends it and starts upgrading. An upgrade takes
+ * repairs; ruins need nothing), whose holder has the {@link #food} for it, and no raid damage still being rebuilt spends it and starts upgrading. An upgrade takes
  * {@link #DAYS_PER_TIER} turns (days) for each tier it's growing to, and while it lasts the town gets no other support:
  * no reinforcing, no wealth, no repairs. Done, it goes up a tier and gains {@link #DEFENSE_PER_TIER} defense. Its tier
  * makes its guards stronger (see {@code TownGuard.equip}), and so higher level, and lets more of them turn out; ruins
@@ -16,6 +16,7 @@ public final class RealmTiers {
     /** Wealth a town keeps back after growing, so it can still pay for repairs. */
     public static final int RESERVE = 5;
     public static final int DEFENSE_PER_TIER = 3;
+    public static final int FOOD_PER_TIER = 5;
     /** Turns (days) an upgrade takes, per tier it's growing to: 2 to a hamlet, 10 to a city. */
     public static final int DAYS_PER_TIER = 2;
     private static final String[] NAMES = { "ruins", "hamlet", "village", "town", "market town", "city" };
@@ -34,6 +35,11 @@ public final class RealmTiers {
     /** The wealth it takes to grow from {@code tier} to the next: 10 per tier (nothing from ruins, then 10, 20, 30, 40). */
     public static int cost(int tier) {
         return 10 * tier;
+    }
+
+    /** The food its holder spends to grow a town from {@code tier} to the next (DD-103): 5 per tier it grows to (ruins resettle free). */
+    public static int food(int tier) {
+        return FOOD_PER_TIER * (tier + 1);
     }
 
     /** The turns (days) it takes to upgrade to {@code tier}. */
@@ -69,10 +75,14 @@ public final class RealmTiers {
                 continue;
             }
             boolean rebuilding = town.stat("wrecked") > town.stat("repair") || town.stat("damage") > 0;
-            if (tier >= MAX_TIER || (tier > 0 && (rebuilding || town.stat("wealth") < cost(tier) + RESERVE))) {
+            if (tier >= MAX_TIER || (tier > 0 && (rebuilding || town.stat("wealth") < cost(tier) + RESERVE))
+                    || (tier > 0 && RealmEconomy.food(realm, town.owner()) < food(tier))) {
                 continue;
             }
             realm.addStat(town, "wealth", -cost(tier));
+            if (tier > 0) {
+                RealmEconomy.spendFood(realm, town.owner(), food(tier));
+            }
             realm.setStat(town, "upgrading", days(tier + 1));
             realm.news(Realm.LogKind.TOWN, town.owner(), town.name() + " has begun " + (tier == 0 ? "resettling" : "growing") + " into a " + name(tier + 1) + ": it'll take "
                     + days(tier + 1) + " days, and it can't be helped until then.");

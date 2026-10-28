@@ -32,7 +32,8 @@ import net.neoforged.neoforge.event.AddReloadListenerEvent;
  * ({@code targets}), whether it secures a new holding before moving on ({@code fortify_after_capture}), how keen it is
  * to win back what it lost ({@code retake}), how far from its capital it fights ({@code home_radius}), how much
  * stronger its troops are ({@code military_bonus}), whether it raises the fallen ({@code raise_dead}), blights its land
- * ({@code blight}), or attacks in bursts from its capital ({@code burst_ratio}). {@code reserve}, {@code roams} and
+ * ({@code blight}), or attacks in bursts from its capital ({@code burst_ratio}), and the resource kind it gets twice
+ * as much from ({@code affinity}, DD-103). {@code reserve}, {@code roams} and
  * {@code tithe} are read once troops and wealth are tracked (phases 2 and 4).
  * <p>
  * A faction without its own dungeon mobs yet (the kobolds and elementals) raids with its file's {@code mobs} (spawner
@@ -55,10 +56,10 @@ public final class RealmFactions {
     public record Traits(String id, String name, String capital, String leader, String champion, double growth, double aggression,
             double attackBar, Targets targets, double weakBar, boolean fortifyAfterCapture, double retake, double reserve, boolean roams,
             int homeRadius, double tithe, double militaryBonus, double raiseDead, int blight, double burstRatio, List<String> mobs,
-            String bossFaction) {
+            String bossFaction, String affinity) {
         /** For a faction with no file: average in every way. */
         public static final Traits GENERIC = new Traits("", "", "", "", "", 1.0, 1.0, 0.5, Targets.KINGDOM_FIRST, 0.75, false, 0.5, 0.2, false,
-                0, 0.0, 0.0, 0.0, 0, 0.0, List.of(), "");
+                0, 0.0, 0.0, 0.0, 0, 0.0, List.of(), "", "");
 
         /** The faction's name in the news: its own, or its id ("the goblins"). */
         public String displayName() {
@@ -83,7 +84,8 @@ public final class RealmFactions {
                     GsonHelper.getAsBoolean(json, "roams", d.roams), GsonHelper.getAsInt(json, "home_radius", d.homeRadius),
                     GsonHelper.getAsDouble(json, "tithe", d.tithe), GsonHelper.getAsDouble(json, "military_bonus", d.militaryBonus),
                     GsonHelper.getAsDouble(json, "raise_dead", d.raiseDead), GsonHelper.getAsInt(json, "blight", d.blight),
-                    GsonHelper.getAsDouble(json, "burst_ratio", d.burstRatio), List.copyOf(mobs), GsonHelper.getAsString(json, "boss_faction", ""));
+                    GsonHelper.getAsDouble(json, "burst_ratio", d.burstRatio), List.copyOf(mobs), GsonHelper.getAsString(json, "boss_faction", ""),
+                    GsonHelper.getAsString(json, "affinity", ""));
         }
     }
 

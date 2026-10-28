@@ -55,11 +55,13 @@ public class RealmTurnTests {
                 "reinforcing strengthens border towns only");
         RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.MUSTER);
         helper.assertTrue(realm.kingdomStat("army") == 13, "mustering grows the army");
+        int trade = io.github.ranger3462.dungeondelving.realm.RealmEconomy.trade(realm, RealmNode.KINGDOM);
         RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.GATHER_WEALTH);
-        helper.assertTrue(realm.kingdomStat("treasury") == 13 && riverhold.stat("wealth") == 11, "gathering wealth fills the treasury and the towns");
+        helper.assertTrue(io.github.ranger3462.dungeondelving.realm.RealmEconomy.trade(realm, RealmNode.KINGDOM) == trade + 3 && riverhold.stat("wealth") == 11,
+                "gathering wealth fills the kingdom's trade and the towns");
 
         RealmTurns.nationAct(realm, DungeonFactions.GOBLINS, RealmTurns.NationAction.BUILD_MILITARY, 0L);
-        helper.assertTrue(warren.stat("military") == 10 + RealmTurns.points(DungeonFactions.GOBLINS, 2) && RealmTurns.points(DungeonFactions.GOBLINS, 2) == 3,
+        helper.assertTrue(warren.stat("military") == 13,
                 "building military strengthens the strongholds, faster for the fast-growing goblins: " + warren.stat("military"));
         realm.setStat(warren, "military", 12);
         realm.setStat(realm.node("millbrook").orElseThrow(), "defense", 30);

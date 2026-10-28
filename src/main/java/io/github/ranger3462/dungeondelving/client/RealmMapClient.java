@@ -36,7 +36,21 @@ public final class RealmMapClient {
     public record Fact(String label, String value, String hint) {}
 
     public record Nation(String id, int military, int strongholds, int towns, boolean pushedBack, String name, String leader, String champion,
-            String capital, String about, boolean marching) {}
+            String capital, String about, boolean marching, Purse purse) {}
+
+    /** A faction's food and trade, a turn's income and upkeep, and its wealth factor (in hundredths). */
+    public record Purse(int food, int trade, int foodIn, int tradeIn, int upkeep, int factor) {
+        static Purse of(CompoundTag tag) {
+            return new Purse(tag.getInt("food"), tag.getInt("trade"), tag.getInt("foodIn"), tag.getInt("tradeIn"), tag.getInt("upkeep"),
+                    tag.contains("factor") ? tag.getInt("factor") : 100);
+        }
+
+        /** "Food 12 (+4, troops eat 1)    Trade 20 (+3)    Grows x1.4". */
+        public String line() {
+            return "Food " + food + " (+" + foodIn + (upkeep > 0 ? ", troops eat " + upkeep : "") + ")    Trade " + trade + " (+" + tradeIn
+                    + ")    Grows x" + String.format(java.util.Locale.ROOT, "%.1f", factor / 100.0);
+        }
+    }
 
     /** A realm log entry: its kind is one of Realm.LogKind's names. */
     public record Entry(int turn, String text, boolean news, String kind, String who) {}
@@ -44,7 +58,7 @@ public final class RealmMapClient {
     public record Raid(String nation, String from, String to, long resolveAt) {}
 
     public record Data(Map<String, Node> nodes, List<String[]> links, Map<String, Integer> kingdom, List<Nation> nations, List<Raid> raids,
-            List<Entry> log, String kingdomAbout, int turn, long lastTurn, long turnLength, long serverNow, long receivedAt) {
+            List<Entry> log, String kingdomAbout, Purse kingdomPurse, int turn, long lastTurn, long turnLength, long serverNow, long receivedAt) {
         /** The server's clock now, by how long it's been since this came. */
         public long serverTime() {
             return serverNow + (System.currentTimeMillis() - receivedAt);
@@ -96,7 +110,7 @@ public final class RealmMapClient {
             CompoundTag nation = (CompoundTag) entry;
             nations.add(new Nation(nation.getString("id"), nation.getInt("military"), nation.getInt("strongholds"), nation.getInt("towns"),
                     nation.getBoolean("pushedBack"), nation.getString("name"), nation.getString("leader"), nation.getString("champion"),
-                    nation.getString("capital"), nation.getString("about"), nation.getBoolean("marching")));
+                    nation.getString("capital"), nation.getString("about"), nation.getBoolean("marching"), Purse.of(nation.getCompound("purse"))));
         }
         List<Raid> raids = new ArrayList<>();
         for (Tag entry : tag.getList("raids", Tag.TAG_COMPOUND)) {
@@ -108,7 +122,7 @@ public final class RealmMapClient {
             CompoundTag logged = (CompoundTag) entry;
             log.add(new Entry(logged.getInt("turn"), logged.getString("text"), logged.getBoolean("news"), logged.getString("kind"), logged.getString("who")));
         }
-        latest = new Data(nodes, links, kingdom, nations, raids, log, tag.getString("kingdomAbout"), tag.getInt("turn"), tag.getLong("lastTurn"), tag.getLong("turnLength"),
+        latest = new Data(nodes, links, kingdom, nations, raids, log, tag.getString("kingdomAbout"), Purse.of(tag.getCompound("kingdomPurse")), tag.getInt("turn"), tag.getLong("lastTurn"), tag.getLong("turnLength"),
                 tag.getLong("now"), System.currentTimeMillis());
         waypointsPending = true;
         updateWaypoints();

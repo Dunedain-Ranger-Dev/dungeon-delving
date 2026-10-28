@@ -43,7 +43,9 @@ public final class Realm extends SavedData {
     /** When the last turn was due, in real time (milliseconds); 0 until the clock first starts. */
     long lastTurnMillis;
     /** The kingdom's own stats: its standing army and treasury. */
-    final Map<String, Integer> kingdom = new LinkedHashMap<>(Map.of("army", 10, "treasury", 10));
+    final Map<String, Integer> kingdom = new LinkedHashMap<>(Map.of("army", 10));
+    /** Each faction's food and trade (DD-103, see RealmEconomy), by faction. */
+    final Map<String, Map<String, Integer>> purses = new LinkedHashMap<>();
     /** Raids declared and not yet resolved. */
     final List<Raid> raids = new ArrayList<>();
     /** The most recent happenings, oldest first. */
@@ -65,6 +67,8 @@ public final class Realm extends SavedData {
         CAPTURE,
         /** A town growing, rebuilding or falling to ruin. */
         TOWN,
+        /** Food and trade: running short, troops deserting. */
+        SUPPLY,
         OTHER
     }
 
@@ -133,6 +137,9 @@ public final class Realm extends SavedData {
     public boolean add(RealmNode node) {
         if (nodes.putIfAbsent(node.id, node) != null) {
             return false;
+        }
+        if (node.type == RealmNode.Type.RESOURCE && node.kind().isEmpty()) {
+            node.setKind(RealmEconomy.Kind.FARMLAND.id());
         }
         setDirty();
         return true;
@@ -288,6 +295,16 @@ public final class Realm extends SavedData {
         return Collections.unmodifiableMap(kingdom);
     }
 
+    /** A faction's food and trade (unset ones are RealmEconomy.START). */
+    public Map<String, Integer> purse(String faction) {
+        return Collections.unmodifiableMap(purses.getOrDefault(faction, Map.of()));
+    }
+
+    public void setPurse(String faction, String what, int amount) {
+        purses.computeIfAbsent(faction, key -> new LinkedHashMap<>()).put(what, amount);
+        setDirty();
+    }
+
     public List<Raid> raids() {
         return Collections.unmodifiableList(raids);
     }
@@ -363,6 +380,13 @@ public final class Realm extends SavedData {
         CompoundTag kingdomTag = new CompoundTag();
         kingdom.forEach(kingdomTag::putInt);
         tag.put("kingdom", kingdomTag);
+        CompoundTag purseTag = new CompoundTag();
+        purses.forEach((faction, purse) -> {
+            CompoundTag one = new CompoundTag();
+            purse.forEach(one::putInt);
+            purseTag.put(faction, one);
+        });
+        tag.put("purses", purseTag);
         ListTag raidList = new ListTag();
         for (Raid raid : raids) {
             CompoundTag raidTag = new CompoundTag();
@@ -404,6 +428,15 @@ public final class Realm extends SavedData {
         CompoundTag kingdomTag = tag.getCompound("kingdom");
         for (String stat : kingdomTag.getAllKeys()) {
             realm.kingdom.put(stat, kingdomTag.getInt(stat));
+        }
+        CompoundTag purseTag = tag.getCompound("purses");
+        for (String faction : purseTag.getAllKeys()) {
+            CompoundTag one = purseTag.getCompound(faction);
+            one.getAllKeys().forEach(what -> realm.purses.computeIfAbsent(faction, key -> new LinkedHashMap<>()).put(what, one.getInt(what)));
+        }
+        Integer treasury = realm.kingdom.remove("treasury"); // Saved before purses (DD-103): the kingdom's treasury was its trade.
+        if (treasury != null && !realm.purse(RealmNode.KINGDOM).containsKey(RealmEconomy.TRADE)) {
+            realm.purses.computeIfAbsent(RealmNode.KINGDOM, key -> new LinkedHashMap<>()).put(RealmEconomy.TRADE, treasury);
         }
         for (Tag entry : tag.getList("raids", Tag.TAG_COMPOUND)) {
             CompoundTag raid = (CompoundTag) entry;

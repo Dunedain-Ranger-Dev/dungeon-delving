@@ -77,11 +77,11 @@ public final class RealmRaids {
      * Empty if nothing can attack it, or a raid's already on it.
      */
     public static Optional<Realm.Raid> declare(Realm realm, String targetId, long resolveAt) {
-        Optional<RealmNode> target = realm.node(targetId).filter(node -> node.type == RealmNode.Type.TOWN || ((node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.SITE) && !node.monsters()));
+        Optional<RealmNode> target = realm.node(targetId).filter(node -> node.type == RealmNode.Type.TOWN || node.type == RealmNode.Type.RESOURCE || ((node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.SITE) && !node.monsters()));
         if (target.isEmpty() || realm.raids.stream().anyMatch(raid -> raid.town().equals(targetId))) {
             return Optional.empty();
         }
-        if (target.get().type == RealmNode.Type.TOWN && target.get().monsters()) {
+        if ((target.get().type == RealmNode.Type.TOWN || target.get().type == RealmNode.Type.RESOURCE) && target.get().monsters()) {
             Optional<RealmNode> from = realm.neighbors(targetId).stream().filter(RealmTurns::kingdomSettlement)
                     .max(java.util.Comparator.comparingInt(node -> node.stat("defense")));
             if (from.isEmpty()) {
@@ -121,13 +121,14 @@ public final class RealmRaids {
 
     /**
      * Whether a raid by {@code by} (the kingdom, or a monster nation) can take a node: a stronghold or site no monster
-     * nation holds (monsters only; the kingdom takes those by clearing them), or a town in ruins (tier 0) held by the
-     * other side, or no one. A town above ruins can only be sacked.
+     * nation holds (monsters only; the kingdom takes those by clearing them), a resource node anyone else holds, or a
+     * town in ruins (tier 0) held by the other side, or no one. A town above ruins can only be sacked.
      */
     public static boolean capturable(RealmNode node, String by) {
         boolean monsters = !RealmNode.KINGDOM.equals(by);
         return switch (node.type) {
             case STRONGHOLD, SITE -> monsters && !by.equals(node.owner());
+            case RESOURCE -> !by.equals(node.owner());
             case TOWN -> RealmTiers.tier(node) == 0 && !by.equals(node.owner());
             default -> false;
         };
@@ -140,7 +141,7 @@ public final class RealmRaids {
 
     /** The defense a raid's target puts up, before its roll: its own, plus the army's share if it's the kingdom's. */
     public static int defense(Realm realm, RealmNode target) {
-        return ownDefense(target) + (target.kingdoms() ? realm.kingdomStat("army") / ARMY_SHARE : 0);
+        return ownDefense(target) + (target.kingdoms() ? realm.kingdomStat("army") / ARMY_SHARE : 0) + RealmEconomy.mineDefense(realm, target);
     }
 
     /** Resolves one raid with these rolls (a d20 each), and takes it off the list. Returns whether the attackers won. */
@@ -155,7 +156,8 @@ public final class RealmRaids {
     /** A raid's attack, before its roll: the stronghold's military (+ the champion's bonus from a capital), or half the kingdom's army (+ its champion's). */
     public static int attack(Realm realm, Realm.Raid raid, RealmNode attacker) {
         return attack(realm, raid.nation(), attacker)
-                + (attacker.type == RealmNode.Type.CAPITAL && !RealmNode.KINGDOM.equals(raid.nation()) ? RealmCapitals.CHAMPION_BONUS : 0);
+                + (attacker.type == RealmNode.Type.CAPITAL && !RealmNode.KINGDOM.equals(raid.nation())
+                        ? RealmCapitals.CHAMPION_BONUS + RealmEconomy.arcane(realm, raid.nation()) : 0);
     }
 
     /** What a nation attacks with from a place, before its roll or a champion: its military, by its {@code military_bonus} (DD-102). */
@@ -168,7 +170,8 @@ public final class RealmRaids {
 
     /** What the kingdom's marches attack with: half its army, plus its champion's bonus if it has a capital. */
     public static int kingdomAttack(Realm realm) {
-        return realm.kingdomStat("army") / 2 + (RealmCapitals.kingdomChampion(realm) ? RealmCapitals.CHAMPION_BONUS : 0);
+        return realm.kingdomStat("army") / 2
+                + (RealmCapitals.kingdomChampion(realm) ? RealmCapitals.CHAMPION_BONUS + RealmEconomy.arcane(realm, RealmNode.KINGDOM) : 0);
     }
 
     /** Takes up to {@code amount} military from a raid's attackers (the kingdom's army, for its raids); returns how much. */
@@ -257,6 +260,10 @@ public final class RealmRaids {
                 int gained = plunder(wealthLost);
                 realm.addStat(attacker, "military", gained);
                 spoils = " The plunder swelled their ranks by " + gained + ".";
+            }
+            int coin = RealmEconomy.plunder(realm, target.owner(), raid.nation(), wealthLost);
+            if (coin > 0) {
+                spoils += " They carried off " + coin + " trade.";
             }
             realm.news(Realm.LogKind.BATTLE, raid.nation(), who(realm, raid, attacker) + " sacked " + target.name() + how + " (" + attack + " against " + defense
                     + "): it lost " + defenseLost + " defense, " + wealthLost + " wealth and " + moraleLost + " morale." + spoils);

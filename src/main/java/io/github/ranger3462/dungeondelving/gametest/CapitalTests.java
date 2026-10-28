@@ -73,9 +73,10 @@ public class CapitalTests {
         helper.assertTrue(raid.stronghold().equals("crownhold") && realm.log().stream().anyMatch(entry -> entry.text().contains("led by its champion")),
                 "from its capital, led by its champion");
         helper.assertTrue(RealmRaids.decide(realm, raid, 50, 1, false) && ruins.kingdoms(), "and takes the ruins");
-        int treasury = realm.kingdomStat("treasury");
+        int treasury = io.github.ranger3462.dungeondelving.realm.RealmEconomy.trade(realm, RealmNode.KINGDOM);
         RealmTurns.kingdomAct(realm, RealmTurns.KingdomAction.GATHER_WEALTH);
-        helper.assertTrue(realm.kingdomStat("treasury") == treasury + 2, "the capital pays into the treasury as well as the town");
+        helper.assertTrue(io.github.ranger3462.dungeondelving.realm.RealmEconomy.trade(realm, RealmNode.KINGDOM) == treasury + 2,
+                "the capital pays into the kingdom's trade as well as the town");
         helper.succeed();
     }
 

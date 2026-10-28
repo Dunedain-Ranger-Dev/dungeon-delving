@@ -124,6 +124,7 @@ public final class RealmMap {
             entry.putString("capital", traits.capital());
             entry.putString("about", about(traits));
             entry.putBoolean("marching", realm.nodes().stream().anyMatch(node -> nation.equals(node.owner()) && node.stat("bursting") > 0));
+            entry.put("purse", purse(realm, nation));
             nations.add(entry);
         }
         tag.put("nations", nations);
@@ -149,10 +150,24 @@ public final class RealmMap {
         }
         tag.put("log", log);
         tag.putString("kingdomAbout", about(RealmFactions.get(RealmNode.KINGDOM)));
+        tag.put("kingdomPurse", purse(realm, RealmNode.KINGDOM));
         tag.putInt("turn", realm.turn());
         tag.putLong("lastTurn", realm.lastTurnMillis());
         tag.putLong("turnLength", RealmTurns.turnMillis());
         return tag;
+    }
+
+    /** A faction's food and trade, what comes in and goes out a turn, and how much its trade speeds it up. */
+    private static CompoundTag purse(Realm realm, String faction) {
+        CompoundTag purse = new CompoundTag();
+        RealmEconomy.Income income = RealmEconomy.income(realm, faction);
+        purse.putInt("food", RealmEconomy.food(realm, faction));
+        purse.putInt("trade", RealmEconomy.trade(realm, faction));
+        purse.putInt("foodIn", income.food());
+        purse.putInt("tradeIn", income.trade());
+        purse.putInt("upkeep", income.upkeep());
+        purse.putInt("factor", (int) Math.round(RealmEconomy.factor(realm, faction) * 100));
+        return purse;
     }
 
     /** A line of a place's stats as the menu shows it: "Defense: 34", with what it means ("20 its own, 14 from the army"). */
@@ -169,13 +184,24 @@ public final class RealmMap {
             int tier = RealmTiers.tier(node);
             facts.add(new Fact("Size", RealmTiers.name(tier), tier == 0 ? "the next raid that wins takes it" : "tier " + tier + " of 5"));
         }
+        RealmEconomy.kind(node).ifPresent(kind -> facts.add(new Fact("Gives", kind.gives, "to whoever holds it")));
+        if (node.type == RealmNode.Type.RESOURCE && RealmEconomy.kind(node).isEmpty()) {
+            facts.add(new Fact("Gives", "nothing yet", "set its kind: " + String.join(", ", RealmEconomy.kindIds())));
+        }
         int own = RealmRaids.ownDefense(node);
         int defense = RealmRaids.defense(realm, node);
+        int mines = RealmEconomy.mineDefense(realm, node);
         if (node.type == RealmNode.Type.STRONGHOLD || node.type == RealmNode.Type.CAPITAL || node.stat("military") > 0) {
             facts.add(new Fact("Troops", String.valueOf(node.stat("military")), node.monsters() ? "what it raids with" : "its garrison"));
         }
-        facts.add(new Fact("Defense", String.valueOf(defense),
-                defense > own ? own + " its own, " + (defense - own) + " from the kingdom's army" : "what attackers must beat"));
+        List<String> from = new ArrayList<>();
+        if (defense - own - mines > 0) {
+            from.add((defense - own - mines) + " from the kingdom's army");
+        }
+        if (mines > 0) {
+            from.add(mines + " from its mines");
+        }
+        facts.add(new Fact("Defense", String.valueOf(defense), from.isEmpty() ? "what attackers must beat" : own + " its own, " + String.join(", ", from)));
         if (node.type == RealmNode.Type.TOWN) {
             int morale = node.stat("morale");
             facts.add(new Fact("Morale", String.valueOf(morale), morale < LOW_MORALE ? "low: its people may give up" : "how its people hold up"));
@@ -242,6 +268,7 @@ public final class RealmMap {
         if (traits.blight() > 0) {
             parts.add("Blights the land it holds.");
         }
+        RealmEconomy.Kind.byId(traits.affinity()).ifPresent(kind -> parts.add("Gets twice as much from " + kind.id().replace('_', ' ') + "s."));
         return String.join(" ", parts);
     }
 

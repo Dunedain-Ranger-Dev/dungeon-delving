@@ -40,7 +40,7 @@ import net.minecraft.world.phys.Vec3;
 public final class RealmMapIcons {
     /** What the old waypoints were named with. */
     private static final String OLD_PREFIX = "[Realm] ";
-    private static final Set<String> PLACES = Set.of("town", "stronghold", "capital", "site");
+    private static final Set<String> PLACES = Set.of("town", "stronghold", "capital", "site", "resource");
     private static final int MAX_RAID_LINES = 3;
     private static final Set<String> CLEARED = new HashSet<>();
     private static boolean registered;

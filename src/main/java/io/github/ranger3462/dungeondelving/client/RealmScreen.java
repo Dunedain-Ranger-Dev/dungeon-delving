@@ -153,7 +153,7 @@ public class RealmScreen extends Screen {
         return switch (node.type()) {
             case "capital" -> 11;
             case "town", "stronghold" -> 8;
-            case "site" -> 6;
+            case "site", "resource" -> 6;
             default -> 5;
         };
     }
@@ -255,7 +255,7 @@ public class RealmScreen extends Screen {
     }
 
     private static final String[][] KINDS = { { "PREPARE", "Routine", "909090" }, { "MARCH", "March", "F0A040" }, { "BATTLE", "Battle", "FF6060" },
-            { "CAPTURE", "Taken", "FFD040" }, { "TOWN", "Town", "80E080" }, { "OTHER", "", "C0C0C0" } };
+            { "CAPTURE", "Taken", "FFD040" }, { "TOWN", "Town", "80E080" }, { "SUPPLY", "Supply", "E8D8A0" }, { "OTHER", "", "C0C0C0" } };
 
     private static String[] kind(String name) {
         for (String[] kind : KINDS) {
@@ -383,9 +383,9 @@ public class RealmScreen extends Screen {
         data.raids().stream().filter(raid -> "kingdom".equals(raid.nation()))
                 .forEach(raid -> kingdomStatus.add("Marching on " + data.name(raid.to()) + " (" + clock(data.until(raid)) + ")"));
         cards.add(new Object[] { "kingdom", "The Kingdom", "",
-                "Army " + data.kingdom().getOrDefault("army", 0) + "    Treasury " + data.kingdom().getOrDefault("treasury", 0)
-                        + "    Towns " + held + " of " + towns + "    Strongholds " + strongholds,
-                kingdomStatus, data.kingdomAbout() });
+                "Army " + data.kingdom().getOrDefault("army", 0) + "    Towns " + held + " of " + towns + "    Strongholds " + strongholds
+                        + "    Resources " + nodes.stream().filter(node -> "resource".equals(node.type()) && node.kingdoms()).count(),
+                kingdomStatus, data.kingdomAbout(), data.kingdomPurse().line() });
         for (RealmMapClient.Nation nation : data.nations()) {
             List<String> leaders = new ArrayList<>();
             if (!nation.leader().isEmpty()) {
@@ -410,11 +410,12 @@ public class RealmScreen extends Screen {
                 status.add("Biding its time");
             }
             cards.add(new Object[] { nation.id(), capitalised(nation.name().isEmpty() ? nation.id() : nation.name()), String.join(", ", leaders),
-                    "Troops " + nation.military() + "    Strongholds " + nation.strongholds() + (nation.towns() > 0 ? "    Towns " + nation.towns() : ""),
-                    status, nation.about() });
+                    "Troops " + nation.military() + "    Strongholds " + nation.strongholds() + (nation.towns() > 0 ? "    Towns " + nation.towns() : "")
+                            + resources(nodes, nation.id()),
+                    status, nation.about(), nation.purse().line() });
         }
         if (data.nations().isEmpty()) {
-            cards.add(new Object[] { "none", "No nations in the field", "", "", List.of(), "Monster nations take turns once they hold a stronghold." });
+            cards.add(new Object[] { "none", "No nations in the field", "", "", List.of(), "Monster nations take turns once they hold a stronghold.", "" });
         }
         for (Object[] card : cards) {
             int column = 0;
@@ -435,6 +436,11 @@ public class RealmScreen extends Screen {
         scrollbar(graphics, x1, y0, y1);
     }
 
+    private static String resources(Collection<RealmMapClient.Node> nodes, String owner) {
+        long held = nodes.stream().filter(node -> "resource".equals(node.type()) && owner.equals(node.owner())).count();
+        return held > 0 ? "    Resources " + held : "";
+    }
+
     /** Draws one nation's card; returns its bottom. */
     @SuppressWarnings("unchecked")
     private int card(GuiGraphics graphics, Object[] card, int x, int y, int w) {
@@ -445,7 +451,9 @@ public class RealmScreen extends Screen {
         List<FormattedCharSequence> leaders = ((String) card[2]).isEmpty() ? List.of() : font.split(Component.literal((String) card[2]), inner);
         List<FormattedCharSequence> about = font.split(Component.literal((String) card[5]), inner);
         List<String> status = (List<String>) card[4];
-        height += leaders.size() * LINE + (((String) card[3]).isEmpty() ? 0 : LINE + 2) + status.size() * LINE + 3 + about.size() * LINE + 4;
+        String purse = (String) card[6];
+        height += leaders.size() * LINE + (((String) card[3]).isEmpty() ? 0 : LINE + 2) + (purse.isEmpty() ? 0 : LINE + 2) + status.size() * LINE + 3
+                + about.size() * LINE + 4;
         graphics.fill(x, y, x + w, y + height, 0xFF222222);
         graphics.fill(x, y, x + 3, y + height, 0xFF000000 | color);
         int tx = x + 9;
@@ -458,6 +466,10 @@ public class RealmScreen extends Screen {
         }
         if (!((String) card[3]).isEmpty()) {
             graphics.drawString(font, (String) card[3], tx, row[0], 0xFFFFFF);
+            row[0] += LINE + 2;
+        }
+        if (!purse.isEmpty()) {
+            graphics.drawString(font, purse, tx, row[0], 0xE8D8A0);
             row[0] += LINE + 2;
         }
         for (String line : status) {
@@ -506,6 +518,14 @@ public class RealmScreen extends Screen {
             int outline = node.id().equals(selected) ? 0xFFFFFFFF : "capital".equals(node.type()) ? 0xFFE0C060 : 0xFF000000;
             graphics.fill(sx - half - 1, sy - half - 1, sx + half + 2, sy + half + 2, outline);
             graphics.fill(sx - half, sy - half, sx + half + 1, sy + half + 1, 0xFF000000 | RealmMapClient.color(node.owner()));
+            if ("resource".equals(node.type())) {
+                // A diamond: the square's corners cut back, with a light middle.
+                graphics.fill(sx - half - 1, sy - half - 1, sx - half + 1, sy - half + 1, 0xF0141A20);
+                graphics.fill(sx + half, sy - half - 1, sx + half + 2, sy - half + 1, 0xF0141A20);
+                graphics.fill(sx - half - 1, sy + half, sx - half + 1, sy + half + 2, 0xF0141A20);
+                graphics.fill(sx + half, sy + half, sx + half + 2, sy + half + 2, 0xF0141A20);
+                graphics.fill(sx, sy, sx + 1, sy + 1, 0xFFFFFFFF);
+            }
             if ("stronghold".equals(node.type()) || "capital".equals(node.type())) {
                 graphics.fill(sx - 1, sy - 1, sx + 2, sy + 2, 0xFF000000);
             }
@@ -561,7 +581,7 @@ public class RealmScreen extends Screen {
         int x = x0 + 6, w = PANEL_WIDTH - 12;
         int[] y = { TOP + 6 };
         text(graphics, "The Kingdom", x, y, GOLD);
-        text(graphics, "Army " + data.kingdom().getOrDefault("army", 0) + "   Treasury " + data.kingdom().getOrDefault("treasury", 0), x, y, 0xFFFFFF);
+        text(graphics, "Army " + data.kingdom().getOrDefault("army", 0) + "   Food " + data.kingdomPurse().food() + "   Trade " + data.kingdomPurse().trade(), x, y, 0xFFFFFF);
         Collection<RealmMapClient.Node> nodes = data.nodes().values();
         long towns = nodes.stream().filter(node -> "town".equals(node.type())).count();
         long held = nodes.stream().filter(node -> "town".equals(node.type()) && node.kingdoms()).count();

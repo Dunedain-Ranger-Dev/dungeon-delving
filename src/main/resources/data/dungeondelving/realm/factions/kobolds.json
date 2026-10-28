@@ -20,5 +20,6 @@
     "dungeondelving:goblin_pyro=30@3-4",
     "minecraft:blaze=50@4"
   ],
-  "boss_faction": "goblins"
+  "boss_faction": "goblins",
+  "affinity": "mine"
 }

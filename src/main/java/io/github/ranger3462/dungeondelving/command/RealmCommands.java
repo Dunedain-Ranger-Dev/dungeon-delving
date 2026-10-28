@@ -34,7 +34,8 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
  * stand), {@code rename}, {@code owner}, {@code kind} (a site's or event's: watchtower, bridge, caravan...), {@code set}
  * (a stat).</li>
  * <li>{@code /realm link <a> <b>} and {@code /realm unlink <a> <b>}: the links that make borders.</li>
- * <li>{@code /realm clock}: the turn, the kingdom's army and treasury, raids declared, and the time to the next turn.
+ * <li>{@code /realm clock}: the turn, the kingdom's army, each faction's food and trade, raids declared, and the time to the next turn.
+ * <li>{@code /realm purse <faction> [food|trade <amount>]}: a faction's food and trade, and its takings a turn; or sets one.
  * {@code /realm turn [count]}: take turns now. {@code /realm log [count]}: what's happened lately (DD-95).</li>
  * <li>{@code /realm blueprint save <id> <radius> [down] [up]}: snapshot the blocks around a node, to rebuild it from after
  * raids. {@code info}, {@code damage <id> <points>} (as a sacking would), {@code repair <id>} (all of it, now) (DD-97).</li>
@@ -75,6 +76,13 @@ public final class RealmCommands {
                                 .executes(context -> list(context, StringArgumentType.getString(context, "type")))))
                 .then(Commands.literal("info").then(node("id").executes(RealmCommands::info)))
                 .then(Commands.literal("clock").executes(RealmCommands::clock))
+                .then(Commands.literal("purse").then(Commands.argument("faction", StringArgumentType.word())
+                        .suggests((context, builder) -> net.minecraft.commands.SharedSuggestionProvider.suggest(
+                                io.github.ranger3462.dungeondelving.realm.RealmEconomy.factions(realm(context)), builder))
+                        .executes(RealmCommands::purse)
+                        .then(Commands.argument("what", StringArgumentType.word())
+                                .suggests((context, builder) -> net.minecraft.commands.SharedSuggestionProvider.suggest(java.util.List.of("food", "trade"), builder))
+                                .then(Commands.argument("amount", IntegerArgumentType.integer(0, 100000)).executes(RealmCommands::setPurse)))))
                 .then(Commands.literal("danger").executes(RealmCommands::danger))
                 .then(Commands.literal("raid").then(node("town").executes(RealmCommands::raid)))
                 .then(Commands.literal("guards").then(node("town").executes(RealmCommands::guards)
@@ -196,7 +204,7 @@ public final class RealmCommands {
         }
         Optional<RealmNode.Type> type = RealmNode.Type.byId(typeId);
         if (type.isEmpty()) {
-            Feedback.fail(source, "Unknown node type " + typeId + ": town, site, stronghold, battle or event.");
+            Feedback.fail(source, "Unknown node type " + typeId + ": town, site, resource, stronghold, capital, battle or event.");
             return 0;
         }
         Optional<String> owner = ownerArgument != null ? Optional.of(ownerArgument) : Realm.defaultOwner(type.get());
@@ -460,14 +468,44 @@ public final class RealmCommands {
         return 1;
     }
 
+    /** {@code /realm purse <faction>}: its food and trade, and what comes in and goes out a turn. */
+    private static int purse(CommandContext<CommandSourceStack> context) {
+        Realm realm = realm(context);
+        String faction = StringArgumentType.getString(context, "faction");
+        io.github.ranger3462.dungeondelving.realm.RealmEconomy.Income income = io.github.ranger3462.dungeondelving.realm.RealmEconomy.income(realm, faction);
+        Feedback.tell(context.getSource(), "The " + faction + ": food " + io.github.ranger3462.dungeondelving.realm.RealmEconomy.food(realm, faction)
+                + ", trade " + io.github.ranger3462.dungeondelving.realm.RealmEconomy.trade(realm, faction) + ".");
+        Feedback.detail(context.getSource(), "Each turn: +" + income.food() + " food, +" + income.trade() + " trade; its troops eat " + income.upkeep() + ".");
+        return 1;
+    }
+
+    /** {@code /realm purse <faction> <food|trade> <amount>}: sets it (for testing). */
+    private static int setPurse(CommandContext<CommandSourceStack> context) {
+        String faction = StringArgumentType.getString(context, "faction");
+        String what = StringArgumentType.getString(context, "what");
+        if (!what.equals("food") && !what.equals("trade")) {
+            Feedback.fail(context.getSource(), "A purse holds food or trade.");
+            return 0;
+        }
+        if (!Realm.validOwner(faction) || RealmNode.NONE.equals(faction)) {
+            Feedback.fail(context.getSource(), "Unknown faction " + faction + ".");
+            return 0;
+        }
+        io.github.ranger3462.dungeondelving.realm.RealmEconomy.set(realm(context), faction, what, IntegerArgumentType.getInteger(context, "amount"));
+        Feedback.tell(context.getSource(), "The " + faction + "'s " + what + " is now " + IntegerArgumentType.getInteger(context, "amount") + ".");
+        return 1;
+    }
+
     private static int clock(CommandContext<CommandSourceStack> context) {
         Realm realm = realm(context);
         long seconds = RealmTurns.untilNext(realm, System.currentTimeMillis()) / 1000;
         Feedback.tell(context.getSource(), "Turn " + realm.turn() + ". The next in " + seconds / 60 + ":" + String.format("%02d", seconds % 60) + ".");
         Feedback.detail(context.getSource(), "The kingdom: " + realm.kingdomStats().entrySet().stream().map(e -> e.getKey() + " " + e.getValue())
                 .collect(Collectors.joining(", ")) + "; the border faces " + RealmTurns.threat(realm) + " monster military.");
-        for (String nation : realm.nations()) {
-            Feedback.detail(context.getSource(), "The " + nation + ": military " + RealmTurns.military(realm, nation));
+        for (String faction : io.github.ranger3462.dungeondelving.realm.RealmEconomy.factions(realm)) {
+            Feedback.detail(context.getSource(), (RealmNode.KINGDOM.equals(faction) ? "The kingdom" : "The " + faction + ": military " + RealmTurns.military(realm, faction))
+                    + ", food " + io.github.ranger3462.dungeondelving.realm.RealmEconomy.food(realm, faction)
+                    + ", trade " + io.github.ranger3462.dungeondelving.realm.RealmEconomy.trade(realm, faction));
         }
         for (Realm.Raid raid : realm.raids()) {
             long left = Math.max(0, raid.resolveAt() - System.currentTimeMillis()) / 1000;
@@ -513,6 +551,7 @@ public final class RealmCommands {
                 case CAPTURE -> ChatFormatting.GOLD;
                 case MARCH -> ChatFormatting.LIGHT_PURPLE;
                 case TOWN -> ChatFormatting.GREEN;
+                case SUPPLY -> ChatFormatting.YELLOW;
                 default -> ChatFormatting.GRAY;
             };
             String tag = switch (entry.kind()) {
@@ -520,6 +559,7 @@ public final class RealmCommands {
                 case CAPTURE -> "Taken";
                 case MARCH -> "March";
                 case TOWN -> "Town";
+                case SUPPLY -> "Supply";
                 case PREPARE -> "Routine";
                 case OTHER -> "";
             };

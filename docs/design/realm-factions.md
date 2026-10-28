@@ -1,7 +1,7 @@
 # Realm factions: who they are and how they play (proposal)
 
 From the kingdom behaviour writeup (Zach, 2026-10-27). This is the plan for the next round of realm work. Today's
-rules are in `realm-decisions.md`; this page says what changes. Phase 1 is built (DD-102); the rest isn't yet. Questions still open are
+rules are in `realm-decisions.md`; this page says what changes. Phases 1 (DD-102) and 2 (DD-103) are built; the rest isn't yet. Questions still open are
 at the end.
 
 ## The factions
@@ -135,3 +135,29 @@ The kobolds and elementals can join the realm in phase 1 with stand-in mobs, or 
   mustering. The wealth factor in section 2 uses trade.
 - **Kobolds and elementals join now**, with stand-in mobs until their own exist (DD-54).
 - **Order:** the phases as written.
+
+## Built in phase 2 (DD-103)
+
+- **Purses:** every faction keeps food and trade (starting at 10 each). The kingdom's old treasury became its trade.
+- **Income each turn:** a town gives food and trade equal to its tier; a stronghold 1 of each; a capital 3 of each;
+  resources by kind (below), twice over for a faction's `affinity` (elementals: arcane sites; kobolds: mines).
+- **Food:** troops eat 1 a turn per 20 (the kingdom's army; a nation's strongholds and capital). A faction that runs
+  out loses a quarter of the unfed troops to desertion, with news. Growing a town costs its holder 5 food per tier it
+  grows to (ruins resettle free).
+- **Trade:** building up, fortifying, reinforcing and mustering cost 2 trade; without it they give half. Their points
+  scale by 1 + trade / 50, up to x2. A sack carries off the defender's trade as well as the town's wealth.
+- **Resource nodes** (`/realm node add <id> resource [owner]`, then `/realm node kind <id> <kind>`):
+
+| Kind | Gives its holder |
+| --- | --- |
+| farmland | +3 food a turn |
+| market (or port) | +3 trade a turn |
+| mine | +3 defense to each of its holder's places linked to it, +1 trade |
+| lumber_camp | +1 to its holder's fortifying and reinforcing (up to 3 camps), +1 trade |
+| arcane_site | +2 to its holder's champion, +1 trade |
+
+  Anyone can take a resource node it doesn't hold; the kingdom marches on them before sacking towns.
+- `/realm purse <faction> [food|trade <amount>]` shows or sets a purse.
+
+Still to come: `tithe` (needs wealth moving between places) and real troop upkeep and gear (phase 4).
+

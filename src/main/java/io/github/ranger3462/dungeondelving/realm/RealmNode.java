@@ -30,6 +30,8 @@ public final class RealmNode {
         SITE(Map.of("heat", 0)),
         /** A monster nation's base: its military and how fortified it is. */
         STRONGHOLD(Map.of("military", 10, "fortification", 5)),
+        /** Land that gives its holder food, trade or more each turn, by its kind (RealmEconomy.Kind): anyone can take it. */
+        RESOURCE(Map.of("fortification", 3)),
         /** A monster nation's home base: never taken; sends its champion once the nation is pushed back (DD-101). */
         CAPITAL(Map.of("military", 30, "rally", 0)),
         /** A raid or attack in progress (made by the turns, later). */

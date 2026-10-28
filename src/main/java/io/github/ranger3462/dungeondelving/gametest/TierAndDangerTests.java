@@ -52,6 +52,7 @@ public class TierAndDangerTests {
         helper.assertTrue(RealmTiers.grow(realm) == 1 && RealmTiers.tier(town) == 2 && town.stat("defense") == defense + RealmTiers.DEFENSE_PER_TIER,
                 "on the fourth day it's a village, with more defense");
         realm.setStat(town, "wealth", 1000);
+        io.github.ranger3462.dungeondelving.realm.RealmEconomy.set(realm, RealmNode.KINGDOM, io.github.ranger3462.dungeondelving.realm.RealmEconomy.FOOD, 1000);
         realm.setStat(town, "damage", 5);
         helper.assertTrue(RealmTiers.grow(realm) == 0 && !RealmTiers.upgrading(town), "not while it's still rebuilding from a raid");
         realm.setStat(town, "damage", 0);

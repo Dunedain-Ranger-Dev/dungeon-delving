@@ -117,6 +117,7 @@ public final class RealmTurns {
         RealmGarrison.newDay(realm);
         RealmDamage.fundRepairs(realm);
         RealmTiers.grow(realm);
+        RealmEconomy.collect(realm);
         kingdomAct(realm, pick(kingdomWeights(realm), random), time);
         for (String nation : realm.nations()) {
             nationAct(realm, nation, pick(nationWeights(realm, nation), random), time);
@@ -138,18 +139,25 @@ public final class RealmTurns {
 
     /**
      * Where the kingdom would march, and from which of its towns: the nearest town in ruins a monster nation holds,
-     * linked to one of its towns (to take it back), or failing that the weakest-defended one (to sack it).
+     * linked to one of its towns (to take it back), then the weakest resource node it doesn't hold (to take it), or
+     * failing that the weakest-defended town (to sack it).
      */
     public static Optional<Map.Entry<RealmNode, RealmNode>> marchTarget(Realm realm) {
         List<Map.Entry<RealmNode, RealmNode>> held = new ArrayList<>();
+        List<Map.Entry<RealmNode, RealmNode>> land = new ArrayList<>();
         for (RealmNode from : realm.nodes()) {
             if (kingdomSettlement(from)) {
                 realm.neighbors(from.id).stream().filter(node -> node.type == RealmNode.Type.TOWN && !node.kingdoms()).forEach(node -> held.add(Map.entry(from, node)));
+                realm.neighbors(from.id).stream().filter(node -> node.type == RealmNode.Type.RESOURCE && !node.kingdoms()).forEach(node -> land.add(Map.entry(from, node)));
             }
         }
         Optional<Map.Entry<RealmNode, RealmNode>> ruins = held.stream().filter(entry -> RealmRaids.capturable(entry.getValue(), RealmNode.KINGDOM))
                 .min(Comparator.comparingDouble(entry -> entry.getKey().pos().distSqr(entry.getValue().pos())));
-        return ruins.isPresent() ? ruins
+        if (ruins.isPresent()) {
+            return ruins;
+        }
+        Optional<Map.Entry<RealmNode, RealmNode>> resource = land.stream().min(Comparator.comparingInt(entry -> RealmRaids.defense(realm, entry.getValue())));
+        return resource.isPresent() ? resource
                 : held.stream().filter(entry -> entry.getValue().monsters()).min(Comparator.comparingInt(entry -> entry.getValue().stat("defense")));
     }
 
@@ -171,7 +179,7 @@ public final class RealmTurns {
         Map<KingdomAction, Integer> weights = new LinkedHashMap<>();
         weights.put(KingdomAction.REINFORCE, border.isEmpty() ? 0 : 2 + (threat > defense ? 4 : 0));
         weights.put(KingdomAction.MUSTER, 2 + (realm.kingdomStat("army") < threat / 2 ? 2 : 0));
-        weights.put(KingdomAction.GATHER_WEALTH, 2 + (realm.kingdomStat("treasury") < 10 ? 2 : 0));
+        weights.put(KingdomAction.GATHER_WEALTH, 2 + (RealmEconomy.trade(realm, RealmNode.KINGDOM) < 10 ? 2 : 0));
         Optional<Map.Entry<RealmNode, RealmNode>> march = marchTarget(realm);
         boolean marching = realm.raids.stream().anyMatch(raid -> RealmNode.KINGDOM.equals(raid.nation()));
         // Only when it's fairly sure to win (its attack bar, DD-102): the keener the more it outmatches the target.
@@ -191,18 +199,19 @@ public final class RealmTurns {
         switch (action) {
             case REINFORCE -> {
                 List<RealmNode> border = supported(borderTowns(realm));
-                border.forEach(town -> realm.addStat(town, "defense", 2));
-                realm.record(Realm.LogKind.PREPARE, RealmNode.KINGDOM, "The kingdom reinforced its border: " + names(border) + " each gained 2 defense.");
+                int gained = RealmEconomy.spend(realm, RealmNode.KINGDOM, 2) + RealmEconomy.lumber(realm, RealmNode.KINGDOM);
+                border.forEach(town -> realm.addStat(town, "defense", gained));
+                realm.record(Realm.LogKind.PREPARE, RealmNode.KINGDOM, "The kingdom reinforced its border: " + names(border) + " each gained " + gained + " defense.");
             }
             case MUSTER -> {
-                realm.addKingdomStat("army", 3);
+                realm.addKingdomStat("army", RealmEconomy.spend(realm, RealmNode.KINGDOM, 3));
                 realm.record(Realm.LogKind.PREPARE, RealmNode.KINGDOM, "The kingdom mustered troops: its army is now " + realm.kingdomStat("army") + ".");
             }
             case GATHER_WEALTH -> {
                 List<RealmNode> towns = supported(realm.nodes().stream().filter(node -> node.type == RealmNode.Type.TOWN && node.kingdoms()).toList());
                 towns.forEach(town -> realm.addStat(town, "wealth", 1));
-                realm.addKingdomStat("treasury", towns.size() + (RealmCapitals.kingdomChampion(realm) ? 1 : 0));
-                realm.record(Realm.LogKind.PREPARE, RealmNode.KINGDOM, "The kingdom gathered wealth: its treasury is now " + realm.kingdomStat("treasury") + ".");
+                RealmEconomy.add(realm, RealmNode.KINGDOM, RealmEconomy.TRADE, towns.size() + (RealmCapitals.kingdomChampion(realm) ? 1 : 0));
+                realm.record(Realm.LogKind.PREPARE, RealmNode.KINGDOM, "The kingdom gathered wealth: its trade is now " + RealmEconomy.trade(realm, RealmNode.KINGDOM) + ".");
             }
             case MARCH -> marchTarget(realm).ifPresent(target -> {
                 Realm.Raid raid = new Realm.Raid(RealmNode.KINGDOM, target.getKey().id, target.getValue().id, realm.turn, time + turnMillis() / 2);
@@ -232,9 +241,9 @@ public final class RealmTurns {
     /** A raid a nation could make: from where, on what, and its chance of winning (before any champion). */
     public record RaidPlan(RealmNode from, RealmNode target, double chance) {}
 
-    /** Points an action gives a faction: its base, by the faction's growth (at least 1). */
-    public static int points(String faction, int base) {
-        return Math.max(1, (int) Math.round(base * RealmFactions.get(faction).growth()));
+    /** Points an action gives a faction, paid for: its base, by its growth and wealth (RealmEconomy#spend). */
+    public static int points(Realm realm, String faction, int base) {
+        return RealmEconomy.spend(realm, faction, base);
     }
 
     /**
@@ -378,7 +387,7 @@ public final class RealmTurns {
         }
         switch (action) {
             case BUILD_MILITARY -> {
-                int gained = points(nation, 2);
+                int gained = points(realm, nation, 2);
                 if (strongholds.isEmpty()) {
                     // Pushed back: the nation rebuilds at its capital.
                     capital.ifPresent(home -> {
@@ -391,7 +400,7 @@ public final class RealmTurns {
                 realm.record(Realm.LogKind.PREPARE, nation, "The " + name + " built up their military: " + names(strongholds) + " each gained " + gained + ".");
             }
             case FORTIFY -> {
-                int gained = points(nation, 1);
+                int gained = points(realm, nation, 1) + RealmEconomy.lumber(realm, nation);
                 strongholds.forEach(node -> realm.addStat(node, "fortification", gained));
                 towns.forEach(town -> realm.addStat(town, "defense", gained));
                 realm.record(Realm.LogKind.PREPARE, nation, "The " + name + " fortified " + names(java.util.stream.Stream.concat(strongholds.stream(), towns.stream()).toList()) + ".");
