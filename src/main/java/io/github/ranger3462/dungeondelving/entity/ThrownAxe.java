@@ -36,6 +36,15 @@ public class ThrownAxe extends ThrowableItemProjectile {
         super(ModEntities.THROWN_AXE.get(), thrower, level);
     }
 
+    protected ThrownAxe(EntityType<? extends ThrownAxe> type, Level level, LivingEntity thrower) {
+        super(type, thrower, level);
+    }
+
+    /** How hard it hits. */
+    public float damage() {
+        return DAMAGE;
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
@@ -76,7 +85,7 @@ public class ThrownAxe extends ThrowableItemProjectile {
 
     /** Hurts what the axe hit. */
     public void strike(Entity target) {
-        target.hurt(damageSources().thrown(this, getOwner()), DAMAGE);
+        target.hurt(damageSources().thrown(this, getOwner()), damage());
     }
 
     @Override

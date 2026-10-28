@@ -13,8 +13,8 @@
   "home_radius": 2,
   "tithe": 0.75,
   "mobs": [
-    "dungeondelving:goblin=60@1-2",
-    "dungeondelving:goblin_archer=40@1-2",
+    "dungeondelving:kobold_looter=60@1-2",
+    "dungeondelving:kobold_scavenger=40@1-2",
     "dungeondelving:goblin_shaman=20@2-3",
     "dungeondelving:hobgoblin_soldier=40@3",
     "dungeondelving:goblin_pyro=30@3-4",

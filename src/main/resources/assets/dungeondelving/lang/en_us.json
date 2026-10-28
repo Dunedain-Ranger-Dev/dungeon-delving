@@ -1746,5 +1746,10 @@
   "item.dungeondelving.gold_coin": "Gold Coin",
   "item.dungeondelving.platinum_coin": "Platinum Coin",
   "entity.dungeondelving.town_mage": "Town Battlemage",
-  "item.dungeondelving.town_mage_spawn_egg": "Town Battlemage Spawn Egg"
+  "item.dungeondelving.town_mage_spawn_egg": "Town Battlemage Spawn Egg",
+  "entity.dungeondelving.kobold_looter": "Kobold Looter",
+  "item.dungeondelving.kobold_looter_spawn_egg": "Kobold Looter Spawn Egg",
+  "entity.dungeondelving.kobold_scavenger": "Kobold Scavenger",
+  "item.dungeondelving.kobold_scavenger_spawn_egg": "Kobold Scavenger Spawn Egg",
+  "entity.dungeondelving.thrown_spear": "Thrown Spear"
 }

@@ -42,4 +42,7 @@ Replaces the old skeleton faction. The MVP's only faction.
 
 - **Kobolds:** probably a neutral faction found only in T1 dungeons. Kobold Looters (melee) and Kobold Scavengers
   (ranged, throwing spears), basically the same as goblins. Wyrmlings will likely join them as a draconic faction.
+  *Built (DD-54):* the Looter (stone pickaxe, 12 HP) and the Scavenger (thrown spears, 10 HP), smaller than goblins.
+  Their trick is pack tactics: with two or more other kobolds within 6 blocks they hit 1.5x as hard, spears too. The
+  realm's kobolds raid with them at tiers 1-2. Not in dungeons yet: they need a T1 boss first.
 - **Dark elves:** once the factions are fleshed out more thoroughly.

@@ -20,7 +20,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 /**
- * Draws goblins, hobgoblins and orcs with the vanilla humanoid body (goblins shrunk to three quarters size), with each
+ * Draws goblins, hobgoblins, orcs and kobolds with the vanilla humanoid body (goblins shrunk to three quarters size), with each
  * type's own texture ({@code textures/entity/<type>.png}) and any armor they wear. A placeholder until custom models
  * exist.
  */
@@ -57,6 +57,8 @@ public class ArmedHumanoidRenderer<T extends ArmedHumanoid> extends HumanoidMobR
     }
 
     private static final float ORC_SCALE = 1.08f;
+    /** Kobolds are a little smaller than goblins. */
+    private static final float KOBOLD_SCALE = 0.68f;
 
     @EventBusSubscriber(modid = DungeonDelving.MODID, value = Dist.CLIENT)
     public static final class Registration {
@@ -79,6 +81,9 @@ public class ArmedHumanoidRenderer<T extends ArmedHumanoid> extends HumanoidMobR
                 registerOrc(event, orc.get(), orc.getId().getPath());
             }
             event.registerEntityRenderer(ModEntities.THROWN_AXE.get(), ThrownAxeRenderer::new);
+            event.registerEntityRenderer(ModEntities.THROWN_SPEAR.get(), ThrownSpearRenderer::new);
+            event.registerEntityRenderer(ModEntities.KOBOLD_LOOTER.get(), context -> new ArmedHumanoidRenderer<>(context, "kobold_looter", KOBOLD_SCALE));
+            event.registerEntityRenderer(ModEntities.KOBOLD_SCAVENGER.get(), context -> new ArmedHumanoidRenderer<>(context, "kobold_scavenger", KOBOLD_SCALE));
             if (ModList.get().isLoaded("irons_spellbooks")) {
                 GoblinShamanRenderer.register(event);
             }

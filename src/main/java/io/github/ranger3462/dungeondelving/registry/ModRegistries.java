@@ -194,7 +194,8 @@ public final class ModRegistries {
                         ModEntities.HOBGOBLIN_VETERAN_SPAWN_EGG, ModEntities.HOBGOBLIN_GENERAL_SPAWN_EGG, ModEntities.ORC_SCRAPPER_SPAWN_EGG,
                         ModEntities.ORC_RAIDER_SPAWN_EGG, ModEntities.ORC_VETERAN_SPAWN_EGG, ModEntities.ORC_VAGABOND_SPAWN_EGG,
                         ModEntities.ORC_RAMPAGER_SPAWN_EGG, ModEntities.ORC_COMMANDER_SPAWN_EGG, ModEntities.ORC_CHIEFTAIN_SPAWN_EGG,
-                        ModEntities.ORC_WARCHIEF_SPAWN_EGG, ModEntities.TOWN_GUARD_SPAWN_EGG)) {
+                        ModEntities.ORC_WARCHIEF_SPAWN_EGG, ModEntities.KOBOLD_LOOTER_SPAWN_EGG, ModEntities.KOBOLD_SCAVENGER_SPAWN_EGG,
+                        ModEntities.TOWN_GUARD_SPAWN_EGG)) {
                     output.accept(egg.get());
                 }
                 io.github.ranger3462.dungeondelving.economy.Coins.all().forEach(coin -> output.accept(coin.get()));
