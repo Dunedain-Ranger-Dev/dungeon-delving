@@ -71,7 +71,13 @@ public class EconomyTests {
         helper.assertTrue(RealmEconomy.upkeep(realm, DungeonFactions.GOBLINS) == 5, "100 troops eat 5 food a turn");
         RealmEconomy.collect(realm);
         helper.assertTrue(warren.stat("military") < 100 && RealmEconomy.food(realm, DungeonFactions.GOBLINS) == 0
-                && realm.log().stream().anyMatch(entry -> entry.kind() == Realm.LogKind.SUPPLY), "with 1 food coming in, some desert: " + warren.stat("military"));
+                && realm.log().stream().anyMatch(entry -> entry.kind() == Realm.LogKind.SUPPLY), "with only the warren's own food coming in, some desert: " + warren.stat("military"));
+
+        RealmNode lair = node("lair", RealmNode.Type.CAPITAL, "orcs", 1);
+        realm.add(lair);
+        realm.setStat(lair, "military", RealmEconomy.CAPITAL_FOOD * RealmEconomy.TROOPS_PER_FOOD);
+        helper.assertTrue(RealmEconomy.income(realm, "orcs").food() >= RealmEconomy.upkeep(realm, "orcs"),
+                "a capital alone feeds a garrison of " + lair.stat("military"));
 
         RealmNode town = node("town", RealmNode.Type.TOWN, RealmNode.KINGDOM, 2);
         realm.add(town);

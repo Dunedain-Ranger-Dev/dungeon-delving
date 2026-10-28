@@ -139,7 +139,7 @@ The kobolds and elementals can join the realm in phase 1 with stand-in mobs, or 
 ## Built in phase 2 (DD-103)
 
 - **Purses:** every faction keeps food and trade (starting at 10 each). The kingdom's old treasury became its trade.
-- **Income each turn:** a town gives food and trade equal to its tier; a stronghold 1 of each; a capital 3 of each;
+- **Income each turn:** a town gives food and trade equal to its tier; a stronghold 3 food and 1 trade; a capital 8 food and 3 trade (a capital alone feeds 160 troops);
   resources by kind (below), twice over for a faction's `affinity` (elementals: arcane sites; kobolds: mines).
 - **Food:** troops eat 1 a turn per 20 (the kingdom's army; a nation's strongholds and capital). A faction that runs
   out loses a quarter of the unfed troops to desertion, with news. Growing a town costs its holder 5 food per tier it

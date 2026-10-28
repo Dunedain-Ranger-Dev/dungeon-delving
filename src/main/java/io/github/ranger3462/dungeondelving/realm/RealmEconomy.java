@@ -29,6 +29,9 @@ public final class RealmEconomy {
     public static final int ACTION_COST = 2;
     /** Troops one food a turn feeds. */
     public static final int TROOPS_PER_FOOD = 20;
+    /** Food a stronghold and a capital grow for themselves a turn: enough that a nation's home can feed a real garrison. */
+    public static final int STRONGHOLD_FOOD = 3;
+    public static final int CAPITAL_FOOD = 8;
     /** Trade for each step of the wealth factor's 1: at 50 trade, points are doubled. */
     public static final int FACTOR_TRADE = 50;
     public static final double MAX_FACTOR = 2.0;
@@ -113,11 +116,11 @@ public final class RealmEconomy {
                     }
                 }
                 case STRONGHOLD -> {
-                    food++;
+                    food += STRONGHOLD_FOOD;
                     trade++;
                 }
                 case CAPITAL -> {
-                    food += 3;
+                    food += CAPITAL_FOOD;
                     trade += 3;
                 }
                 case RESOURCE -> {
