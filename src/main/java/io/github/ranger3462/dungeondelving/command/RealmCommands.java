@@ -367,8 +367,8 @@ public final class RealmCommands {
         Realm realm = realm(context);
         var raid = io.github.ranger3462.dungeondelving.realm.RealmRaids.declare(realm, town, System.currentTimeMillis() + 10_000L);
         if (raid.isEmpty()) {
-            Feedback.fail(context.getSource(), "No raid: " + town + " must be a town, or a stronghold or site the monsters don't hold, bordering a monster "
-                    + "stronghold (a lost stronghold can also be raided by a pushed-back capital), or a monster-held town bordering a kingdom town, "
+            Feedback.fail(context.getSource(), "No raid: " + town + " must be a town or capital, or a stronghold or site the monsters don't hold, bordering a monster "
+                    + "stronghold (a lost stronghold can also be raided by a pushed-back capital), or a monster-held town or capital bordering a kingdom town, "
                     + "with no raid on it already.");
             return 0;
         }
