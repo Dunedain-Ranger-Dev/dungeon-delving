@@ -190,6 +190,8 @@ dependencies {
     compileOnly "curse.maven:irons-spells-n-spellbooks-855414:8680204"  // 1.21.1-3.16.3
     compileOnly "curse.maven:irons-lib-1492763:8973642"
     compileOnly "curse.maven:geckolib-388172:8893490"
+    // Optional integration: Kobolds!, whose model and textures our kobolds borrow. Only used when it is installed.
+    compileOnly "curse.maven:kobolds-484967:9257299"                    // 4.0.2
     compileOnly "curse.maven:playeranimator-658587:7389814"
     // Optional integration: Ars Nouveau mana, for the Tester's Charm. Only used when Ars Nouveau is installed.
     compileOnly "curse.maven:ars-nouveau-401955:9052154"                // 5.13.3
@@ -342,8 +344,11 @@ dependencies {
         localRuntime "curse.maven:entityculling-448233:9100286"              // 1.11.3
         // Newer Minecraft features: the Pale Garden and the Creaking (on trial)
         localRuntime "curse.maven:vanillabackport-417430:9318571"            // 1.2.2
-        localRuntime "curse.maven:appleskin-248787:7854442"                  // 3.0.9
         localRuntime "curse.maven:platform-997634:9318519"                   // 1.4.2, its library
+        // Food and saturation on the hunger bar (on trial)
+        localRuntime "curse.maven:appleskin-248787:7854442"                  // 3.0.9
+        // Kobold models and textures, which our kobolds use when it is installed
+        localRuntime "curse.maven:kobolds-484967:9257299"                    // 4.0.2
     }
 
     // For more info:

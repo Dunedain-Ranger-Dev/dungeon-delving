@@ -61,7 +61,8 @@ public class GarrisonTests {
         zombie.moveTo(town.pos().offset(0, 0, 3).getCenter());
         level.addFreshEntity(zombie);
         helper.assertTrue(RealmGarrison.mayEngage(guards.get(0), zombie), "a guard goes for a monster that comes close");
-        helper.assertTrue(zombie.targetSelector.getAvailableGoals().size() == EntityType.ZOMBIE.create(level).targetSelector.getAvailableGoals().size() + 1,
+        // At least one more: other mods add their own on joining too (Kobolds! sets zombies on kobolds).
+        helper.assertTrue(zombie.targetSelector.getAvailableGoals().size() > EntityType.ZOMBIE.create(level).targetSelector.getAvailableGoals().size(),
                 "and monsters in the world go for guards");
         zombie.moveTo(town.pos().offset(0, 0, RealmGarrison.AGGRO + 8).getCenter());
         helper.assertFalse(RealmGarrison.mayEngage(guards.get(0), zombie), "an off-duty guard leaves a far-off monster alone");

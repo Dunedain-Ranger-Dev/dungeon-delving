@@ -47,4 +47,6 @@ Replaces the old skeleton faction. The MVP's only faction.
   realm's kobolds raid with them at tiers 1-2. They hold tier 1 dungeons (when `kobolds` is in `enabledFactions`),
   led by the **Kobold Packmaster**: a big kobold (80 HP, iron pickaxe) who comes with two looters and two scavengers,
   so he fights as a pack from the start, and once, below half health, yaps for two more looters.
+  With the Kobolds! mod installed (it's in the pack), all three wear its model and skins (MIT): the looter the plain
+  kobold, the scavenger the engineer and the Packmaster the warrior. Its own dens and zombie kobolds are switched off.
 - **Dark elves:** once the factions are fleshed out more thoroughly.

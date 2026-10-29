@@ -86,6 +86,15 @@ Procedurally generated dungeons: dive in, survive, and bring back the loot.
     ordering="NONE"
     side="BOTH"
 
+# Kobolds! is optional: when it's installed our kobolds wear its model, and we load after it so our data can switch off
+# its kobold dens and zombie kobold spawns (data/kobolds/tags/worldgen/biome).
+[[dependencies.${mod_id}]]
+    modId="kobolds"
+    type="optional"
+    versionRange="[4,)"
+    ordering="AFTER"
+    side="BOTH"
+
 # Features are specific properties of the game environment, that you may want to declare you require. This example declares
 # that your mod requires GL version 3.2 or higher. Other features will be added. They are side aware so declaring this won't
 # stop your mod loading on the server for example.

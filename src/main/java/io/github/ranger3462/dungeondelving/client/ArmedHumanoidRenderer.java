@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.entity.ArmedHumanoid;
 import io.github.ranger3462.dungeondelving.integration.irons.GoblinShamanRenderer;
+import io.github.ranger3462.dungeondelving.integration.kobolds.KoboldsModRenderer;
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -22,7 +23,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 /**
  * Draws goblins, hobgoblins, orcs and kobolds with the vanilla humanoid body (goblins shrunk to three quarters size), with each
  * type's own texture ({@code textures/entity/<type>.png}) and any armor they wear. A placeholder until custom models
- * exist.
+ * exist; kobolds use the Kobolds! mod's model when it's installed ({@link KoboldsModRenderer}).
  */
 public class ArmedHumanoidRenderer<T extends ArmedHumanoid> extends HumanoidMobRenderer<T, ArmedHumanoidModel<T>> {
     private static final float GOBLIN_SCALE = 0.75f;
@@ -85,6 +86,9 @@ public class ArmedHumanoidRenderer<T extends ArmedHumanoid> extends HumanoidMobR
             event.registerEntityRenderer(ModEntities.KOBOLD_LOOTER.get(), context -> new ArmedHumanoidRenderer<>(context, "kobold_looter", KOBOLD_SCALE));
             event.registerEntityRenderer(ModEntities.KOBOLD_SCAVENGER.get(), context -> new ArmedHumanoidRenderer<>(context, "kobold_scavenger", KOBOLD_SCALE));
             event.registerEntityRenderer(ModEntities.KOBOLD_PACKMASTER.get(), context -> new ArmedHumanoidRenderer<>(context, "kobold_packmaster", KOBOLD_SCALE));
+            if (ModList.get().isLoaded("kobolds")) {
+                KoboldsModRenderer.register(event); // The Kobolds! mod's model and skins, in place of the placeholders.
+            }
             if (ModList.get().isLoaded("irons_spellbooks")) {
                 GoblinShamanRenderer.register(event);
             }
