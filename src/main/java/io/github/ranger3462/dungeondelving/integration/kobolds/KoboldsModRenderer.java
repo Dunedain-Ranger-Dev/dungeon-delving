@@ -1,7 +1,10 @@
 package io.github.ranger3462.dungeondelving.integration.kobolds;
 
+import java.util.List;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.client.ArmedHumanoidModel;
 import io.github.ranger3462.dungeondelving.entity.Kobold;
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
@@ -21,13 +24,17 @@ import net.salju.kobolds.init.KoboldsClient;
 /**
  * Draws our kobolds with the Kobolds! mod's model and skins (MIT, by Jusey1 and team) when it's installed: its body,
  * horns and tail, its glowing eyes, and its armor fit. Our kobolds keep their own AI; only the look is borrowed. The
- * looter wears the plain kobold skin, the scavenger the engineer's and the Packmaster the warrior's.
+ * looter wears the plain kobold skin, the scavenger the engineer's and the Packmaster the warrior's. Each kobold's scales
+ * are one of the dragon colours ({@link #COLOURS}), picked from its UUID so it keeps its colour: black is Kobolds!'s own
+ * skin, the rest are recoloured copies (tools/kobold_dragon_skins.py).
  */
 public class KoboldsModRenderer<T extends Kobold> extends HumanoidMobRenderer<T, KoboldsModRenderer.KoboldModel<T>> {
     /** Kobolds! draws its grown kobolds at this size. */
     private static final float SCALE = 0.875f;
     private static final ResourceLocation EYES = ResourceLocation.fromNamespaceAndPath("kobolds", "textures/entity/eyes/base.png");
-    private final ResourceLocation texture;
+    /** The scale colours, black first (Kobolds!'s own). Keep in sync with tools/kobold_dragon_skins.py. */
+    public static final List<String> COLOURS = List.of("black", "red", "blue", "green", "white", "brass", "copper");
+    private final List<ResourceLocation> textures;
 
     public KoboldsModRenderer(EntityRendererProvider.Context context, String skin) {
         super(context, new KoboldModel<>(adult(context.bakeLayer(KoboldsClient.KOBOLD))), 0.36f);
@@ -39,7 +46,9 @@ public class KoboldsModRenderer<T extends Kobold> extends HumanoidMobRenderer<T,
                 return RenderType.eyes(EYES);
             }
         });
-        this.texture = ResourceLocation.fromNamespaceAndPath("kobolds", "textures/entity/kobolds/" + skin + ".png");
+        this.textures = COLOURS.stream().map(colour -> colour.equals("black")
+                ? ResourceLocation.fromNamespaceAndPath("kobolds", "textures/entity/kobolds/" + skin + ".png")
+                : DungeonDelving.id("textures/entity/kobold/" + skin + "_" + colour + ".png")).toList();
     }
 
     /** Hides the baby horns, which the model only shows on young kobolds. */
@@ -75,9 +84,14 @@ public class KoboldsModRenderer<T extends Kobold> extends HumanoidMobRenderer<T,
         }
     }
 
+    /** A kobold's scale colour, the same every time it's drawn. */
+    public static String colour(Kobold kobold) {
+        return COLOURS.get(Math.floorMod(kobold.getUUID().hashCode(), COLOURS.size()));
+    }
+
     @Override
     public ResourceLocation getTextureLocation(T mob) {
-        return texture;
+        return textures.get(COLOURS.indexOf(colour(mob)));
     }
 
     @Override

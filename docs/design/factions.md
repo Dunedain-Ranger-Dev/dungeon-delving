@@ -49,4 +49,6 @@ Replaces the old skeleton faction. The MVP's only faction.
   so he fights as a pack from the start, and once, below half health, yaps for two more looters.
   With the Kobolds! mod installed (it's in the pack), all three wear its model and skins (MIT): the looter the plain
   kobold, the scavenger the engineer and the Packmaster the warrior. Its own dens and zombie kobolds are switched off.
+  Their scales come in dragon colours, one per kobold at random: black (Kobolds!'s own), red, blue, green, white, brass
+  and copper (recoloured copies, made by tools/kobold_dragon_skins.py).
 - **Dark elves:** once the factions are fleshed out more thoroughly.
