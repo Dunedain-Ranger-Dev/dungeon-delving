@@ -7,6 +7,7 @@ import io.github.ranger3462.dungeondelving.entity.Kobold;
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.HumanoidMobRenderer;
@@ -22,14 +23,14 @@ import net.salju.kobolds.init.KoboldsClient;
  * horns and tail, its glowing eyes, and its armor fit. Our kobolds keep their own AI; only the look is borrowed. The
  * looter wears the plain kobold skin, the scavenger the engineer's and the Packmaster the warrior's.
  */
-public class KoboldsModRenderer<T extends Kobold> extends HumanoidMobRenderer<T, ArmedHumanoidModel<T>> {
+public class KoboldsModRenderer<T extends Kobold> extends HumanoidMobRenderer<T, KoboldsModRenderer.KoboldModel<T>> {
     /** Kobolds! draws its grown kobolds at this size. */
     private static final float SCALE = 0.875f;
     private static final ResourceLocation EYES = ResourceLocation.fromNamespaceAndPath("kobolds", "textures/entity/eyes/base.png");
     private final ResourceLocation texture;
 
     public KoboldsModRenderer(EntityRendererProvider.Context context, String skin) {
-        super(context, new ArmedHumanoidModel<>(adult(context.bakeLayer(KoboldsClient.KOBOLD))), 0.36f);
+        super(context, new KoboldModel<>(adult(context.bakeLayer(KoboldsClient.KOBOLD))), 0.36f);
         addLayer(new HumanoidArmorLayer<>(this, new HumanoidModel<>(context.bakeLayer(KoboldsClient.KOBOLD_ARMOR_INNER)),
                 new HumanoidModel<>(context.bakeLayer(KoboldsClient.KOBOLD_ARMOR_OUTER)), context.getModelManager()));
         addLayer(new EyesLayer<>(this) {
@@ -50,6 +51,28 @@ public class KoboldsModRenderer<T extends Kobold> extends HumanoidMobRenderer<T,
             }
         }
         return root;
+    }
+
+    /**
+     * Our armed humanoid poses on the Kobolds! body. The vanilla humanoid animation puts the arms and legs where a
+     * player's go, which leaves gaps on the narrower kobold, so after it runs each limb goes back to the kobold's own
+     * joint (keeping its swing).
+     */
+    public static class KoboldModel<T extends Kobold> extends ArmedHumanoidModel<T> {
+        public KoboldModel(ModelPart root) {
+            super(root);
+        }
+
+        @Override
+        public void setupAnim(T mob, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+            super.setupAnim(mob, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+            for (ModelPart part : new ModelPart[] {head, hat, body, rightArm, leftArm, rightLeg, leftLeg}) {
+                PartPose joint = part.getInitialPose();
+                part.x = joint.x;
+                part.y = joint.y;
+                part.z = joint.z;
+            }
+        }
     }
 
     @Override
