@@ -1751,5 +1751,7 @@
   "item.dungeondelving.kobold_looter_spawn_egg": "Kobold Looter Spawn Egg",
   "entity.dungeondelving.kobold_scavenger": "Kobold Scavenger",
   "item.dungeondelving.kobold_scavenger_spawn_egg": "Kobold Scavenger Spawn Egg",
-  "entity.dungeondelving.thrown_spear": "Thrown Spear"
+  "entity.dungeondelving.thrown_spear": "Thrown Spear",
+  "entity.dungeondelving.kobold_packmaster": "Kobold Packmaster",
+  "item.dungeondelving.kobold_packmaster_spawn_egg": "Kobold Packmaster Spawn Egg"
 }

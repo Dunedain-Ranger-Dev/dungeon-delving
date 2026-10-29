@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Set;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.SpawnerMobs;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonBosses;
 import io.github.ranger3462.dungeondelving.entity.Kobold;
+import io.github.ranger3462.dungeondelving.entity.KoboldPackmaster;
 import io.github.ranger3462.dungeondelving.entity.KoboldScavenger;
 import io.github.ranger3462.dungeondelving.entity.ThrownSpear;
 import io.github.ranger3462.dungeondelving.realm.RealmFactions;
@@ -17,6 +20,7 @@ import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -95,6 +99,45 @@ public class KoboldTests {
             }
         } finally {
             looter.discard();
+            pack.forEach(Kobold::discard);
+        }
+        helper.succeed();
+    }
+
+    /** Kobolds hold tier 1 dungeons only, led by the Packmaster, and he comes with his pack. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void koboldDungeonsAreLedByThePackmaster(GameTestHelper helper) {
+        RandomSource random = RandomSource.create(541);
+        List<String> withKobolds = List.of(DungeonFactions.UNDEAD, DungeonFactions.KOBOLDS);
+        Set<String> tierOne = new HashSet<>();
+        for (int i = 0; i < 100; i++) {
+            tierOne.add(DungeonFactions.pick(1, random, withKobolds));
+            helper.assertTrue(DungeonFactions.pick(2, random, withKobolds).equals(DungeonFactions.UNDEAD), "kobolds hold only tier 1 dungeons");
+        }
+        helper.assertTrue(tierOne.contains(DungeonFactions.KOBOLDS), "tier 1 dungeons should roll kobolds when they're on");
+        helper.assertTrue(DungeonBosses.pick(1, DungeonFactions.KOBOLDS, random).equals(DungeonBosses.KOBOLD_PACKMASTER), "the kobolds' boss is the Packmaster");
+        Set<String> mobs = new HashSet<>();
+        for (int i = 0; i < 200; i++) {
+            SpawnerMobs.pick(helper.getLevel(), random, DungeonFactions.mobs(DungeonFactions.KOBOLDS), 1)
+                    .ifPresent(type -> mobs.add(BuiltInRegistries.ENTITY_TYPE.getKey(type.value()).getPath()));
+        }
+        helper.assertTrue(mobs.equals(Set.of("kobold_looter", "kobold_scavenger")), "kobold spawners spawn looters and scavengers, got " + mobs);
+
+        BlockPos pos = helper.absolutePos(new BlockPos(1, 1, 1)).above(100);
+        LivingEntity boss = DungeonBosses.spawn(helper.getLevel(), pos, 1, 0, DungeonBosses.KOBOLD_PACKMASTER);
+        List<Kobold> pack = helper.getLevel().getEntitiesOfClass(Kobold.class, boss.getBoundingBox().inflate(8), kobold -> kobold != boss);
+        try {
+            helper.assertTrue(boss instanceof KoboldPackmaster && boss.getMaxHealth() == KoboldPackmaster.MAX_HEALTH, "the Packmaster should be a big kobold");
+            helper.assertTrue(DungeonBosses.isBoss(boss) && boss.getMainHandItem().is(Items.IRON_PICKAXE), "he's a boss with an iron pickaxe");
+            helper.assertTrue(pack.size() == 4, "he comes with two looters and two scavengers, got " + pack.size());
+            KoboldPackmaster packmaster = (KoboldPackmaster) boss;
+            helper.assertTrue(packmaster.inPack(), "with his pack around him, he fights as a pack");
+            packmaster.rally();
+            List<Kobold> after = helper.getLevel().getEntitiesOfClass(Kobold.class, boss.getBoundingBox().inflate(8), kobold -> kobold != boss);
+            helper.assertTrue(packmaster.hasRallied() && after.size() == pack.size() + KoboldPackmaster.RALLY, "his call brings " + KoboldPackmaster.RALLY + " more looters");
+            pack = after;
+        } finally {
+            boss.discard();
             pack.forEach(Kobold::discard);
         }
         helper.succeed();

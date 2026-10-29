@@ -107,4 +107,18 @@ for x in range(20, 28, 2):
     scavenger[(x, 21)] = BONE + (255,)
 png(ENTITY / "kobold_scavenger.png", 64, 64, scavenger)
 
+packmaster = kobold_body()
+# The boss: a crown of teeth and bone, a gold-studded vest and a sash of trophies.
+fill(packmaster, 8, 0, 16, 2, BONE, 6)
+for x in range(0, 32, 2):
+    packmaster[(x, 8)] = BONE + (255,)
+fill(packmaster, 20, 20, 22, 32, LEATHER_DARK, 6)
+fill(packmaster, 26, 20, 28, 32, LEATHER_DARK, 6)
+for y in range(21, 32, 3):
+    packmaster[(20, y)] = (200, 160, 64, 255)
+    packmaster[(27, y)] = (200, 160, 64, 255)
+for i in range(8):
+    packmaster[(20 + i, 20 + i)] = (140, 30, 30, 255)
+png(ENTITY / "kobold_packmaster.png", 64, 64, packmaster)
+
 print("Wrote the kobold textures")

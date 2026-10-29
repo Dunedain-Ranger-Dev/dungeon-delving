@@ -44,5 +44,7 @@ Replaces the old skeleton faction. The MVP's only faction.
   (ranged, throwing spears), basically the same as goblins. Wyrmlings will likely join them as a draconic faction.
   *Built (DD-54):* the Looter (stone pickaxe, 12 HP) and the Scavenger (thrown spears, 10 HP), smaller than goblins.
   Their trick is pack tactics: with two or more other kobolds within 6 blocks they hit 1.5x as hard, spears too. The
-  realm's kobolds raid with them at tiers 1-2. Not in dungeons yet: they need a T1 boss first.
+  realm's kobolds raid with them at tiers 1-2. They hold tier 1 dungeons (when `kobolds` is in `enabledFactions`),
+  led by the **Kobold Packmaster**: a big kobold (80 HP, iron pickaxe) who comes with two looters and two scavengers,
+  so he fights as a pack from the start, and once, below half health, yaps for two more looters.
 - **Dark elves:** once the factions are fleshed out more thoroughly.

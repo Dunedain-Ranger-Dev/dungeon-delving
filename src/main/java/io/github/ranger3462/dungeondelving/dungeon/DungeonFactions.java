@@ -21,6 +21,7 @@ public final class DungeonFactions {
     public static final String GOBLINS = "goblins";
     public static final String UNDEAD = "undead";
     public static final String ORCS = "orcs";
+    public static final String KOBOLDS = "kobolds";
     /** The undead's old name, still found in saved runs. */
     private static final String OLD_SKELETONS = "skeletons";
 
@@ -53,6 +54,8 @@ public final class DungeonFactions {
             "dungeondelving:orc_scrapper=55@1", "dungeondelving:orc_raider=45@1-2",
             "dungeondelving:orc_veteran=45@2-3", "dungeondelving:orc_doomsayer=15@2-3",
             "dungeondelving:orc_vagabond=35@3-4", "dungeondelving:orc_rampager=45@4", "dungeondelving:orc_shaman=15@4");
+    /** Kobolds (DD-54) hold only tier 1 dungeons: looters and scavengers, led by the Kobold Packmaster. */
+    public static final List<String> KOBOLD_DEFAULTS = List.of("dungeondelving:kobold_looter=60@1", "dungeondelving:kobold_scavenger=40@1");
     public static final List<String> ENABLED_DEFAULTS = List.of(UNDEAD);
 
     private static final Map<String, Supplier<List<? extends String>>> MOBS = new LinkedHashMap<>();
@@ -61,6 +64,7 @@ public final class DungeonFactions {
         MOBS.put(GOBLINS, () -> Config.GOBLIN_MOBS.get()); // Lambdas, not method references: Config may still be loading here.
         MOBS.put(UNDEAD, () -> Config.UNDEAD_MOBS.get());
         MOBS.put(ORCS, () -> Config.ORC_MOBS.get());
+        MOBS.put(KOBOLDS, () -> Config.KOBOLD_MOBS.get());
     }
 
     private DungeonFactions() {}

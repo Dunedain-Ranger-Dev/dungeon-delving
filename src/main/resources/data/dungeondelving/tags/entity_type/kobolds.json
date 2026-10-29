@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "dungeondelving:kobold_looter",
-    "dungeondelving:kobold_scavenger"
+    "dungeondelving:kobold_scavenger",
+    "dungeondelving:kobold_packmaster"
   ]
 }

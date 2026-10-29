@@ -11,6 +11,7 @@ import java.util.List;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.entity.Goblin;
 import io.github.ranger3462.dungeondelving.entity.Kobold;
+import io.github.ranger3462.dungeondelving.entity.KoboldPackmaster;
 import io.github.ranger3462.dungeondelving.entity.KoboldScavenger;
 import io.github.ranger3462.dungeondelving.entity.ThrownSpear;
 import io.github.ranger3462.dungeondelving.entity.GoblinArcher;
@@ -195,6 +196,10 @@ public final class ModEntities {
             properties -> new DeferredSpawnEggItem(KOBOLD_LOOTER, 0xA0522D, 0x7A7A7A, properties));
     public static final DeferredItem<DeferredSpawnEggItem> KOBOLD_SCAVENGER_SPAWN_EGG = ModRegistries.ITEMS.registerItem("kobold_scavenger_spawn_egg",
             properties -> new DeferredSpawnEggItem(KOBOLD_SCAVENGER, 0xA0522D, 0xC9A227, properties));
+    /** The kobolds' tier 1 boss. */
+    public static final DeferredHolder<EntityType<?>, EntityType<KoboldPackmaster>> KOBOLD_PACKMASTER = kobold("kobold_packmaster", KoboldPackmaster::new);
+    public static final DeferredItem<DeferredSpawnEggItem> KOBOLD_PACKMASTER_SPAWN_EGG = ModRegistries.ITEMS.registerItem("kobold_packmaster_spawn_egg",
+            properties -> new DeferredSpawnEggItem(KOBOLD_PACKMASTER, 0xA0522D, 0xC8A040, properties));
     /** The spear kobold scavengers throw. */
     public static final DeferredHolder<EntityType<?>, EntityType<ThrownSpear>> THROWN_SPEAR = ENTITIES.register("thrown_spear",
             () -> EntityType.Builder.<ThrownSpear>of(ThrownSpear::new, MobCategory.MISC).sized(0.3f, 0.3f).clientTrackingRange(4).updateInterval(10)
@@ -247,6 +252,7 @@ public final class ModEntities {
         event.put(TOWN_GUARD.get(), TownGuard.createAttributes().build());
         event.put(KOBOLD_LOOTER.get(), Kobold.Looter.createAttributes().build());
         event.put(KOBOLD_SCAVENGER.get(), KoboldScavenger.createAttributes().build());
+        event.put(KOBOLD_PACKMASTER.get(), KoboldPackmaster.createAttributes().build());
     }
 
     @SubscribeEvent
@@ -255,7 +261,8 @@ public final class ModEntities {
                 SKELETON_LORD.get(), STRAY_SWORDSMAN.get(), BOGGED_SWORDSMAN.get(), WITHER_SKELETON_ARCHER.get(), ZOMBIE_LORD.get(),
                 HOBGOBLIN_SOLDIER.get(), HOBGOBLIN_HUNTER.get(), HOBGOBLIN_VANGUARD.get(), HOBGOBLIN_SPELLBREAKER.get(), GOBLIN_GLADIATOR.get(),
                 HOBGOBLIN_VETERAN.get(), HOBGOBLIN_GENERAL.get(), ORC_SCRAPPER.get(), ORC_RAIDER.get(), ORC_VETERAN.get(), ORC_VAGABOND.get(),
-                ORC_RAMPAGER.get(), ORC_COMMANDER.get(), ORC_CHIEFTAIN.get(), ORC_WARCHIEF.get(), KOBOLD_LOOTER.get(), KOBOLD_SCAVENGER.get())) {
+                ORC_RAMPAGER.get(), ORC_COMMANDER.get(), ORC_CHIEFTAIN.get(), ORC_WARCHIEF.get(), KOBOLD_LOOTER.get(), KOBOLD_SCAVENGER.get(),
+                KOBOLD_PACKMASTER.get())) {
             event.register(goblin, SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules,
                     RegisterSpawnPlacementsEvent.Operation.REPLACE);
         }

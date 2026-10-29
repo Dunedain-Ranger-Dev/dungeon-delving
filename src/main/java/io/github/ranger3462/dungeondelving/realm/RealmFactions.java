@@ -106,10 +106,13 @@ public final class RealmFactions {
         return nations;
     }
 
-    /** The mobs a nation raids with: its dungeon faction's, or its file's stand-ins. */
+    /**
+     * The mobs a nation raids with: its file's, if it lists any (the kobolds hold only tier 1 dungeons, so their file
+     * fills the higher tiers with stand-ins), else its dungeon faction's.
+     */
     public static List<? extends String> mobs(String nation) {
-        List<? extends String> own = DungeonFactions.mobs(nation);
-        return own.isEmpty() ? get(nation).mobs() : own;
+        List<String> file = get(nation).mobs();
+        return file.isEmpty() ? DungeonFactions.mobs(nation) : file;
     }
 
     /** The faction whose bosses a nation's champion is drawn from: its own, or its file's stand-in. */

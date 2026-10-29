@@ -90,9 +90,12 @@ public final class Config {
     public static final ModConfigSpec.ConfigValue<List<? extends String>> UNDEAD_MOBS = mobList("undeadMobs", "undead",
             DungeonFactions.UNDEAD_DEFAULTS);
     public static final ModConfigSpec.ConfigValue<List<? extends String>> ORC_MOBS = mobList("orcMobs", "orc", DungeonFactions.ORC_DEFAULTS);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> KOBOLD_MOBS = mobList("koboldMobs", "kobold",
+            DungeonFactions.KOBOLD_DEFAULTS);
     public static final ModConfigSpec.ConfigValue<List<? extends String>> ENABLED_FACTIONS = BUILDER
-            .comment("Which factions can hold dungeons: undead, goblins, orcs. Each dungeon rolls one of these that has a boss",
-                    "for its tier. Goblins and orcs are Phase 2 and still being tested, so only the undead are on by default.")
+            .comment("Which factions can hold dungeons: undead, goblins, orcs, kobolds. Each dungeon rolls one of these that has a",
+                    "boss for its tier (kobolds have one only at tier 1). Goblins, orcs and kobolds are Phase 2 and still being",
+                    "tested, so only the undead are on by default.")
             .defineList("enabledFactions", DungeonFactions.ENABLED_DEFAULTS, () -> DungeonFactions.UNDEAD, value -> value instanceof String);
 
     public static final ModConfigSpec.BooleanValue BLOCK_NATURAL_SPAWNS = BUILDER

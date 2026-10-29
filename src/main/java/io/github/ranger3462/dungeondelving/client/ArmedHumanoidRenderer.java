@@ -84,6 +84,7 @@ public class ArmedHumanoidRenderer<T extends ArmedHumanoid> extends HumanoidMobR
             event.registerEntityRenderer(ModEntities.THROWN_SPEAR.get(), ThrownSpearRenderer::new);
             event.registerEntityRenderer(ModEntities.KOBOLD_LOOTER.get(), context -> new ArmedHumanoidRenderer<>(context, "kobold_looter", KOBOLD_SCALE));
             event.registerEntityRenderer(ModEntities.KOBOLD_SCAVENGER.get(), context -> new ArmedHumanoidRenderer<>(context, "kobold_scavenger", KOBOLD_SCALE));
+            event.registerEntityRenderer(ModEntities.KOBOLD_PACKMASTER.get(), context -> new ArmedHumanoidRenderer<>(context, "kobold_packmaster", KOBOLD_SCALE));
             if (ModList.get().isLoaded("irons_spellbooks")) {
                 GoblinShamanRenderer.register(event);
             }

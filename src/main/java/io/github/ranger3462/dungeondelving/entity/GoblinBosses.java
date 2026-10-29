@@ -27,8 +27,8 @@ import net.neoforged.neoforge.event.EventHooks;
 public final class GoblinBosses {
     private GoblinBosses() {}
 
-    /** Makes a boss for its arena, named; {@code DungeonBosses} adds it to the world. */
-    private static <T extends Mob> T make(EntityType<T> type, ServerLevel level, BlockPos pos, String name) {
+    /** Makes a boss for its arena, named; {@code DungeonBosses} adds it to the world. The kobolds' Packmaster uses it too. */
+    static <T extends Mob> T make(EntityType<T> type, ServerLevel level, BlockPos pos, String name) {
         T boss = type.create(level);
         boss.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, 180.0f, 0.0f);
         EventHooks.finalizeMobSpawn(boss, level, level.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);

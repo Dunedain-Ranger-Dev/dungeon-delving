@@ -18,6 +18,7 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
+import io.github.ranger3462.dungeondelving.entity.KoboldPackmaster;
 import io.github.ranger3462.dungeondelving.entity.OrcBosses;
 import io.github.ranger3462.dungeondelving.entity.SkeletonLord;
 import io.github.ranger3462.dungeondelving.entity.ZombieLord;
@@ -84,6 +85,7 @@ public final class DungeonBosses {
     public static final String ORC_COMMANDER = "orc_commander";
     public static final String ORC_CHIEFTAIN = "orc_chieftain";
     public static final String ORC_WARCHIEF = "orc_warchief";
+    public static final String KOBOLD_PACKMASTER = "kobold_packmaster";
     /** Registered by the Iron's Spells integration; without it, the Barrow King guards tier 4 as well. */
     public static final String LICH_LORD = "lich_lord";
     /** How close players must be to see a boss's health bar. */
@@ -127,6 +129,7 @@ public final class DungeonBosses {
         register(new BossType(ORC_COMMANDER, DungeonFactions.ORCS, tier -> tier == 1, OrcBosses::commander));
         register(new BossType(ORC_CHIEFTAIN, DungeonFactions.ORCS, tier -> tier == 2, OrcBosses::chieftain));
         register(new BossType(ORC_WARCHIEF, DungeonFactions.ORCS, tier -> tier == 4, OrcBosses::warchief));
+        register(new BossType(KOBOLD_PACKMASTER, DungeonFactions.KOBOLDS, tier -> tier == 1, KoboldPackmaster::create));
         register(new BossType(SKELETON_LORD, DungeonFactions.UNDEAD, tier -> tier == 2, SkeletonLord::create));
         register(new BossType(BARROW_KING, DungeonFactions.UNDEAD, tier -> tier == 3 || (tier == 4 && !TYPES.containsKey(LICH_LORD)),
                 DungeonBosses::createBarrowKing));
@@ -138,6 +141,9 @@ public final class DungeonBosses {
         addRetinue(ORC_CHIEFTAIN, (level, pos, tier) -> ring(level, pos, ModEntities.ORC_RAIDER.get(), 2, 5.0, 0.25));
         addRetinue(ORC_WARCHIEF, (level, pos, tier) -> ring(level, pos, ModEntities.ORC_RAMPAGER.get(), 2, 3.0, 0.0));
         addRetinue(ORC_WARCHIEF, (level, pos, tier) -> ring(level, pos, ModEntities.ORC_VAGABOND.get(), 2, 6.0, 0.25));
+        // The Packmaster's pack: close enough that he and they all fight as a pack.
+        addRetinue(KOBOLD_PACKMASTER, (level, pos, tier) -> ring(level, pos, ModEntities.KOBOLD_LOOTER.get(), 2, 2.5, 0.0));
+        addRetinue(KOBOLD_PACKMASTER, (level, pos, tier) -> ring(level, pos, ModEntities.KOBOLD_SCAVENGER.get(), 2, 4.5, 0.25));
     }
 
     /** Adds a boss type, e.g. from an optional integration. */

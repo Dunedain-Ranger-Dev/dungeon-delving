@@ -12,6 +12,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import io.github.ranger3462.dungeondelving.entity.Kobold;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -28,7 +29,8 @@ public final class FactionInfighting {
     /** A faction's spellcasters and support mobs, never targeted by their own faction. */
     public static final TagKey<EntityType<?>> CASTERS = TagKey.create(Registries.ENTITY_TYPE, DungeonDelving.id("faction_casters"));
     /** The factions, by the tag their mobs share. */
-    private static final List<TagKey<EntityType<?>>> FACTIONS = List.of(GoblinSwarm.GOBLINS, OrcBosses.ORCS, EntityTypeTags.UNDEAD);
+    private static final List<TagKey<EntityType<?>>> FACTIONS = List.of(GoblinSwarm.GOBLINS, OrcBosses.ORCS, Kobold.KOBOLDS,
+            EntityTypeTags.UNDEAD);
 
     private FactionInfighting() {}
 
