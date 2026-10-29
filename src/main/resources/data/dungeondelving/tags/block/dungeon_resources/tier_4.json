@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "dungeondelving:borax_deposit"
+    {
+      "id": "ddprofessions:borax_deposit",
+      "required": false
+    }
   ]
 }

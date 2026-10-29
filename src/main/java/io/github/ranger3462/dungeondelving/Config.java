@@ -2,13 +2,11 @@ package io.github.ranger3462.dungeondelving;
 
 import java.util.List;
 
-import io.github.ranger3462.dungeondelving.character.SkillLevels;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.RoomCounts;
 import io.github.ranger3462.dungeondelving.dungeon.RoomMobCap;
 import io.github.ranger3462.dungeondelving.dungeon.SpawnerMobs;
 import io.github.ranger3462.dungeondelving.dungeon.layout.LayoutType;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -47,17 +45,6 @@ public final class Config {
                     "entries (one number per tier). Once a room holds this many, its spawners wait until some die, so rooms with",
                     "several spawners can't swamp you. A faction without an entry uses 7,9,12,15.")
             .defineList("roomMobCaps", RoomMobCap.DEFAULTS, () -> "orcs=7,9,12,15", value -> value instanceof String text && RoomMobCap.parse(text).isPresent());
-
-    public static final ModConfigSpec.ConfigValue<List<? extends String>> CHARACTER_LEVEL_SKILLS = BUILDER
-            .comment("Which skills (Pufferfish's Skills categories) count toward the character level. Without Pufferfish's",
-                    "Skills, only the crafting skills count.")
-            .defineList("characterLevelSkills", SkillLevels.DEFAULT_SKILLS, () -> "dungeondelving:mining",
-                    value -> value instanceof String text && ResourceLocation.tryParse(text) != null);
-
-    public static final ModConfigSpec.IntValue CHARACTER_LEVEL_TOP_SKILLS = BUILDER
-            .comment("The character level is 1 plus the average of a player's best this-many skill levels (RuneScape-style), so",
-                    "crafters and fighters level alike. Each character level past 1 earns an ability point.")
-            .defineInRange("characterLevelTopSkills", 6, 1, 20);
 
     public static final ModConfigSpec.IntValue FACTION_INFIGHTING_MAX_TIER = BUILDER
             .comment("Up to this dungeon tier, a mob hit by one of its own faction (a stray arrow) may turn on it. Above it, a",
@@ -111,16 +98,6 @@ public final class Config {
                 .defineList(key, defaults, () -> "minecraft:zombie=1", value -> value instanceof String text && SpawnerMobs.parse(text).isPresent());
     }
 
-    public static final ModConfigSpec.IntValue REALM_TURN_MINUTES = BUILDER
-            .comment("Real minutes between the realm's turns (docs/design/realm.md). 20 is a Minecraft day. Turns keep coming while",
-                    "the server is off, and are caught up when it starts (up to realmCatchUpTurns).")
-            .defineInRange("realmTurnMinutes", 20, 1, 24 * 60);
-
-    public static final ModConfigSpec.IntValue REALM_CATCH_UP_TURNS = BUILDER
-            .comment("The most turns the realm catches up on when the server starts after being off. Any more are skipped, so a long",
-                    "time away doesn't flatten the realm.")
-            .defineInRange("realmCatchUpTurns", 24, 0, 1000);
-
     static final ModConfigSpec SPEC = BUILDER.build();
 
     private Config() {}
@@ -136,10 +113,6 @@ public final class Config {
         if (DungeonFactions.OLD_GOBLIN_DEFAULTS.contains(List.copyOf(GOBLIN_MOBS.get()))) {
             GOBLIN_MOBS.set(DungeonFactions.GOBLIN_DEFAULTS);
             GOBLIN_MOBS.save();
-        }
-        if (SkillLevels.OLD_DEFAULT_SKILLS.contains(List.copyOf(CHARACTER_LEVEL_SKILLS.get()))) {
-            CHARACTER_LEVEL_SKILLS.set(SkillLevels.DEFAULT_SKILLS);
-            CHARACTER_LEVEL_SKILLS.save();
         }
     }
 }

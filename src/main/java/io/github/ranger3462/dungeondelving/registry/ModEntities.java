@@ -26,7 +26,6 @@ import io.github.ranger3462.dungeondelving.entity.SkeletonLord;
 import io.github.ranger3462.dungeondelving.entity.SkeletonSwordsman;
 import io.github.ranger3462.dungeondelving.entity.StraySwordsman;
 import io.github.ranger3462.dungeondelving.entity.ThrownAxe;
-import io.github.ranger3462.dungeondelving.entity.TownGuard;
 import io.github.ranger3462.dungeondelving.entity.WitherSkeletonArcher;
 import io.github.ranger3462.dungeondelving.entity.ZombieLord;
 import net.minecraft.core.registries.Registries;
@@ -210,13 +209,6 @@ public final class ModEntities {
                 .clientTrackingRange(8).build(DungeonDelving.id(name).toString()));
     }
 
-    /** The town guard (DD-98): a human soldier who turns out when a realm town is raided. */
-    public static final DeferredHolder<EntityType<?>, EntityType<TownGuard>> TOWN_GUARD = ENTITIES.register("town_guard",
-            () -> EntityType.Builder.of(TownGuard::new, MobCategory.MISC).sized(0.6f, 1.8f).eyeHeight(1.62f).clientTrackingRange(10)
-                    .build(DungeonDelving.id("town_guard").toString()));
-    public static final DeferredItem<DeferredSpawnEggItem> TOWN_GUARD_SPAWN_EGG = ModRegistries.ITEMS.registerItem("town_guard_spawn_egg",
-            properties -> new DeferredSpawnEggItem(TOWN_GUARD, 0x3A5A8C, 0xC8C8C8, properties));
-
     private ModEntities() {}
 
     public static void register(IEventBus modEventBus) {
@@ -249,7 +241,6 @@ public final class ModEntities {
         event.put(ORC_COMMANDER.get(), OrcBosses.Commander.createAttributes().build());
         event.put(ORC_CHIEFTAIN.get(), OrcBosses.Chieftain.createAttributes().build());
         event.put(ORC_WARCHIEF.get(), OrcBosses.Warchief.createAttributes().build());
-        event.put(TOWN_GUARD.get(), TownGuard.createAttributes().build());
         event.put(KOBOLD_LOOTER.get(), Kobold.Looter.createAttributes().build());
         event.put(KOBOLD_SCAVENGER.get(), KoboldScavenger.createAttributes().build());
         event.put(KOBOLD_PACKMASTER.get(), KoboldPackmaster.createAttributes().build());

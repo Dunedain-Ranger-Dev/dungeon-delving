@@ -12,7 +12,6 @@ import io.github.ranger3462.dungeondelving.entity.Kobold;
 import io.github.ranger3462.dungeondelving.entity.KoboldPackmaster;
 import io.github.ranger3462.dungeondelving.entity.KoboldScavenger;
 import io.github.ranger3462.dungeondelving.entity.ThrownSpear;
-import io.github.ranger3462.dungeondelving.realm.RealmFactions;
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -140,19 +139,6 @@ public class KoboldTests {
             boss.discard();
             pack.forEach(Kobold::discard);
         }
-        helper.succeed();
-    }
-
-    /** The realm's kobolds raid with real kobolds at the low tiers now, not goblins. */
-    @GameTest(template = ANY_TEMPLATE)
-    public static void realmKoboldsRaidAsKobolds(GameTestHelper helper) {
-        RandomSource random = RandomSource.create(54);
-        Set<String> seen = new HashSet<>();
-        for (int i = 0; i < 500; i++) {
-            SpawnerMobs.pick(helper.getLevel(), random, RealmFactions.mobs("kobolds"), 1)
-                    .ifPresent(type -> seen.add(BuiltInRegistries.ENTITY_TYPE.getKey(type.value()).getPath()));
-        }
-        helper.assertTrue(seen.equals(Set.of("kobold_looter", "kobold_scavenger")), "tier 1 kobold raiders should be kobolds, got " + seen);
         helper.succeed();
     }
 }

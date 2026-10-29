@@ -10,18 +10,13 @@ import io.github.ranger3462.dungeondelving.block.DungeonGateBlock;
 import io.github.ranger3462.dungeondelving.block.PuzzleLockBlock;
 import io.github.ranger3462.dungeondelving.block.RelicAltarBlock;
 import io.github.ranger3462.dungeondelving.block.WarDrumBlock;
-import io.github.ranger3462.dungeondelving.character.Characters;
-import io.github.ranger3462.dungeondelving.character.ElixirOfRebirthItem;
-import io.github.ranger3462.dungeondelving.character.TomeOfCallingItem;
-import io.github.ranger3462.dungeondelving.character.TomeOfInsightItem;
 import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
-import io.github.ranger3462.dungeondelving.forging.Forging;
-import io.github.ranger3462.dungeondelving.guild.GuildLedgerBlock;
 import io.github.ranger3462.dungeondelving.gate.DungeonGates;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsOrcs;
-import io.github.ranger3462.dungeondelving.skill.CraftingSkills;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
+import io.github.ranger3462.dungeondelving.economy.Coins;
+import io.github.ranger3462.dungeondelving.entity.Mending;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsGoblins;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsSkeletons;
 import io.github.ranger3462.dungeondelving.testing.TestersCharm;
@@ -60,16 +55,6 @@ public final class ModRegistries {
     public static final DeferredRegister<CreativeModeTab> TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, DungeonDelving.MODID);
     public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> LOOT_MODIFIERS =
             DeferredRegister.create(NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, DungeonDelving.MODID);
-
-    /** Marks a guild workshop for every crafting profession (DD-88). It replaced the Forge Hearth, so old hearths load as ledgers. */
-    public static final DeferredBlock<GuildLedgerBlock> GUILD_LEDGER = BLOCKS.registerBlock("guild_ledger", GuildLedgerBlock::new,
-            BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).strength(2.5f).sound(SoundType.WOOD).noOcclusion());
-    public static final DeferredItem<BlockItem> GUILD_LEDGER_ITEM = ITEMS.registerSimpleBlockItem(GUILD_LEDGER);
-
-    static {
-        BLOCKS.addAlias(DungeonDelving.id("forge_hearth"), DungeonDelving.id("guild_ledger"));
-        ITEMS.addAlias(DungeonDelving.id("forge_hearth"), DungeonDelving.id("guild_ledger"));
-    }
 
     /** Right-click in the overworld to start a dungeon run. */
     public static final DeferredBlock<DungeonGateBlock> DUNGEON_GATE = BLOCKS.registerBlock("dungeon_gate", DungeonGateBlock::new,
@@ -129,15 +114,6 @@ public final class ModRegistries {
             new Item.Properties().rarity(Rarity.UNCOMMON));
 
     /** Testing tool: can't die, damage readout, fast regeneration and mana, and flight. Creative tab only. */
-    /** A Tome of Calling: read it to choose (or change) your class (DD-83). */
-    public static final DeferredItem<TomeOfCallingItem> TOME_OF_CALLING = ITEMS.registerItem("tome_of_calling", TomeOfCallingItem::new,
-            new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
-    /** An Elixir of Rebirth: drink it to choose your race again (DD-82). */
-    public static final DeferredItem<ElixirOfRebirthItem> ELIXIR_OF_REBIRTH = ITEMS.registerItem("elixir_of_rebirth", ElixirOfRebirthItem::new,
-            new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
-    /** A Tome of Insight: read it for a bonus ability point (DD-80). */
-    public static final DeferredItem<TomeOfInsightItem> TOME_OF_INSIGHT = ITEMS.registerItem("tome_of_insight", TomeOfInsightItem::new,
-            new Item.Properties().stacksTo(16).rarity(Rarity.EPIC));
     public static final DeferredItem<TestersCharm.CharmItem> TESTERS_CHARM = ITEMS.registerItem("testers_charm", TestersCharm.CharmItem::new,
             new Item.Properties().stacksTo(1).rarity(Rarity.EPIC));
 
@@ -182,9 +158,6 @@ public final class ModRegistries {
                 output.accept(DUNGEON_KEY.get());
                 output.accept(RELIC_SHARD.get());
                 output.accept(TESTERS_CHARM.get());
-                output.accept(TOME_OF_INSIGHT.get());
-                output.accept(ELIXIR_OF_REBIRTH.get());
-                output.accept(TOME_OF_CALLING.get());
                 output.accept(ModEntities.GOBLIN_SPAWN_EGG.get());
                 output.accept(ModEntities.GOBLIN_SPEAR.get());
                 output.accept(ModEntities.GOBLIN_ARCHER_SPAWN_EGG.get());
@@ -195,11 +168,10 @@ public final class ModRegistries {
                         ModEntities.ORC_RAIDER_SPAWN_EGG, ModEntities.ORC_VETERAN_SPAWN_EGG, ModEntities.ORC_VAGABOND_SPAWN_EGG,
                         ModEntities.ORC_RAMPAGER_SPAWN_EGG, ModEntities.ORC_COMMANDER_SPAWN_EGG, ModEntities.ORC_CHIEFTAIN_SPAWN_EGG,
                         ModEntities.ORC_WARCHIEF_SPAWN_EGG, ModEntities.KOBOLD_LOOTER_SPAWN_EGG, ModEntities.KOBOLD_SCAVENGER_SPAWN_EGG,
-                        ModEntities.KOBOLD_PACKMASTER_SPAWN_EGG,
-                        ModEntities.TOWN_GUARD_SPAWN_EGG)) {
+                        ModEntities.KOBOLD_PACKMASTER_SPAWN_EGG)) {
                     output.accept(egg.get());
                 }
-                io.github.ranger3462.dungeondelving.economy.Coins.all().forEach(coin -> output.accept(coin.get()));
+                Coins.all().forEach(coin -> output.accept(coin.get()));
                 output.accept(ModEntities.SKELETON_SWORDSMAN_SPAWN_EGG.get());
                 output.accept(ModEntities.SKELETON_KNIGHT_SPAWN_EGG.get());
                 output.accept(ModEntities.SKELETON_LORD_SPAWN_EGG.get());
@@ -212,16 +184,6 @@ public final class ModRegistries {
                         "skeleton_mage_spawn_egg", "wither_skeleton_mage_spawn_egg", "lich_lord_spawn_egg" }) {
                     BuiltInRegistries.ITEM.getOptional(DungeonDelving.id(optional)).ifPresent(output::accept);
                 }
-                for (var forging : java.util.List.of(GUILD_LEDGER_ITEM, Forging.BELLOWS_ITEM, Forging.MASTER_ANVIL_ITEM,
-                        Forging.GRINDING_WHEEL_ITEM, Forging.QUENCHING_OIL, Forging.COKE_INFUSED_IRON_INGOT, Forging.HEATED_INGOT, Forging.STRUCK_INGOT,
-                        Forging.QUENCHED_INGOT, Forging.UNSTABLE_INGOT, Forging.TEMPERED_IRON_INGOT, Forging.SAND_FLUX, Forging.BORAX,
-                        Forging.BORAX_DEPOSIT_ITEM, Forging.BORAX_FLUX, Forging.RUNIC_FLUX, Forging.RUNEFORGED_FLUX, Forging.ARMOR_PLATE, Forging.RIVETS,
-                        Forging.CHAIN_LINKS, Forging.BLADE, Forging.AXE_HEAD, Forging.TANNING_RACK_ITEM, Forging.LEATHER_SCRAPS, Forging.REFINED_LEATHER, Forging.HARDENED_LEATHER, Forging.LEATHER_BASE,
-                        Forging.GAMBESON_BASE)) {
-                    output.accept(forging.get());
-                }
-                Forging.gear().forEach(output::accept);
-                io.github.ranger3462.dungeondelving.forging.Crafts.creativeItems().forEach(item -> output.accept(item.get()));
                 output.accept(RIFTSTONE_ITEM.get());
                 for (DungeonOre ore : DungeonOre.values()) {
                     output.accept(ore.oreItem.get());
@@ -246,22 +208,15 @@ public final class ModRegistries {
         ModEntities.init();
         RunicWorkshop.init();
         RunicWorkshop.register(modEventBus);
-        Forging.init();
-        Forging.register(modEventBus);
-        io.github.ranger3462.dungeondelving.forging.Crafts.init();
-        io.github.ranger3462.dungeondelving.forging.Crafts.register(modEventBus);
         DungeonGates.init();
         DungeonGates.register(modEventBus);
-        CraftingSkills.register(modEventBus);
-        Characters.register(modEventBus);
         ModEntities.register(modEventBus);
-        io.github.ranger3462.dungeondelving.economy.Coins.init();
-        io.github.ranger3462.dungeondelving.entity.Mending.register(modEventBus);
+        Coins.init();
+        Mending.register(modEventBus);
         if (ModList.get().isLoaded("irons_spellbooks")) {
             IronsGoblins.register(modEventBus);
             IronsSkeletons.register(modEventBus);
             IronsOrcs.register(modEventBus);
-            io.github.ranger3462.dungeondelving.integration.irons.IronsTownMages.register(modEventBus);
         }
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);

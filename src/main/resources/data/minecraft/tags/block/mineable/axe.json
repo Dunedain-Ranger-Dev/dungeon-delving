@@ -1,18 +1,4 @@
 {
   "replace": false,
-  "values": [
-    "dungeondelving:bellows",
-    "dungeondelving:tanning_rack",
-    "dungeondelving:guild_ledger",
-    "dungeondelving:shaping_rack",
-    "dungeondelving:tanning_barrel",
-    "dungeondelving:fleshing_beam",
-    "dungeondelving:spinning_wheel",
-    "dungeondelving:great_loom",
-    "dungeondelving:dye_works",
-    "dungeondelving:wood_lathe",
-    "dungeondelving:treadle_lathe",
-    "dungeondelving:bowyers_bench",
-    "dungeondelving:jewelers_bench"
-  ]
+  "values": []
 }

@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/template_anvil",
-  "textures": {
-    "particle": "minecraft:block/polished_deepslate",
-    "body": "minecraft:block/polished_deepslate",
-    "top": "minecraft:block/chiseled_deepslate"
-  }
-}

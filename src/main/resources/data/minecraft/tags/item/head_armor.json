@@ -1,9 +1,4 @@
 {
   "replace": false,
-  "values": [
-    "dungeondelving:brigandine_helmet",
-    "dungeondelving:hauberk_helmet",
-    "dungeondelving:plate_helmet",
-    "dungeondelving:gilded_helmet"
-  ]
+  "values": []
 }

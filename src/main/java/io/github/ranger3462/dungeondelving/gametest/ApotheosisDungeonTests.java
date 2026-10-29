@@ -7,10 +7,10 @@ import com.mojang.authlib.GameProfile;
 import dev.shadowsoffire.apotheosis.affix.AffixHelper;
 import dev.shadowsoffire.apotheosis.tiers.WorldTier;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
-import io.github.ranger3462.dungeondelving.forging.ForgedGear;
-import io.github.ranger3462.dungeondelving.forging.Forging;
 import io.github.ranger3462.dungeondelving.integration.apotheosis.ApotheosisDungeons;
-import io.github.ranger3462.dungeondelving.integration.apotheosis.ApotheosisForging;
+import dev.shadowsoffire.apotheosis.loot.LootController;
+import dev.shadowsoffire.apotheosis.loot.LootRarity;
+import dev.shadowsoffire.apotheosis.tiers.GenContext;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -64,10 +64,9 @@ public class ApotheosisDungeonTests {
             return;
         }
         ServerPlayer player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "affix_tester"));
-        ItemStack sword = new ItemStack(Forging.FORGED_SWORD.get());
-        sword.set(Forging.STARS.get(), Forging.MAX_STARS);
-        ForgedGear.applyStats(sword);
-        ApotheosisForging.roll(sword, player);
+        ItemStack sword = new ItemStack(net.minecraft.world.item.Items.DIAMOND_SWORD);
+        GenContext context = GenContext.forPlayer(player);
+        LootController.createLootItem(sword, LootRarity.random(context), context);
         helper.assertTrue(ApotheosisDungeons.isApotheosisLoot(sword), "a rolled sword is affix gear");
         Zombie zombie = EntityType.ZOMBIE.create(helper.getLevel());
         zombie.setItemSlot(EquipmentSlot.MAINHAND, sword);
@@ -82,7 +81,8 @@ public class ApotheosisDungeonTests {
     /** With the pack's data, Apotheosis no longer injects affix gear or gems into chests outside dungeons. */
     @GameTest(template = ANY_TEMPLATE)
     public static void overworldChestsHaveNoAffixGear(GameTestHelper helper) {
-        if (!apotheosis()) {
+        // The pack's KubeJS data does this, so it's only tested with the pack loaded (its dev project).
+        if (!apotheosis() || !net.neoforged.fml.ModList.get().isLoaded("kubejs")) {
             helper.succeed();
             return;
         }

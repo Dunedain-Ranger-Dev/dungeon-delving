@@ -1,7 +1,5 @@
 package io.github.ranger3462.dungeondelving;
 
-import io.github.ranger3462.dungeondelving.integration.skills.PufferfishSkills;
-import io.github.ranger3462.dungeondelving.integration.spellengine.SpellEngineMagic;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import org.slf4j.Logger;
 
@@ -9,7 +7,7 @@ import com.mojang.logging.LogUtils;
 
 import io.github.ranger3462.dungeondelving.dungeon.CuriosLoot;
 import io.github.ranger3462.dungeondelving.integration.apotheosis.ApotheosisDungeons;
-import io.github.ranger3462.dungeondelving.integration.apotheosis.ApotheosisForging;
+import io.github.ranger3462.dungeondelving.integration.professions.ProfessionsLink;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -32,22 +30,14 @@ public class DungeonDelving {
         modContainer.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         modEventBus.addListener(ModConfigEvent.Loading.class, Config::onLoad);
         modEventBus.addListener(ModConfigEvent.Reloading.class, Config::onLoad);
-        if (ModList.get().isLoaded("puffish_skills")) {
-            PufferfishSkills.register();
-        }
-        if (ModList.get().isLoaded("spell_engine")) {
-            SpellEngineMagic.register();
-            io.github.ranger3462.dungeondelving.integration.spellengine.ForgedCasting.register(modEventBus);
-        }
         if (ModList.get().isLoaded("curios")) {
             CuriosLoot.register();
-            // Items exist only after registration, so the jewelry is handed to Curios in common setup.
-            modEventBus.addListener((net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent event) ->
-                    event.enqueueWork(io.github.ranger3462.dungeondelving.forging.GoldCurios::register));
         }
         if (ModList.get().isLoaded("apotheosis")) {
-            ApotheosisForging.register();
             ApotheosisDungeons.register();
+        }
+        if (ModList.get().isLoaded("ddprofessions")) {
+            ProfessionsLink.register();
         }
     }
 

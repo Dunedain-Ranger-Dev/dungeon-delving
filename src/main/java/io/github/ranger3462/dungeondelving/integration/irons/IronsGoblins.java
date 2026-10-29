@@ -89,8 +89,6 @@ public final class IronsGoblins {
         modEventBus.addListener(IronsGoblins::onAttributes);
         // Spellbreakers go after whoever has been casting.
         NeoForge.EVENT_BUS.addListener((SpellOnCastEvent event) -> Spellcasters.markCast(event.getEntity()));
-        // Casting trains the spell's magic school tree (DD-81).
-        IronsMagic.register();
         modEventBus.addListener(IronsGoblins::onSpawnPlacements);
     }
 

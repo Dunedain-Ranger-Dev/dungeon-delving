@@ -19,6 +19,8 @@ import com.google.gson.JsonParser;
 import com.reazip.economycraft.EconomyCraft;
 import com.reazip.economycraft.util.EconomyPaths;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.Resource;
 
@@ -98,7 +100,10 @@ public final class EconomyCraftPrices {
             return Optional.empty();
         }
         try (Reader reader = resource.get().openAsReader()) {
-            return Optional.of(JsonParser.parseReader(reader).getAsJsonObject());
+            JsonObject prices = JsonParser.parseReader(reader).getAsJsonObject();
+            // The list prices other mods' items too (Professions and Skills' materials and gear); leave out any not installed.
+            prices.keySet().removeIf(id -> !BuiltInRegistries.ITEM.containsKey(ResourceLocation.parse(id)));
+            return Optional.of(prices);
         } catch (IOException | RuntimeException e) {
             DungeonDelving.LOGGER.warn("Couldn't read Dungeon Delving's EconomyCraft prices", e);
             return Optional.empty();

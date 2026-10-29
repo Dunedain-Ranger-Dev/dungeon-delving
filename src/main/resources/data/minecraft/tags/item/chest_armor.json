@@ -1,9 +1,4 @@
 {
   "replace": false,
-  "values": [
-    "dungeondelving:brigandine_chestplate",
-    "dungeondelving:hauberk_chestplate",
-    "dungeondelving:plate_chestplate",
-    "dungeondelving:gilded_chestplate"
-  ]
+  "values": []
 }

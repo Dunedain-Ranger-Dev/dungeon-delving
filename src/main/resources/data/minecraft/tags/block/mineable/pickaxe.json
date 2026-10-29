@@ -13,16 +13,6 @@
     "dungeondelving:thailite_block",
     "dungeondelving:riftstone",
     "dungeondelving:runic_workshop",
-    "dungeondelving:master_anvil",
-    "dungeondelving:grinding_wheel",
-    "dungeondelving:oil_cauldron",
-    "dungeondelving:borax_deposit",
-    "dungeondelving:gate_tuner",
-    "dungeondelving:tanning_vat",
-    "dungeondelving:sizing_vat",
-    "dungeondelving:finishing_vat",
-    "dungeondelving:crucible",
-    "dungeondelving:great_crucible",
-    "dungeondelving:jewelers_loupe"
+    "dungeondelving:gate_tuner"
   ]
 }
