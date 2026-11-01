@@ -33,9 +33,7 @@ public class DungeonDelving {
         if (ModList.get().isLoaded("curios")) {
             CuriosLoot.register();
         }
-        if (ModList.get().isLoaded("apotheosis")) {
-            ApotheosisDungeons.register();
-        }
+        ApotheosisDungeons.register();
         if (ModList.get().isLoaded("ddprofessions")) {
             ProfessionsLink.register();
         }

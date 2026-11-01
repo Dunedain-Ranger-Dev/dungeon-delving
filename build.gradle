@@ -185,10 +185,14 @@ dependencies {
     compileOnly "curse.maven:placebo-283644:9153039"                         // 1.21.1-9.9.4
     compileOnly "curse.maven:apothic-attributes-898963:9006294"              // 1.21.1-2.11.0
 
+    // Apotheosis and its libraries, which this mod requires (neoforge.mods.toml), so every run loads them.
+    localRuntime "curse.maven:apotheosis-313970:8993983"                     // 1.21.1-8.9.0
+    localRuntime "curse.maven:placebo-283644:9153039"                        // 1.21.1-9.9.4
+    localRuntime "curse.maven:apothic-attributes-898963:9006294"             // 1.21.1-2.11.0
+
     // Mods loaded in dev runs and game tests, so the integrations can be tried. localRuntime keeps them out of this
-    // mod's published dependencies: it doesn't require any. Versions match the pack's pack.json. They're left out of
-    // runData, because Apotheosis's own data generators need its optional Gateways mod. The whole pack runs from the
-    // pack repository's dev project.
+    // mod's published dependencies. Versions match the pack's pack.json. They're left out of runData, which doesn't
+    // need them. The whole pack runs from the pack repository's dev project.
     if (!gradle.startParameter.taskNames.any { it.toLowerCase().contains('rundata') }) {
         siblingMods.each { name, coordinates ->
             if (file("../${name}").isDirectory()) {
@@ -196,10 +200,7 @@ dependencies {
             }
         }
         localRuntime "curse.maven:curios-309927:6529130"                     // 9.5.1+1.21.1
-        // Apotheosis and its libraries
-        localRuntime "curse.maven:apotheosis-313970:8993983"                 // 1.21.1-8.9.0
-        localRuntime "curse.maven:placebo-283644:9153039"                    // 1.21.1-9.9.4
-        localRuntime "curse.maven:apothic-attributes-898963:9006294"         // 1.21.1-2.11.0
+        // Apotheosis's sister mods
         localRuntime "curse.maven:apothic-enchanting-1063926:9095862"        // 1.21.1-1.6.4
         localRuntime "curse.maven:apothic-spawners-986583:8469405"           // 1.21.1-1.4.0
         localRuntime "curse.maven:patchouli-306770:7730942"                  // 1.21.1-93-neoforge
@@ -216,6 +217,9 @@ dependencies {
         localRuntime "curse.maven:sophisticated-core-618298:9341397"         // 1.21.1-1.5.19.2434
         // Pufferfish's Skills, so Professions and Skills' trees load in its link tests
         localRuntime "curse.maven:puffish-skills-835091:9101377"             // 0.19.2
+    } else {
+        // Apotheosis's own data generators fail without its optional Gateways mod.
+        localRuntime "curse.maven:gateways-to-eternity-417802:6926284"       // 1.21.1-5.1.0
     }
 }
 

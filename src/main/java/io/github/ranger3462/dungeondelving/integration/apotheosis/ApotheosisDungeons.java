@@ -41,8 +41,11 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
  * <li><b>Invaders come from dungeons (DD-31).</b> Apotheosis only turns natural spawns into invaders, and dungeons have
  * none, so dungeon spawners sometimes call one in instead ({@link #INVADER_CHANCE}). The pack's data turns natural
  * invaders off everywhere and keeps invaders and elites to the dungeon dimension.</li>
+ * <li><b>Monsters get tougher by tier (DD-23).</b> On top of Apotheosis's own tier boosts (armor, armor pierce,
+ * damage reduction), this mod's data ({@code data/dungeondelving/tier_augments}) gives monsters more health and damage
+ * in Ascent, Summit and Pinnacle, so tier 2 to 4 dungeons.</li>
  * </ul>
- * Only loaded when Apotheosis is installed, so nothing outside this package may refer to these classes directly.
+ * Apotheosis is a required dependency.
  */
 public final class ApotheosisDungeons {
     /** The chance a dungeon spawner calls in an Apotheosis invader instead of its mob, by dungeon tier (index 0 is tier 1). */

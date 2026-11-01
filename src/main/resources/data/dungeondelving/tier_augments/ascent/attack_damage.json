@@ -1,0 +1,12 @@
+{
+  "type": "apotheosis:attribute",
+  "modifier": {
+    "attribute": "minecraft:generic.attack_damage",
+    "operation": "add_multiplied_base",
+    "value": 0.1
+  },
+  "modifier_id": "dungeondelving:ascent/attack_damage",
+  "sort_index": 100,
+  "target": "monsters",
+  "tier": "ascent"
+}

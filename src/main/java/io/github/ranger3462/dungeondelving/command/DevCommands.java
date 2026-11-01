@@ -32,7 +32,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 
@@ -216,10 +215,6 @@ public final class DevCommands {
     /** Calls an Apotheosis invader in next to the player, the way dungeon spawners sometimes do. For testing. */
     private static int invader(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         ServerPlayer player = context.getSource().getPlayerOrException();
-        if (!ModList.get().isLoaded("apotheosis")) {
-            fail(context.getSource(), "Apotheosis isn't installed.");
-            return 0;
-        }
         if (player.level().dimension() != DungeonDimension.DUNGEON) {
             fail(context.getSource(), "Invaders only come in dungeons. Enter one first.");
             return 0;

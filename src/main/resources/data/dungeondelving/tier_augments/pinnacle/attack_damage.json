@@ -1,0 +1,12 @@
+{
+  "type": "apotheosis:attribute",
+  "modifier": {
+    "attribute": "minecraft:generic.attack_damage",
+    "operation": "add_multiplied_base",
+    "value": 0.35
+  },
+  "modifier_id": "dungeondelving:pinnacle/attack_damage",
+  "sort_index": 100,
+  "target": "monsters",
+  "tier": "pinnacle"
+}

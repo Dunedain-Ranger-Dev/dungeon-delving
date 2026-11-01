@@ -1,0 +1,12 @@
+{
+  "type": "apotheosis:attribute",
+  "modifier": {
+    "attribute": "minecraft:generic.max_health",
+    "operation": "add_multiplied_base",
+    "value": 0.3
+  },
+  "modifier_id": "dungeondelving:summit/max_health",
+  "sort_index": 100,
+  "target": "monsters",
+  "tier": "summit"
+}

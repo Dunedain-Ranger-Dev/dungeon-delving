@@ -11,6 +11,8 @@ import io.github.ranger3462.dungeondelving.integration.apotheosis.ApotheosisDung
 import dev.shadowsoffire.apotheosis.loot.LootController;
 import dev.shadowsoffire.apotheosis.loot.LootRarity;
 import dev.shadowsoffire.apotheosis.tiers.GenContext;
+import dev.shadowsoffire.apotheosis.tiers.augments.TierAugment;
+import dev.shadowsoffire.apotheosis.tiers.augments.TierAugmentRegistry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -20,6 +22,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootParams;
@@ -37,16 +40,8 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 public class ApotheosisDungeonTests {
     private static final String ANY_TEMPLATE = "dungeon/cap_placeholder";
 
-    private static boolean apotheosis() {
-        return ModList.get().isLoaded("apotheosis");
-    }
-
     @GameTest(template = ANY_TEMPLATE)
     public static void worldTiersFollowDungeonTiers(GameTestHelper helper) {
-        if (!apotheosis()) {
-            helper.succeed();
-            return;
-        }
         helper.assertTrue(ApotheosisDungeons.tierFor(1) == WorldTier.FRONTIER && ApotheosisDungeons.tierFor(2) == WorldTier.ASCENT
                 && ApotheosisDungeons.tierFor(3) == WorldTier.SUMMIT && ApotheosisDungeons.tierFor(4) == WorldTier.PINNACLE,
                 "dungeon tiers 1-4 are Frontier, Ascent, Summit and Pinnacle");
@@ -59,10 +54,6 @@ public class ApotheosisDungeonTests {
 
     @GameTest(template = ANY_TEMPLATE)
     public static void mobsOutsideDungeonsDontKeepAffixGear(GameTestHelper helper) {
-        if (!apotheosis()) {
-            helper.succeed();
-            return;
-        }
         ServerPlayer player = FakePlayerFactory.get(helper.getLevel(), new GameProfile(UUID.randomUUID(), "affix_tester"));
         ItemStack sword = new ItemStack(net.minecraft.world.item.Items.DIAMOND_SWORD);
         GenContext context = GenContext.forPlayer(player);
@@ -78,11 +69,27 @@ public class ApotheosisDungeonTests {
         helper.succeed();
     }
 
+    /** Our tier boosts (DD-23): monsters get +50% health and +35% damage in Pinnacle, on top of Apotheosis's own. */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void pinnacleMonstersGetMoreHealthAndDamage(GameTestHelper helper) {
+        Zombie zombie = EntityType.ZOMBIE.create(helper.getLevel());
+        double health = zombie.getAttributeBaseValue(Attributes.MAX_HEALTH);
+        double damage = zombie.getAttributeBaseValue(Attributes.ATTACK_DAMAGE);
+        for (TierAugment augment : TierAugmentRegistry.getAugments(WorldTier.PINNACLE, TierAugment.Target.MONSTERS)) {
+            augment.apply(helper.getLevel(), zombie);
+        }
+        helper.assertTrue(Math.abs(zombie.getMaxHealth() - health * 1.5) < 0.01, "Pinnacle health is +50%, got " + zombie.getMaxHealth());
+        helper.assertTrue(Math.abs(zombie.getAttributeValue(Attributes.ATTACK_DAMAGE) - damage * 1.35) < 0.01,
+                "Pinnacle damage is +35%, got " + zombie.getAttributeValue(Attributes.ATTACK_DAMAGE));
+        zombie.discard();
+        helper.succeed();
+    }
+
     /** With the pack's data, Apotheosis no longer injects affix gear or gems into chests outside dungeons. */
     @GameTest(template = ANY_TEMPLATE)
     public static void overworldChestsHaveNoAffixGear(GameTestHelper helper) {
         // The pack's KubeJS data does this, so it's only tested with the pack loaded (its dev project).
-        if (!apotheosis() || !net.neoforged.fml.ModList.get().isLoaded("kubejs")) {
+        if (!ModList.get().isLoaded("kubejs")) {
             helper.succeed();
             return;
         }
