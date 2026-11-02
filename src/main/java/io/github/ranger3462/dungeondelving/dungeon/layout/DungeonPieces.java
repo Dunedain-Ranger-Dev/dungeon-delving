@@ -30,6 +30,9 @@ import net.minecraft.util.RandomSource;
  * {@code _placeholder}) are only used for a kind that has no real pieces yet, so hand-built rooms take over as soon
  * as they are added. Pieces whose size doesn't match the current spec (for example, built before a spec change) are
  * skipped with a warning.
+ * <p>
+ * Other mods can build layouts from their own piece set with {@link #load(MinecraftServer, String, String)}, e.g.
+ * Deep Mines' {@code data/deepmines/structure/mines/}.
  */
 public final class DungeonPieces {
     public enum Kind {
@@ -71,7 +74,6 @@ public final class DungeonPieces {
 
     /** Where dungeon pieces live, inside a namespace's {@code structure} folder. */
     public static final String FOLDER = "dungeon";
-    private static final String RESOURCE_FOLDER = "structure/" + FOLDER;
     private static final String PLACEHOLDER_SUFFIX = "_placeholder";
 
     private final Map<ResourceLocation, Kind> all;
@@ -91,14 +93,34 @@ public final class DungeonPieces {
 
     /** Finds every dungeon piece in the loaded data packs and in this world's exported pieces. */
     public static DungeonPieces load(MinecraftServer server) {
+        Map<ResourceLocation, Kind> all = find(server, DungeonDelving.MODID, FOLDER);
+        exportedNames(server).forEach(name -> Kind.of(name).ifPresent(kind -> all.put(id(name), kind)));
+        return sort(server, all, false);
+    }
+
+    /**
+     * Another mod's piece set, from {@code data/<namespace>/structure/<folder>/}, named with the same prefixes. Only
+     * ordinary rooms, tunnels and caps are required: a room kind with no pieces of its own (say, no boss rooms) uses
+     * the ordinary rooms instead.
+     */
+    public static DungeonPieces load(MinecraftServer server, String namespace, String folder) {
+        return sort(server, find(server, namespace, folder), true);
+    }
+
+    private static Map<ResourceLocation, Kind> find(MinecraftServer server, String namespace, String folder) {
+        String resourceFolder = "structure/" + folder;
         Map<ResourceLocation, Kind> all = new TreeMap<>();
-        server.getResourceManager().listResources(RESOURCE_FOLDER, file -> file.getPath().endsWith(".nbt")).keySet().forEach(file -> {
-            if (file.getNamespace().equals(DungeonDelving.MODID)) {
-                String name = file.getPath().substring(RESOURCE_FOLDER.length() + 1, file.getPath().length() - ".nbt".length());
-                Kind.of(name).ifPresent(kind -> all.put(id(name), kind));
+        server.getResourceManager().listResources(resourceFolder, file -> file.getPath().endsWith(".nbt")).keySet().forEach(file -> {
+            if (file.getNamespace().equals(namespace)) {
+                String name = file.getPath().substring(resourceFolder.length() + 1, file.getPath().length() - ".nbt".length());
+                Kind.of(name).ifPresent(kind -> all.put(ResourceLocation.fromNamespaceAndPath(namespace, folder + "/" + name), kind));
             }
         });
-        exportedNames(server).forEach(name -> Kind.of(name).ifPresent(kind -> all.put(id(name), kind)));
+        return all;
+    }
+
+    /** Sorts pieces into pools, skipping any of the wrong size; with {@code roomsFallBack}, missing room kinds use ordinary rooms. */
+    private static DungeonPieces sort(MinecraftServer server, Map<ResourceLocation, Kind> all, boolean roomsFallBack) {
 
         Map<Kind, List<ResourceLocation>> real = new EnumMap<>(Kind.class);
         Map<Kind, List<ResourceLocation>> placeholders = new EnumMap<>(Kind.class);
@@ -122,10 +144,15 @@ public final class DungeonPieces {
         Map<Kind, List<ResourceLocation>> pools = new EnumMap<>(Kind.class);
         for (Kind kind : Kind.values()) {
             List<ResourceLocation> chosen = real.get(kind).isEmpty() ? placeholders.get(kind) : real.get(kind);
-            if (chosen.isEmpty()) {
-                throw new IllegalStateException("No dungeon pieces found for " + kind + " (expected " + RESOURCE_FOLDER + "/" + kind.prefix + "*.nbt)");
+            if (chosen.isEmpty() && !(roomsFallBack && kind.isRoom() && kind != Kind.COMMON)) {
+                throw new IllegalStateException("No dungeon pieces found for " + kind + " (expected " + kind.prefix + "*.nbt)");
             }
             pools.put(kind, List.copyOf(chosen));
+        }
+        for (Kind kind : Kind.values()) {
+            if (pools.get(kind).isEmpty()) {
+                pools.put(kind, pools.get(Kind.COMMON));
+            }
         }
         return new DungeonPieces(all, skipped, pools);
     }

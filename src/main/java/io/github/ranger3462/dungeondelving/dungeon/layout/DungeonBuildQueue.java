@@ -9,7 +9,9 @@ import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonDimension;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder.Placement;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
@@ -21,7 +23,8 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
  * Builds dungeons a few steps per server tick (pieces, then the bedrock shell), so building a large dungeon doesn't
- * freeze the server.
+ * freeze the server. Builds go to the dungeon dimension unless another level is given (e.g. Deep Mines' floors);
+ * regions are counted per level.
  */
 @EventBusSubscriber(modid = DungeonDelving.MODID)
 public final class DungeonBuildQueue {
@@ -29,50 +32,67 @@ public final class DungeonBuildQueue {
     public static final int PIECES_PER_TICK = 4;
 
     /** One step of building a region: placing a piece or filling a shell section. */
-    private record Task(int region, Consumer<ServerLevel> step, String description) {}
+    private record Task(ResourceKey<Level> level, int region, Consumer<ServerLevel> step, String description) {}
 
     private static final Deque<Task> TASKS = new ArrayDeque<>();
 
     private DungeonBuildQueue() {}
 
     public static void add(int region, List<Placement> placements, DungeonMarkers.Rolls rolls) {
-        placements.forEach(placement -> TASKS.add(new Task(region, level -> DungeonBuilder.place(level, placement, rolls), placement.template().toString())));
+        add(DungeonDimension.DUNGEON, region, placements, rolls);
+    }
+
+    public static void add(ResourceKey<Level> level, int region, List<Placement> placements, DungeonMarkers.Rolls rolls) {
+        placements.forEach(placement -> TASKS.add(new Task(level, region, l -> DungeonBuilder.place(l, placement, rolls), placement.template().toString())));
     }
 
     /** Sets blocks once the pieces queued before them are placed, e.g. the boss door. */
     public static void addBlocks(int region, List<BlockPos> positions, BlockState state, String description) {
-        TASKS.add(new Task(region, level -> positions.forEach(pos -> level.setBlock(pos, state, Block.UPDATE_CLIENTS)), description));
+        addBlocks(DungeonDimension.DUNGEON, region, positions, state, description);
+    }
+
+    public static void addBlocks(ResourceKey<Level> level, int region, List<BlockPos> positions, BlockState state, String description) {
+        TASKS.add(new Task(level, region, l -> positions.forEach(pos -> l.setBlock(pos, state, Block.UPDATE_CLIENTS)), description));
     }
 
     public static void addShell(int region, List<BoundingBox> sections) {
-        sections.forEach(box -> TASKS.add(new Task(region, level -> DungeonBuilder.fillShell(level, box), "bedrock shell " + box)));
+        addShell(DungeonDimension.DUNGEON, region, sections);
+    }
+
+    public static void addShell(ResourceKey<Level> level, int region, List<BoundingBox> sections) {
+        sections.forEach(box -> TASKS.add(new Task(level, region, l -> DungeonBuilder.fillShell(l, box), "bedrock shell " + box)));
     }
 
     /** Drops any pieces still waiting for a region, e.g. when its run ends before the dungeon finished building. */
     public static void cancel(int region) {
-        TASKS.removeIf(task -> task.region() == region);
+        cancel(DungeonDimension.DUNGEON, region);
+    }
+
+    public static void cancel(ResourceKey<Level> level, int region) {
+        TASKS.removeIf(task -> task.level().equals(level) && task.region() == region);
     }
 
     public static int pending(int region) {
-        return (int) TASKS.stream().filter(task -> task.region() == region).count();
+        return pending(DungeonDimension.DUNGEON, region);
+    }
+
+    public static int pending(ResourceKey<Level> level, int region) {
+        return (int) TASKS.stream().filter(task -> task.level().equals(level) && task.region() == region).count();
     }
 
     @SubscribeEvent
     public static void onServerTick(ServerTickEvent.Post event) {
-        if (TASKS.isEmpty()) {
-            return;
-        }
-        ServerLevel dungeon = event.getServer().getLevel(DungeonDimension.DUNGEON);
-        if (dungeon == null) {
-            TASKS.clear();
-            return;
-        }
         for (int i = 0; i < PIECES_PER_TICK && !TASKS.isEmpty(); i++) {
             Task task = TASKS.poll();
+            ServerLevel level = event.getServer().getLevel(task.level());
+            if (level == null) {
+                DungeonDelving.LOGGER.warn("Dropping {} for region {}: {} isn't loaded", task.description(), task.region(), task.level().location());
+                continue;
+            }
             try {
-                task.step().accept(dungeon);
+                task.step().accept(level);
             } catch (RuntimeException e) {
-                DungeonDelving.LOGGER.error("Failed to build {} in dungeon region {}", task.description(), task.region(), e);
+                DungeonDelving.LOGGER.error("Failed to build {} in {} region {}", task.description(), task.level().location(), task.region(), e);
             }
         }
     }
