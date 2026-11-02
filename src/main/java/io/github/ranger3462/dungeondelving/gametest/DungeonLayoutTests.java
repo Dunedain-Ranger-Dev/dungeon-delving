@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
+import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuildQueue;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonBuilder;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Cell;
@@ -244,6 +246,36 @@ public class DungeonLayoutTests {
 
     private static void bedrock(GameTestHelper helper, BlockPos pos, String what) {
         helper.assertTrue(helper.getLevel().getBlockState(pos).is(Blocks.BEDROCK), what + " should be bedrock at " + pos.toShortString());
+    }
+
+    /** Another mod's piece set loads from its own folder, by the same prefixes (here, Dungeon Delving's own, by folder). */
+    @GameTest(template = ANY_TEMPLATE)
+    public static void piecesLoadFromAnyFolder(GameTestHelper helper) {
+        DungeonPieces byFolder = DungeonPieces.load(helper.getLevel().getServer(), DungeonDelving.MODID, DungeonPieces.FOLDER);
+        DungeonPieces own = DungeonPieces.load(helper.getLevel().getServer());
+        for (DungeonPieces.Kind kind : DungeonPieces.Kind.values()) {
+            helper.assertTrue(own.pool(kind).containsAll(byFolder.pool(kind)) && !byFolder.pool(kind).isEmpty(),
+                    kind + " pieces should load by folder: " + byFolder.pool(kind));
+        }
+        helper.succeed();
+    }
+
+    /** The build queue builds in whichever level it's given, not just the dungeon dimension (Deep Mines builds in its own). */
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 100)
+    public static void buildQueueBuildsInAnyLevel(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        DungeonLayout layout = new DungeonLayout(Map.of(Cell.ORIGIN, new Room(Cell.ORIGIN, RoomKind.START, Rotation.NONE, Mirror.NONE)), Set.of());
+        BlockPos center = helper.absolutePos(BlockPos.ZERO).above(120);
+        int region = -1;
+        DungeonBuildQueue.add(level.dimension(), region,
+                DungeonBuilder.plan(layout, DungeonPieces.load(level.getServer()), center, RandomSource.create(1)), DungeonMarkers.Rolls.fromConfig(1));
+        BlockPos min = DungeonBuilder.roomMin(center, Cell.ORIGIN);
+        helper.succeedWhen(() -> {
+            helper.assertTrue(DungeonBuildQueue.pending(level.dimension(), region) == 0, "the queue should finish the room");
+            solid(helper, min, "room floor corner");
+            solid(helper, min.offset(ROOM_SIZE - 1, ROOM_HEIGHT - 1, ROOM_SIZE - 1), "opposite room ceiling corner");
+            clear(level, min.offset(-1, -1, -1), min.offset(ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE));
+        });
     }
 
     private static void solid(GameTestHelper helper, BlockPos pos, String what) {
