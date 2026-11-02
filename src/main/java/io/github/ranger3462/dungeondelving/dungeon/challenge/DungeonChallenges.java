@@ -9,6 +9,7 @@ import io.github.ranger3462.dungeondelving.dungeon.DungeonRegions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonRun;
 import io.github.ranger3462.dungeondelving.dungeon.RoomMobCap;
 import io.github.ranger3462.dungeondelving.dungeon.RoomSpec;
+import io.github.ranger3462.dungeondelving.dungeon.SpawnerWaves;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -83,11 +84,13 @@ public final class DungeonChallenges {
 
     /**
      * A dungeon spawner spawning a mob: skipped if its room already holds its mob cap ({@link RoomMobCap}); otherwise, in
-     * a room still waiting on hunt targets, it may become one.
+     * a room still waiting on hunt targets, it may become one. A wave from a common room's spawner
+     * ({@link SpawnerWaves}) comes all at once, so the cap doesn't cut it short.
      */
     @SubscribeEvent
     public static void onSpawnerSpawn(FinalizeSpawnEvent event) {
-        if (event.getSpawnType() != MobSpawnType.SPAWNER || event.getLevel().getLevel().dimension() != DungeonDimension.DUNGEON) {
+        if (event.getSpawnType() != MobSpawnType.SPAWNER || event.isSpawnCancelled()
+                || event.getLevel().getLevel().dimension() != DungeonDimension.DUNGEON) {
             return;
         }
         Mob mob = event.getEntity();
@@ -95,7 +98,7 @@ public final class DungeonChallenges {
         int region = DungeonDimension.regionAt(pos);
         long room = DungeonDimension.roomMinAt(pos).asLong();
         DungeonRegions.get().progress(region).ifPresent(progress -> {
-            if (RoomMobCap.full(event.getLevel().getLevel(), pos, progress.faction(), progress.tier())) {
+            if (event.getSpawner() != null && RoomMobCap.full(event.getLevel().getLevel(), pos, progress.faction(), progress.tier())) {
                 event.setSpawnCancelled(true);
                 return;
             }

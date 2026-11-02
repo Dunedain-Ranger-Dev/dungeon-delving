@@ -39,7 +39,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
  * <li>Loot marker: a chest with the tier's {@code dungeondelving:chests/tier_<n>/room} loot, or nothing.</li>
  * <li>Mob marker: a monster spawner for a random mob of the dungeon's faction (see {@link DungeonFactions}), or
  * nothing (see the {@code mobMarkerChance} config). Dungeon spawners ignore light level, so lit rooms still spawn mobs,
- * and spawn fewer mobs at low tiers.</li>
+ * and spawn fewer mobs at low tiers. In common rooms they send one wave and break instead (see {@link SpawnerWaves}).</li>
  * <li>Resource marker: the dungeon's tier ore, the common dungeon ore, an ore from the
  * {@code dungeondelving:dungeon_resources} block tag or the tier's {@code dungeondelving:dungeon_resources/tier_<n>}
  * tag, or otherwise Riftstone, so there are never gaps.</li>
@@ -108,6 +108,11 @@ public final class DungeonMarkers {
         }
         for (StructureTemplate.StructureBlockInfo info : template.filterBlocks(pos, settings, ModRegistries.WAR_DRUM.get())) {
             DungeonWaves.addDrum(rolls.region(), info.pos());
+        }
+        if (SpawnerWaves.commonRoom(template, pos, settings)) {
+            for (StructureTemplate.StructureBlockInfo info : template.filterBlocks(pos, settings, ModRegistries.MOB_MARKER.get())) {
+                SpawnerWaves.mark(level, info.pos(), rolls.tier());
+            }
         }
     }
 
