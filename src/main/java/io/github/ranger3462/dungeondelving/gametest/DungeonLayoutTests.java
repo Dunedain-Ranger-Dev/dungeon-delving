@@ -4,6 +4,7 @@ import static io.github.ranger3462.dungeondelving.dungeon.RoomSpec.*;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,10 +21,12 @@ import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayoutGenerator
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
@@ -276,6 +279,38 @@ public class DungeonLayoutTests {
             solid(helper, min.offset(ROOM_SIZE - 1, ROOM_HEIGHT - 1, ROOM_SIZE - 1), "opposite room ceiling corner");
             clear(level, min.offset(-1, -1, -1), min.offset(ROOM_SIZE, ROOM_HEIGHT, ROOM_SIZE));
         });
+    }
+
+    /**
+     * Light from a build is worked out before its chunks unload, and reaches across chunk borders (DD-116): a lamp the
+     * queue places beside a room, far from the test grid where nothing else keeps chunks loaded, lights the air
+     * around it, fading by one a block, past the next chunk's border. The check waits long enough for chunks nothing
+     * holds to have unloaded, and loads them again to read their light.
+     */
+    @GameTest(template = ANY_TEMPLATE, timeoutTicks = 400)
+    public static void builtLightReachesAcrossChunks(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        int region = -7;
+        BlockPos center = new BlockPos(8192, helper.absolutePos(BlockPos.ZERO).getY() + 120, 8192);
+        DungeonLayout layout = new DungeonLayout(Map.of(Cell.ORIGIN, new Room(Cell.ORIGIN, RoomKind.START, Rotation.NONE, Mirror.NONE)), Set.of());
+        DungeonBuildQueue.add(level.dimension(), region,
+                DungeonBuilder.plan(layout, DungeonPieces.load(level.getServer()), center, RandomSource.create(1)), DungeonMarkers.Rolls.fromConfig(1));
+        // Three blocks short of a chunk border, well clear of the room.
+        BlockPos min = DungeonBuilder.roomMin(center, Cell.ORIGIN);
+        int border = SectionPos.sectionToBlockCoord(SectionPos.blockToSectionCoord(min.getX() - 16));
+        BlockPos lamp = new BlockPos(border - 3, min.getY() + 5, min.getZ() - 8);
+        DungeonBuildQueue.addBlocks(level.dimension(), region, List.of(lamp), Blocks.GLOWSTONE.defaultBlockState(), "test lamp");
+        helper.runAfterDelay(100, () -> helper.succeedWhen(() -> {
+            helper.assertTrue(DungeonBuildQueue.pending(level.dimension(), region) == 0, "the queue should finish");
+            helper.assertFalse(level.getChunkSource().getLightEngine().hasLightWork(), "the light engine should catch up");
+            for (int step = 1; step <= 8; step++) {
+                BlockPos pos = lamp.east(step);
+                level.getChunk(pos);
+                int light = level.getBrightness(LightLayer.BLOCK, pos);
+                helper.assertTrue(light >= 15 - step, "block light " + step + " east of the lamp should be at least " + (15 - step) + ", not " + light);
+            }
+            level.setBlock(lamp, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }));
     }
 
     private static void solid(GameTestHelper helper, BlockPos pos, String what) {

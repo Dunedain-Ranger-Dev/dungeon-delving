@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonBosses;
 import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonLayout.Cell;
@@ -17,9 +18,12 @@ import io.github.ranger3462.dungeondelving.dungeon.layout.DungeonPieces.Kind;
 import io.github.ranger3462.dungeondelving.gate.RunTuning;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.SectionPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.TicketType;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
@@ -35,6 +39,11 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
  * centered on {@code center}.
  */
 public final class DungeonBuilder {
+    /** How long the chunks a build touches stay loaded after it last touched them: plenty for the light engine to catch up. */
+    public static final int KEEP_LOADED_TICKS = 30 * 20;
+    private static final TicketType<ChunkPos> BUILDING = TicketType.create(DungeonDelving.MODID + ":building", Comparator.comparingLong(ChunkPos::toLong),
+            KEEP_LOADED_TICKS);
+
     private DungeonBuilder() {}
 
     /** One structure to place, positioned by the minimum corner of the space it should occupy once turned. */
@@ -212,8 +221,25 @@ public final class DungeonBuilder {
         return turn ? box(tunnelMin, z1, y1, x1, z2, y2, x2) : box(tunnelMin, x1, y1, z1, x2, y2, z2);
     }
 
+    /**
+     * Keeps the chunks around a box loaded for {@link #KEEP_LOADED_TICKS} (DD-116). Nothing else holds the chunks a
+     * build writes into, so they'd unload a tick or two later and be saved with whatever light they had, light still
+     * being worked out for thousands of new blocks, and marked as correct; loaded again, that light is never redone,
+     * and torch light stops in hard lines. Light can't spread into an unloaded neighbor either, so the ring of chunks
+     * around the box is kept too.
+     */
+    public static void keepLoaded(ServerLevel level, BoundingBox box) {
+        for (int x = SectionPos.blockToSectionCoord(box.minX()) - 1; x <= SectionPos.blockToSectionCoord(box.maxX()) + 1; x++) {
+            for (int z = SectionPos.blockToSectionCoord(box.minZ()) - 1; z <= SectionPos.blockToSectionCoord(box.maxZ()) + 1; z++) {
+                ChunkPos chunk = new ChunkPos(x, z);
+                level.getChunkSource().addRegionTicket(BUILDING, chunk, 0, chunk);
+            }
+        }
+    }
+
     /** Fills one shell section with bedrock. */
     public static void fillShell(ServerLevel level, BoundingBox box) {
+        keepLoaded(level, box);
         BlockState bedrock = Blocks.BEDROCK.defaultBlockState();
         for (BlockPos pos : BlockPos.betweenClosed(box.minX(), box.minY(), box.minZ(), box.maxX(), box.maxY(), box.maxZ())) {
             level.setBlock(pos, bedrock, Block.UPDATE_CLIENTS);
@@ -244,6 +270,7 @@ public final class DungeonBuilder {
         StructurePlaceSettings settings = new StructurePlaceSettings().setRotation(placement.rotation()).setMirror(placement.mirror());
         BoundingBox box = template.getBoundingBox(settings, BlockPos.ZERO);
         BlockPos pos = placement.targetMin().offset(-box.minX(), -box.minY(), -box.minZ());
+        keepLoaded(level, template.getBoundingBox(settings, pos));
         template.placeInWorld(level, pos, pos, settings, level.getRandom(), Block.UPDATE_CLIENTS);
         if (resolveMarkers) {
             DungeonMarkers.resolve(level, template, pos, settings, level.getRandom(), rolls, placement.targetMin());

@@ -52,7 +52,10 @@ public final class DungeonBuildQueue {
     }
 
     public static void addBlocks(ResourceKey<Level> level, int region, List<BlockPos> positions, BlockState state, String description) {
-        TASKS.add(new Task(level, region, l -> positions.forEach(pos -> l.setBlock(pos, state, Block.UPDATE_CLIENTS)), description));
+        TASKS.add(new Task(level, region, l -> positions.forEach(pos -> {
+            DungeonBuilder.keepLoaded(l, new BoundingBox(pos));
+            l.setBlock(pos, state, Block.UPDATE_CLIENTS);
+        }), description));
     }
 
     public static void addShell(int region, List<BoundingBox> sections) {
