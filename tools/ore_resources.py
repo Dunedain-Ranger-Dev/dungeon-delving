@@ -1,7 +1,7 @@
 """Writes the dungeon ores' models, names, drops, recipes and tags.
 
 Run from the project root: python tools/ore_resources.py
-Must match DungeonOre.java. Textures come from tools/placeholder_ore_textures.py until real art exists.
+Must match DungeonOre.java. Textures come from tools/vanilla_textures.py until real art exists.
 """
 import json
 from pathlib import Path

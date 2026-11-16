@@ -29,6 +29,13 @@ modified, or reused outside this project without written permission:
 If you are unsure whether a file counts as code or an asset, ask before
 reusing it.
 
+**Textures made from Minecraft's:** the textures under
+`src/main/resources/assets/dungeondelving/textures/` are recolored or cut-down
+copies of Minecraft's own textures, made by `tools/vanilla_textures.py`. They
+remain Mojang's work, and this project claims no rights over them. The kobold
+skins under `textures/entity/kobold/` are recolors of the Kobolds! mod's skins
+and stay under its MIT license (see `KOBOLDS_LICENSE.txt` beside them).
+
 ## Contributions
 
 By submitting code to this repository, you agree to license it under
