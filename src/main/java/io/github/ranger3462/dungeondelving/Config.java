@@ -79,10 +79,21 @@ public final class Config {
     public static final ModConfigSpec.ConfigValue<List<? extends String>> ORC_MOBS = mobList("orcMobs", "orc", DungeonFactions.ORC_DEFAULTS);
     public static final ModConfigSpec.ConfigValue<List<? extends String>> KOBOLD_MOBS = mobList("koboldMobs", "kobold",
             DungeonFactions.KOBOLD_DEFAULTS);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> SPIDER_MOBS = mobList("spiderMobs", "spider", DungeonFactions.SPIDER_DEFAULTS);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> FOREST_TROLL_MOBS = mobList("forestTrollMobs", "forest troll",
+            DungeonFactions.FOREST_TROLL_DEFAULTS);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> FROST_TROLL_MOBS = mobList("frostTrollMobs", "frost troll",
+            DungeonFactions.FROST_TROLL_DEFAULTS);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> MOUNTAIN_TROLL_MOBS = mobList("mountainTrollMobs", "mountain troll",
+            DungeonFactions.MOUNTAIN_TROLL_DEFAULTS);
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> MYTHICAL_BEAST_MOBS = mobList("mythicalBeastMobs", "mythical beast",
+            DungeonFactions.MYTHICAL_BEAST_DEFAULTS);
     public static final ModConfigSpec.ConfigValue<List<? extends String>> ENABLED_FACTIONS = BUILDER
-            .comment("Which factions can hold dungeons: undead, goblins, orcs, kobolds. Each dungeon rolls one of these that has a",
-                    "boss for its tier (kobolds have one only at tier 1). Goblins, orcs and kobolds are Phase 2 and still being",
-                    "tested, so only the undead are on by default.")
+            .comment("Which factions can hold dungeons: undead, goblins, orcs, kobolds, and the cave creatures: spiders, forest_trolls,",
+                    "frost_trolls, mountain_trolls, mythical_beasts. Each dungeon rolls one of these that has a boss for its tier.",
+                    "The cave creatures' bosses need Iron's Spells (the spider queens) or Ice and Fire (the rest), and the kobolds'",
+                    "tier 3 and 4 boss needs Ice and Fire. Factions other than the undead are still being tested, so only the undead",
+                    "are on by default.")
             .defineList("enabledFactions", DungeonFactions.ENABLED_DEFAULTS, () -> DungeonFactions.UNDEAD, value -> value instanceof String);
 
     public static final ModConfigSpec.BooleanValue BLOCK_NATURAL_SPAWNS = BUILDER
@@ -113,6 +124,10 @@ public final class Config {
         if (DungeonFactions.OLD_GOBLIN_DEFAULTS.contains(List.copyOf(GOBLIN_MOBS.get()))) {
             GOBLIN_MOBS.set(DungeonFactions.GOBLIN_DEFAULTS);
             GOBLIN_MOBS.save();
+        }
+        if (DungeonFactions.OLD_KOBOLD_DEFAULTS.contains(List.copyOf(KOBOLD_MOBS.get()))) {
+            KOBOLD_MOBS.set(DungeonFactions.KOBOLD_DEFAULTS);
+            KOBOLD_MOBS.save();
         }
     }
 }

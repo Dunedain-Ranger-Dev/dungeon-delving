@@ -196,7 +196,10 @@ public class SkeletonTests {
     /** A raised shield really blocks: a hit from the front does nothing, a hit from behind still lands. */
     @GameTest(template = ANY_TEMPLATE, timeoutTicks = 60)
     public static void aRaisedShieldBlocksHitsFromTheFront(GameTestHelper helper) {
-        SkeletonSwordsman swordsman = spawn(helper, ModEntities.SKELETON_SWORDSMAN.get());
+        // In its own arena: other tests' clean-ups sweep up mobs near the test grid.
+        BlockPos arena = TestArena.away(helper, 6, 100);
+        TestArena.load(helper.getLevel(), arena);
+        SkeletonSwordsman swordsman = spawn(helper, ModEntities.SKELETON_SWORDSMAN.get(), arena);
         swordsman.setNoAi(true);
         swordsman.setYRot(0.0f); // Facing south (+z).
         swordsman.setYHeadRot(0.0f);
@@ -206,10 +209,10 @@ public class SkeletonTests {
         front.moveTo(swordsman.getX(), swordsman.getY(), swordsman.getZ() + 2);
         Zombie behind = EntityType.ZOMBIE.create(helper.getLevel());
         behind.moveTo(swordsman.getX(), swordsman.getY(), swordsman.getZ() - 2);
-        // Shields only block once they've been up for 5 ticks.
-        helper.runAfterDelay(10, () -> {
+        // Shields only block once they've been up for 5 ticks, counted from when the swordsman starts ticking.
+        helper.succeedWhen(() -> {
+            helper.assertTrue(swordsman.isBlocking(), "the swordsman should be blocking after raising its shield");
             try {
-                helper.assertTrue(swordsman.isBlocking(), "the swordsman should be blocking after raising its shield");
                 float health = swordsman.getHealth();
                 swordsman.hurt(helper.getLevel().damageSources().mobAttack(front), 6.0f);
                 helper.assertTrue(swordsman.getHealth() == health, "a hit from the front should be blocked");
@@ -220,14 +223,17 @@ public class SkeletonTests {
                 swordsman.discard();
                 front.discard();
                 behind.discard();
+                TestArena.unload(helper.getLevel(), arena);
             }
-            helper.succeed();
         });
     }
 
     private static <T extends SkeletonSwordsman> T spawn(GameTestHelper helper, EntityType<T> type) {
+        return spawn(helper, type, helper.absolutePos(new BlockPos(0, 1, 0)).above(100));
+    }
+
+    private static <T extends SkeletonSwordsman> T spawn(GameTestHelper helper, EntityType<T> type, BlockPos pos) {
         T mob = type.create(helper.getLevel());
-        BlockPos pos = helper.absolutePos(new BlockPos(0, 1, 0)).above(100);
         mob.moveTo(pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5);
         EventHooks.finalizeMobSpawn(mob, helper.getLevel(), helper.getLevel().getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);
         helper.getLevel().addFreshEntity(mob);

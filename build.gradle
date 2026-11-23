@@ -184,6 +184,9 @@ dependencies {
     compileOnly "curse.maven:apotheosis-313970:8993983"                      // 1.21.1-8.9.0: world tiers follow dungeon tiers
     compileOnly "curse.maven:placebo-283644:9153039"                         // 1.21.1-9.9.4
     compileOnly "curse.maven:apothic-attributes-898963:9006294"              // 1.21.1-2.11.0
+    compileOnly "curse.maven:iceandfire-ce-1040076:9128508"                  // 2.1.4: dragons, trolls and the hydra in dungeons
+    compileOnly "curse.maven:uranus-1010827:8587525"                         // 2.4.1-bugfix, Ice and Fire's library
+    compileOnly "curse.maven:jupiter-1072905:7738312"                        // 2.3.7, Ice and Fire's library
 
     // Apotheosis and its libraries, which this mod requires (neoforge.mods.toml), so every run loads them.
     localRuntime "curse.maven:apotheosis-313970:8993983"                     // 1.21.1-8.9.0

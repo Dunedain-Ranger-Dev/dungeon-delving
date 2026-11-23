@@ -7,6 +7,7 @@ import com.mojang.logging.LogUtils;
 
 import io.github.ranger3462.dungeondelving.dungeon.CuriosLoot;
 import io.github.ranger3462.dungeondelving.integration.apotheosis.ApotheosisDungeons;
+import io.github.ranger3462.dungeondelving.integration.iceandfire.IafDungeons;
 import io.github.ranger3462.dungeondelving.integration.professions.ProfessionsLink;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -34,6 +35,9 @@ public class DungeonDelving {
             CuriosLoot.register();
         }
         ApotheosisDungeons.register();
+        if (ModList.get().isLoaded("iceandfire")) {
+            IafDungeons.register();
+        }
         if (ModList.get().isLoaded("ddprofessions")) {
             ProfessionsLink.register();
         }

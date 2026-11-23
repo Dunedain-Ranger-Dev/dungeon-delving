@@ -299,6 +299,8 @@ public class DungeonLayoutTests {
         BlockPos min = DungeonBuilder.roomMin(center, Cell.ORIGIN);
         int border = SectionPos.sectionToBlockCoord(SectionPos.blockToSectionCoord(min.getX() - 16));
         BlockPos lamp = new BlockPos(border - 3, min.getY() + 5, min.getZ() - 8);
+        // An earlier run may have left the lamp there; placing the same block again wouldn't relight anything.
+        level.setBlock(lamp, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
         DungeonBuildQueue.addBlocks(level.dimension(), region, List.of(lamp), Blocks.GLOWSTONE.defaultBlockState(), "test lamp");
         helper.runAfterDelay(100, () -> helper.succeedWhen(() -> {
             helper.assertTrue(DungeonBuildQueue.pending(level.dimension(), region) == 0, "the queue should finish");

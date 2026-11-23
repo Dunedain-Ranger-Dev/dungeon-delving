@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.entity.ArmedHumanoid;
 import io.github.ranger3462.dungeondelving.integration.irons.GoblinShamanRenderer;
+import io.github.ranger3462.dungeondelving.integration.irons.SpiderQueenRenderer;
 import io.github.ranger3462.dungeondelving.integration.kobolds.KoboldsModRenderer;
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import net.minecraft.client.model.HumanoidModel;
@@ -19,6 +20,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 
 /**
  * Draws goblins, hobgoblins, orcs and kobolds with the vanilla humanoid body (goblins shrunk to three quarters size), with each
@@ -64,6 +66,13 @@ public class ArmedHumanoidRenderer<T extends ArmedHumanoid> extends HumanoidMobR
     @EventBusSubscriber(modid = DungeonDelving.MODID, value = Dist.CLIENT)
     public static final class Registration {
         private Registration() {}
+
+        @SubscribeEvent
+        public static void onRegisterReloadListeners(RegisterClientReloadListenersEvent event) {
+            if (ModList.get().isLoaded("irons_spellbooks")) {
+                SpiderQueenRenderer.registerReloadListener(event); // The spider queens' recolored textures.
+            }
+        }
 
         @SubscribeEvent
         public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {

@@ -188,5 +188,16 @@
   "item.dungeondelving.kobold_scavenger_spawn_egg": "Kobold Scavenger Spawn Egg",
   "entity.dungeondelving.thrown_spear": "Thrown Spear",
   "entity.dungeondelving.kobold_packmaster": "Kobold Packmaster",
-  "item.dungeondelving.kobold_packmaster_spawn_egg": "Kobold Packmaster Spawn Egg"
+  "item.dungeondelving.kobold_packmaster_spawn_egg": "Kobold Packmaster Spawn Egg",
+  "entity.dungeondelving.wyrmling_nest": "Nest Guardian",
+  "entity.dungeondelving.forest_troll_king": "Forest Troll King",
+  "entity.dungeondelving.frost_troll_king": "Frost Troll King",
+  "entity.dungeondelving.mountain_troll_king": "Mountain Troll King",
+  "entity.dungeondelving.hydra": "The Hydra",
+  "entity.dungeondelving.spider_queen": "Spider Queen",
+  "entity.dungeondelving.cave_spider_queen": "Cave Spider Queen",
+  "entity.dungeondelving.ice_spider_queen": "Ice Spider Queen",
+  "item.dungeondelving.spider_queen_spawn_egg": "Spider Queen Spawn Egg",
+  "item.dungeondelving.cave_spider_queen_spawn_egg": "Cave Spider Queen Spawn Egg",
+  "item.dungeondelving.ice_spider_queen_spawn_egg": "Ice Spider Queen Spawn Egg"
 }

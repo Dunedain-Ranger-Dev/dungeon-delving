@@ -14,6 +14,7 @@ import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
 import io.github.ranger3462.dungeondelving.dungeon.TagDungeonLootModifier;
 import io.github.ranger3462.dungeondelving.gate.DungeonGates;
 import io.github.ranger3462.dungeondelving.integration.irons.IronsOrcs;
+import io.github.ranger3462.dungeondelving.integration.irons.IronsSpiders;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonKeyItem;
 import io.github.ranger3462.dungeondelving.economy.Coins;
 import io.github.ranger3462.dungeondelving.entity.Mending;
@@ -217,6 +218,7 @@ public final class ModRegistries {
             IronsGoblins.register(modEventBus);
             IronsSkeletons.register(modEventBus);
             IronsOrcs.register(modEventBus);
+            IronsSpiders.register(modEventBus);
         }
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
