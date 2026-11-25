@@ -9,8 +9,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          path: dungeon-delving
           fetch-depth: 0
           fetch-tags: true
+
+      # Our other mods, next to this one as in development: the build includes them (settings.gradle) and compiles
+      # the optional links against them.
+      - name: Checkout Professions and Skills
+        uses: actions/checkout@v4
+        with:
+          repository: Dunedain-Ranger-Dev/professions-and-skills
+          path: professions-and-skills
+
+      - name: Checkout Deep Mines
+        uses: actions/checkout@v4
+        with:
+          repository: Dunedain-Ranger-Dev/deep-mines
+          path: deep-mines
 
       - name: Setup JDK 21
         uses: actions/setup-java@v4
@@ -22,6 +37,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle
+        working-directory: dungeon-delving
         run: ./gradlew build
       - name: Run game tests
+        working-directory: dungeon-delving
         run: ./gradlew runGameTestServer
