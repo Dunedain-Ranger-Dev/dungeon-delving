@@ -88,6 +88,10 @@ public final class DungeonBosses {
     public static final String KOBOLD_PACKMASTER = "kobold_packmaster";
     /** Registered by the Iron's Spells integration; without it, the Barrow King guards tier 4 as well. */
     public static final String LICH_LORD = "lich_lord";
+    /** A boss type's faction when it can guard any faction's dungeons, e.g. the Treasure Vault. */
+    public static final String ANY_FACTION = "any";
+    /** Saved in a boss's tag to drop a different loot table than its own, e.g. for a solved puzzle. */
+    public static final String LOOT_OVERRIDE = "loot";
     /** How close players must be to see a boss's health bar. */
     private static final double BAR_RANGE = 48.0;
     /** How far inside the boss room's door the exit appears. */
@@ -102,7 +106,10 @@ public final class DungeonBosses {
         return ResourceKey.create(Registries.LOOT_TABLE, DungeonDelving.id("bosses/" + boss + "/tier_" + DungeonRun.clampTier(tier)));
     }
 
-    /** A kind of boss: its faction, which tiers it can guard, and how to make one (without adding it to the world). */
+    /**
+     * A kind of boss: its faction ({@link #ANY_FACTION} for any), which tiers it can guard, and how to make one (without
+     * adding it to the world). A spawner that makes no mob is a boss that isn't a mob, e.g. the Treasure Vault ({@link PuzzleBosses}).
+     */
     public record BossType(String id, String faction, IntPredicate tiers, Spawner spawner) {}
 
     @FunctionalInterface
@@ -133,6 +140,8 @@ public final class DungeonBosses {
         register(new BossType(SKELETON_LORD, DungeonFactions.UNDEAD, tier -> tier == 2, SkeletonLord::create));
         register(new BossType(BARROW_KING, DungeonFactions.UNDEAD, tier -> tier == 3 || (tier == 4 && !TYPES.containsKey(LICH_LORD)),
                 DungeonBosses::createBarrowKing));
+        // A tier 2 boss room any faction's dungeon may get: no boss, a puzzle that opens a vault.
+        register(new BossType(PuzzleBosses.TREASURE_VAULT, ANY_FACTION, tier -> tier == 2, (level, pos, tier) -> null));
         addRetinue(SKELETON_LORD, (level, pos, tier) -> ring(level, pos, ModEntities.SKELETON_KNIGHT.get(), SkeletonLord.GUARDS, 3.0, 0.0));
         addRetinue(BARROW_KING, (level, pos, tier) -> ring(level, pos, ModEntities.SKELETON_KNIGHT.get(), BARROW_KING_GUARDS, 3.0, 0.0));
         // Every orc boss brings part of his warband.
@@ -186,11 +195,11 @@ public final class DungeonBosses {
     /** Picks the boss for a dungeon of this tier held by this faction (any faction if null), or the Barrow King if none fits. */
     public static String pick(int tier, String faction, RandomSource random) {
         List<BossType> candidates = TYPES.values().stream()
-                .filter(type -> type.tiers().test(tier) && (faction == null || type.faction().equals(faction))).toList();
+                .filter(type -> type.tiers().test(tier) && (faction == null || type.faction().equals(faction) || type.faction().equals(ANY_FACTION))).toList();
         return candidates.isEmpty() ? BARROW_KING : candidates.get(random.nextInt(candidates.size())).id();
     }
 
-    /** Whether a faction has a boss for this tier. */
+    /** Whether a faction has its own boss for this tier (bosses for {@link #ANY_FACTION} don't count). */
     public static boolean guards(String faction, int tier) {
         return TYPES.values().stream().anyMatch(type -> type.faction().equals(faction) && type.tiers().test(tier));
     }
@@ -207,6 +216,10 @@ public final class DungeonBosses {
     public static LivingEntity spawn(ServerLevel level, BlockPos pos, int tier, int region, String boss) {
         BossType type = TYPES.getOrDefault(boss, TYPES.get(BARROW_KING));
         Mob mob = type.spawner().create(level, pos, tier);
+        if (mob == null) {
+            PuzzleBosses.setUp(level, pos, tier, region, type.id(), null);
+            return null;
+        }
         mob.setPersistenceRequired();
         CompoundTag tag = new CompoundTag();
         tag.putString("id", type.id());
@@ -215,7 +228,11 @@ public final class DungeonBosses {
         mob.getPersistentData().put(BOSS_TAG, tag);
         level.addFreshEntity(mob);
         RETINUES.getOrDefault(type.id(), List.of()).forEach(retinue -> retinue.spawn(level, pos, tier));
-        DungeonChallenges.rallySpawners(level, DungeonDimension.roomMinAt(pos), tier);
+        if (PuzzleBosses.isPuzzleBoss(type.id())) {
+            PuzzleBosses.setUp(level, pos, tier, region, type.id(), mob);
+        } else {
+            DungeonChallenges.rallySpawners(level, DungeonDimension.roomMinAt(pos), tier);
+        }
         return mob;
     }
 
@@ -224,7 +241,9 @@ public final class DungeonBosses {
      * Barrow King), tagged as a boss (for its loot and boss bar) with no dungeon region, persistent, with its retinue.
      */
     public static Mob spawnChampion(ServerLevel level, BlockPos pos, int tier, String faction) {
-        BossType type = TYPES.getOrDefault(pick(tier, faction, level.getRandom()), TYPES.get(BARROW_KING));
+        String picked = pick(tier, faction, level.getRandom());
+        // A champion fights in the open: no bosses that need a puzzle room, or that aren't a mob.
+        BossType type = PuzzleBosses.isPuzzleBoss(picked) ? TYPES.get(BARROW_KING) : TYPES.getOrDefault(picked, TYPES.get(BARROW_KING));
         Mob mob = type.spawner().create(level, pos, tier);
         mob.setPersistenceRequired();
         CompoundTag tag = new CompoundTag();
@@ -282,7 +301,8 @@ public final class DungeonBosses {
             return;
         }
         CompoundTag tag = boss.getPersistentData().getCompound(BOSS_TAG);
-        LootTable table = level.getServer().reloadableRegistries().getLootTable(lootTable(tag.getString("id"), tag.getInt("tier")));
+        String loot = tag.contains(LOOT_OVERRIDE) ? tag.getString(LOOT_OVERRIDE) : tag.getString("id");
+        LootTable table = level.getServer().reloadableRegistries().getLootTable(lootTable(loot, tag.getInt("tier")));
         LootParams params = new LootParams.Builder(level)
                 .withParameter(LootContextParams.THIS_ENTITY, boss)
                 .withParameter(LootContextParams.ORIGIN, boss.position())
@@ -301,10 +321,14 @@ public final class DungeonBosses {
         if (tag.getInt("region") == NO_REGION) {
             return; // A realm champion: no dungeon to tell, clear or open.
         }
-        DungeonChallenges.tellRegion(level, tag.getInt("region"),
-                Component.translatable("message.dungeondelving.boss_defeated", boss.getDisplayName()).withStyle(ChatFormatting.GOLD));
-        DungeonChallenges.clearSpawners(level, DungeonDimension.roomMinAt(boss.blockPosition()), tag.getInt("tier"), false);
-        DungeonRegions.get().progress(tag.getInt("region")).flatMap(progress -> exitPos(progress.door()))
+        defeated(level, tag.getInt("region"), tag.getInt("tier"), boss.blockPosition(), boss.getDisplayName());
+    }
+
+    /** A dungeon's boss is beaten: tells the run, shuts off the boss room's spawners and opens the exit. */
+    public static void defeated(ServerLevel level, int region, int tier, BlockPos where, Component boss) {
+        DungeonChallenges.tellRegion(level, region, Component.translatable("message.dungeondelving.boss_defeated", boss).withStyle(ChatFormatting.GOLD));
+        DungeonChallenges.clearSpawners(level, DungeonDimension.roomMinAt(where), tier, false);
+        DungeonRegions.get().progress(region).flatMap(progress -> exitPos(progress.door()))
                 .ifPresent(pos -> level.setBlock(pos, ModRegistries.DUNGEON_EXIT.get().defaultBlockState(), Block.UPDATE_ALL));
     }
 

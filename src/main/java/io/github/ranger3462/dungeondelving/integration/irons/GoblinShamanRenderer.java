@@ -33,6 +33,9 @@ public class GoblinShamanRenderer extends AbstractSpellCastingMobRenderer {
         // Skeleton mages borrow Iron's own necromancer look until they get their own texture.
         event.registerEntityRenderer(IronsSkeletons.SKELETON_MAGE.get(),
                 context -> new GoblinShamanRenderer(context, ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "textures/entity/necromancer.png"), 1.0f));
+        // The Archivist borrows Iron's cultist look, at dwarf size, until he gets his own.
+        event.registerEntityRenderer(IronsSkeletons.DWARF_ARCHIVIST.get(),
+                context -> new GoblinShamanRenderer(context, ResourceLocation.fromNamespaceAndPath("irons_spellbooks", "textures/entity/cultist.png"), 0.85f));
         UndeadCasterRenderer.register(event);
         SpiderQueenRenderer.register(event);
     }

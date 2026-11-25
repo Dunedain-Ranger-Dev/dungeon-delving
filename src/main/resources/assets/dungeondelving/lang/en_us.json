@@ -199,5 +199,15 @@
   "entity.dungeondelving.ice_spider_queen": "Ice Spider Queen",
   "item.dungeondelving.spider_queen_spawn_egg": "Spider Queen Spawn Egg",
   "item.dungeondelving.cave_spider_queen_spawn_egg": "Cave Spider Queen Spawn Egg",
-  "item.dungeondelving.ice_spider_queen_spawn_egg": "Ice Spider Queen Spawn Egg"
+  "item.dungeondelving.ice_spider_queen_spawn_egg": "Ice Spider Queen Spawn Egg",
+  "block.dungeondelving.puzzle_trap": "Puzzle Trap",
+  "entity.dungeondelving.undead_dwarf_archivist": "Undead Dwarf Archivist",
+  "item.dungeondelving.undead_dwarf_archivist_spawn_egg": "Undead Dwarf Archivist Spawn Egg",
+  "entity.dungeondelving.treasure_vault": "The Treasure Vault",
+  "message.dungeondelving.archivist_waits": "The Archivist looks up from his ledgers and waits. Solve his puzzle before he loses patience.",
+  "message.dungeondelving.archivist_angered": "The Archivist slams his ledger shut and rises to fight!",
+  "message.dungeondelving.archivist_impatient": "The Archivist has waited long enough. He rises to fight!",
+  "message.dungeondelving.archivist_humbled": "The puzzle is solved! Shaken, the Archivist fights on, weakened.",
+  "message.dungeondelving.vault_sealed": "A sealed vault. Its lock is a puzzle.",
+  "message.dungeondelving.vault_guards": "A wrong answer! The vault's guards come running."
 }

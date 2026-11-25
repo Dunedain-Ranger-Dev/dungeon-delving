@@ -8,6 +8,7 @@ import io.github.ranger3462.dungeondelving.block.BossDoorBlock;
 import io.github.ranger3462.dungeondelving.block.DungeonExitBlock;
 import io.github.ranger3462.dungeondelving.block.DungeonGateBlock;
 import io.github.ranger3462.dungeondelving.block.PuzzleLockBlock;
+import io.github.ranger3462.dungeondelving.block.PuzzleTrapBlock;
 import io.github.ranger3462.dungeondelving.block.RelicAltarBlock;
 import io.github.ranger3462.dungeondelving.block.WarDrumBlock;
 import io.github.ranger3462.dungeondelving.dungeon.RemoveDungeonOnlyModifier;
@@ -93,6 +94,11 @@ public final class ModRegistries {
             BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).strength(-1.0f, 3600000.0f).noLootTable()
                     .lightLevel(state -> state.getValue(PuzzleLockBlock.SOLVED) ? 10 : 3).sound(SoundType.VAULT));
     public static final DeferredItem<BlockItem> PUZZLE_LOCK_ITEM = ITEMS.registerSimpleBlockItem(PUZZLE_LOCK);
+    /** A puzzle boss room's wrong answer: each time builders' redstone powers it, the puzzle is failed (DD-58). */
+    public static final DeferredBlock<PuzzleTrapBlock> PUZZLE_TRAP = BLOCKS.registerBlock("puzzle_trap", PuzzleTrapBlock::new,
+            BlockBehaviour.Properties.of().mapColor(MapColor.DEEPSLATE).strength(-1.0f, 3600000.0f).noLootTable()
+                    .lightLevel(state -> state.getValue(PuzzleTrapBlock.POWERED) ? 8 : 0).sound(SoundType.TRIAL_SPAWNER));
+    public static final DeferredItem<BlockItem> PUZZLE_TRAP_ITEM = ITEMS.registerSimpleBlockItem(PUZZLE_TRAP);
     /** The heart of a collection challenge room: offer it enough Relic Shards and it gives up a Dungeon Key. */
     public static final DeferredBlock<RelicAltarBlock> RELIC_ALTAR = BLOCKS.registerBlock("relic_altar", RelicAltarBlock::new,
             BlockBehaviour.Properties.of().mapColor(MapColor.METAL).strength(-1.0f, 3600000.0f).noLootTable().lightLevel(state -> 7)
@@ -154,6 +160,7 @@ public final class ModRegistries {
                 output.accept(HUNT_MARKER.get());
                 output.accept(BOSS_MARKER.get());
                 output.accept(PUZZLE_LOCK_ITEM.get());
+                output.accept(PUZZLE_TRAP_ITEM.get());
                 output.accept(RELIC_ALTAR_ITEM.get());
                 output.accept(WAR_DRUM_ITEM.get());
                 output.accept(DUNGEON_KEY.get());

@@ -48,10 +48,10 @@ public class BossRosterTests {
     public static void eachTierHasItsBoss(GameTestHelper helper) {
         RandomSource random = RandomSource.create(1);
         for (int i = 0; i < 20; i++) {
-            helper.assertTrue(DungeonBosses.pick(1, DungeonFactions.UNDEAD, random).equals(DungeonBosses.ZOMBIE_LORD), "undead tier 1: the Zombie Lord");
-            helper.assertTrue(DungeonBosses.pick(2, DungeonFactions.UNDEAD, random).equals(DungeonBosses.SKELETON_LORD), "undead tier 2: the Skeleton Lord");
-            helper.assertTrue(DungeonBosses.pick(3, DungeonFactions.UNDEAD, random).equals(DungeonBosses.BARROW_KING), "undead tier 3: the Barrow King");
-            helper.assertTrue(DungeonBosses.pick(4, DungeonFactions.UNDEAD, random).equals(irons() ? DungeonBosses.LICH_LORD : DungeonBosses.BARROW_KING),
+            helper.assertTrue(BossPicks.own(1, DungeonFactions.UNDEAD, random).equals(DungeonBosses.ZOMBIE_LORD), "undead tier 1: the Zombie Lord");
+            helper.assertTrue(BossPicks.own(2, DungeonFactions.UNDEAD, random).equals(DungeonBosses.SKELETON_LORD), "undead tier 2: the Skeleton Lord");
+            helper.assertTrue(BossPicks.own(3, DungeonFactions.UNDEAD, random).equals(DungeonBosses.BARROW_KING), "undead tier 3: the Barrow King");
+            helper.assertTrue(BossPicks.own(4, DungeonFactions.UNDEAD, random).equals(irons() ? DungeonBosses.LICH_LORD : DungeonBosses.BARROW_KING),
                     "undead tier 4: the Lich Lord (or the Barrow King without Iron's Spells)");
         }
         helper.succeed();
@@ -68,7 +68,7 @@ public class BossRosterTests {
             }
             String faction = DungeonFactions.pick(1, random, List.of(DungeonFactions.UNDEAD, DungeonFactions.GOBLINS));
             tierOne.add(faction);
-            String boss = DungeonBosses.pick(1, faction, random);
+            String boss = BossPicks.own(1, faction, random);
             helper.assertTrue(faction.equals(DungeonFactions.GOBLINS) ? boss.equals(DungeonBosses.GOBLIN_GLADIATOR) : boss.equals(DungeonBosses.ZOMBIE_LORD),
                     "a tier 1 " + faction + " dungeon got the wrong boss: " + boss);
         }

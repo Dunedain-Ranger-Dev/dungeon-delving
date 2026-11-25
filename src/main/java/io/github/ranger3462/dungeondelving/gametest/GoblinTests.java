@@ -240,11 +240,11 @@ public class GoblinTests {
     @GameTest(template = ANY_TEMPLATE)
     public static void goblinBossesGuardEachTier(GameTestHelper helper) {
         RandomSource random = RandomSource.create(2);
-        helper.assertTrue(DungeonBosses.pick(1, DungeonFactions.GOBLINS, random).equals(DungeonBosses.GOBLIN_GLADIATOR), "tier 1: the Gladiator");
-        helper.assertTrue(DungeonBosses.pick(3, DungeonFactions.GOBLINS, random).equals(DungeonBosses.HOBGOBLIN_VETERAN), "tier 3: the Veteran");
-        helper.assertTrue(DungeonBosses.pick(4, DungeonFactions.GOBLINS, random).equals(DungeonBosses.HOBGOBLIN_GENERAL), "tier 4: the General");
+        helper.assertTrue(BossPicks.own(1, DungeonFactions.GOBLINS, random).equals(DungeonBosses.GOBLIN_GLADIATOR), "tier 1: the Gladiator");
+        helper.assertTrue(BossPicks.own(3, DungeonFactions.GOBLINS, random).equals(DungeonBosses.HOBGOBLIN_VETERAN), "tier 3: the Veteran");
+        helper.assertTrue(BossPicks.own(4, DungeonFactions.GOBLINS, random).equals(DungeonBosses.HOBGOBLIN_GENERAL), "tier 4: the General");
         if (ModList.get().isLoaded("irons_spellbooks")) {
-            helper.assertTrue(DungeonBosses.pick(2, DungeonFactions.GOBLINS, random).equals("goblin_chief"), "tier 2: the Goblin Shaman Chief");
+            helper.assertTrue(BossPicks.own(2, DungeonFactions.GOBLINS, random).equals("goblin_chief"), "tier 2: the Goblin Shaman Chief");
         }
         BlockPos pos = helper.absolutePos(new BlockPos(0, 1, 0)).above(100);
         LivingEntity gladiator = DungeonBosses.spawn(helper.getLevel(), pos, 1, -1, DungeonBosses.GOBLIN_GLADIATOR);

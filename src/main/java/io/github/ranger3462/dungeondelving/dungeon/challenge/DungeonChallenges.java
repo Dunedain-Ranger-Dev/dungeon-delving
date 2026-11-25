@@ -178,6 +178,9 @@ public final class DungeonChallenges {
         if (level.dimension() != DungeonDimension.DUNGEON || DungeonRegions.get().progress(region).isEmpty()) {
             return;
         }
+        if (PuzzleBosses.solved(level, lock)) {
+            return; // The boss room's puzzle, not a challenge room's.
+        }
         roomCleared(level, region, DungeonDimension.roomMinAt(lock), Vec3.atCenterOf(lock.above()),
                 Component.translatable("message.dungeondelving.puzzle_solved"));
     }

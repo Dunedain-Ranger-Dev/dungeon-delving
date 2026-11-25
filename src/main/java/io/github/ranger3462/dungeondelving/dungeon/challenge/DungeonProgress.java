@@ -35,6 +35,8 @@ public final class DungeonProgress {
     private final Map<Long, Integer> relics = new HashMap<>();
     /** Wave defense rooms not yet beaten, by room. */
     private final Map<Long, WaveRoom> waveRooms = new HashMap<>();
+    /** The boss room's puzzle, for a puzzle boss ({@link PuzzleBosses}); empty otherwise. */
+    private CompoundTag bossPuzzle = new CompoundTag();
 
     public DungeonProgress(int tier, int keysNeeded, List<BlockPos> door, BlockPos bossSpawn) {
         this(tier, DungeonBosses.BARROW_KING, keysNeeded, door, bossSpawn);
@@ -209,6 +211,11 @@ public final class DungeonProgress {
         return waveRooms;
     }
 
+    /** The boss room's puzzle state ({@link PuzzleBosses}); empty if the boss has none. Changes are saved with the progress. */
+    public CompoundTag bossPuzzle() {
+        return bossPuzzle;
+    }
+
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();
         tag.putInt("tier", tier);
@@ -252,6 +259,9 @@ public final class DungeonProgress {
             waves.add(entry);
         });
         tag.put("wave_rooms", waves);
+        if (!bossPuzzle.isEmpty()) {
+            tag.put("boss_puzzle", bossPuzzle.copy());
+        }
         return tag;
     }
 
@@ -284,6 +294,7 @@ public final class DungeonProgress {
             CompoundTag entry = (CompoundTag) entryTag;
             progress.waveRooms.put(entry.getLong("room"), WaveRoom.load(entry));
         }
+        progress.bossPuzzle = tag.getCompound("boss_puzzle").copy();
         return progress;
     }
 }

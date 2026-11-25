@@ -158,7 +158,7 @@ public class OrcTests {
             expected.put(3, "orc_lorekeeper");
         }
         for (var entry : expected.entrySet()) {
-            String boss = DungeonBosses.pick(entry.getKey(), DungeonFactions.ORCS, random);
+            String boss = BossPicks.own(entry.getKey(), DungeonFactions.ORCS, random);
             helper.assertTrue(boss.equals(entry.getValue()), "tier " + entry.getKey() + " orc dungeons should be guarded by " + entry.getValue()
                     + ", got " + boss);
             helper.assertTrue(helper.getLevel().getServer().reloadableRegistries().getLootTable(DungeonBosses.lootTable(boss, entry.getKey()))

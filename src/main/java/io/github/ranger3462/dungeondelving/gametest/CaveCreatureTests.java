@@ -59,19 +59,19 @@ public class CaveCreatureTests {
     public static void eachCaveFactionHasItsBossByTier(GameTestHelper helper) {
         RandomSource random = RandomSource.create(3);
         if (irons()) {
-            helper.assertTrue(DungeonBosses.pick(1, DungeonFactions.SPIDERS, random).equals("spider_queen"), "spiders, tier 1: the Spider Queen");
-            helper.assertTrue(DungeonBosses.pick(2, DungeonFactions.SPIDERS, random).equals("cave_spider_queen"), "spiders, tier 2: the Cave Spider Queen");
-            helper.assertTrue(DungeonBosses.pick(3, DungeonFactions.SPIDERS, random).equals("ice_spider_queen"), "spiders, tier 3: the Ice Spider Queen");
+            helper.assertTrue(BossPicks.own(1, DungeonFactions.SPIDERS, random).equals("spider_queen"), "spiders, tier 1: the Spider Queen");
+            helper.assertTrue(BossPicks.own(2, DungeonFactions.SPIDERS, random).equals("cave_spider_queen"), "spiders, tier 2: the Cave Spider Queen");
+            helper.assertTrue(BossPicks.own(3, DungeonFactions.SPIDERS, random).equals("ice_spider_queen"), "spiders, tier 3: the Ice Spider Queen");
             helper.assertFalse(DungeonBosses.guards(DungeonFactions.SPIDERS, 4), "spiders don't hold tier 4");
         }
         if (iceAndFire()) {
-            helper.assertTrue(DungeonBosses.pick(2, DungeonFactions.FOREST_TROLLS, random).equals("forest_troll_king"), "forest trolls, tier 2");
-            helper.assertTrue(DungeonBosses.pick(3, DungeonFactions.FROST_TROLLS, random).equals("frost_troll_king"), "frost trolls, tier 3");
-            helper.assertTrue(DungeonBosses.pick(3, DungeonFactions.MOUNTAIN_TROLLS, random).equals("mountain_troll_king"), "mountain trolls, tier 3");
-            helper.assertTrue(DungeonBosses.pick(3, DungeonFactions.MYTHICAL_BEASTS, random).equals("hydra"), "mythical beasts, tier 3: the Hydra");
-            helper.assertTrue(DungeonBosses.pick(3, DungeonFactions.KOBOLDS, random).equals("wyrmling_nest")
-                    && DungeonBosses.pick(4, DungeonFactions.KOBOLDS, random).equals("wyrmling_nest"), "kobolds, tiers 3 and 4: the Wyrmling Nest");
-            helper.assertTrue(DungeonBosses.pick(1, DungeonFactions.KOBOLDS, random).equals(DungeonBosses.KOBOLD_PACKMASTER), "kobolds, tier 1: still the Packmaster");
+            helper.assertTrue(BossPicks.own(2, DungeonFactions.FOREST_TROLLS, random).equals("forest_troll_king"), "forest trolls, tier 2");
+            helper.assertTrue(BossPicks.own(3, DungeonFactions.FROST_TROLLS, random).equals("frost_troll_king"), "frost trolls, tier 3");
+            helper.assertTrue(BossPicks.own(3, DungeonFactions.MOUNTAIN_TROLLS, random).equals("mountain_troll_king"), "mountain trolls, tier 3");
+            helper.assertTrue(BossPicks.own(3, DungeonFactions.MYTHICAL_BEASTS, random).equals("hydra"), "mythical beasts, tier 3: the Hydra");
+            helper.assertTrue(BossPicks.own(3, DungeonFactions.KOBOLDS, random).equals("wyrmling_nest")
+                    && BossPicks.own(4, DungeonFactions.KOBOLDS, random).equals("wyrmling_nest"), "kobolds, tiers 3 and 4: the Wyrmling Nest");
+            helper.assertTrue(BossPicks.own(1, DungeonFactions.KOBOLDS, random).equals(DungeonBosses.KOBOLD_PACKMASTER), "kobolds, tier 1: still the Packmaster");
             helper.assertFalse(DungeonBosses.guards(DungeonFactions.KOBOLDS, 2), "kobolds don't hold tier 2");
         }
         helper.succeed();

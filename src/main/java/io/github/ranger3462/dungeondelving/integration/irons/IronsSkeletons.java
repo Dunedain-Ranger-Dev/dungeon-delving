@@ -3,6 +3,7 @@ package io.github.ranger3462.dungeondelving.integration.irons;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.challenge.DungeonBosses;
+import io.github.ranger3462.dungeondelving.dungeon.challenge.PuzzleBosses;
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import io.github.ranger3462.dungeondelving.registry.ModRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -26,6 +27,8 @@ public final class IronsSkeletons {
     public static DeferredHolder<EntityType<?>, EntityType<LichLord>> LICH_LORD;
     public static DeferredItem<DeferredSpawnEggItem> LICH_LORD_SPAWN_EGG;
     public static final String LICH_LORD_ID = "lich_lord";
+    public static DeferredHolder<EntityType<?>, EntityType<DwarfArchivist>> DWARF_ARCHIVIST;
+    public static DeferredItem<DeferredSpawnEggItem> DWARF_ARCHIVIST_SPAWN_EGG;
     /** Skeleton mages in the Barrow King's court. */
     public static final int BARROW_KING_MAGES = 1;
 
@@ -49,6 +52,12 @@ public final class IronsSkeletons {
         LICH_LORD_SPAWN_EGG = ModRegistries.ITEMS.registerItem("lich_lord_spawn_egg",
                 properties -> new DeferredSpawnEggItem(LICH_LORD, 0x8A7A55, 0x4A1E6A, properties));
         DungeonBosses.register(new DungeonBosses.BossType(LICH_LORD_ID, DungeonFactions.UNDEAD, tier -> tier == 4, LichLord::create));
+        DWARF_ARCHIVIST = ModEntities.ENTITIES.register(PuzzleBosses.ARCHIVIST,
+                () -> EntityType.Builder.of(DwarfArchivist::new, MobCategory.MONSTER).sized(0.6f, 1.95f).eyeHeight(1.74f)
+                        .clientTrackingRange(10).build(DungeonDelving.id(PuzzleBosses.ARCHIVIST).toString()));
+        DWARF_ARCHIVIST_SPAWN_EGG = ModRegistries.ITEMS.registerItem("undead_dwarf_archivist_spawn_egg",
+                properties -> new DeferredSpawnEggItem(DWARF_ARCHIVIST, 0x5A4A3A, 0xB08A3A, properties));
+        DungeonBosses.register(new DungeonBosses.BossType(PuzzleBosses.ARCHIVIST, DungeonFactions.UNDEAD, tier -> tier == 1, DwarfArchivist::create));
         // A mage behind the King, out past his knights.
         DungeonBosses.addRetinue(DungeonBosses.BARROW_KING,
                 (level, pos, tier) -> DungeonBosses.ring(level, pos, SKELETON_MAGE.get(), BARROW_KING_MAGES, 6.0, 0.5));
@@ -59,5 +68,6 @@ public final class IronsSkeletons {
         event.put(SKELETON_MAGE.get(), SkeletonMage.createAttributes().build());
         event.put(WITHER_SKELETON_MAGE.get(), WitherSkeletonMage.createAttributes().build());
         event.put(LICH_LORD.get(), LichLord.createAttributes().build());
+        event.put(DWARF_ARCHIVIST.get(), DwarfArchivist.createAttributes().build());
     }
 }

@@ -114,7 +114,7 @@ public class KoboldTests {
             helper.assertTrue(DungeonFactions.pick(2, random, withKobolds).equals(DungeonFactions.UNDEAD), "kobolds hold only tier 1 dungeons");
         }
         helper.assertTrue(tierOne.contains(DungeonFactions.KOBOLDS), "tier 1 dungeons should roll kobolds when they're on");
-        helper.assertTrue(DungeonBosses.pick(1, DungeonFactions.KOBOLDS, random).equals(DungeonBosses.KOBOLD_PACKMASTER), "the kobolds' boss is the Packmaster");
+        helper.assertTrue(BossPicks.own(1, DungeonFactions.KOBOLDS, random).equals(DungeonBosses.KOBOLD_PACKMASTER), "the kobolds' boss is the Packmaster");
         Set<String> mobs = new HashSet<>();
         for (int i = 0; i < 200; i++) {
             SpawnerMobs.pick(helper.getLevel(), random, DungeonFactions.mobs(DungeonFactions.KOBOLDS), 1)

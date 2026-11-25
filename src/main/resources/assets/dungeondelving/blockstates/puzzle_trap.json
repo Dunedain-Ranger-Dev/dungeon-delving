@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "dungeondelving:block/puzzle_trap"
+    },
+    "powered=true": {
+      "model": "dungeondelving:block/puzzle_trap_powered"
+    }
+  }
+}
