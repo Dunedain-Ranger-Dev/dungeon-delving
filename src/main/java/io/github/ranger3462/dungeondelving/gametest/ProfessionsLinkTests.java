@@ -1,22 +1,30 @@
 package io.github.ranger3462.dungeondelving.gametest;
 
 import io.github.ranger3462.ddprofessions.ProfessionsAndSkills;
+import io.github.ranger3462.ddprofessions.forging.Crafts;
 import io.github.ranger3462.ddprofessions.skill.ActivitySkills;
 import io.github.ranger3462.dungeondelving.DungeonDelving;
+import io.github.ranger3462.dungeondelving.dungeon.DungeonFactions;
 import io.github.ranger3462.dungeondelving.dungeon.DungeonMarkers;
+import io.github.ranger3462.dungeondelving.dungeon.Overgrowth;
 import io.github.ranger3462.dungeondelving.integration.professions.ProfessionsLink;
 import io.github.ranger3462.dungeondelving.registry.DungeonOre;
 import io.github.ranger3462.dungeondelving.registry.ModEntities;
 import io.github.ranger3462.dungeondelving.workshop.RunicWorkshop;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -25,7 +33,7 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 /**
  * Dungeon Delving with Professions and Skills (DD-107): our ores count as ores for its skills and races, our metals fill
  * its tier metal tags, its borax turns up in our dungeons, our bosses drop its tomes, our spear trains its Polearms,
- * and only dungeon mobs get a dungeon level. Each check needs Professions and Skills, so passes without it.
+ * only dungeon mobs get a dungeon level, and its rarer materials come from our dungeons. Each check needs Professions and Skills, so passes without it.
  */
 @GameTestHolder(DungeonDelving.MODID)
 @PrefixGameTestTemplate(false)
@@ -88,6 +96,48 @@ public class ProfessionsLinkTests {
         Zombie zombie = EntityType.ZOMBIE.create(helper.getLevel());
         helper.assertTrue(ProfessionsLink.dungeonLevel(zombie, 3).isEmpty(), "a zombie outside a dungeon keeps its own level");
         zombie.discard();
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void koboldsAndCastersDropMaterials(GameTestHelper helper) {
+        if (!professions()) {
+            helper.succeed();
+            return;
+        }
+        var looter = ModEntities.KOBOLD_LOOTER.get();
+        helper.assertTrue(ProfessionsLink.material(looter, 1, DungeonFactions.KOBOLDS).isEmpty(), "nothing from tier 1");
+        helper.assertTrue(ProfessionsLink.material(looter, 3, DungeonFactions.KOBOLDS).filter(Crafts.EMBERROOT.get()::equals).isPresent(),
+                "kobolds drop Emberroot from tier 2");
+        BuiltInRegistries.ENTITY_TYPE.getOptional(DungeonDelving.id("wither_skeleton_mage")).ifPresent(mage -> // with Iron's Spells
+                helper.assertTrue(ProfessionsLink.material(mage, 4, DungeonFactions.UNDEAD).filter(Crafts.ARCANE_DUST.get()::equals).isPresent(),
+                        "casters drop Arcane Dust from tier 2"));
+        helper.assertTrue(ProfessionsLink.material(EntityType.ZOMBIE, 4, DungeonFactions.UNDEAD).isEmpty(), "other mobs drop neither");
+        helper.succeed();
+    }
+
+    @GameTest(template = ANY_TEMPLATE)
+    public static void barrowmossGrowsInUndeadDungeons(GameTestHelper helper) {
+        if (!professions()) {
+            helper.succeed();
+            return;
+        }
+        var level = helper.getLevel();
+        BlockPos min = helper.absolutePos(new BlockPos(0, 1, 0)), max = min.offset(6, 5, 6);
+        BoundingBox room = BoundingBox.fromCorners(min, max);
+        for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
+            boolean wall = pos.getX() == min.getX() || pos.getX() == max.getX() || pos.getY() == min.getY() || pos.getY() == max.getY()
+                    || pos.getZ() == min.getZ() || pos.getZ() == max.getZ();
+            level.setBlock(pos, (wall ? Blocks.STONE : Blocks.AIR).defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        helper.assertTrue(Overgrowth.grow(level, room, RandomSource.create(3), DungeonFactions.GOBLINS, 4) == 0, "nothing grows for goblins");
+        helper.assertTrue(Overgrowth.maybeGrow(level, room, RandomSource.create(3), 1, DungeonFactions.UNDEAD) == 0, "nor at tier 1");
+        int grown = Overgrowth.grow(level, room, RandomSource.create(3), DungeonFactions.UNDEAD, 4);
+        long patches = BlockPos.betweenClosedStream(min, max).filter(pos -> level.getBlockState(pos).is(Crafts.BARROWMOSS_PATCH.get())).count();
+        for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+        helper.assertTrue(grown == 4 && patches == 4, "four patches of Barrowmoss grew on the walls: " + grown + ", found " + patches);
         helper.succeed();
     }
 }
