@@ -114,6 +114,7 @@ public final class DungeonMarkers {
                 SpawnerWaves.mark(level, info.pos(), rolls.tier());
             }
         }
+        Overgrowth.maybeGrow(level, template.getBoundingBox(settings, pos), random, rolls.tier(), rolls.faction());
     }
 
     /** Resolves one marker block at a position, as if it were the only one in its room. */

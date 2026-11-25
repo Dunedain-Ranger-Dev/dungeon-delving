@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    {
+      "id": "ddprofessions:barrowmoss_patch",
+      "required": false
+    }
+  ]
+}
